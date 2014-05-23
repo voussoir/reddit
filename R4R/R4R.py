@@ -10,7 +10,7 @@ USERNAME  = ""
 PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
-#This is a short description of what the bot does. For example "Newsletter bot"
+#This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "penpals+dirtypenpals+kikpals+dirtykikpals+r4r+dirtyr4r+MakeNewFriendsHere"
 SUBLIST = ['penpals','dirtypenpals','r4r','dirtyr4r','kikpals','dirtykikpals','makenewfriendshere','needafriend']
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."

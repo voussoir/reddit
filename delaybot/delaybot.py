@@ -6,13 +6,13 @@ import datetime
 import sqlite3
 
 
-USERNAME = "throowiebot"
+USERNAME = ""
 #This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD = "throw"
+PASSWORD = ""
 #This is the bot's Password. 
-USERAGENT = "throowiebot experiment by /u/throowie"
-#This is a short description of what the bot does. For example "/r/pkmntcgtrades post limit bot"
-SUBREDDIT = "throowie"
+USERAGENT = ""
+#This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter Bot"
+SUBREDDIT = ""
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 MAXPOSTS = 30
 #This is how many posts you want to retreieve all at once. Max 100, but you won't need that many.

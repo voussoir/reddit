@@ -7,7 +7,7 @@ from tkinter.ttk import Frame, Button, Style, Label
 
 '''This is the only thing you need to edit'''  
 USERAGENT = ""
-#This is a short description of what the bot does. For example "Newsletter bot"
+#This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 
 
 

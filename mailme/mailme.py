@@ -1,21 +1,26 @@
 import praw # simple interface to the reddit API, also handles rate limiting of requests
 import time
-import os
-import sys
 import sqlite3
 
-''''USER CONFIGURATION'''
+'''USER CONFIGURATION'''
+
 USERNAME  = ""
 #This is the bot's Username. In order to send mail, he must have some amount of Karma.
 PASSWORD  = ""
 #This is the bot's Password. 
+RECIPIENT = ""
+#The username that will receive this notification. It can be the same as USERNAME if you want to
+MTITLE = ""
+#This will be the title of the PM that you get
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = ""
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-MAXPOSTS = 10
-#This is how many posts you want to retreieve all at once. Max 100, but you don't always need that many.
-WAIT = 600
+PARENTSTRING = ['phrase 1', 'phrase 2', 'phrase 3', 'phrase 4']
+#These are the words that you are looking for
+MAXPOSTS = 100
+#This is how many posts you want to retreieve all at once. Max 100, but your subs probably don't get 100 posts per minute.
+WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
 
@@ -24,7 +29,7 @@ WAIT = 600
 
 
 
-
+WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
     USERNAME = bot.getu()
@@ -32,14 +37,13 @@ try:
     USERAGENT = bot.geta()
 except ImportError:
     pass
-WAITS = str(WAIT)
+
 sql = sqlite3.connect('sql.db')
 print('Loaded SQL Database')
 cur = sql.cursor()
 
 cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
 print('Loaded Completed table')
-
 
 sql.commit()
 
@@ -49,23 +53,20 @@ r.login(USERNAME, PASSWORD)
 def scanSub():
     print('Searching '+ SUBREDDIT + '.')
     subreddit = r.get_subreddit(SUBREDDIT)
-    posts = subreddit.get_new(limit=MAXPOSTS)
+    posts = subreddit.get_comments(limit=MAXPOSTS)
     for post in posts:
-        ptitle = post.title
-        pauthor = post.author.name
         pid = post.id
+        pauthor = post.author.name
+        plink = post.permalink
+        print(pid)
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
         if not cur.fetchone():
             try:
                 cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
-                
-                titlesplit = ptitle.split()
-                for word in titlesplit:
-                    if len(word) > 1 and word[0] == '#':
-                        print(pid + ', ' + pauthor + ': ' + word)
-                        hashtag = word[1:]
-                        link = 'http://twitter.com/intent/tweet?button_hashtag=' + hashtag
-                        post.add_comment('[Use this hashtag!](' + link + ')')
+                pbody = post.body.lower()
+                if any(key.lower() in pbody for key in PARENTSTRING):
+                    print('Found ' + pid + ' by ' + pauthor)
+                    r.send_message(RECIPIENT, MTITLE, pauthor + ' has said one of your keywords.\n\n[Find it here.](' + plink + ')')
 
             except IndexError:
                 pass
