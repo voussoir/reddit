@@ -12,11 +12,12 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "karmaless"
+SUBREDDIT = ""
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
+MAXPOSTS = 100
+#This is how mnay posts you want to retrieve all at once. PRAW will download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
-WAITS = str(WAIT)
 
 '''All done!'''
 
@@ -25,6 +26,7 @@ WAITS = str(WAIT)
 
 
 
+WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
     USERNAME = bot.getu()
@@ -56,7 +58,7 @@ print('Loaded PM table')
 sql.commit()
 
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD) # necessary if your bot will talk to people
+r.login(USERNAME, PASSWORD)
 
 def countTable(table):
     cur.execute("SELECT * FROM '%s'" % table)
@@ -71,7 +73,7 @@ def countTable(table):
 def scanCom():
     print('Searching Comments.')
     subreddit = r.get_subreddit(SUBREDDIT)
-    comments = subreddit.get_comments(limit=200)
+    comments = subreddit.get_comments(limit=MAXPOSTS)
     for comment in comments:
         cur.execute('SELECT * FROM waiting WHERE ID="%s"' % comment.id)
         if not cur.fetchone():
