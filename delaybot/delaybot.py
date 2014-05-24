@@ -19,7 +19,7 @@ MAXPOSTS = 30
 #This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
-DELAY = 300
+DELAY = 518400
 #This is the time limit between a user's posts, IN SECONDS. 1h = 3600 || 12h = 43200 || 24h = 86400 || 144h = 518400
 WAITS = str(WAIT)
 
