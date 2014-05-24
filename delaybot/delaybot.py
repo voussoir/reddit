@@ -21,7 +21,6 @@ WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 DELAY = 518400
 #This is the time limit between a user's posts, IN SECONDS. 1h = 3600 || 12h = 43200 || 24h = 86400 || 144h = 518400
-WAITS = str(WAIT)
 
 '''All done!'''
 
@@ -30,6 +29,7 @@ WAITS = str(WAIT)
 
 
 
+WAITS = str(WAIT)
 sql = sqlite3.connect('sql.db')
 print('Loaded SQL Database')
 cur = sql.cursor()
