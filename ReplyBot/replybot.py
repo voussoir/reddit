@@ -13,7 +13,7 @@ USERAGENT = ""
 SUBREDDIT = "all"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 PARENTSTRING = ['phrase 1', 'phrase 2', 'phrase 3', 'phrase 4']
-#This is the word that you want to reply to
+#These are the words you are looking for
 REPLYSTRING = "Hi hungry, I'm dad"
 #This is the word you want to put in reply
 MAXPOSTS = 100

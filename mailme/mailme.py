@@ -9,7 +9,7 @@ USERNAME  = ""
 PASSWORD  = ""
 #This is the bot's Password. 
 RECIPIENT = ""
-#The username that will receive this notification. It can be the same as USERNAME if you want to
+#The username that will receive this PM. It can be the same as USERNAME if you want to
 MTITLE = ""
 #This will be the title of the PM that you get
 USERAGENT = ""
@@ -66,7 +66,7 @@ def scanSub():
                 pbody = post.body.lower()
                 if any(key.lower() in pbody for key in PARENTSTRING):
                     print('Found ' + pid + ' by ' + pauthor)
-                    r.send_message(RECIPIENT, MTITLE, pauthor + ' has said one of your keywords.\n\n[Find it here.](' + plink + ')')
+                    r.send_message(RECIPIENT, MTITLE, pauthor + ' has said one of your keywords.\n\n[Find it here.](' + plink + ')', captcha=None)
 
             except IndexError:
                 pass
