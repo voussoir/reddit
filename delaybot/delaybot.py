@@ -5,6 +5,7 @@ import time
 import datetime
 import sqlite3
 
+'''USER CONFIGURATION'''
 
 USERNAME = ""
 #This is the bot's Username. In order to send mail, he must have some amount of Karma.
@@ -21,6 +22,13 @@ WAIT = 20
 DELAY = 300
 #This is the time limit between a user's posts, IN SECONDS. 1h = 3600 || 12h = 43200 || 24h = 86400 || 144h = 518400
 WAITS = str(WAIT)
+
+'''All done!'''
+
+
+
+
+
 
 sql = sqlite3.connect('sql.db')
 print('Loaded SQL Database')
