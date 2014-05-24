@@ -1,4 +1,4 @@
-#This bot was written by /u/GoldenSights for /u/FourMakesTwoUNLESS
+#This bot was written by /u/GoldenSights for /u/FourMakesTwoUNLESS on behalf of /r/pkmntcgtrades
 
 import praw
 import time

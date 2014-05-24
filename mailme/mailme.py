@@ -19,7 +19,7 @@ SUBREDDIT = ""
 PARENTSTRING = ['phrase 1', 'phrase 2', 'phrase 3', 'phrase 4']
 #These are the words that you are looking for
 MAXPOSTS = 100
-#This is how many posts you want to retreieve all at once. Max 100, but your subs probably don't get 100 posts per minute.
+#This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
