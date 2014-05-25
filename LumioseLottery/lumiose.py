@@ -20,7 +20,7 @@ WAIT = 20
 DELAY = 86400
 #This is the time between Daily threads, IN SECONDS. 1h = 3600 || 12h = 43200 || 24h = 86400 || 144h = 518400
 #Obviously daily means 24h, but it's always nice to have configurability
-BODY = '[d]\n\nThis thread is for the days you draw a lucky number for which there is no matching OTN thread.\n\nPlease follow this commenting format^1:\n\n>My lucky number: #####\n\n>Time until midnight\n\n>My OTN thread\n\n>The Prize I wish to win\n\nThis way other players can check if a traded pokemon has the number.\n\nMay the odds be ever in your favor.\n\n^1: ^The ^last ^five ^characters ^of ^your ^first ^line ^should ^be ^your ^OTN ^only. ^Do ^NOT ^bolden, ^italicize, ^or ^otherwise ^mark ^it. ^Do ^not ^add ^puncutation ^to ^it'
+BODY = '[d]\n\nThis thread is for the days you draw a lucky number for which there is no matching OTN thread.\n\nPlease follow this commenting format^1\n\n>My lucky number: #####\n\n>Time until midnight\n\n>My OTN thread\n\n>The Prize I wish to win\n\nThis way other players can check if a traded pokemon has the number.\n\nMay the odds be ever in your favor.\n\n^1: ^The ^last ^five ^characters ^of ^your ^first ^line ^should ^be ^your ^OTN ^only. ^Do ^NOT ^bolden, ^italicize, ^or ^otherwise ^mark ^it. ^Do ^not ^add ^puncutation ^to ^it'
 #This is the body of Dailythreads. It follows reddit's usual markdown syntax where \n\n stars a new line
 NORESULTS = 'We have checked your lucky number against our database, but found no matches!'
 #This is what the bot says to you if your comment in Daily doesn't match any databased OTNs
