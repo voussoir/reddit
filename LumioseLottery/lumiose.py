@@ -195,4 +195,5 @@ while True:
 	except Exception as e:
 		print('An error has occured during daily:', e)
 	print('Running again in ' + WAITS + ' seconds.\n')
+	sql.commit()
 	time.sleep(WAIT)
