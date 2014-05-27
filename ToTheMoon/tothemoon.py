@@ -14,7 +14,7 @@ SUBREDDIT = "dogecoin"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 COMMENT = "to the mooonnn!! +/u/dogetipbot 4.12345678 doge verify"
 #This is the word you want to put in reply
-MAXPOSTS = 100
+MAXPOSTS = 20
 #This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
@@ -56,15 +56,14 @@ def scanSub():
             pauthor = post.author.name
         except AttributeError:
             pauthor = "[DELETED]"
+
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
         if not cur.fetchone():
-            try:
+            if post.score > 11:
                 cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
-                print('Tipping ' + pauthor + ' on thread ' + pid)
+                print('Tipping ' + pauthor + ' on thread ' + post.id)
                 post.add_comment(COMMENT)
 
-            except IndexError:
-                pass
     sql.commit()
 
 
