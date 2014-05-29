@@ -14,11 +14,11 @@ SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 RESPONSE = "I have detected some mobile links in your comment. Here are the non-mobile clickables:\n\n"
 #This is what the bot says right before all the fixed links
+MOBILES = ["http://m.", "http://en.m.", "http://i.reddit."]
 MAXPOSTS = 100
 #This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
-
 
 '''All done!'''
 
@@ -28,8 +28,8 @@ WAIT = 20
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getu()
-    PASSWORD = bot.getp()
+    USERNAME = bot.getuG()
+    PASSWORD = bot.getpG()
     USERAGENT = bot.geta()
 except ImportError:
     pass
@@ -63,13 +63,9 @@ def scanSub():
             pbody = post.body
             pbodysplit = pbody.split()
             for word in pbodysplit:
-                if 'http://m.' in word:
+                if any(mobile in word for mobile in MOBILES):
                     word = word.replace('http://m.', 'http://')
-                    corrections.append(word)
-                if 'http://i.reddit' in word:
                     word = word.replace('http://i.reddit', 'http://reddit')
-                    corrections.append(word)
-                if 'http://en.m.' in word:
                     word = word.replace('http://en.m.', 'http://en.')
                     corrections.append(word)
             if len(corrections) > 0:
