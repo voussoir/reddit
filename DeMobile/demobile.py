@@ -14,7 +14,7 @@ SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 RESPONSE = "I have detected some mobile links in your comment. Here are the non-mobile clickables:\n\n"
 #This is what the bot says right before all the fixed links
-MOBILES = ["http://m.", "http://en.m.", "http://i.reddit."]
+MOBILES = ["http://m.", "http://en.m.", "http://i.reddit.", "http://mobile."]
 #These are the different forms of mobile links. To handle each one, scroll down to line 70.
 MAXPOSTS = 100
 #This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
@@ -68,6 +68,7 @@ def scanSub():
                     word = word.replace('http://m.', 'http://')
                     word = word.replace('http://i.reddit', 'http://reddit')
                     word = word.replace('http://en.m.', 'http://en.')
+                    word = word.replace('http://mobile.', 'http://')
                     corrections.append(word)
             if len(corrections) > 0:
                 print(pid + ' by ' + pauthor + ': Fixed ' + str(len(corrections)) + ' links.')
