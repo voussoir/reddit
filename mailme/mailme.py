@@ -56,7 +56,10 @@ def scanSub():
     posts = subreddit.get_comments(limit=MAXPOSTS)
     for post in posts:
         pid = post.id
-        pauthor = post.author.name
+        try:
+            pauthor = post.author.name
+        except AttributeError:
+            pauthor = '[DELETED]'
         plink = post.permalink
         print(pid)
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)

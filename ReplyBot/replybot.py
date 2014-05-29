@@ -54,7 +54,10 @@ def scanSub():
     posts = subreddit.get_comments(limit=MAXPOSTS)
     for post in posts:
         pid = post.id
-        pauthor = post.author.name
+        try:
+            pauthor = post.author.name
+        except AttributeError:
+            pauthor = '[DELETED]'
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
         if not cur.fetchone():
             cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
