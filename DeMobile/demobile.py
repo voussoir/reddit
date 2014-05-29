@@ -10,12 +10,10 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "all"
+SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-PARENTSTRING = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
-#These are the words you are looking for
-REPLYSTRING = "Hi hungry, I'm dad"
-#This is the word you want to put in reply
+RESPONSE = "I have detected some mobile links in your comment. Here are the non-mobile clickables:\n\n"
+#This is what the bot says right before all the fixed links
 MAXPOSTS = 100
 #This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
 WAIT = 20
@@ -53,15 +51,33 @@ def scanSub():
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_comments(limit=MAXPOSTS)
     for post in posts:
+        corrections = []
         pid = post.id
-        pauthor = post.author.name
+        try:
+            pauthor = post.author.name
+        except AttributeError:
+            pauthor = '[DELETED]'
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
         if not cur.fetchone():
             cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
-            pbody = post.body.lower()
-            if any(key.lower() in pbody for key in PARENTSTRING):
-                print('Replying to ' + pid + ' by ' + pauthor)
-                post.reply(REPLYSTRING)
+            pbody = post.body
+            pbodysplit = pbody.split()
+            for word in pbodysplit:
+                if 'http://m.' in word:
+                    word = word.replace('http://m.', 'http://')
+                    corrections.append(word)
+                if 'http://i.reddit' in word:
+                    word = word.replace('http://i.reddit', 'http://reddit')
+                    corrections.append(word)
+                if 'http://en.m.' in word:
+                    word = word.replace('http://en.m.', 'http://en.')
+                    corrections.append(word)
+            if len(corrections) > 0:
+                print(pid + ' by ' + pauthor + ': Fixed ' + str(len(corrections)) + ' links.')
+                f = '\n\n'.join(corrections)
+                post.reply(RESPONSE + f)
+
+
     sql.commit()
 
 
