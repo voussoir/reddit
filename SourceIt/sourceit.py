@@ -19,9 +19,9 @@ MAXPOSTS = 30
 #This is how many posts you want to retreieve all at once. PRAW can download 100 at a time.
 WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
-DELAY = 300
+DELAY = 30
 #This is the time, IN SECONDS, the user has to make his comment. If he does not have a root comment by this time, post is removed.
-MESSAGE = "You have not made a root comment on your post within the timelimit. Your post has been removed. Contact the moderators if you believe this was done in error"
+MESSAGE = "You have not made a comment within the timelimit. Your post has been removed. Contact the moderators if you believe this was done in error"
 #This is what the bot tells you when your post gets removed. Uses reddit's usual Markdown formatting
 IGNOREMODS = False
 #Do you want the bot to ignore posts made by moderators? Use True or False (With capitals! No quotations!)
@@ -95,7 +95,7 @@ def scan():
 				difference = curtime - ptime
 				if difference > DELAY:
 					print(pid + ', ' + pauthor + ': Finding comments')
-					comments = post.comments
+					comments = praw.helpers.flatten_tree(post.comments)
 					for comment in comments:
 						try:
 							cauthor = comment.author.name
