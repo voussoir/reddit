@@ -12,10 +12,8 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-PARENTSTRING = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
+PARENTSTRING = ["don't quote me", "dont quote me"]
 #These are the words you are looking for
-REPLYSTRING = "Hi hungry, I'm dad"
-#This is the word you want to put in reply
 MAXPOSTS = 100
 #This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
 WAIT = 20
@@ -30,9 +28,9 @@ WAIT = 20
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getu()
-    PASSWORD = bot.getp()
-    USERAGENT = bot.geta()
+    USERNAME = bot.getuG()
+    PASSWORD = bot.getpG()
+    USERAGENT = bot.getaG()
 except ImportError:
     pass
 
@@ -54,22 +52,25 @@ def scanSub():
     posts = subreddit.get_comments(limit=MAXPOSTS)
     for post in posts:
         pid = post.id
-        try:
-            pauthor = post.author.name
-        except AttributeError:
-            pauthor = '[DELETED]'
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
-        if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
-            pbody = post.body.lower()
-            if any(key.lower() in pbody for key in PARENTSTRING):
-                print('Replying to ' + pid + ' by ' + pauthor)
-                post.reply(REPLYSTRING)
+        pbody = post.body
+        pbody = pbody.replace('\n\n', '\n\n>')
+        if any(key.lower() in pbody.lower() for key in PARENTSTRING):
+            cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+            if not cur.fetchone():
+                cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
+                try:
+                    pauthor = post.author.name
+                    if pauthor != USERNAME:
+                        response = ">" + pbody + "\n\n- /u/" + pauthor
+                        print('Replying to ' + pid + ' by ' + pauthor)
+                        post.reply(response)
+                except AttributeError:
+                    print('Author deleted. Ignoring comment')
     sql.commit()
-
 
 while True:
     scanSub()
     print('Running again in ' + WAITS + ' seconds \n')
     sql.commit()
     time.sleep(WAIT)
+ 
