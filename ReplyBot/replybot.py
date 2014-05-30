@@ -69,7 +69,10 @@ def scanSub():
 
 
 while True:
-    scanSub()
+    try:
+        scanSub()
+    except Exception as e:
+        print('An error has occured:', e)
     print('Running again in ' + WAITS + ' seconds \n')
     sql.commit()
     time.sleep(WAIT)

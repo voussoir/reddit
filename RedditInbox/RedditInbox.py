@@ -69,22 +69,23 @@ class Example(Frame):
 
 
     def login(self, username, password):
-        print('U: ' + username)
+        #print('U: ' + username)
         self.username = username
         if username == '':
-            print('Please enter a username')
+            #print('Please enter a username')
             self.entryUsername.focus_set()
         elif password == '':
-            print('Please enter a password')
+            #print('Please enter a password')
             self.entryPassword.set_focus()
             
         if username != '' and password != '':
-            print('Attempting login for ' + username)
+            #print('Attempting login for ' + username)
             try:
                 self.USERAGENT = username + ' scans his inbox for new mail.'
                 self.r = praw.Reddit(self.USERAGENT)
+                #self.r.config._ssl_url = None
                 self.r.login(username, password)
-                print('You have logged in as ' + username)
+                #print('You have logged in as ' + username)
                 self.labelU.grid_forget()
                 self.labelP.grid_forget()
                 self.entryUsername.grid_forget()
@@ -98,35 +99,40 @@ class Example(Frame):
                 self.playedSound = 'false'
                 self.loop()
             except praw.errors.InvalidUserPass:
-                print('Invalid username or password')
+                pass
+                #print('Invalid username or password')
 
     def loop(self):
-        print('Starting new search')
-        hasmail = 'false'
-        for msg in self.r.get_unread(limit=None):
-            hasmail = 'true'
-        
-        if hasmail == 'true':
-            print("You've got mail!")
-            if self.playedSound == 'false':
-                winsound.PlaySound('pop.wav', winsound.SND_FILENAME)
-            self.playedSound = 'true'
-            self.labelGray.grid_forget()
-            self.labelRed.grid(row=2, column=0)
-        if hasmail == 'false':
-            self.playedSound = 'false'
-            print('No mail!')
-            self.labelRed.grid_forget()
-            self.labelGray.grid(row=2, column=0)
-        self.user = self.r.get_redditor(self.username)
-        lkarma = str(self.user.link_karma)
-        ckarma = str(self.user.comment_karma)
-        lkarma = self.karmaRound(lkarma)
-        ckarma = self.karmaRound(ckarma)
-        karmastring = lkarma + ' • ' + ckarma
-        self.labelKarma.config(text = karmastring)
+        while True:
+            try:
+                #print('Starting new search')
+                hasmail = 'false'
+                for msg in self.r.get_unread(limit=None):
+                    hasmail = 'true'
+                
+                if hasmail == 'true':
+                    #print("You've got mail!")
+                    if self.playedSound == 'false':
+                        winsound.PlaySound('pop.wav', winsound.SND_FILENAME)
+                    self.playedSound = 'true'
+                    self.labelGray.grid_forget()
+                    self.labelRed.grid(row=2, column=0)
+                if hasmail == 'false':
+                    self.playedSound = 'false'
+                    #print('No mail!')
+                    self.labelRed.grid_forget()
+                    self.labelGray.grid(row=2, column=0)
+                self.user = self.r.get_redditor(self.username)
+                lkarma = str(self.user.link_karma)
+                ckarma = str(self.user.comment_karma)
+                lkarma = self.karmaRound(lkarma)
+                ckarma = self.karmaRound(ckarma)
+                karmastring = lkarma + ' • ' + ckarma
+                self.labelKarma.config(text = karmastring)
+                time.sleep(10)
+            except Exception:
+                time.sleep(10)
 
-        self.after(10000, lambda: self.loop())
 
     def karmaRound(self, karma):
         if len(karma) > 4 and len(karma) < 7:
