@@ -124,10 +124,9 @@ def scan():
 
 
 while True:
-	scan()
-	#try:
-	#	scan()
-	#except Exception as e:
-	#	print('An error has occured:', e)
+	try:
+		scan()
+	except Exception as e:
+		print('An error has occured:', e)
 	print('Running again in ' + WAITS + ' seconds.\n')
 	time.sleep(WAIT)
