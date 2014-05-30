@@ -20,7 +20,7 @@ MAXPOSTS = 30
 WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 DELAY = 300
-#This is the time, IN SECONDS, the user has to make his comment. If he does not have a root comment by this time, post is removed.
+#This is the time, IN SECONDS, the user has to make his comment. If he does not have a source by this time, post is removed.
 MESSAGE = "You have not made a comment within the timelimit. Your post has been removed. Contact the moderators if you believe this was done in error"
 #This is what the bot tells you when your post gets removed. Uses reddit's usual Markdown formatting
 IGNOREMODS = False
