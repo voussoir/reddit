@@ -30,9 +30,9 @@ WAIT = 10
 
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getu()
-    PASSWORD = bot.getp()
-    USERAGENT = bot.geta()
+    USERNAME = bot.getuN()
+    PASSWORD = bot.getpN()
+    USERAGENT = bot.getaN()
 except ImportError:
     pass
 WAITS = str(WAIT)
