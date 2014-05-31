@@ -19,7 +19,7 @@ FOOTER = "[In operating Newsletterly](http://redd.it/26xset)"
 #This will be the footer of every message sent by the bot.
 MAXPOSTS = 100
 #This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
-WAIT = 10
+WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
 '''All done!'''
@@ -55,6 +55,7 @@ r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
 def updateSubs():
+    print('Updating subscriptions.')
     global SUBREDDIT
     sublist = []
     cur.execute('SELECT * FROM subscribers')
@@ -98,8 +99,12 @@ def scanSub():
                     print('\t' + post.id)
                     result.append(post.permalink)
         if len(result) > 0:
-            result.append('___\n\n' + FOOTER)
-            r.send_message(user, TITLE, 'Your subscribed subreddits have had some new posts: \n\n' + '\n\n'.join(result), captcha=None)
+            final = 'Your subscribed subreddits have had some new posts: \n\n' + '\n\n'.join(result)
+            final = final[:9900]
+            final = final + '\n\n___\n\n' + FOOTER
+            r.send_message(user, TITLE, final, captcha=None)
+        else:
+            print('\tNone')
     for post in subreddit.get_new(limit=MAXPOSTS):
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % post.id)
         if not cur.fetchone():
@@ -118,7 +123,10 @@ def scanPM():
         if len(bodysplit) <= 10:
             for line in bodysplit:
                 linesplit = line.split()
-                command = linesplit[0]
+                try:
+                    command = linesplit[0]
+                except Exception:
+                    command = 'null'
                 args = []
                 try:
                     linesplit = linesplit[1:]
@@ -141,7 +149,7 @@ def scanPM():
                                     result.append('You have registered in the Newsletter database to receive /r/' + arg)
                                 else:
                                     print(author + ' is already subscribed to ' + arg)
-                                    result.append('You are already registered in the Newsletter database to receive /r/' + arg + '. Maybe you meant to Unsubscribe or try a different subreddit')
+                                    result.append('You are already registered in the Newsletter database to receive /r/' + arg)
                             except Exception:
                                 print(author + ' attempted to subscribe to ' + arg + ' but failed.')
                                 result.append('We were unable to find any subreddit by the name of /r/' + arg + '. Please confirm that it is spelled correctly and is a public subreddit.')
@@ -159,7 +167,7 @@ def scanPM():
                                     result.append('You will no longer receive /r/' + arg)
                                 else:
                                     print(author + ' is not subscribed to ' + arg)
-                                    result.append('You are not registered in the Newsletter database to receive /r/' + arg + '. Maybe you meant to Subscribe or try a different subreddit')
+                                    result.append('You are not registered in the Newsletter database to receive /r/' + arg)
             
                 elif command == 'report':
                     print(author + ': report')
@@ -171,12 +179,16 @@ def scanPM():
                     if s == '':
                         s += 'None!'
                     result.append('You have requested a list of your Newsletter subscriptions.\n\n' + s)
+                elif command == 'null':
+                    print(author + ': null')
                 else:
                     result.append("The command '" + command + "' doesn't seem to comply with proper syntax")
                 result.append('\n\n_____')
                 sql.commit()
-            result.append(FOOTER)
-            r.send_message(author, TITLE, '\n\n'.join(result), captcha=None)
+            final =  '\n\n'.join(result)
+            final = final[:9900]
+            final = final + '\n\n____\n\n' + FOOTER
+            r.send_message(author, TITLE, final, captcha=None)
 
         else:
             r.send_message(author, 'Newsletteryly', 'Your message was too long.\n\n' + FOOTER)
@@ -187,8 +199,8 @@ def scanPM():
 
 
 while True:
-    #updateSubs()
     scanPM()
+    updateSubs()
     scanSub()
     print(str(countTable('subscribers')) + ' active subscriptions.')
     print('Running again in ' + WAITS + ' seconds \n')
