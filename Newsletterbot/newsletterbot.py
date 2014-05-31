@@ -13,9 +13,9 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "all"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-TITLE = "Newsletteryly"
+TITLE = "Newsletterly"
 #This is the title of every message sent by the bot.
-FOOTER = "[In operating BotBotBot](http://redd.it/26xset)"
+FOOTER = "[In operating Newsletterly](http://redd.it/26xset)"
 #This will be the footer of every message sent by the bot.
 MAXPOSTS = 100
 #This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
