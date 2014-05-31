@@ -14,11 +14,9 @@ RECIPIENT = ""
 #The username that will receive this PM. It can be the same as USERNAME if you want to
 MTITLE = ""
 #This will be the title of the PM that you get
-SUBREDDIT = ""
-#This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-PARENTSTRING = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
-#These are the words that you are looking for
-MAXPOSTS = 100
+REDDITORS = ["Unidan", "GoldenSights"]
+#This is the person or people you want to. Add or remove items from this list with commas serparating each.
+MAXPOSTS = 10
 #This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
@@ -51,25 +49,23 @@ r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
 def scanSub():
-    print('Searching '+ SUBREDDIT + '.')
-    subreddit = r.get_subreddit(SUBREDDIT)
-    posts = subreddit.get_comments(limit=MAXPOSTS)
-    for post in posts:
-        pid = post.id
-        try:
-            pauthor = post.author.name
-        except AttributeError:
-            pauthor = '[DELETED]'
-        plink = post.permalink
-        print(pid)
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
-        if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
-            pbody = post.body.lower()
-            if any(key.lower() in pbody for key in PARENTSTRING):
-                print('Found ' + pid + ' by ' + pauthor)
-                r.send_message(RECIPIENT, MTITLE, pauthor + ' has said one of your keywords.\n\n[Find it here.](' + plink + ')', captcha=None)
-
+    result = []
+    for REDDITOR in REDDITORS:
+        print('Searching '+ REDDITOR + '.')
+        redditor = r.get_redditor(REDDITOR)
+        posts = redditor.get_overview(limit=MAXPOSTS)
+        for post in posts:
+            pid = post.id
+            plink = post.permalink
+            cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+            if not cur.fetchone():
+                cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+                print('Found ' + pid + ' by ' + REDDITOR)
+                result.append(REDDITOR + ' has made a comment or post. [Find it here.](' + plink + ')')
+    if len(result) > 0:
+        r.send_message(RECIPIENT, MTITLE, '\n\n'.join(result), captcha=None)
+        print('Message sent')
+    
     sql.commit()
 
 
