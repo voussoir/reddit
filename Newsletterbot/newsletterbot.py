@@ -138,7 +138,7 @@ def scanPM():
                                 if not cur.fetchone():
                                     #print('New Subscriber: ' + author + ' to ' + arg)
                                     cur.execute('INSERT INTO subscribers VALUES("%s", "%s")' % (author, arg))
-                                    result.append('You have successfully registered in the Newsletter database to receive /r/' + arg)
+                                    result.append('You have registered in the Newsletter database to receive /r/' + arg)
                                 else:
                                     print(author + ' is already subscribed to ' + arg)
                                     result.append('You are already registered in the Newsletter database to receive /r/' + arg + '. Maybe you meant to Unsubscribe or try a different subreddit')
