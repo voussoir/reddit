@@ -152,7 +152,7 @@ def scanPM():
                                     result.append('You are already registered in the Newsletter database to receive /r/' + arg)
                             except Exception:
                                 print(author + ' attempted to subscribe to ' + arg + ' but failed.')
-                                result.append('We were unable to find any subreddit by the name of /r/' + arg + '. Please confirm that it is spelled correctly and is a public subreddit.')
+                                result.append('We were unable to find any subreddit by the name of /r/' + arg + '. Confirm that it is spelled correctly and is public.')
                 
                         if command == 'unsubscribe':
                             if arg == 'all':
@@ -183,11 +183,12 @@ def scanPM():
                     print(author + ': null')
                 else:
                     result.append("The command '" + command + "' doesn't seem to comply with proper syntax")
-                result.append('\n\n_____')
+                if command != 'null':
+                    result.append('\n\n_____')
                 sql.commit()
             final =  '\n\n'.join(result)
             final = final[:9900]
-            final = final + '\n\n____\n\n' + FOOTER
+            final = final + '\n\n' + FOOTER
             r.send_message(author, TITLE, final, captcha=None)
 
         else:
