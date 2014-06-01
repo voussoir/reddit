@@ -110,10 +110,10 @@ def scan():
 							sql.commit()
 							print('\t' + pauthor + "'s database info has been reset.")
 						else:
-							differences = str(DELAY - difference)
+							differences = '%.0f' % (DELAY - difference)
 							print('\tPost does not comply with timelimit guidelines. Author must wait ' + differences)
 							print('\t' + pauthor + "'s database info remains unchanged")
-							response = post.add_comment('You are posting here too frequently, so your post has been deleted. Please refer to the rule "Submit no more than one post per 7 days" in [the guidelines.](http://www.reddit.com/r/pkmntcgtrades/wiki/guidelines#wiki_rules)')
+							response = post.add_comment('You are posting here too frequently, so your post has been deleted. You may post again in ' + str(datetime.timedelta(seconds=float(differences))))
 							response.distinguish()
 							post.remove(spam=False)
 							time.sleep(5)
