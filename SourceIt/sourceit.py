@@ -25,6 +25,8 @@ MESSAGE = "You have not made a comment within the timelimit. Your post has been 
 #This is what the bot tells you when your post gets removed. Uses reddit's usual Markdown formatting
 IGNOREMODS = False
 #Do you want the bot to ignore posts made by moderators? Use True or False (With capitals! No quotations!)
+IGNORESELFPOST = True
+#Do you want the bot to ignore selfposts?
 '''All done!'''
 
 
@@ -54,7 +56,7 @@ Trying = True
 while Trying:
 	try:
 		r.login(USERNAME, PASSWORD)
-		print('Successfully logged in')
+		print('Successfully logged in\n')
 		Trying = False
 	except praw.errors.InvalidUserPass:
 		print('Wrong Username or Password')
@@ -91,34 +93,41 @@ def scan():
 
 		cur.execute('SELECT * FROM oldposts WHERE id="%s"' % pid)
 		if not cur.fetchone():
-			if pauthor not in mods or IGNOREMODS == False:
-				difference = curtime - ptime
-				if difference > DELAY:
-					print(pid + ', ' + pauthor + ': Finding comments')
-					comments = praw.helpers.flatten_tree(post.comments)
-					for comment in comments:
-						try:
-							cauthor = comment.author.name
-						except AttributeError:
-							cauthor = '[deleted]'
-						if cauthor == pauthor and found == False:
-							print('\tFound comment by OP')
-							found = True
-					if found == False:
-						print('\tComments were empty, or OP was not found. Post will be removed.')
-						response = post.add_comment(MESSAGE)
-						response.distinguish()
-						post.remove(spam=False)
-						print('\tPost removed')
-						time.sleep(5)
+			if post.is_self == False or IGNORESELFPOST == False:
+				if pauthor not in mods or IGNOREMODS == False:
+					difference = curtime - ptime
+					if difference > DELAY:
+						print(pid + ', ' + pauthor + ': Finding comments')
+						comments = praw.helpers.flatten_tree(post.comments)
+						for comment in comments:
+							try:
+								cauthor = comment.author.name
+							except AttributeError:
+								cauthor = '[deleted]'
+							if cauthor == pauthor and found == False:
+								print('\tFound comment by OP')
+								found = True
+						if found == False:
+							print('\tComments were empty, or OP was not found. Post will be removed.')
+							response = post.add_comment(MESSAGE)
+							response.distinguish()
+							post.remove(spam=False)
+							print('\tPost removed')
+							time.sleep(5)
 
+						cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+					else:
+						differences = str('%.0f' % (DELAY - difference))
+						print(pid + ', ' + pauthor + ': Still has ' + differences + 's.')
+				
+				if pauthor in mods and IGNOREMODS == True:
+					print(pid + ', ' + pauthor + ': Ignoring Moderator')
 					cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
 
-				else:
-					differences = str('%.0f' % (DELAY - difference))
-					print(pid + ', ' + pauthor + ': Still has ' + differences + 's.')
-			if pauthor in mods and IGNOREMODS == True:
+			if post.is_self == True and IGNORESELFPOST == True:
+				print(pid + ', ' + pauthor + ': Ignoring Selfpost')
 				cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+
 		sql.commit()
 
 
