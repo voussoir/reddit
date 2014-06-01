@@ -17,7 +17,7 @@ RESPONSE = "I have detected some mobile links in your comment. Here are the non-
 MOBILES = ["http://m.", "http://en.m.", "http://i.reddit.", "http://mobile."]
 #These are the different forms of mobile links. To handle each one, scroll down to line 70.
 MAXPOSTS = 100
-#This is how many posts you want to retrieve all at once. PRAW will download 100 at a time.
+#This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 

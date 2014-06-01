@@ -17,7 +17,7 @@ PARENTSTRING = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
 REPLYSTRING = "Hi hungry, I'm dad"
 #This is the word you want to put in reply
 MAXPOSTS = 100
-#This is how many posts you want to retrieve all at once. PRAW will download 100 at a time.
+#This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 

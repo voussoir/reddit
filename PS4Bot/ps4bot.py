@@ -14,7 +14,7 @@ USERAGENT = ""
 SUBREDDIT = ""
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 MAXPOSTS = 10
-#This is how many posts you want to retrieve all at once. PRAW will download 100 at a time.
+#This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 600
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 

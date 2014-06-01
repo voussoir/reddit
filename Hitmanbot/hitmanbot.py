@@ -8,7 +8,7 @@ USERNAME  = ""
 PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
-#This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
+#This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot".
 SUBREDDIT = "reddithitman"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 
