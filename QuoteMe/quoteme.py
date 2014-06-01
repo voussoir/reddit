@@ -15,7 +15,7 @@ SUBREDDIT = "GoldTesting"
 PARENTSTRING = ["don't quote me", "dont quote me"]
 #These are the words you are looking for
 MAXPOSTS = 100
-#This is how many posts you want to retreieve all at once. PRAW will download 100 at a time.
+#This is how many posts you want to retrieve all at once. PRAW will download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
