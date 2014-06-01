@@ -10,9 +10,9 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-RECIPIENT = ""
+RECIPIENT = "75000"
 #The username that will receive this PM. It can be the same as USERNAME if you want to
-MTITLE = ""
+MTITLE = "0"
 #This will be the title of the PM that you get
 REDDITORS = ["Unidan", "GoldenSights"]
 #This is the person or people you want to. Add or remove items from this list with commas serparating each.

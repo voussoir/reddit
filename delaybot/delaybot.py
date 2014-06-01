@@ -67,7 +67,10 @@ def scan():
 	subreddit = r.get_subreddit(SUBREDDIT)
 	posts = subreddit.get_new(limit=MAXPOSTS)
 	for post in posts:
-		pauthor = post.author.name
+		try:
+			pauthor = post.author.name
+		except Exception:
+			pauthor = '[deleted]'
 		pid = post.id
 		plink = post.short_link
 		ptime = post.created_utc
