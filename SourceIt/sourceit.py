@@ -1,7 +1,3 @@
-
-
-
-
 import praw
 import time
 import datetime
