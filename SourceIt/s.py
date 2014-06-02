@@ -1,7 +1,3 @@
-
-
-
-
 import praw
 import time
 import datetime
@@ -19,19 +15,15 @@ SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 MAXPOSTS = 30
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 20
+WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 DELAY = 300
 #This is the time, IN SECONDS, the user has to make his comment. If he does not have a source by this time, post is removed.
 MESSAGE = "You have not made a comment within the timelimit. Your post has been removed. Contact the moderators if you believe this was done in error"
 #This is what the bot tells you when your post gets removed. Uses reddit's usual Markdown formatting
-MINLENGTH = 50
-#The minimum length of a Source comment to count as valid. You can set this to 0 for any comment to be valid.
-TOOSHORT = "Your comment is pretty short. Might want to beef it up"
-#This is what gets replied when MINLENGTH is not met.
 IGNOREMODS = False
 #Do you want the bot to ignore posts made by moderators? Use True or False (With capitals! No quotations!)
-IGNORESELFPOST = False
+IGNORESELFPOST = True
 #Do you want the bot to ignore selfposts?
 '''All done!'''
 
@@ -42,12 +34,12 @@ IGNORESELFPOST = False
 
 WAITS = str(WAIT)
 try:
-	import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-	USERNAME = bot.getuG()
-	PASSWORD = bot.getpG()
-	USERAGENT = bot.getaG()
+    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
+    USERNAME = bot.getuG()
+    PASSWORD = bot.getpG()
+    USERAGENT = bot.getaG()
 except ImportError:
-	pass
+    pass
 
 sql = sqlite3.connect('sql.db')
 print('Loaded SQL Database')
@@ -89,47 +81,30 @@ def scan():
 	posts = subreddit.get_new(limit=MAXPOSTS)
 	for post in posts:
 		found = False
-		short = False
 		pid = post.id
 		try:
 			pauthor = post.author.name
 		except AttributeError:
 			pauthor = '[deleted]'
 		ptime = post.created_utc
-		curtime = getTime(True)		
-		
+		curtime = getTime(True)
+
 		cur.execute('SELECT * FROM oldposts WHERE id="%s"' % pid)
 		if not cur.fetchone():
 			if post.is_self == False or IGNORESELFPOST == False:
 				if pauthor not in mods or IGNOREMODS == False:
 					difference = curtime - ptime
-					
-					print(pid + ', ' + pauthor + ': Finding comments')
-					comments = praw.helpers.flatten_tree(post.comments)
-					for comment in comments:
-						cid = 't3_' + comment.id
-						try:
-							cauthor = comment.author.name
-						except AttributeError:
-							cauthor = '[deleted]'
-						if cauthor == pauthor and found == False:
-							print('\tFound comment by OP')
-							found = True
-							cbody = comment.body
-							clength = len(cbody)
-							if clength < MINLENGTH:
-								short = True
-								cur.execute('SELECT * FROM oldposts WHERE id="%s"' % cid)
-								if not cur.fetchone():
-									print('\tComment is too short. Replying...')
-									response = comment.reply(TOOSHORT)
-									response.distinguish()
-									cur.execute('INSERT INTO oldposts VALUES("%s")' % cid)
-								else:
-									print('\tOP has already been warned.')
-									
-					
-					if difference > DELAY:		 
+					if difference > DELAY:
+						print(pid + ', ' + pauthor + ': Finding comments')
+						comments = praw.helpers.flatten_tree(post.comments)
+						for comment in comments:
+							try:
+								cauthor = comment.author.name
+							except AttributeError:
+								cauthor = '[deleted]'
+							if cauthor == pauthor and found == False:
+								print('\tFound comment by OP')
+								found = True
 						if found == False:
 							print('\tComments were empty, or OP was not found. Post will be removed.')
 							response = post.add_comment(MESSAGE)
@@ -137,18 +112,11 @@ def scan():
 							post.remove(spam=False)
 							print('\tPost removed')
 							time.sleep(5)
-							
-						if found == True and short == True:
-							print('\tFound comment, but reporting for length')
-							post.report()
-						
-						if found == True and short == False:
-							print('\tComment is okay. Passing')
 
 						cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
 					else:
 						differences = str('%.0f' % (DELAY - difference))
-						print('\tStill has ' + differences + 's.')
+						print(pid + ', ' + pauthor + ': Still has ' + differences + 's.')
 				
 				if pauthor in mods and IGNOREMODS == True:
 					print(pid + ', ' + pauthor + ': Ignoring Moderator')
