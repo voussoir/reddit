@@ -6,7 +6,7 @@ When a user makes a post in the subreddit, he has a certain amount of time to pr
 [This](http://www.reddit.com/r/GoldTesting/comments/26wjq1/red/) post met the requirement. [This](http://www.reddit.com/r/GoldTesting/comments/26whfo/pyre/) one didn't.
 
 ________
-As of reddit 21, sourceit.py has received a major upgrade. The original for is available as s.py in case there are bugs in the new one.
+As of reddit 21, sourceit.py has received a major upgrade. The original is available as s.py in case there are bugs in the new one.
 
 **New Things**:
 
