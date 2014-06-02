@@ -34,7 +34,7 @@ SUBDUMP = False
 DSUB = "GoldTesting"
 #If SUBDUMP is set to true, you will need to choose a subreddit to submit to.
 
-MAXPOSTS = 10
+MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
