@@ -117,7 +117,7 @@ def scan():
 							found = True
 							cbody = comment.body
 							clength = len(cbody)
-							if clength < MINLENGTH:
+							if clength <= MINLENGTH:
 								short = True
 								cur.execute('SELECT * FROM oldposts WHERE id="%s"' % cid)
 								if not cur.fetchone():
