@@ -22,17 +22,17 @@ RSAVE = False
 MAILME = True
 #Do you want the bot to send you a PM when it gets something? Use True or False (Use capitals! No quotations!)
 RECIPIENT = "GoldenSights"
-#If MAILME is set to true, you will need a name for the PM to go to
+#If MAILME is set to True, you will need a name for the PM to go to
 MTITLE = "Great Comments of Exceptional Length"
-#If MAILME is set to true, you will need the PM to have a subject line.
+#If MAILME is set to True, you will need the PM to have a subject line.
 MHEADER = "Comments over " + str(THRESHOLD) + " characters in length:"
 #This is part of the message body, on a line above the list of results. You can set it to "" if you just want the list by itself.
 
 
 SUBDUMP = False
-#Do you want the bot to dump comments into a subreddit as posts?
+#Do you want the bot to dump into a subreddit as posts? Use True or False (Use capitals! No quotations!)
 DSUB = "GoldTesting"
-#If SUBDUMP is set to true, you will need to choose a subreddit to submit to.
+#If SUBDUMP is set to True, you will need to choose a subreddit to submit to.
 
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
