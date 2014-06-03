@@ -98,7 +98,7 @@ def scanSub():
         for m in range(len(result)):
             result[m] = '- [' + authors[m] + '](' + result[m] + ')'
         r.send_message(RECIPIENT, MTITLE, MHEADER + '\n\n' + '\n\n'.join(result), captcha=None)
-        print('Mailed ' + RECIPIENT)
+        print('\tMailed ' + RECIPIENT)
         
         cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
     sql.commit()
