@@ -92,7 +92,7 @@ def scanSub():
                     if SUBDUMP == True:
                         create = r.submit(DSUB, pauthor + ' in /r/' + post.submission.subreddit.display_name, url=plink, captcha = None)
                         print('\tDumped to ' + DSUB)
-                except IndexError:
+                except AttributeError:
                     print(pid + ': Author deleted. Ignoring comment')
     if len(result) > 0 and MAILME == True:
         for m in range(len(result)):
