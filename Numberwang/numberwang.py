@@ -1,6 +1,7 @@
 import praw # simple interface to the reddit API, also handles rate limiting of requests
 import time
 import sqlite3
+import string
 
 '''USER CONFIGURATION'''
 
@@ -23,8 +24,7 @@ WAIT = 20
 '''All done!'''
 
 
-
-
+PUNC = string.digits + string.punctuation
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
@@ -52,16 +52,14 @@ def scanSub():
     posts = subreddit.get_comments(limit=MAXPOSTS)
     for post in posts:
         pid = post.id
-        pbody = post.body
-        pnum = pbody[-5:]
+        pbodysplit = post.body.split()
+        pnum = pbodysplit[len(pbodysplit)-1]
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
         if not cur.fetchone():
-            try:
-                int(pnum)
+            if all(c in PUNC for c in pnum) and len(pnum) > 5:
                 print(pid + ": " + pnum + ' is Numberwang!')
                 post.reply(REPLYSTRING)
-            except ValueError:
-                pass
+            
     
         cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
     sql.commit()
