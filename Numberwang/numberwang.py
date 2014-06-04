@@ -24,6 +24,7 @@ WAIT = 20
 '''All done!'''
 
 
+NUMS = string.digits
 PUNC = string.digits + string.punctuation
 WAITS = str(WAIT)
 try:
@@ -56,9 +57,12 @@ def scanSub():
         pnum = pbodysplit[len(pbodysplit)-1]
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
         if not cur.fetchone():
-            if all(c in PUNC for c in pnum) and len(pnum) > 5:
-                print(pid + ": " + pnum + ' is Numberwang!')
-                post.reply(REPLYSTRING)
+            if all(c in PUNC for c in pnum) and len(pnum) >= 5:
+                if all(c in NUMS for c in pnum[:5]):
+                    print(pid + ": " + pnum + ' is Numberwang!')
+                    post.reply(REPLYSTRING)
+                else:
+                    print(pid + ' is not Numberwang.')
             
     
         cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
