@@ -61,33 +61,32 @@ def scanSub():
 				
 				break
 
-		if time.strftime("%A") in WEEKEND:
-			print('Weekend! Will not operate today.')
+		if time.strftime("%A") not in WEEKEND:
 
-		elif clist[0] == '*' + currentday:
-			print('Same day')
+			if clist[0] == '*' + currentday:
+				print('Same day')
+	
+			else:
+				clistfile.close()
+				print('New day')
+				print('Posting ' + current)
+				try:
+					r.submit(SUBREDDIT, str(time.strftime(TITLE.replace('_country_', current))), \
+					url=SUBMISSION.replace('_country_', current.replace(' ', '%20')), captcha=None)
+				except praw.errors.AlreadySubmitted:
+					print("\tThis has already been submitted.")
+				clist[0] = '*' + currentday
+				clist[currentm] = '*' + current
+				currentm += 1
+				current = clist[currentm]
+
+				clistfile = open(PRINTFILE, "w")
+				for item in clist:
+					print(item, file=clistfile)
+				print('Wrote file.')
 
 		else:
-			clistfile.close()
-			print('New day')
-			print('Posting ' + current)
-			try:
-				pass
-				#r.submit(SUBREDDIT, str(time.strftime(TITLE.replace('_country_', current))), url=SUBMISSION.replace('_country_', current.replace(' ', '%20')), captcha=None)
-			except praw.errors.AlreadySubmitted:
-				print("\tThis may have already been submitted.")
-			clist[0] = '*' + currentday
-			clist[currentm] = '*' + current
-			currentm += 1
-			current = clist[currentm]
-		
-
-
-			clistfile = open(PRINTFILE, "w")
-			for item in clist:
-				print(item, file=clistfile)
-			print('Wrote file.')
-
+			print('Weekend. Will not operate.')
 		print('Next country: ' + str(currentm) + ', ' + current)
 
 	else:
