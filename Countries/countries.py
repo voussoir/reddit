@@ -20,7 +20,7 @@ WAIT = 30
 PRINTFILE = "country_list.txt"
 #This is the file, in the same directory as the .py file, where the names are stored
 WEEKEND = ['Saturday', 'Sunday']
-#These are days that you don't want the bot to run. You can have any. Use proper capitalisation.
+#These are days that you don't want the bot to run. You can have anything you want in here. Use proper capitalisation.
 
 '''All done!'''
 
@@ -61,18 +61,19 @@ def scanSub():
 				
 				break
 
-		if clist[0] == '*' + currentday:
-			print('Same day')
-
 		if time.strftime("%A") in WEEKEND:
 			print('Weekend! Will not operate today.')
-	
+
+		elif clist[0] == '*' + currentday:
+			print('Same day')
+
 		else:
 			clistfile.close()
 			print('New day')
 			print('Posting ' + current)
 			try:
-				r.submit(SUBREDDIT, str(time.strftime(TITLE.replace('_country_', current))), url=SUBMISSION.replace('_country_', current.replace(' ', '%20')), captcha=None)
+				pass
+				#r.submit(SUBREDDIT, str(time.strftime(TITLE.replace('_country_', current))), url=SUBMISSION.replace('_country_', current.replace(' ', '%20')), captcha=None)
 			except praw.errors.AlreadySubmitted:
 				print("\tThis may have already been submitted.")
 			clist[0] = '*' + currentday
