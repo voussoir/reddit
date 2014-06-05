@@ -11,7 +11,7 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "all"
+SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 TITLE = "Newsletterly"
 #This is the title of every message sent by the bot.
@@ -19,7 +19,7 @@ FOOTER = "[In operating Newsletterly](http://redd.it/26xset)"
 #This will be the footer of every message sent by the bot.
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 20
+WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
 '''All done!'''
@@ -64,6 +64,7 @@ def updateSubs():
             sublist.append(sub[1])
     if len(sublist) > 0:
         SUBREDDIT = '+'.join(sublist)
+    return SUBREDDIT
 
 def countTable(table):
     cur.execute("SELECT * FROM '%s'" % table)
@@ -77,7 +78,7 @@ def countTable(table):
     return c
 
 def scanSub():
-    print('Searching '+ SUBREDDIT + '.')
+    print('Searching Subreddits.')
     subreddit = r.get_subreddit(SUBREDDIT)
     userlist = []
     cur.execute('SELECT * FROM subscribers')
@@ -97,7 +98,7 @@ def scanSub():
             if not cur.fetchone():
                 if post.subreddit.display_name.lower() in usersubs:
                     print('\t' + post.id)
-                    result.append(post.permalink)
+                    result.append('[' + post.title + '](' + post.permalink + ')')
         if len(result) > 0:
             final = 'Your subscribed subreddits have had some new posts: \n\n' + '\n\n'.join(result)
             final = final[:9900]
@@ -179,6 +180,12 @@ def scanPM():
                     if s == '':
                         s += 'None!'
                     result.append('You have requested a list of your Newsletter subscriptions.\n\n' + s)
+
+                elif command == 'reportall' and author == 'GoldenSights':
+                    print(author + ': reportall')
+                    s = updateSubs()
+                    s = s.replace('+','\n\n/r/')
+                    result.append('You have requested a list of all active Newsletter subscriptions.\n\n/r/' + s)
                 elif command == 'null':
                     print(author + ': null')
                 else:
@@ -204,6 +211,6 @@ while True:
     updateSubs()
     scanSub()
     print(str(countTable('subscribers')) + ' active subscriptions.')
-    print('Running again in ' + WAITS + ' seconds \n')
+    print('Running again in ' + WAITS + ' seconds \n_________\n')
     sql.commit()
     time.sleep(WAIT)

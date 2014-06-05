@@ -1,0 +1,199 @@
+*155
+*Afghanistan
+*Armenia
+Azerbaijan
+Georgia
+Bahrain
+Cyprus
+Iran
+Iraq
+Israel
+Jordan
+Kuwait
+Lebanon
+Oman
+Palestine
+Qatar
+Saudi Arabia
+Syria
+Turkey
+United Arab Emirates
+Yemen
+Kazakhstan
+Kyrgyzstan
+Tajikistan
+Turkmenistan
+Uzbekistan
+Bangladesh
+Bhutan
+India
+Maldives
+Nepal
+Pakistan
+Sri Lanka
+China
+Japan
+North Korea
+South Korea
+Mongolia
+Taiwan
+Cambodia
+Laos
+Myanmar
+Thailand
+Vietnam
+Brunei
+East Timor
+Indonesia
+Malaysia
+Philippines
+Singapore
+Australia
+New Zealand
+Fiji
+Papua New Guinea
+Solomon Islands
+Vanuatu
+Kiribati
+Marshall Islands
+Federated States of Micronesia
+Nauru
+Palau
+Samoa
+Tonga
+Tuvalu
+Algeria
+Egypt
+Libya
+Morocco
+Sudan
+Tunisia
+Benin
+Burkina Faso
+Cape Verde
+Cote d'Ivoire
+Gambia
+Ghana
+Guinea
+Guinea-Bissau
+Liberia
+Mali
+Mauritania
+Niger
+Nigeria
+Senegal
+Sierra Leone
+Togo
+Angola
+Cameroon
+Central African Republic
+Chad
+Democratic Republic of the Congo
+Republic of the Congo
+Equatorial Guinea
+Gabon
+Sao Tome and Principe
+Burundi
+Djibouti
+Eritrea
+Ethiopia
+Kenya
+Malawi
+Mozambique
+Rwanda
+Somalia
+South Sudan
+Tanzania
+Uganda
+Zambia
+Zimbabwe
+Comoros
+Madagascar
+Mauritius
+Seychelles
+Botswana
+Lesotho
+Namibia
+South Africa
+Swaziland
+Argentina
+Bolivia
+Brazil
+Chile
+Colombia
+Ecuador
+Guyana
+Paraguay
+Peru
+Suriname
+Uruguay
+Venezuela
+Belize
+Costa Rica
+El Salvador
+Guatemala
+Honduras
+Nicaragua
+Panama
+Antigua and Barbuda
+Barbados
+Dominica
+Grenada
+Saint Kitts and Nevis
+Saint Lucia
+Saint Vincent and the Grenadines
+Trinidad and Tobago
+Cuba
+Dominican Republic
+Haiti
+Jamaica
+Bahamas
+Canada
+United States of America
+Belarus
+Bulgaria
+Czech Republic
+Hungary
+Moldova
+Poland
+Romania
+Russia
+Slovakia
+Ukraine
+Albania
+Bosnia and Herzegovina
+Bulgaria
+Croatia
+Greece
+Kosovo
+Macedonia
+Montenegro
+Romania
+Serbia
+Slovenia
+Andorra
+Italy
+Malta
+Portugal
+San Marino
+Spain
+Vatican City
+Austria
+Belgium
+France
+Germany
+Liechtenstein
+Luxembourg
+Monaco
+Netherlands
+Switzerland
+Estonia
+Latvia
+Lithuania
+Denmark
+Finland
+Iceland
+Norway
+Sweden
+Ireland
+United Kingdom
