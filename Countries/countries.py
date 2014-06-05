@@ -77,7 +77,10 @@ def scanSub():
 			clistfile.close()
 			print('New day')
 			print('Posting ' + current)
-			r.submit(SUBREDDIT, str(time.strftime(TITLE.replace('_country_', current))), url=SUBMISSION.replace('_country_', current.replace(' ', '%20')), captcha=None)
+			try:
+				r.submit(SUBREDDIT, str(time.strftime(TITLE.replace('_country_', current))), url=SUBMISSION.replace('_country_', current.replace(' ', '%20')), captcha=None)
+			except praw.errors.AlreadySubmitted:
+				print("\tThis may have already been submitted.")
 			clist[0] = '*' + currentday
 			clist[currentm] = '*' + current
 			currentm += 1
