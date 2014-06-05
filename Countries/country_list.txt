@@ -1,6 +1,6 @@
-*155
-*Afghanistan
-*Armenia
+*0
+Afghanistan
+Armenia
 Azerbaijan
 Georgia
 Bahrain
