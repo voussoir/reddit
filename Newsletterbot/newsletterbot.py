@@ -21,7 +21,7 @@ MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
-
+ADMIN = "GoldenSights"
 '''All done!'''
 
 
@@ -165,7 +165,7 @@ def scanPM():
                                 else:
                                     result.append('You are not registered in the Newsletter database to receive /r/' + arg)
 
-                        if command == 'reportall' and author == 'GoldenSights':
+                        if command == 'reportall' and author == ADMIN:
                             s = ''
                             un = ''
                             try:
@@ -179,7 +179,7 @@ def scanPM():
                                 s += '\n\n/r/' + m[1]
                             if s == '':
                                 s += '\n\nNone!'
-                            result.append('All active Newsletter subscriptions for /u/' + arg + s)
+                            result.append('All active Newsletter subscriptions for /u/' + arg + ':' + s)
             
                 elif command == 'report':
                     print(author + ': report')
@@ -192,16 +192,17 @@ def scanPM():
                         s += 'None!'
                     result.append('You have requested a list of your Newsletter subscriptions.\n\n' + s)
 
-                elif command == 'reportall' and author == 'GoldenSights':
+                elif command == 'reportall' and author == ADMIN:
                     print(author + ': reportall')
                     s = updateSubs()
                     s = s.replace('+','\n\n/r/')
-                    result.append('All active Newsletter subscriptions.\n\n/r/' + s)
+                    result.append('All active Newsletter subscriptions:\n\n/r/' + s)
 
                 
                 elif command == 'null':
                     print(author + ': null')
                 else:
+                    print(author + ': ' + command + ' < Bad syntax')
                     result.append("The command '" + command + "' doesn't seem to comply with proper syntax")
                 if command != 'null':
                     result.append('\n\n_____')
