@@ -1,6 +1,5 @@
 import praw
 import time
-import datetime
 
 '''USER CONFIGURATION'''
 USERNAME  = ""
@@ -41,16 +40,6 @@ except ImportError:
 
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD)
-
-def getTime(bool):
-	timeNow = datetime.datetime.now(datetime.timezone.utc)
-	timeUnix = timeNow.timestamp()
-	if bool == False:
-		return timeNow
-	else:
-		return timeUnix
-
-
 
 
 def scanSub():
