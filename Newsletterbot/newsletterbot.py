@@ -145,30 +145,41 @@ def scanPM():
                                 s = r.get_subreddit(arg, fetch=True)
                                 cur.execute('SELECT * FROM subscribers WHERE name="%s" AND reddit="%s"' % (author, arg))
                                 if not cur.fetchone():
-                                    #print('New Subscriber: ' + author + ' to ' + arg)
                                     cur.execute('INSERT INTO subscribers VALUES("%s", "%s")' % (author, arg))
                                     result.append('You have registered in the Newsletter database to receive /r/' + arg)
                                 else:
                                     print(author + ' is already subscribed to ' + arg)
                                     result.append('You are already registered in the Newsletter database to receive /r/' + arg)
                             except Exception:
-                                print(author + ' attempted to subscribe to ' + arg + ' but failed.')
-                                result.append('We were unable to find any subreddit by the name of /r/' + arg + '. Confirm that it is spelled correctly and is public.')
+                                result.append('Unable to find any subreddit by the name of /r/' + arg + '. Confirm that it is spelled correctly and is public.')
                 
                         if command == 'unsubscribe':
                             if arg == 'all':
-                                #print('Lost Subscriber: ' + author + ' from ' + arg)
                                 cur.execute('DELETE FROM subscribers WHERE name = "%s"' % author)
                                 result.append('You have been removed from all subscriptions.')
                             else:
                                 cur.execute('SELECT * FROM subscribers WHERE name="%s" AND reddit="%s"' % (author, arg))
                                 if cur.fetchone():
-                                    #print('Lost Subscriber: ' + author + ' from ' + arg)
                                     cur.execute('DELETE FROM subscribers WHERE name = "%s" AND reddit = "%s"' % (author, arg))
                                     result.append('You will no longer receive /r/' + arg)
                                 else:
-                                    print(author + ' is not subscribed to ' + arg)
                                     result.append('You are not registered in the Newsletter database to receive /r/' + arg)
+
+                        if command == 'reportall' and author == 'GoldenSights':
+                            s = ''
+                            un = ''
+                            try:
+                                u = r.get_redditor(arg)
+                                un = u.name
+                            except Exception:
+                                s += '\n\nUser does not exist!'
+                            cur.execute('SELECT * FROM subscribers WHERE name="%s"' % un)
+                            f = cur.fetchall()
+                            for m in f:
+                                s += '\n\n/r/' + m[1]
+                            if s == '':
+                                s += '\n\nNone!'
+                            result.append('All active Newsletter subscriptions for /u/' + arg + s)
             
                 elif command == 'report':
                     print(author + ': report')
@@ -185,7 +196,9 @@ def scanPM():
                     print(author + ': reportall')
                     s = updateSubs()
                     s = s.replace('+','\n\n/r/')
-                    result.append('You have requested a list of all active Newsletter subscriptions.\n\n/r/' + s)
+                    result.append('All active Newsletter subscriptions.\n\n/r/' + s)
+
+                
                 elif command == 'null':
                     print(author + ': null')
                 else:
@@ -196,20 +209,25 @@ def scanPM():
             final =  '\n\n'.join(result)
             final = final[:9900]
             final = final + '\n\n' + FOOTER
-            r.send_message(author, TITLE, final, captcha=None)
 
         else:
-            r.send_message(author, 'Newsletteryly', 'Your message was too long.\n\n' + FOOTER)
+            final = 'Your message was too long. This measure is in place to prevent abuse. \
+            When subscribing to multiple subreddits, use the comma syntax instead of making new lines\n\n_____\n\n' + FOOTER
             print(author + ': Message was too long')
+        
+        r.send_message(author, TITLE, final, captcha=None)
         pm.mark_as_read()
     sql.commit()
     print('')
 
 
 while True:
-    scanPM()
-    updateSubs()
-    scanSub()
+    try:
+        scanPM()
+        updateSubs()
+        scanSub()
+    except Exception as e:
+        print('ERROR: ' + e)
     print(str(countTable('subscribers')) + ' active subscriptions.')
     print('Running again in ' + WAITS + ' seconds \n_________\n')
     sql.commit()
