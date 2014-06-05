@@ -19,6 +19,8 @@ WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 PRINTFILE = "country_list.txt"
 #This is the file, in the same directory as the .py file, where the names are stored
+WEEKEND = ['Saturday', 'Sunday']
+#These are days that you don't want the bot to run. You can have any. Use proper capitalisation.
 
 '''All done!'''
 
@@ -61,6 +63,9 @@ def scanSub():
 
 		if clist[0] == '*' + currentday:
 			print('Same day')
+
+		if time.strftime("%A") in WEEKEND:
+			print('Weekend! Will not operate today.')
 	
 		else:
 			clistfile.close()
