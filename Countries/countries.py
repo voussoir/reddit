@@ -16,8 +16,6 @@ TITLE = "Country of the day for %B %d: _country_"
 #%B and %d will be interpreted by time.strftime()
 SUBMISSION = "http://www.google.com/search?q=site:wikipedia.org%20_country_%20country&btnI"
 #This is the link that will be submitted. _country_ will be replaced by the country
-DELAY = 518400
-#This is the time limit between a user's posts, IN SECONDS. 1h = 3600 || 12h = 43200 || 24h = 86400 || 144h = 518400
 WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 PRINTFILE = "country_list.txt"
