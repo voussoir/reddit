@@ -102,9 +102,14 @@ def scan():
 						print('\t' + pauthor + "'s database info has been reset.")
 					else:
 						differences = '%.0f' % (DELAY - difference)
-						print('\tPost does not comply with timelimit guidelines. Author must wait ' + differences)
+						timestring = str(datetime.timedelta(seconds=float(differences)))
+						timestring = timestring.replace(':', ' hours, and ', 1)
+						timestring = timestring.replace(':', ' minutes.x', 1)
+						timestring = timestring.split('x')
+						timestring = timestring[0]
+						print('\tPost does not comply with timelimit guidelines. Author must wait ' + timestring)
 						print('\t' + pauthor + "'s database info remains unchanged")
-						response = post.add_comment('You are posting here too frequently, so your post has been deleted. You may post again in ' + str(datetime.timedelta(seconds=float(differences))))
+						response = post.add_comment('You are posting here too frequently, so your post has been deleted. You may post again in ' + str(timestring))
 						response.distinguish()
 						post.remove(spam=False)
 						time.sleep(5)
