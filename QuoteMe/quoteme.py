@@ -1,3 +1,4 @@
+#/u/GoldenSights
 import praw # simple interface to the reddit API, also handles rate limiting of requests
 import time
 import sqlite3
@@ -16,7 +17,7 @@ PARENTSTRING = ["don't quote me", "dont quote me"]
 #These are the words you are looking for
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 20
+WAIT = 10
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
 
@@ -58,14 +59,20 @@ def scanSub():
             cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
             if not cur.fetchone():
                 cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
-                try:
-                    pauthor = post.author.name
-                    if pauthor != USERNAME:
-                        response = ">" + pbody + "\n\n- /u/" + pauthor
-                        print('Replying to ' + pid + ' by ' + pauthor)
-                        post.reply(response)
-                except AttributeError:
-                    print('Author deleted. Ignoring comment')
+
+                pbodysplit = pbody.strip().split('.')
+                for sent in pbodysplit:
+                    if any(key.lower() in sent.lower() for key in PARENTSTRING):
+                        try:
+                            pauthor = post.author.name
+                            if pauthor != USERNAME:
+                                response = ">" + sent + "\n\n- /u/" + pauthor
+                                print('Replying to ' + pid + ' by ' + pauthor)
+                                print(sent)
+                                post.reply(response)
+                                break
+                        except Exceptiont:
+                            print('Failed.')
     sql.commit()
 
 while True:
