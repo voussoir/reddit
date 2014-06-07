@@ -1,10 +1,10 @@
-*0
-Afghanistan
-Armenia
-Azerbaijan
-Georgia
-Bahrain
-Cyprus
+*2014-06-07
+*Afghanistan
+*Armenia
+*Azerbaijan
+*Georgia
+*Bahrain
+*Cyprus
 Iran
 Iraq
 Israel

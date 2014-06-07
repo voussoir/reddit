@@ -1,6 +1,8 @@
 #/u/GoldenSights
 import praw
 import time
+import pytz
+from datetime import datetime
 
 '''USER CONFIGURATION'''
 USERNAME  = ""
@@ -20,7 +22,7 @@ WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 PRINTFILE = "country_list.txt"
 #This is the file, in the same directory as the .py file, where the names are stored
-WEEKEND = ['Saturday', 'Sunday']
+WEEKEND = []
 #These are days that you don't want the bot to run. You can have anything you want in here. Use proper capitalisation.
 
 '''All done!'''
@@ -49,8 +51,10 @@ def scanSub():
 	print('Scanning')
 	clistfile = open(PRINTFILE, "r+")
 	clist = []
-	currentday = time.strftime("%j")
-	print('Current day: ' + currentday)
+	currentday = datetime.now(pytz.timezone('utc'))
+	currentdaystr = str(currentday)
+	currentdaystr = currentdaystr[:19]
+	print('Current day: ' + currentdaystr)
 	for line in clistfile:
 		clist.append(line.strip())
 
@@ -62,9 +66,9 @@ def scanSub():
 				
 				break
 
-		if time.strftime("%A") not in WEEKEND:
+		if datetime.strftime(currentday, "%A") not in WEEKEND:
 
-			if clist[0] == '*' + currentday:
+			if clist[0] == '*' + currentdaystr[:10]:
 				print('Same day')
 	
 			else:
@@ -72,11 +76,11 @@ def scanSub():
 				print('New day')
 				print('Posting ' + current)
 				try:
-					r.submit(SUBREDDIT, str(time.strftime(TITLE.replace('_country_', current))), \
+					r.submit(SUBREDDIT, str(datetime.strftime(currentday, TITLE.replace('_country_', current))), \
 					url=SUBMISSION.replace('_country_', current.replace(' ', '%20')), captcha=None)
 				except praw.errors.AlreadySubmitted:
 					print("\tThis has already been submitted.")
-				clist[0] = '*' + currentday
+				clist[0] = '*' + currentdaystr[:10]
 				clist[currentm] = '*' + current
 				currentm += 1
 				current = clist[currentm]
