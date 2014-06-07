@@ -1,8 +1,6 @@
 #/u/GoldenSights
 import praw # simple interface to the reddit API, also handles rate limiting of requests
 import time
-import os
-import sys
 import sqlite3
 
 ''''USER CONFIGURATION'''
