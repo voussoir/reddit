@@ -11,7 +11,7 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "GoldTesting"
+SUBREDDIT = "all"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 PARENTSTRING = ["don't quote me", "dont quote me"]
 #These are the words you are looking for
@@ -54,13 +54,12 @@ def scanSub():
     for post in posts:
         pid = post.id
         pbody = post.body
-        pbody = pbody.replace('\n\n', '\n\n>')
+        pbody = pbody.replace('\n\n', '.\n\n>')
         if any(key.lower() in pbody.lower() for key in PARENTSTRING):
             cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
             if not cur.fetchone():
                 cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
-
-                pbodysplit = pbody.strip().split('.')
+                pbodysplit = pbody.split('.')
                 for sent in pbodysplit:
                     if any(key.lower() in sent.lower() for key in PARENTSTRING):
                         try:
@@ -68,10 +67,10 @@ def scanSub():
                             if pauthor != USERNAME:
                                 response = ">" + sent + "\n\n- /u/" + pauthor
                                 print('Replying to ' + pid + ' by ' + pauthor)
-                                print(sent)
+                                print(sent.strip())
                                 post.reply(response)
                                 break
-                        except Exceptiont:
+                        except Exception:
                             print('Failed.')
     sql.commit()
 
