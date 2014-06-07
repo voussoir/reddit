@@ -18,6 +18,9 @@ TITLE = "Country of the day for %B %d: _country_"
 #%B and %d will be interpreted by time.strftime()
 SUBMISSION = "http://www.google.com/search?q=site:wikipedia.org%20_country_%20country&btnI"
 #This is the link that will be submitted. _country_ will be replaced by the country
+TIMEZONE = 'utc'
+#What timezone are you using?
+#http://stackoverflow.com/questions/13866926/python-pytz-list-of-timezones
 WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 PRINTFILE = "country_list.txt"
@@ -51,7 +54,7 @@ def scanSub():
 	print('Scanning')
 	clistfile = open(PRINTFILE, "r+")
 	clist = []
-	currentday = datetime.now(pytz.timezone('utc'))
+	currentday = datetime.now(pytz.timezone(TIMEZONE))
 	currentdaystr = str(currentday)
 	currentdaystr = currentdaystr[:19]
 	print('Current day: ' + currentdaystr)
