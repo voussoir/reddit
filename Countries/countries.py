@@ -13,9 +13,9 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-TITLE = "Country of the day for %B %d: _country_"
+TITLE = "Country of the day for %B %d, %Y: _country_"
 #This is the title of the submission to your subreddit. _country_ will be replaced by the country
-#%B and %d will be interpreted by time.strftime()
+#%B and %d will be interpreted by datetime.strftime() where %B %d, %Y returns "June 07, 2014"
 SUBMISSION = "http://www.google.com/search?q=site:wikipedia.org%20_country_%20country&btnI"
 #This is the link that will be submitted. _country_ will be replaced by the country
 TIMEZONE = 'utc'
