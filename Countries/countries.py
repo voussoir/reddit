@@ -22,7 +22,7 @@ WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 PRINTFILE = "country_list.txt"
 #This is the file, in the same directory as the .py file, where the names are stored
-WEEKEND = []
+WEEKEND = ["Saturday", "Sunday"]
 #These are days that you don't want the bot to run. You can have anything you want in here. Use proper capitalisation.
 
 '''All done!'''
