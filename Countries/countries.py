@@ -21,11 +21,20 @@ SUBMISSION = "http://www.google.com/search?q=site:wikipedia.org%20_country_%20co
 TIMEZONE = 'utc'
 #What timezone are you using?
 #http://stackoverflow.com/questions/13866926/python-pytz-list-of-timezones
+LEAVECOMMENT = True
+#Do you want the bot to leave a comment on the new submission? Use True or False (use capitals! no quotations!)
+COMMENT = "Tomorrow's country is _newcountry_.\n\nFind the full schedule [here.](http://redd.it/27bxwi)\n\n[^^Source ^^Code](https://github.com/voussoir/reddit/tree/master/Countries)"
+#If LEAVECOMMENT is true, this is the comment that will be posted.
+#_newcountry_ will be replaced by the next country on the list, if available.
+DISTINGUISHPOST = True
+#Do you want the post to be moderator-distinguished?
+DISTINGUISHCOMMENT = True
+#Do you want the comment to be moderator-distinguished?
 WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 PRINTFILE = "country_list.txt"
 #This is the file, in the same directory as the .py file, where the names are stored
-WEEKEND = ["Saturday", "Sunday"]
+WEEKEND = ["Saturday"]
 #These are days that you don't want the bot to run. You can have anything you want in here. Use proper capitalisation.
 
 '''All done!'''
@@ -54,6 +63,8 @@ def scanSub():
 	print('Scanning')
 	clistfile = open(PRINTFILE, "r+")
 	clist = []
+	current = 'NULL'
+	currentm = 'NULL'
 	currentday = datetime.now(pytz.timezone(TIMEZONE))
 	currentdaystr = str(currentday)
 	currentdaystr = currentdaystr[:19]
@@ -69,34 +80,54 @@ def scanSub():
 				
 				break
 
-		if datetime.strftime(currentday, "%A") not in WEEKEND:
-
-			if clist[0] == '*' + currentdaystr[:10]:
-				print('Same day')
+		if current != 'NULL' and currentm != 'NULL':
+			if datetime.strftime(currentday, "%A") not in WEEKEND:
+	
+				if clist[0] == '*' + currentdaystr[:10]:
+					print('Same day')
+		
+				else:
+					clistfile.close()
+					print('New day')
+					print('Posting ' + current)
+					clist[0] = '*' + currentdaystr[:10]
+					clist[currentm] = '*' + current
+					currentm += 1
+					try:
+						newpost = r.submit(SUBREDDIT, str(datetime.strftime(currentday, TITLE.replace('_country_', current))), \
+						url=SUBMISSION.replace('_country_', current.replace(' ', '%20')), captcha=None)
+						if DISTINGUISHPOST == True:
+							print('Distinguishing Post')
+							newpost.distinguish()
+						if LEAVECOMMENT == True:
+							print('Creating comment')
+							try:
+								newcomm = newpost.add_comment(COMMENT.replace('_newcountry_', clist[currentm]))
+							except IndexError:
+								newcomm = newpost.add_comment(COMMENT.replace('_newcountry_', '*not available*'))
+								print('Next country not available!')
+	
+							if DISTINGUISHCOMMENT == True:
+								print('Distinguishing Comment')
+								newcomm.distinguish()
+					except praw.errors.AlreadySubmitted:
+						print("\tThis has already been submitted.")
+					try:
+						current = clist[currentm]
+					except IndexError:
+						current = 'Unavailable'
+						print('Next country not available!')
+	
+					clistfile = open(PRINTFILE, "w")
+					for item in clist:
+						print(item, file=clistfile)
+					print('Wrote file.')
 	
 			else:
-				clistfile.close()
-				print('New day')
-				print('Posting ' + current)
-				try:
-					r.submit(SUBREDDIT, str(datetime.strftime(currentday, TITLE.replace('_country_', current))), \
-					url=SUBMISSION.replace('_country_', current.replace(' ', '%20')), captcha=None)
-				except praw.errors.AlreadySubmitted:
-					print("\tThis has already been submitted.")
-				clist[0] = '*' + currentdaystr[:10]
-				clist[currentm] = '*' + current
-				currentm += 1
-				current = clist[currentm]
-
-				clistfile = open(PRINTFILE, "w")
-				for item in clist:
-					print(item, file=clistfile)
-				print('Wrote file.')
-
+				print('Weekend. Will not operate.')
+			print('Next country: ' + str(currentm) + ', ' + current)
 		else:
-			print('Weekend. Will not operate.')
-		print('Next country: ' + str(currentm) + ', ' + current)
-
+			print('ERROR: Are there any more countries?')
 	else:
 		print('The file is empty.')
 

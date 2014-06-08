@@ -1,4 +1,4 @@
-*2014-06-07
+*2014-06-08
 *Afghanistan
 *Armenia
 *Azerbaijan
@@ -6,8 +6,7 @@
 *Bahrain
 *Cyprus
 *Iran
-Iraq
-Israel
+*Iraq
 Jordan
 Kuwait
 Lebanon
