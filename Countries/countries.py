@@ -15,7 +15,7 @@ SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 TITLE = "Country of the day for %B %d, %Y: _country_"
 #This is the title of the submission to your subreddit. _country_ will be replaced by the country
-#%B and %d will be interpreted by datetime.strftime() where %B %d, %Y returns "June 07, 2014"
+#%B, %d, and %Y will be interpreted by datetime.strftime() where %B %d, %Y returns "June 07, 2014"
 SUBMISSION = "http://www.google.com/search?q=site:wikipedia.org%20_country_%20country&btnI"
 #This is the link that will be submitted. _country_ will be replaced by the country
 TIMEZONE = 'utc'
@@ -34,7 +34,7 @@ WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 PRINTFILE = "country_list.txt"
 #This is the file, in the same directory as the .py file, where the names are stored
-WEEKEND = ["Saturday"]
+WEEKEND = ["Saturday", "Sunday"]
 #These are days that you don't want the bot to run. You can have anything you want in here. Use proper capitalisation.
 
 '''All done!'''
