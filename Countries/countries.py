@@ -30,7 +30,7 @@ DISTINGUISHPOST = True
 #Do you want the post to be moderator-distinguished?
 DISTINGUISHCOMMENT = True
 #Do you want the comment to be moderator-distinguished?
-WAIT = 30
+WAIT = 300
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 PRINTFILE = "country_list.txt"
 #This is the file, in the same directory as the .py file, where the names are stored
