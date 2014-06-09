@@ -16,6 +16,7 @@ SUBREDDIT = "GoldTesting"
 TITLE = "Country of the day for %B %d, %Y: _country_"
 #This is the title of the submission to your subreddit. _country_ will be replaced by the country
 #%B, %d, and %Y will be interpreted by datetime.strftime() where %B %d, %Y returns "June 07, 2014"
+#https://docs.python.org/2/library/time.html#time.strftime
 SUBMISSION = "http://www.google.com/search?q=site:wikipedia.org%20_country_%20country&btnI"
 #This is the link that will be submitted. _country_ will be replaced by the country
 TIMEZONE = 'utc'
