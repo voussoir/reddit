@@ -115,12 +115,12 @@ def scan():
 							except AttributeError:
 								cauthor = '[deleted]'
 							if cauthor != pauthor:
-								print('\tFound comment by other user. Marking as Waiting.')
 								found = True
 								break
 						if found == False:
 							print('\tNo comments by another user. No action taken.')
 						else:
+							print('\tFound comment by other user. Marking as Waiting.')
 							post.set_flair(FLAIRWAITING)
 
 
