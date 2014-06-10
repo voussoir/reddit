@@ -20,7 +20,7 @@ SPECIALS = ["GoldenSights", "duckvimes_"]
 SPECIALSTRING = [" | [Author!](http://reddit.com/u/_username_/gilded)", " | [Moderator!](http://reddit.com/u/_username_/gilded)"]
 #This is the extra remark that Special Users get. _username_ will be replaced by the username automatically
 DEADUSER = ": [Dead User](http://reddit.com/u/_username_/submitted)"
-#This is the remark for accounts which are invalid or shadowbanned
+#This is the remark for accounts which are invalid or shadowbanned. _username_ will be replaced by the username automatically
 HEADER = "These users have been mentioned:\n\n#####&#009;\n\n######&#009;\n\n####&#009;\n\n"
 #This will be at the very top of the comment. \n\n creates a new line. Set this to "" if you don't want anything.
 FOOTER = "\n\n*This was done by a bot. Contact the moderators or [author](http://reddit.com/u/GoldenSights) if there is a problem.*"
