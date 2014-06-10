@@ -229,7 +229,7 @@ while True:
         updateSubs()
         scanSub()
     except Exception as e:
-        print('ERROR: ' + e)
+        print('ERROR: ' + str(e))
     print(str(countTable('subscribers')) + ' active subscriptions.')
     print('Running again in ' + WAITS + ' seconds \n_________\n')
     sql.commit()

@@ -138,6 +138,6 @@ while True:
 	try:
 		scanSub()
 	except Exception as e:
-		print('There has been an error: ' + e)
+		print('There has been an error: ' + str(e))
 	print('Running again in ' + WAITS + ' seconds.\n')
 	time.sleep(WAIT)

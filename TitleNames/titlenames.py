@@ -19,7 +19,7 @@ SPECIALS = ["GoldenSights", "duckvimes_"]
 #This is the list of Special Users
 SPECIALSTRING = [" | [Author!](http://reddit.com/u/_username_/gilded)", " | [Moderator!](http://reddit.com/u/_username_/gilded)"]
 #This is the extra remark that Special Users get. _username_ will be replaced by the username automatically
-DEADUSER = " | [Dead User]"
+DEADUSER = ": [Dead User](http://reddit.com/u/_username_/submitted)"
 #This is the remark for accounts which are invalid or shadowbanned
 HEADER = "These users have been mentioned:\n\n#####&#009;\n\n######&#009;\n\n####&#009;\n\n"
 #This will be at the very top of the comment. \n\n creates a new line. Set this to "" if you don't want anything.
@@ -87,19 +87,20 @@ def scanSub():
                         word = word.replace(TRIGGERSTRING, '')
                         word = ''.join(c for c in word if c in CHARS)
                         finalword = TRIGGERSTRING + word
-                        finalword += NORMALSTRING.replace('_username_', word)
+
+                        try:
+                            user = r.get_redditor(word, fetch=True)
+                            finalword = finalword.replace(word, user.name)
+                            finalword += NORMALSTRING.replace('_username_', word)
+                        except Exception:
+                            finalword += DEADUSER.replace('_username_', word)
+                            print('\tDead')
+
                         for m in range(len(SPECIALS)):
                             name = SPECIALS[m]
                             if name.lower() == word.lower():
                                 print('\tSpecial')
                                 finalword += SPECIALSTRING[m].replace('_username_', word)
-
-                        try:
-                            user = r.get_redditor(word, fetch=True)
-                            finalword = finalword.replace(word, user.name)
-                        except Exception:
-                            finalword += DEADUSER
-                            print('\tDead')
 
                         result.append(finalword)
             if len(result) > 0:
@@ -118,7 +119,7 @@ while True:
     try:
         scanSub()
     except Exception as e:
-        print('An error has occured:', e)
+        print('An error has occured:', str(e))
     print('Running again in ' + WAITS + ' seconds \n')
     sql.commit()
     time.sleep(WAIT)
