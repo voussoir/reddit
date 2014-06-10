@@ -19,7 +19,7 @@ SPECIALS = ["GoldenSights", "duckvimes_"]
 #This is the list of Special Users
 SPECIALSTRING = [" | [Author!](http://reddit.com/u/_username_/gilded)", " | [Moderator!](http://reddit.com/u/_username_/gilded)"]
 #This is the extra remark that Special Users get. _username_ will be replaced by the username automatically
-DEADUSER = ", [Dead User]"
+DEADUSER = " | [Dead User]"
 #This is the remark for accounts which are invalid or shadowbanned
 HEADER = "These users have been mentioned:\n\n#####&#009;\n\n######&#009;\n\n####&#009;\n\n"
 #This will be at the very top of the comment. \n\n creates a new line. Set this to "" if you don't want anything.
@@ -85,8 +85,6 @@ def scanSub():
                     if TRIGGERSTRING in word:
                         print(word)
                         word = word.replace(TRIGGERSTRING, '')
-                        if word == '':
-                            break
                         word = ''.join(c for c in word if c in CHARS)
                         finalword = TRIGGERSTRING + word
                         finalword += NORMALSTRING.replace('_username_', word)
