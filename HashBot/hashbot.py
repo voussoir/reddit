@@ -55,19 +55,14 @@ def scanSub():
         pid = post.id
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
         if not cur.fetchone():
-            try:
-                cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
-                
-                titlesplit = ptitle.split()
-                for word in titlesplit:
-                    if len(word) > 1 and word[0] == '#':
-                        print(pid + ', ' + pauthor + ': ' + word)
-                        hashtag = word[1:]
-                        link = 'http://twitter.com/intent/tweet?button_hashtag=' + hashtag
-                        post.add_comment('[Use this hashtag!](' + link + ')')
-
-            except IndexError:
-                pass
+            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+            titlesplit = ptitle.split()
+            for word in titlesplit:
+                if len(word) > 1 and word[0] == '#':
+                    print(pid + ', ' + pauthor + ': ' + word)
+                    hashtag = word[1:]
+                    link = 'http://twitter.com/intent/tweet?button_hashtag=' + hashtag
+                    post.add_comment('[Use this hashtag!](' + link + ')')
     sql.commit()
 
 
