@@ -13,7 +13,7 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "all"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subs, use "sub1+sub2+sub3+...". For all use "all"
-THRESHOLD = 6000
+THRESHOLD = 60
 #Any comment longer than this many characters will be saved.
 
 RSAVE = False
@@ -77,10 +77,10 @@ def scanSub():
         pid = post.id
         plink = post.permalink
         pbody = post.body
-        plen = len(pbody)
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
         if not cur.fetchone():
             cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
+            plen = len(pbody)
             if plen >= THRESHOLD:
                 try:
                     pauthor = post.author.name
