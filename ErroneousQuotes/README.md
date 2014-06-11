@@ -7,7 +7,6 @@ The **first** thing in a comment must be /u/Bots-Username. The bot will only res
 
 /u/GoldenSights Always be careful on the internet, kids!
 
-|
 V
 
 >Always be careful on the internet, kids!
