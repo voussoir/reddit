@@ -58,12 +58,16 @@ def scanSub():
     for post in posts:
         pid = post.id
         pbody = post.body
+        try:
+            pauthor = post.author.name
+        except AttributeError:
+            pauthor = '[DELETED]'
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
         if not cur.fetchone():
             cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
             if pbody.lower()[:cutoff] == '/u/' + USERNAME.lower() + ' ':
                 quote = pbody.split('\n\n')[0][cutoff:]
-                if len(quote) <= MAXLENGTH:
+                if len(quote) <= MAXLENGTH and pauthor != USERNAME:
                     name = NAMES[random.randint(0,len(NAMES)-1)]
                     print(pid + ': ' + quote + '- ' + name)
                     response = '>' + quote + '\n\n- ' + name
