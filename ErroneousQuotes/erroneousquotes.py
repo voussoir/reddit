@@ -15,7 +15,7 @@ USERAGENT = ""
 SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 NAMES = ["Abraham Lincoln", "George Washington", "Bill Gates", "Rosa Parks", "/u/GoldenSights", "/u/Unidan", "Napoleon Bonaparte"]
-#These are the words you are looking for
+#Famous People
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 MAXLENGTH = 150
