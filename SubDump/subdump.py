@@ -80,7 +80,7 @@ def scanSub():
         cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
         if not cur.fetchone():
             cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
-            if any(key.lower() in pbody for key in KEYWORDS):
+            if any(key.lower() in pbody.lower() for key in KEYWORDS):
                 try:
                     pauthor = post.author.name
                     print(pid + ', ' + pauthor)
