@@ -20,7 +20,7 @@ RSAVE = False
 #Do you want the bot to save via Reddit Saving? Use True or False (Use capitals! no quotations!)
 #praw DOES NOT allow comments to be saved. Don't ask me why. This will save the submission the comment is connected to.
 
-MAILME = True
+MAILME = False
 #Do you want the bot to send you a PM when it gets something? Use True or False (Use capitals! No quotations!)
 RECIPIENT = "GoldenSights"
 #If MAILME is set to True, you will need a name for the PM to go to
@@ -78,10 +78,10 @@ def scanSub():
         plink = post.permalink
         pbody = post.body
         plen = len(pbody)
-        if plen >= THRESHOLD:
-            cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
-            if not cur.fetchone():
-                cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
+        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+        if not cur.fetchone():
+            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
+            if plen >= THRESHOLD:
                 try:
                     pauthor = post.author.name
                     print(pid + ', ' + pauthor + ': ' + str(plen) + ' characters.')
