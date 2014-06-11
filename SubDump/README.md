@@ -1,9 +1,9 @@
-SubSump
+SubDump
 =============
 
 This was almost entirely ripped from Novella.
 
-This bot searches for comments that contain your keyword, and saves them for later reading. You can choose any or all of three modes
+This bot searches for comments that contain your keyword, and saves. You can choose any or all of three modes
 
 - Reddit Saving. PRAW doesn't allow you to save comments. No clue why. Bot will save the submission to its account
 
