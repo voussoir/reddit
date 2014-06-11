@@ -14,7 +14,7 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-NAMES = ["Abraham Lincoln", "George Washington", "Bill Gates", "Rosa Parks", "/u/GoldenSights", "/u/Unidan", "Napoleon Bonaparte"]
+NAMES = ["Abraham Lincoln", "George Washington", "Bill Gates", "Rosa Parks", "GoldenSights", "Unidan", "Napoleon Bonaparte"]
 #Famous People
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
@@ -32,8 +32,8 @@ WAIT = 20
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
+    USERNAME = bot.getu7()
+    PASSWORD = bot.getp7()
     USERAGENT = bot.getaG()
 except ImportError:
     pass
