@@ -67,6 +67,20 @@ def updateSubs():
         SUBREDDIT = '+'.join(sublist)
     return SUBREDDIT
 
+def updateUsers():
+    print('Updating users.')
+    ulist = []
+    cur.execute('SELECT * FROM subscribers')
+    for sub in cur.fetchall():
+        if sub[0] not in ulist:
+            ulist.append(sub[0])
+    if len(ulist) > 0:
+        ustring = '\n\n/u/'.join(ulist)
+        ustring = '/u/' + ustring
+    else:
+        ustring = 'None!'
+    return ustring
+
 def countTable(table):
     cur.execute("SELECT * FROM '%s'" % table)
     c = 0
@@ -99,7 +113,7 @@ def scanSub():
             if not cur.fetchone():
                 if post.subreddit.display_name.lower() in usersubs:
                     print('\t' + post.id)
-                    result.append('[' + post.title + '](' + post.permalink + ')')
+                    result.append('[' + post.subreddit.display_name + ': ' + post.title + '](' + post.permalink + ')')
         if len(result) > 0:
             final = 'Your subscribed subreddits have had some new posts: \n\n' + '\n\n'.join(result)
             final = final[:9900]
@@ -199,6 +213,10 @@ def scanPM():
                     s = s.replace('+','\n\n/r/')
                     result.append('All active Newsletter subscriptions:\n\n/r/' + s)
 
+                elif command == 'reportusers' and author == ADMIN:
+                    print(author + ': reportusers')
+                    s = updateUsers()
+                    result.append('All active Newsletter users:\n\n' + s)
                 
                 elif command == 'null':
                     print(author + ': null')
