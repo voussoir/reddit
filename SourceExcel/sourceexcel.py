@@ -27,9 +27,11 @@ IGNOREMODS = False
 IGNORESELFPOST = False
 #Do you want the bot to ignore selfposts?
 FLAIRUNSOLVED = "unsolved"
-#The flair assigned to unsolved posts.
+CSSUNSOLVED = "unsolved"
+#The flair text and css class assigned to unsolved posts.
 FLAIRWAITING = "Waiting on OP"
-#The flair assigned to waiting posts.
+CSSWAITING = "waiting"
+#The flair text and css class assigned to waiting posts.
 '''All done!'''
 
 
@@ -121,7 +123,7 @@ def scan():
 							print('\tNo comments by another user. No action taken.')
 						else:
 							print('\tFound comment by other user. Marking as Waiting.')
-							post.set_flair(FLAIRWAITING)
+							post.set_flair(flair_text=FLAIRWAITING, flair_css_class=CSSWAITING)
 
 
 
@@ -138,6 +140,7 @@ def scan():
 								ctimes.append(comment.created_utc)
 						if found == True:
 							print('\tFound comment by OP. All clear.')
+							post.set_flair(flair_text=FLAIRUNSOLVED, flair_css_class=CSSUNSOLVED)
 							cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
 						elif found == False and len(ctimes) > 0:
 							print('\tNo comments by OP. Checking time limit.')

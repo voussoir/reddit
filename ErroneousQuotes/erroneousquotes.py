@@ -68,9 +68,13 @@ def scanSub():
             if pbody.lower()[:cutoff] == '/u/' + USERNAME.lower() + ' ':
                 quote = pbody.split('\n\n')[0][cutoff:]
                 if len(quote) <= MAXLENGTH and pauthor != USERNAME:
-                    name = NAMES[random.randint(0,len(NAMES)-1)]
-                    print(pid + ': ' + quote + '- ' + name)
-                    response = '>' + quote + '\n\n- ' + name
+                    if ('/u/' + USERNAME) in quote:
+                        print(pid + ': Meatbag detected')
+                        response = 'Nice try, meatbag'
+                    else:
+                        name = NAMES[random.randint(0,len(NAMES)-1)]
+                        print(pid + ': ' + quote + '- ' + name)
+                        response = '>' + quote + '\n\n- ' + name
                     post.reply(response)
                 else:
                     print(pid + ': Comment too long')
