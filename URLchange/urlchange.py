@@ -72,10 +72,10 @@ def scanSub():
                                 result.append(sent.replace(PARENTSTRING, REPLACESTRING))
                         except Exception:
                             print('Failed.')
+                if len(result) > 0:
+                    final = HEADER + '\n\n'.join(result)
+                    post.reply(final)
                 cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
-        if len(result) > 0:
-            final = HEADER + '\n\n'.join(result)
-            post.reply(final)
     sql.commit()
 
 while True:
