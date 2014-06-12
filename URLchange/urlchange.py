@@ -75,7 +75,7 @@ def scanSub():
         if len(result) > 0:
             final = HEADER + '\n\n'.join(result)
             post.reply(final)
-            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
+        cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
     sql.commit()
 
 while True:
