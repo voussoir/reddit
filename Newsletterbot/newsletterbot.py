@@ -20,7 +20,7 @@ FOOTER = "[In operating Newsletterly](http://redd.it/26xset)"
 #This will be the footer of every message sent by the bot.
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 30
+WAIT = 90
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 ADMIN = "GoldenSights"
 '''All done!'''
