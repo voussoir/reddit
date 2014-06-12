@@ -11,10 +11,14 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "all"
+SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-PARENTSTRING = ["don't quote me", "dont quote me"]
+HEADER = "I have detected some ship designs in your comment. Here are the viewing links:\n\n"
+#This will be at the top of the comment above the results
+PARENTSTRING = "http://jundroo.com/ViewShip.html?id="
 #These are the words you are looking for
+REPLACESTRING = "http://sr.5of0.com/ViewShip.html?id="
+#This is what parentstring gets replaced with.
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 10
@@ -52,26 +56,26 @@ def scanSub():
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_comments(limit=MAXPOSTS)
     for post in posts:
+        result = []
         pid = post.id
         pbody = post.body
-        pbody = pbody.replace('\n\n', '.\n\n>')
-        if any(key.lower() in pbody.lower() for key in PARENTSTRING):
+        if PARENTSTRING.lower() in pbody.lower():
             cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
             if not cur.fetchone():
-                cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
-                pbodysplit = pbody.split('.')
+                pbodysplit = pbody.split()
+                print(pid)
                 for sent in pbodysplit:
-                    if any(key.lower() in sent.lower() for key in PARENTSTRING):
+                    if PARENTSTRING.lower() in sent.lower():
                         try:
                             pauthor = post.author.name
                             if pauthor != USERNAME:
-                                response = ">" + sent + "\n\n- /u/" + pauthor
-                                print('Replying to ' + pid + ' by ' + pauthor)
-                                print(sent.strip())
-                                post.reply(response)
-                                break
+                                result.append(sent.replace(PARENTSTRING, REPLACESTRING))
                         except Exception:
                             print('Failed.')
+        if len(result) > 0:
+            final = HEADER + '\n\n'.join(result)
+            post.reply(final)
+            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
     sql.commit()
 
 while True:
