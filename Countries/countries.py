@@ -24,7 +24,7 @@ TIMEZONE = 'utc'
 #http://stackoverflow.com/questions/13866926/python-pytz-list-of-timezones
 LEAVECOMMENT = True
 #Do you want the bot to leave a comment on the new submission? Use True or False (use capitals! no quotations!)
-COMMENT = "Tomorrow's country is _newcountry_.\n\nFind the full schedule [here.](http://redd.it/27bxwi)\n\n[^^Source ^^Code](https://github.com/voussoir/reddit/tree/master/Countries)"
+COMMENT = "Next up is _newcountry_. Remember, a new country is only posted Mon-Fri.\n\nFind the full schedule [here](http://redd.it/27bxwi).\n\n^This ^is ^a ^bot! ^For ^issues, ^contact [^GoldenSights ^\(creator)](http://www.reddit.com/u/GoldenSights) ^or [^dont_mind_the_matter ^\(collaborator ^and ^maintainer\)](http://www.reddit.com/u/dont_mind_the_matter) ^| [^Source ^Code](https://github.com/voussoir/reddit/tree/master/Countries)"
 #If LEAVECOMMENT is true, this is the comment that will be posted.
 #_newcountry_ will be replaced by the next country on the list, if available.
 DISTINGUISHPOST = True

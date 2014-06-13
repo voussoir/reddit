@@ -29,7 +29,7 @@ WAIT = 10
 
 
 
-
+PLEN = len(PARENTSTRING)
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
@@ -67,11 +67,16 @@ def scanSub():
                 for sent in pbodysplit:
                     if PARENTSTRING.lower() in sent.lower():
                         try:
+                            int(sent[PLEN:])
                             pauthor = post.author.name
                             if pauthor != USERNAME:
                                 result.append(sent.replace(PARENTSTRING, REPLACESTRING))
+                        except ValueError:
+                            print('Not a valid url')
+                        except AttributeError:
+                            print('Comment author does not exist')
                         except Exception:
-                            print('Failed.')
+                            print('Error.')
                 if len(result) > 0:
                     final = HEADER + '\n\n'.join(result)
                     post.reply(final)
