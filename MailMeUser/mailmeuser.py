@@ -58,9 +58,9 @@ def scanSub():
         for post in posts:
             pid = post.id
             plink = post.permalink
-            cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+            cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
             if not cur.fetchone():
-                cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
                 print('Found ' + pid + ' by ' + REDDITOR)
                 result.append(REDDITOR + ' has made a comment or post. [Find it here.](' + plink + ')')
     if len(result) > 0:

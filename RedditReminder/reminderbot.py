@@ -13,7 +13,7 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = ""
+SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 MAXPOSTS = 100
 #This is how mnay posts you want to retrieve all at once. PRAW can download 100 at a time.
@@ -76,9 +76,9 @@ def scanCom():
     subreddit = r.get_subreddit(SUBREDDIT)
     comments = subreddit.get_comments(limit=MAXPOSTS)
     for comment in comments:
-        cur.execute('SELECT * FROM waiting WHERE ID="%s"' % comment.id)
+        cur.execute('SELECT * FROM waiting WHERE ID=?', [comment.id])
         if not cur.fetchone():
-            cur.execute('SELECT * FROM complete WHERE ID="%s"' % comment.id)
+            cur.execute('SELECT * FROM complete WHERE ID=?', [comment.id])
             if not cur.fetchone():
                 try:
                     if comment.author.name != USERNAME:
@@ -103,7 +103,7 @@ def scanPM():
     print('Searhing PMs')
     pms = r.get_unread(unset_has_mail=True, update_user=True)
     for pm in pms:
-        cur.execute('SELECT * FROM pm WHERE ID="%s"' % pm.id)
+        cur.execute('SELECT * FROM pm WHERE ID=?', [pm.id])
         if not cur.fetchone():
             author = pm.author.name
             idp = pm.id
@@ -140,8 +140,8 @@ def redRem(table):
             comment = r.get_info(thing_id='t1_' + idd)
             try:
                 if (timeUnix - comment.created_utc) > waiter:
-                    cur.execute('DELETE FROM waiting WHERE ID == "%s"' % idd)
-                    cur.execute('INSERT INTO complete VALUES("%s", "%s")' % (comment.author.name, comment.id))
+                    cur.execute('DELETE FROM waiting WHERE ID == ?', [idd])
+                    cur.execute('INSERT INTO complete VALUES(?, ?)', (comment.author.name, comment.id))
                     print('Replying to ' + comment.author.name)
                     commstring = comment.body.lower()
                     lines = comment.body.lower().split('\n\n')
@@ -161,8 +161,8 @@ def redRem(table):
             try:
 
                 if (timeUnix - rtime) > waiter:
-                    cur.execute('DELETE FROM pm WHERE ID == "%s"' % idd)
-                    cur.execute('INSERT INTO complete VALUES("%s", "%s")' % (pm.author.name, pm.id))
+                    cur.execute('DELETE FROM pm WHERE ID == ?', [idd])
+                    cur.execute('INSERT INTO complete VALUES(?, ?)', (pm.author.name, pm.id))
                     print('Replying to ' + pm.author.name)
                     commstring = pm.body.lower()
                     lines = pm.body.lower().split('\n\n')

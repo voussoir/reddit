@@ -95,7 +95,7 @@ def scan():
 		ptime = post.created_utc
 		curtime = getTime(True)		
 		
-		cur.execute('SELECT * FROM oldposts WHERE id="%s"' % pid)
+		cur.execute('SELECT * FROM oldposts WHERE id=?', [pid])
 		if not cur.fetchone():
 			if post.is_self == False or IGNORESELFPOST == False:
 				if pauthor not in mods or IGNOREMODS == False:
@@ -116,12 +116,12 @@ def scan():
 							clength = len(cbody)
 							if clength <= MINLENGTH:
 								short = True
-								cur.execute('SELECT * FROM oldposts WHERE id="%s"' % cid)
+								cur.execute('SELECT * FROM oldposts WHERE id=?', [cid])
 								if not cur.fetchone():
 									print('\tComment is too short. Replying...')
 									response = comment.reply(TOOSHORT)
 									response.distinguish()
-									cur.execute('INSERT INTO oldposts VALUES("%s")' % cid)
+									cur.execute('INSERT INTO oldposts VALUES(?)', [cid])
 								else:
 									print('\tOP has already been warned.')
 									
@@ -142,18 +142,18 @@ def scan():
 						if found == True and short == False:
 							print('\tComment is okay. Passing')
 
-						cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+						cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 					else:
 						differences = str('%.0f' % (DELAY - difference))
 						print('\tStill has ' + differences + 's.')
 				
 				if pauthor in mods and IGNOREMODS == True:
 					print(pid + ', ' + pauthor + ': Ignoring Moderator')
-					cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+					cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
 			if post.is_self == True and IGNORESELFPOST == True:
 				print(pid + ', ' + pauthor + ': Ignoring Selfpost')
-				cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+				cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
 		sql.commit()
 

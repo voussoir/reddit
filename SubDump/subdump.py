@@ -77,9 +77,9 @@ def scanSub():
         pid = post.id
         plink = post.permalink
         pbody = post.body
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])    
             if any(key.lower() in pbody.lower() for key in KEYWORDS):
                 try:
                     pauthor = post.author.name

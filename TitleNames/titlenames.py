@@ -85,9 +85,9 @@ def scanSub():
         except AttributeError:
             pauthor = '[DELETED]'
         pid = post.id
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
             print(pid)
             result = []
             if TRIGGERSTRING in ptitle:

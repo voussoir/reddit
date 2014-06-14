@@ -104,12 +104,12 @@ def scanSub():
         print('Finding posts for ' + user)
         usersubs = []
         result = []
-        cur.execute('SELECT * FROM subscribers WHERE name="%s"' % user)
+        cur.execute('SELECT * FROM subscribers WHERE name=?', [user])
         f = cur.fetchall()
         for m in f:
             usersubs.append(m[1])
         for post in subreddit.get_new(limit=MAXPOSTS):
-            cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % post.id)
+            cur.execute('SELECT * FROM oldposts WHERE ID=?', [post.id])
             if not cur.fetchone():
                 if post.subreddit.display_name.lower() in usersubs:
                     print('\t' + post.id)
@@ -122,9 +122,9 @@ def scanSub():
         else:
             print('\tNone')
     for post in subreddit.get_new(limit=MAXPOSTS):
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % post.id)
+        cur.execute('SELECT * FROM oldposts WHERE ID=?', [post.id])
         if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES("%s")' % post.id)
+            cur.execute('INSERT INTO oldposts VALUES(?)', [post.id])
     sql.commit()
 
 
@@ -158,9 +158,9 @@ def scanPM():
                         if command == 'subscribe':
                             try:
                                 s = r.get_subreddit(arg, fetch=True)
-                                cur.execute('SELECT * FROM subscribers WHERE name="%s" AND reddit="%s"' % (author, arg))
+                                cur.execute('SELECT * FROM subscribers WHERE name=? AND reddit=?', (author, arg))
                                 if not cur.fetchone():
-                                    cur.execute('INSERT INTO subscribers VALUES("%s", "%s")' % (author, arg))
+                                    cur.execute('INSERT INTO subscribers VALUES(?, ?)', (author, arg))
                                     result.append('You have registered in the Newsletter database to receive /r/' + arg)
                                 else:
                                     print(author + ' is already subscribed to ' + arg)
@@ -170,12 +170,12 @@ def scanPM():
                 
                         if command == 'unsubscribe':
                             if arg == 'all':
-                                cur.execute('DELETE FROM subscribers WHERE name = "%s"' % author)
+                                cur.execute('DELETE FROM subscribers WHERE name = ?', [author])
                                 result.append('You have been removed from all subscriptions.')
                             else:
-                                cur.execute('SELECT * FROM subscribers WHERE name="%s" AND reddit="%s"' % (author, arg))
+                                cur.execute('SELECT * FROM subscribers WHERE name=? AND reddit=?', (author, arg))
                                 if cur.fetchone():
-                                    cur.execute('DELETE FROM subscribers WHERE name = "%s" AND reddit = "%s"' % (author, arg))
+                                    cur.execute('DELETE FROM subscribers WHERE name = ? AND reddit = ?', (author, arg))
                                     result.append('You will no longer receive /r/' + arg)
                                 else:
                                     result.append('You are not registered in the Newsletter database to receive /r/' + arg)
@@ -188,7 +188,7 @@ def scanPM():
                                 un = u.name
                             except Exception:
                                 s += '\n\nUser does not exist!'
-                            cur.execute('SELECT * FROM subscribers WHERE name="%s"' % un)
+                            cur.execute('SELECT * FROM subscribers WHERE name=?', un)
                             f = cur.fetchall()
                             for m in f:
                                 s += '\n\n/r/' + m[1]
@@ -199,7 +199,7 @@ def scanPM():
                 elif command == 'report':
                     print(author + ': report')
                     s = ''
-                    cur.execute('SELECT * FROM subscribers WHERE name="%s"' % author)
+                    cur.execute('SELECT * FROM subscribers WHERE name=?', [author])
                     f = cur.fetchall()
                     for m in f:
                         s = s + '/r/' + m[1] + '\n\n'

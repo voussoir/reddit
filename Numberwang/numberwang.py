@@ -56,7 +56,7 @@ def scanSub():
         pid = post.id
         pbodysplit = post.body.split()
         pnum = pbodysplit[len(pbodysplit)-1]
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
             if all(c in PUNC for c in pnum) and all(c in NUMS for c in pnum[:5]) and len(pnum) >= 5:
                 print(pid + ": " + pnum + ' is Numberwang!')
@@ -65,7 +65,7 @@ def scanSub():
                 print(pid + ' is not Numberwang.')
             
     
-        cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+        cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
     sql.commit()
 
 

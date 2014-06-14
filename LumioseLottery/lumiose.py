@@ -122,7 +122,7 @@ def scan():
 	for post in posts:
 		pid = post.id
 		if post.link_flair_text == 'OTN':
-			cur.execute('SELECT * FROM oldposts WHERE id="%s"' % pid)
+			cur.execute('SELECT * FROM oldposts WHERE id=?', [pid])
 			if not cur.fetchone():
 				ptitle = post.title
 				try:
@@ -130,7 +130,7 @@ def scan():
 				except ValueError:
 					ptitle = 'NULL'
 				print(pid + ': ' + ptitle)
-				cur.execute('INSERT INTO oldposts VALUES("%s", "%s")' % (pid, ptitle))
+				cur.execute('INSERT INTO oldposts VALUES(?, ?)', (pid, ptitle))
 		sql.commit()
 
 def daily():
@@ -162,8 +162,8 @@ def daily():
 		newpost = r.submit(SUBREDDIT, title, text=BODY, captcha=None)
 		newid = newpost.id
 		print('Created new Dailypost with id ' + newid)
-		cur.execute('DELETE FROM daily WHERE id="%s"' % previd)
-		cur.execute('INSERT INTO daily VALUES("%s")' % newid)
+		cur.execute('DELETE FROM daily WHERE id=?', [previd])
+		cur.execute('INSERT INTO daily VALUES(?)', [newid])
 		sql.commit()
 	else:
 		print('Scanning root comments')
@@ -171,7 +171,7 @@ def daily():
 		for comment in comments:
 			if comment.is_root:
 				cid = comment.id
-				cur.execute('SELECT * FROM oldcomments WHERE id="%s"' % cid)
+				cur.execute('SELECT * FROM oldcomments WHERE id=?', [cid])
 				if not cur.fetchone():
 					cbody = comment.body.lower()
 					cbodysplit = cbody.split('\n\n')
@@ -182,7 +182,7 @@ def daily():
 						comment.reply(report)
 					except ValueError:
 						pass
-					cur.execute('INSERT INTO oldcomments VALUES("%s")' % cid)
+					cur.execute('INSERT INTO oldcomments VALUES(?)', [cid])
 			sql.commit()
 
 while True:

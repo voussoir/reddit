@@ -59,9 +59,9 @@ def scanSub():
             pauthor = post.author.name
         except AttributeError:
             pauthor = '[DELETED]'
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
             pbody = post.selftext.lower()
             pbody += ' ' + post.title.lower()
             if any(key.lower() in pbody for key in TITLESTRING):

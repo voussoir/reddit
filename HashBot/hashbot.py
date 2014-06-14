@@ -53,9 +53,9 @@ def scanSub():
         ptitle = post.title
         pauthor = post.author.name
         pid = post.id
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
             titlesplit = ptitle.split()
             for word in titlesplit:
                 if len(word) > 1 and word[0] == '#':

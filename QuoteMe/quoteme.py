@@ -56,9 +56,9 @@ def scanSub():
         pbody = post.body
         pbody = pbody.replace('\n\n', '.\n\n>')
         if any(key.lower() in pbody.lower() for key in PARENTSTRING):
-            cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+            cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
             if not cur.fetchone():
-                cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
+                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])    
                 pbodysplit = pbody.split('.')
                 for sent in pbodysplit:
                     if any(key.lower() in sent.lower() for key in PARENTSTRING):

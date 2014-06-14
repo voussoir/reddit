@@ -60,7 +60,7 @@ def scanSub():
         pid = post.id
         pbody = post.body
         if PARENTSTRING.lower() in pbody.lower():
-            cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+            cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
             if not cur.fetchone():
                 pbodysplit = pbody.split()
                 print(pid)
@@ -80,7 +80,7 @@ def scanSub():
                 if len(result) > 0:
                     final = HEADER + '\n\n'.join(result)
                     post.reply(final)
-                cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)    
+                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])    
     sql.commit()
 
 while True:

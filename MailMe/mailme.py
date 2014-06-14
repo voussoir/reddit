@@ -63,9 +63,9 @@ def scanSub():
             pauthor = '[DELETED]'
         plink = post.permalink
         print(pid)
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
             pbody = post.body.lower()
             if any(key.lower() in pbody for key in PARENTSTRING):
                 print('Found ' + pid + ' by ' + pauthor)

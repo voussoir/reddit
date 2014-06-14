@@ -58,7 +58,7 @@ def scanSub():
         except AttributeError:
             pauthor = "[DELETED]"
 
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
             if post.score > 11:
                 cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)

@@ -84,18 +84,18 @@ def scan():
 		ptime = post.created_utc
 		ptitle = post.title.lower()
 		if TSTRING.lower() in ptitle:
-			cur.execute('SELECT * FROM oldposts WHERE id="%s"' % pid)
+			cur.execute('SELECT * FROM oldposts WHERE id=?', [pid])
 			if not cur.fetchone():
-				cur.execute('SELECT * FROM users WHERE name="%s"' % pauthor)
+				cur.execute('SELECT * FROM users WHERE name=?', [pauthor])
 				if not cur.fetchone():
 					print('Found new user: ' + pauthor)
-					cur.execute('INSERT INTO users VALUES("%s", "%s")' % (pauthor, pid))
+					cur.execute('INSERT INTO users VALUES(?, ?)', (pauthor, pid))
 					r.send_message(pauthor, 'Welcome to /r/pkmntcgtrades!','Dear ' + pauthor + ',\n\n Our bot has determined that this is your first time posting in /r/pkmntcgtrades. Please take the time to read [the guidelines](http://www.reddit.com/r/pkmntcgtrades/wiki/guidelines) to understand how the subreddit works.\n\nIf you have any questions, feel free to [message the moderators.](http://www.reddit.com/message/compose?to=%2Fr%2Fpkmntcgtrades) Thanks, and happy trading!', captcha=None)
 					sql.commit()
 					print('\t' + pauthor + ' has been added to the database.')
 					time.sleep(5)
 				else:
-					cur.execute('SELECT * FROM users WHERE name="%s"' % pauthor)
+					cur.execute('SELECT * FROM users WHERE name=?', [pauthor])
 					fetch = cur.fetchone()
 					print('Found post by known user: ' + pauthor)
 					previousid = fetch[1]
@@ -106,8 +106,8 @@ def scan():
 						difference = curtime - previoustime
 						if difference >= DELAY:
 							print('\tPost complies with timelimit guidelines. Permitting')
-							cur.execute('DELETE FROM users WHERE name="%s"' % pauthor)
-							cur.execute('INSERT INTO users VALUES("%s", "%s")' % (pauthor, pid))
+							cur.execute('DELETE FROM users WHERE name=?', [pauthor])
+							cur.execute('INSERT INTO users VALUES(?, ?)', (pauthor, pid))
 							sql.commit()
 							print('\t' + pauthor + "'s database info has been reset.")
 						else:
@@ -118,7 +118,7 @@ def scan():
 							response.distinguish()
 							post.remove(spam=False)
 							time.sleep(5)
-				cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+				cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 		sql.commit()
 
 

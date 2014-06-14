@@ -98,7 +98,7 @@ def scan():
 		curtime = getTime(True)		
 		ctime = curtime
 		
-		cur.execute('SELECT * FROM oldposts WHERE id="%s"' % pid)
+		cur.execute('SELECT * FROM oldposts WHERE id=?', [pid])
 		if not cur.fetchone():
 			if post.is_self == False or IGNORESELFPOST == False:
 				if pauthor not in mods or IGNOREMODS == False:
@@ -141,7 +141,7 @@ def scan():
 						if found == True:
 							print('\tFound comment by OP. All clear.')
 							post.set_flair(flair_text=FLAIRUNSOLVED, flair_css_class=CSSUNSOLVED)
-							cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+							cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 						elif found == False and len(ctimes) > 0:
 							print('\tNo comments by OP. Checking time limit.')
 							ctime = min(ctimes)
@@ -154,7 +154,7 @@ def scan():
 								newcomment.distinguish()
 								print('\tRemoving Post')
 								post.remove()
-								cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+								cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 							else:
 								differences = str('%.0f' % (DELAY - difference))
 								print('\tStill has ' + differences + 's.')
@@ -163,15 +163,15 @@ def scan():
 
 					else:
 						print(pid + ': Neither flair')
-						cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+						cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
 				if pauthor in mods and IGNOREMODS == True:
 					print(pid + ', ' + pauthor + ': Ignoring Moderator')
-					cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+					cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
 			if post.is_self == True and IGNORESELFPOST == True:
 				print(pid + ', ' + pauthor + ': Ignoring Selfpost')
-				cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+				cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
 		sql.commit()
 
