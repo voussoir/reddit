@@ -33,6 +33,8 @@ MAXPOSTS = 15
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
+BREAKPOINTS = ["'"]
+#This is a list of characters which will halt the username creation. Breakpoints.
 
 
 '''All done!'''
@@ -63,6 +65,15 @@ sql.commit()
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
+def breakpoint(word):
+    newword = ''
+    for c in word:
+        if c in CHARS:
+            newword += c
+        if c in BREAKPOINTS:
+            break
+    return newword
+
 def scanSub():
     print('Searching '+ SUBREDDIT + '.')
     subreddit = r.get_subreddit(SUBREDDIT)
@@ -85,9 +96,8 @@ def scanSub():
                     if TRIGGERSTRING in word:
                         print(word)
                         word = word.replace(TRIGGERSTRING, '')
-                        word = ''.join(c for c in word if c in CHARS)
+                        word = breakpoint(word)
                         finalword = TRIGGERSTRING + word
-
                         try:
                             user = r.get_redditor(word, fetch=True)
                             finalword = finalword.replace(word, user.name)
