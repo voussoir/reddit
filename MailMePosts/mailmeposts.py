@@ -62,10 +62,10 @@ def scanSub():
         except AttributeError:
             pauthor = "[DELETED]"
         plink = post.permalink
-        cur.execute('SELECT * FROM oldposts WHERE ID="%s"' % pid)
+        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
             try:
-                cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
                 ptitle = post.title.lower()
                 try:
                     ptext = post.selftext.lower()
