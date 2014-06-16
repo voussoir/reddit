@@ -3,13 +3,12 @@ import praw # simple interface to the reddit API, also handles rate limiting of 
 import time
 import winsound
 import os
+import getpass
 
 '''USER CONFIGURATION'''
 
-USERNAME  = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = ""
-#This is the bot's Password. 
+print('Your password will be hidden while typing.')
+
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 WAIT = 30
@@ -24,15 +23,21 @@ WAIT = 30
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
     USERAGENT = bot.getaG()
 except ImportError:
     pass
 
 
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD) 
+trying = True
+while trying == True:
+	try:
+		USERNAME  = input('Username: ')
+		PASSWORD  = getpass.getpass('Password: ')
+		r.login(USERNAME, PASSWORD) 
+		trying = False
+	except Exception:
+		print('error')
 
 playedSound = False
 def scan():
