@@ -117,7 +117,10 @@ def scanSub():
 
                             if SUBDUMP == True:
                                 print('\tDumping to ' + DSUB)
-                                create = r.submit(DSUB, newtitle, url=purl, captcha = None)
+                                try:
+                                    create = r.submit(DSUB, newtitle, url=purl, captcha = None)
+                                except praw.errors.AlreadySubmitted:
+                                    print('Error: Already Submitted. Skipping...')
                                 print('\tCreated post ' + create.id)
                                 if DISTINGUISHPOST == True:
                                     print('\tDistinguishing post')
