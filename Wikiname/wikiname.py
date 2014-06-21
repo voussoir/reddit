@@ -109,12 +109,12 @@ def scan():
 
 
 while True:
-	scan()
-	sql.commit()
-#	try:
-#		scan()
-#		sql.commit()
-#	except Exception:
-#		print('fail')
+#	scan()
+#	sql.commit()
+	try:
+		scan()
+		sql.commit()
+	except Exception:
+		print('fail')
 	print('Running again in ' + WAITS + ' seconds.\n')
 	time.sleep(WAIT)
