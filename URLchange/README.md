@@ -1,4 +1,4 @@
 URLChange
 =============
 
-Very much ad-hoc. Replaces a piece of a comment with something else and replies. 
+Finds a comment containing a certain string, and replies with a fixed version. Built for /r/SimpleRockets
