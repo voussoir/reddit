@@ -61,7 +61,7 @@ def scanSub():
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
             if post.score > 11:
-                cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
+                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
                 print('Tipping ' + pauthor + ' on thread ' + post.id)
                 post.add_comment(COMMENT)
 
