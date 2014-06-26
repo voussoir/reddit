@@ -67,7 +67,12 @@ def scanSub():
                 for sent in pbodysplit:
                     if PARENTSTRING.lower() in sent.lower():
                         try:
-                            int(sent[PLEN:])
+                            url = sent.replace(PARENTSTRING, REPLACESTRING)
+                            if '(' in url:
+                                url = url[url.index('(')+1:]
+                                url = url.replace(')', '')                            
+
+                            int(sent[PLEN:-1])
                             pauthor = post.author.name
                             if pauthor != USERNAME:
                                 result.append(sent.replace(PARENTSTRING, REPLACESTRING))
