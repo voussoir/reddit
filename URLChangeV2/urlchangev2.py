@@ -107,7 +107,12 @@ def scanComs():
                             if pauthor != USERNAME or IGNORESELF == False:
                                 for key in PARENTSTRING:
                                     if key in sent:
-                                        result.append(sent.replace(key, REPLACESTRING)[:-4])
+                                        url = sent.replace(key, REPLACESTRING)
+                                        url = url.replace('.gif', '')
+                                        if '(' in url:
+                                            url = url[url.index('(')+1:]
+                                            url = url.replace(')', '')
+                                        result.append(url)
                                         break
                             else:
                                 print('Will not reply to self')

@@ -188,7 +188,7 @@ def scanPM():
                                 un = u.name
                             except Exception:
                                 s += '\n\nUser does not exist!'
-                            cur.execute('SELECT * FROM subscribers WHERE name=?', un)
+                            cur.execute('SELECT * FROM subscribers WHERE name=?', [un])
                             f = cur.fetchall()
                             for m in f:
                                 s += '\n\n/r/' + m[1]
