@@ -64,8 +64,11 @@ def scanSub():
             cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
             pbody = post.body.lower()
             if any(key.lower() in pbody for key in PARENTSTRING):
-                print('Replying to ' + pid + ' by ' + pauthor)
-                post.reply(REPLYSTRING)
+                if pauthor != USERNAME:
+                    print('Replying to ' + pid + ' by ' + pauthor)
+                    post.reply(REPLYSTRING)
+                else:
+                    print('Will not reply to self')
     sql.commit()
 
 
