@@ -71,11 +71,10 @@ def scanSub():
                             if '(' in url:
                                 url = url[url.index('(')+1:]
                                 url = url.replace(')', '')                            
-
-                            int(sent[PLEN:-1])
+                            int(url[PLEN:-1])
                             pauthor = post.author.name
-                            if pauthor != USERNAME:
-                                result.append(sent.replace(PARENTSTRING, REPLACESTRING))
+                            if pauthor !=USERNAME:
+                                result.append(url)
                         except ValueError:
                             print('Not a valid url')
                         except AttributeError:
