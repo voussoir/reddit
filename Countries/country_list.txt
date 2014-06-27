@@ -1,14 +1,11 @@
 *2014-06-13
-*Afghanistan
-*Armenia
-*Azerbaijan
-*Georgia
-*Bahrain
-*Cyprus
-*Iran
-*Iraq
-*Israel
-*Jordan
+Georgia
+Bahrain
+Cyprus
+Iran
+Iraq
+Israel
+Jordan
 Kuwait
 Lebanon
 Oman
@@ -19,55 +16,52 @@ Syria
 Turkey
 United Arab Emirates
 Yemen
-Kazakhstan
-Kyrgyzstan
-Tajikistan
-Turkmenistan
-Uzbekistan
-Bangladesh
-Bhutan
-India
-Maldives
-Nepal
-Pakistan
-Sri Lanka
-China
-Japan
-North Korea
-South Korea
-Mongolia
-Taiwan
-Cambodia
-Laos
-Myanmar
-Thailand
-Vietnam
-Brunei
-East Timor
-Indonesia
-Malaysia
-Philippines
-Singapore
 Australia
 New Zealand
-Fiji
-Papua New Guinea
-Solomon Islands
-Vanuatu
-Kiribati
-Marshall Islands
-Federated States of Micronesia
-Nauru
-Palau
-Samoa
-Tonga
-Tuvalu
+Argentina
+Bolivia
+Brazil
+Chile
+Colombia
+Ecuador
+Guyana
+Paraguay
+Peru
+Suriname
+Uruguay
+Venezuela
 Algeria
 Egypt
 Libya
 Morocco
 Sudan
 Tunisia
+Belarus
+Bulgaria
+Czech Republic
+Hungary
+Moldova
+Poland
+Romania
+Russia
+Slovakia
+Ukraine
+Kazakhstan
+Kyrgyzstan
+Tajikistan
+Turkmenistan
+Uzbekistan
+Fiji
+Papua New Guinea
+Solomon Islands
+Vanuatu
+Costa Rica
+Belize
+El Salvador
+Guatemala
+Honduras
+Nicaragua
+Panama
 Benin
 Burkina Faso
 Cape Verde
@@ -84,82 +78,6 @@ Nigeria
 Senegal
 Sierra Leone
 Togo
-Angola
-Cameroon
-Central African Republic
-Chad
-Democratic Republic of the Congo
-Republic of the Congo
-Equatorial Guinea
-Gabon
-Sao Tome and Principe
-Burundi
-Djibouti
-Eritrea
-Ethiopia
-Kenya
-Malawi
-Mozambique
-Rwanda
-Somalia
-South Sudan
-Tanzania
-Uganda
-Zambia
-Zimbabwe
-Comoros
-Madagascar
-Mauritius
-Seychelles
-Botswana
-Lesotho
-Namibia
-South Africa
-Swaziland
-Argentina
-Bolivia
-Brazil
-Chile
-Colombia
-Ecuador
-Guyana
-Paraguay
-Peru
-Suriname
-Uruguay
-Venezuela
-Belize
-Costa Rica
-El Salvador
-Guatemala
-Honduras
-Nicaragua
-Panama
-Antigua and Barbuda
-Barbados
-Dominica
-Grenada
-Saint Kitts and Nevis
-Saint Lucia
-Saint Vincent and the Grenadines
-Trinidad and Tobago
-Cuba
-Dominican Republic
-Haiti
-Jamaica
-Bahamas
-Canada
-United States of America
-Belarus
-Bulgaria
-Czech Republic
-Hungary
-Moldova
-Poland
-Romania
-Russia
-Slovakia
-Ukraine
 Albania
 Bosnia and Herzegovina
 Bulgaria
@@ -178,6 +96,41 @@ Portugal
 San Marino
 Spain
 Vatican City
+Afghanistan
+Bangladesh
+Bhutan
+India
+Maldives
+Nepal
+Pakistan
+Sri Lanka
+Kiribati
+Marshall Islands
+Micronesia, Federated States of
+Nauru
+Palau
+Antigua and Barbuda
+Barbados
+Dominica
+Grenada
+Saint Kitts and Nevis
+Saint Lucia
+Saint Vincent and the Grenadines
+Trinidad and Tobago
+Cuba
+Dominican Republic
+Haiti
+Jamaica
+Bahamas
+Angola
+Cameroon
+C African Republic
+Chad
+Congo, Democratic Republic of the
+Congo, Republic of the
+Equatorial Guinea
+Gabon
+Sao Tome and Principe
 Austria
 Belgium
 France
@@ -187,6 +140,36 @@ Luxembourg
 Monaco
 Netherlands
 Switzerland
+China
+Japan
+Korea, N
+Korea, S
+Mongolia
+Taiwan
+Samoa
+Tonga
+Tuvalu
+Canada
+Mexico
+United States
+Burundi
+Djibouti
+Eritrea
+Ethiopia
+Kenya
+Malawi
+Mozambique
+Rwanda
+Somalia
+S Sudan
+Tanzania
+Uganda
+Zambia
+Zimbabwe
+Comoros
+Madagascar
+Mauritius
+Seychelles
 Estonia
 Latvia
 Lithuania
@@ -197,3 +180,19 @@ Norway
 Sweden
 Ireland
 United Kingdom
+Cambodia
+Laos
+Myanmar
+Thailand
+Vietnam
+Brunei
+E Timor
+Indonesia
+Malaysia
+Philippines
+Singapore
+Botswana
+Lesotho
+Namibia
+S Africa
+Swaziland
