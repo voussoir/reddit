@@ -13,7 +13,7 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-MAXPOSTS = 100
+MAXPOSTS = 2000
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
@@ -89,17 +89,18 @@ def work():
 	listo = scanSent()
 	lista = listi + listo
 	lista.sort(key=lambda x: x.created_utc, reverse=False)
+	mcur = 0
+	mlen = len(lista)
 	for item in lista:
-		print('Writing item ' + item.id, end='')
+		mcur += 1
 		messagefile = open(PRINTFILE, 'r+')
 		messagelist = []
 		for line in messagefile:
 			messagelist.append(line.strip())
 		messagefile.close()
 		messagefile = open(PRINTFILE, 'w')
-
+		print(("%06d" % mcur) + '/' + ("%06d" % mlen) + ': Writing item ' + item.id, end='')
 		try:
-
 			try:
 				pauthor = item.author.name
 			except Exception:
