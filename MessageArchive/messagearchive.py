@@ -34,9 +34,9 @@ clistfile.close()
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getu7()
-    PASSWORD = bot.getp7()
-    USERAGENT = bot.geta7()
+    USERNAME = bot.getuG()
+    PASSWORD = bot.getpG()
+    USERAGENT = bot.getaG()
 except ImportError:
     pass
 
@@ -98,47 +98,55 @@ def work():
 		messagefile.close()
 		messagefile = open(PRINTFILE, 'w')
 
-		if item.parent_id == None:
-			print(' <= Root')
-			messagelist.append('======================================================')
-			messagelist.append(item.id)
-			messagelist.append(datetime.datetime.fromtimestamp(int(item.created_utc)).strftime("%B %d %Y %H:%M UTC"))
-			if item.author.name.lower() == USERNAME.lower():
-				messagelist.append('To ' + item.dest)
+		try:
+
+			try:
+				pauthor = item.author.name
+			except Exception:
+				pauthor = '[DELETED]'
+			if item.parent_id == None:
+				print(' <= Root')
+				messagelist.append('======================================================')
+				messagelist.append(item.id)
+				messagelist.append(datetime.datetime.fromtimestamp(int(item.created_utc)).strftime("%B %d %Y %H:%M UTC"))
+				if pauthor.lower() == USERNAME.lower():
+					messagelist.append('To ' + item.dest)
+				else:
+					messagelist.append('From ' + pauthor)
+				messagelist.append('Subject: ' + item.subject)
+				messagelist.append(item.body.replace('\n', '//'))
+	
 			else:
-				messagelist.append('From ' + item.author.name)
-			messagelist.append('Subject: ' + item.subject)
-			messagelist.append(item.body.replace('\n', '//'))
-
-		else:
-			print()
-			for m in range(len(messagelist)):
-				if item.parent_id[3:] in messagelist[m]:
-
-					count = '| '
-					tline = messagelist[m]
-					while tline[:2] == '| ':
-						count += '| '
-						tline = tline[2:]
-
-					messagelist[m+4] += '\n\n' + count + item.id + '\n'
-					messagelist[m+4] += count + datetime.datetime.fromtimestamp(int(item.created_utc)).strftime("%B %d %Y %H:%M UTC") + '\n' + count
-					if item.author.name.lower() == USERNAME.lower():
-						messagelist[m+4] += 'To ' + item.dest + '\n'
-					else:
-						messagelist[m+4] +='From ' + item.author.name + '\n'
-					messagelist[m+4] += count + 'Subject: ' + item.subject + '\n'
-					messagelist[m+4] += count + item.body.replace('\n', '//')
-
-
-
-
+				print()
+				for m in range(len(messagelist)):
+					if item.parent_id[3:] in messagelist[m]:
+	
+						count = '| '
+						tline = messagelist[m]
+						while tline[:2] == '| ':
+							count += '| '
+							tline = tline[2:]
+	
+						messagelist[m+4] += '\n\n' + count + item.id + '\n'
+						messagelist[m+4] += count + datetime.datetime.fromtimestamp(int(item.created_utc)).strftime("%B %d %Y %H:%M UTC") + '\n' + count
+						if pauthor.lower() == USERNAME.lower():
+							messagelist[m+4] += 'To ' + item.dest + '\n'
+						else:
+							messagelist[m+4] +='From ' + pauthor + '\n'
+						messagelist[m+4] += count + 'Subject: ' + item.subject + '\n'
+						messagelist[m+4] += count + item.body.replace('\n', '//')
+		except Exception:
+			print("Emergency save!")
+			for m in messagelist:
+				print(m, file=messagefile)
+				messagefile.close()
+				time.sleep(0.1)
 
 
 		for m in messagelist:
 			print(m, file=messagefile)
 		messagefile.close()
-		time.sleep(0.2)
+		time.sleep(0.1)
 
 
 
