@@ -3,6 +3,7 @@ import praw # simple interface to the reddit API, also handles rate limiting of 
 import time
 import os
 import sys
+import sqlite3
 
 '''USER CONFIGURATION'''
 USERNAME  = ""
@@ -24,7 +25,14 @@ WAIT = 30
 '''All done!'''
 
 
+sql = sqlite3.connect('sql.db')
+print('Loaded SQL Database')
+cur = sql.cursor()
 
+cur.execute('CREATE TABLE IF NOT EXISTS oldposts(name TEXT)')
+print('Loaded Users table')
+
+sql.commit()
 
 
 try:
@@ -44,25 +52,35 @@ r.login(USERNAME, PASSWORD)
 
 def scanPM():
     print('Searhing Inbox.')
-    pms = r.get_unread(unset_has_mail=True, update_user=True)
+    pms = r.get_unread(update_user=True)
     for pm in pms:
+        alreadysent = False
         result = []
         try:
             author = pm.author.name
-        except Exception:
-            author = 'DELETED'
-        pbody = pm.body.lower()
-        print('Handling ' + pm.id + ' from ' + author)
-        for item in RESPONSE:
-            if item.lower() in pbody:
-                result.append(RESPONSE[item.lower()])
-                print('\t' + item)
-        final = HEADER + '\n\n'
-        final += '\n\n'.join(result)
-        final += '\n\n' + FOOTER
+            print('Handling ' + pm.id + ' from ' + author)
+            cur.execute('SELECT * FROM oldposts WHERE name=?', [author])
+            if not cur.fetchone():
+                pbody = pm.body.lower()
+                for item in RESPONSE:
+                    if item.lower() in pbody:
+                        result.append(RESPONSE[item])
+                        print('\t' + item)
+                if len(result) > 0:
+                    final = HEADER + '\n\n'
+                    final += '\n\n'.join(result)
+                    final += '\n\n' + FOOTER
+                    r.send_message(author, TITLE, final, captcha=None)
+                    cur.execute('INSERT INTO oldposts VALUES(?)', [author])
+                    pm.mark_as_read()
+                else:
+                    print('\tNo results')
+            else:
+                print('\tAlready sent to ' + author)
+        except Exception as e:
+            print(e)
+        sql.commit()
         
-        r.send_message(author, TITLE, final, captcha=None)
-        pm.mark_as_read()
     print('')
 
 
@@ -71,5 +89,6 @@ while True:
         scanPM()
     except Exception as e:
         print('ERROR: ' + str(e))
+    sql.commit()
     print('Running again in ' + WAITS + ' seconds \n_________\n')
     time.sleep(WAIT)
