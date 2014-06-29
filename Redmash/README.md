@@ -1,7 +1,7 @@
 REDMASH
 ==========
 
-Don't waste your time posting this to /r/shittyprogramming. It's bad. I know. 
+Don't waste your time posting this to /r/shittyprogramming. It's bad. I know. I don't care right now.
 
 This scrapes reddit for posts with keywords in the titles, keydomains as the linked url, or keynames as the submitter. It compiles these into multiple TXT files which are sorted by various criteria. 
 

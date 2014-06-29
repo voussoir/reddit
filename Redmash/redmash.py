@@ -12,7 +12,7 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "all-funny-gifs-pics-aww-leagueoflegends-minecraft-mildlyinteresting-tipofmytongue-trees-askreddit"
+SUBREDDIT = "all-funny-gifs-pics-leagueoflegends-minecraft-mildlyinteresting-tipofmytongue-trees-askreddit"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subs, use "sub1+sub2+sub3+...". For all use "all"
 KEYWORDS = [" NSA", "NSA " "Snowden", "Greenwald"]
 #Words to look for
@@ -43,7 +43,7 @@ FORMAT = "_timestamp_: [_title_](_url_) - [r/_subreddit_](_nplink_)"
 PRINTFILE = "nsa"
 #Name of the file that will be produced. Do not type the file extension
 
-MAXPOSTS = 10000
+MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once.
 
 '''All done!'''
@@ -69,7 +69,7 @@ r.login(USERNAME, PASSWORD)
 def work(lista):
 	global listfile
 	if HEADER != "":
-		print(HEADER,listfile)
+		print(HEADER, file=listfile)
 	for post in lista:
 		timestamp = post.created_utc
 		timestamp = datetime.datetime.fromtimestamp(int(timestamp)).strftime(TIMESTAMP)
