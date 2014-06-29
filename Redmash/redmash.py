@@ -2,6 +2,7 @@
 import praw # simple interface to the reddit API, also handles rate limiting of requests
 import time
 import datetime
+import traceback
 import pickle
 
 '''USER CONFIGURATION'''
@@ -12,7 +13,7 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "all-funny-gifs-pics-leagueoflegends-minecraft-mildlyinteresting-tipofmytongue-trees-askreddit"
+SUBREDDIT = "nsaleaks"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subs, use "sub1+sub2+sub3+...". For all use "all"
 KEYWORDS = [" NSA", "NSA " "Snowden", "Greenwald"]
 #Words to look for
@@ -43,7 +44,7 @@ FORMAT = "_timestamp_: [_title_](_url_) - [r/_subreddit_](_nplink_)"
 PRINTFILE = "nsa"
 #Name of the file that will be produced. Do not type the file extension
 
-MAXPOSTS = 100
+MAXPOSTS = 1000
 #This is how many posts you want to retrieve all at once.
 
 '''All done!'''
@@ -87,7 +88,17 @@ def work(lista):
 		slink = post.short_link
 		slink = slink.replace('http://', 'http://np.')
 		final = final.replace('_nplink_', slink)
-		print(final, file=listfile)
+		try:
+			print(final, file=listfile)
+		except:
+			print('\t' + post.id + ': Charstepping')
+			for char in final:
+				try:
+					print(char, file=listfile, end='')
+				except:
+					pass
+			print('',file=listfile)
+
 
 
 
@@ -119,29 +130,34 @@ except Exception:
 	print('EMERGENCY')
 
 print('Collected ' + str(counta) + ' items.')
-print('Writing Time file')
-lista.sort(key=lambda x: x.created_utc, reverse=False)
-listfile = open(PRINTFILE + '_date.txt', 'w')
-work(lista)
-listfile.close()
 
-print('Writing Subreddit file')
-lista.sort(key=lambda x: x.subreddit.display_name.lower(), reverse=False)
-listfile = open(PRINTFILE + '_subreddit.txt', 'w')
-work(lista)
-listfile.close()
-
-print('Writing Title file')
-lista.sort(key=lambda x: x.title.lower(), reverse=False)
-listfile = open(PRINTFILE + '_title.txt', 'w')
-work(lista)
-listfile.close()
-
-print('Writing Author file')
-lista.sort(key=lambda x: x.author.name.lower(), reverse=False)
-listfile = open(PRINTFILE + '_author.txt', 'w')
-work(lista)
-listfile.close()
+try:
+	print('Writing Date file')
+	lista.sort(key=lambda x: x.created_utc, reverse=False)
+	listfile = open(PRINTFILE + '_date.txt', 'w')
+	work(lista)
+	listfile.close()
+	
+	print('Writing Subreddit file')
+	lista.sort(key=lambda x: x.subreddit.display_name.lower(), reverse=False)
+	listfile = open(PRINTFILE + '_subreddit.txt', 'w')
+	work(lista)
+	listfile.close()
+	
+	print('Writing Title file')
+	lista.sort(key=lambda x: x.title.lower(), reverse=False)
+	listfile = open(PRINTFILE + '_title.txt', 'w')
+	work(lista)
+	listfile.close()
+	
+	print('Writing Author file')
+	lista.sort(key=lambda x: x.author.name.lower(), reverse=False)
+	listfile = open(PRINTFILE + '_author.txt', 'w')
+	work(lista)
+	listfile.close()
+except Exception:
+	traceback.print_tb()
+	('EMERGENCY: txt writing failed')
 
 print('Saving to Pickle.')
 class Posted(object):
@@ -168,4 +184,5 @@ for item in lista:
 	listc.append(obj.__dict__)
 filec = open(PRINTFILE + '.p', 'wb')
 pickle.dump(listc, filec)
+filec.close()
 print('Done.')
