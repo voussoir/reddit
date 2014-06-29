@@ -21,6 +21,6 @@ Open Python interpreter
 
 `item = loaded[5]`
 
-`print(item['author'])
+`print(item['author'])`
 
 Contact me if this doesn't make any sense. I wouldn't be surprised.
