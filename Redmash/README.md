@@ -8,6 +8,7 @@ This scrapes reddit for posts with keywords in the titles, keydomains as the lin
 At the end, it packs the information into a pickle file. This allows you to generate more txt files without having to re-run the program. This is especially important if you're scraping several thousand submissions.
 
 **To use the pickle file:**
+
 Open Python interpreter
 
 `import pickle`
