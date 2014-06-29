@@ -115,6 +115,9 @@ def scanSub():
                                 newtitle = newtitle.replace('_author_', pauthor)
                                 newtitle = newtitle.replace('_subreddit_', psub)
 
+                            if len(newtitle) > 300:
+                                newtitle = newtitle[:297] + '...'
+
                             if SUBDUMP == True:
                                 print('\tDumping to ' + DSUB)
                                 try:
