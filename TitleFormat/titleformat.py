@@ -17,8 +17,13 @@ SUBREDDIT = "GoldTesting"
 FORMATS = ['[*] * - *']
 #These are the permitted title formats
 
+FORCEURL = ""
+#Only urls with this in them will be allowed. You should only include "website.com" to stay general
+
 REMOVECOMMENT = "Your submission has been removed because the title does not follow a permitted format. Please check the sidebar"
-#This is what the bot will say 
+#This is what the bot will say when removing for Title
+URLCOMMENT = "Your submission does not follow the URL guidelines"
+#This is what the bot will say when removing for URL
 DISTINGUISHCOMMENT = True
 #If your bot is a moderator, you can distinguish the comment. Use True or False (Use capitals! No quotations!)
 
@@ -108,20 +113,31 @@ def scanSub():
 			if post.is_self == False or IGNORESELFPOST == False:
 				if pauthor not in mods or IGNOREMODS == False:
 					ptitle = post.title
-					done = False
-					for format in FORMATS:
-						print('\t',end='')
-						work(ptitle, format)
-					if done == False:
-						try:
-							print('\tWriting comment')
-							newcom = post.add_comment(REMOVECOMMENT)
+					purl = post.url
+					if FORCEURL != "" and FORCEURL not in purl:
+						print('\tWriting comment')
+						newcom = post.add_comment(URLCOMMENT)
+						if DISTINGUISHCOMMENT == True:
 							print('\tDistinguishing comment')
 							newcom.distinguish()
-							print('\tRemoving post')
-							post.remove()
-						except praw.errors.APIException:
-							print('\tPost is deleted. Ignoring')
+						print('\tRemoving post')
+						post.remove()
+					else:
+						done = False
+						for format in FORMATS:
+							print('\t',end='')
+							work(ptitle, format)
+						if done == False:
+							try:
+								print('\tWriting comment')
+								newcom = post.add_comment(REMOVECOMMENT)
+								if DISTINGUISHCOMMENT == True:
+									print('\tDistinguishing comment')
+									newcom.distinguish()
+								print('\tRemoving post')
+								post.remove()
+							except praw.errors.APIException:
+								print('\tPost is deleted. Ignoring')
 				else:
 					print('\tIgnoring modpost.')
 			else:
