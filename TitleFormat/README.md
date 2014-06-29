@@ -7,7 +7,7 @@ For example:
 
 "[*] * - *" = "[Genre] Artist - Song Name"
 
-"* (*) [*x*]" = "Martian dude (Colored Pencil) [1920x1080]"
+"* (\*) [\*x\*]" = "Martian dude (Colored Pencil) [1920x1080]"
 
 Notice that the asterisks do not care how many words replace them. 
 
