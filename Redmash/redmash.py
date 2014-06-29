@@ -87,7 +87,6 @@ def work(lista):
 		slink = post.short_link
 		slink = slink.replace('http://', 'http://np.')
 		final = final.replace('_nplink_', slink)
-		print('\t' + post.id)
 		print(final, file=listfile)
 
 
@@ -95,27 +94,31 @@ def work(lista):
 lista = []
 count =  0
 counta = 0
-print('Scanning.')
-subreddit = r.get_subreddit(SUBREDDIT)
-posts = subreddit.get_new(limit=MAXPOSTS)
-for post in posts:
-	if not post.is_self or IGNORESELF == False:
-		try:
-			author = post.author.name
-		except Exception:
-			author = '[DELETED]'
-		if any(m.lower() in post.title.lower() for m in KEYWORDS) \
-		or any(m.lower() in post.url.lower() for m in KEYDOMAINS) \
-		or any(m.lower() == author.lower() for m in KEYNAMES):
-			lista.append(post)
-			counta += 1
-	count += 1
-	print(str(count) + ' / ' + MAXS + ' | ' + str(counta))
+try:
+	print('Scanning.')
+	subreddit = r.get_subreddit(SUBREDDIT)
+	posts = subreddit.get_new(limit=MAXPOSTS)
+	for post in posts:
+		if not post.is_self or IGNORESELF == False:
+			try:
+				author = post.author.name
+			except Exception:
+				author = '[DELETED]'
+			if any(m.lower() in post.title.lower() for m in KEYWORDS) \
+			or any(m.lower() in post.url.lower() for m in KEYDOMAINS) \
+			or any(m.lower() == author.lower() for m in KEYNAMES):
+				lista.append(post)
+				counta += 1
+		count += 1
+		print(str(count) + ' / ' + MAXS + ' | ' + str(counta))
+	
+	for item in lista:
+		if item.author == None:
+			item.author = '[DELETED]'
+except Exception:
+	print('EMERGENCY')
 
-for item in lista:
-	if item.author == None:
-		item.author = '[DELETED]'
-
+print('Collected ' + str(counta) + ' items.')
 print('Writing Time file')
 lista.sort(key=lambda x: x.created_utc, reverse=False)
 listfile = open(PRINTFILE + '_date.txt', 'w')
