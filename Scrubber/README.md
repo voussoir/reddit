@@ -7,4 +7,4 @@ It will scan /r/subreddit/new, /top, and /comments. It will then scan /u/user/su
 
 Reddit only allows us to grab 1,000 items from each of the five areas mentioned. It may be impossible to truly scrub the user, but if it's that far back in all directions, it's probably not worth worrying about.
 
-This bot must be a moderator
+You must log in as a moderator, obviously.
