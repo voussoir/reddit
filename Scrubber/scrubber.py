@@ -27,13 +27,16 @@ except ImportError:
 print('Logging in as ' + USERNAME)
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD)
-print('\nWho do you want to scrub?')
-USER = input('>/u/')
-print('\nYou are about to scrub /u/' + USER + "'s existence from /r/" + SUBREDDIT)
-print('Are you sure? Y/N')
-confirm = input('>')
-if confirm.lower() not in ['yes','y']:
-	quit()
+def start():
+	print('\nWho do you want to scrub?')
+	USER = input('>/u/')
+	print('\nYou are about to scrub /u/' + USER + "'s existence from /r/" + SUBREDDIT)
+	print('Are you sure? Y/N')
+	confirm = input('>')
+	if confirm.lower() not in ['yes','y']:
+		pass
+	else:
+		SCRUB(USER)
 	
 def work(posts):
 	for post in posts:
@@ -97,4 +100,5 @@ def SCRUB(USER):
 	print('\nFinished')
 	input()
 
-SCRUB(USER)
+while True:
+	start()
