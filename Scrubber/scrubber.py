@@ -67,38 +67,36 @@ def worku(posts):
 def SCRUB(USER):
 	try:
 		redditor = r.get_redditor(USER)
+		print('\nBeginning scrub in 5 seconds...')
+		time.sleep(5)
+		print('Scrubbing /u/' + USER + ' from /r/' + SUBREDDIT + '\n')
+		subreddit = r.get_subreddit(SUBREDDIT)
+		print('Scanning /r/' + SUBREDDIT + '/New')
+		posts = subreddit.get_new(limit=None)
+		work(posts)
+	
+		print('Scanning /r/' + SUBREDDIT + '/top')
+		posts = subreddit.get_top(limit=None)
+		work(posts)
+	
+		print('Scanning /r/' + SUBREDDIT + '/comments')
+		posts = subreddit.get_comments(limit=None)
+		work(posts)
+	
+		redditor = r.get_redditor(USER,fetch=True)
+		print('Scanning /u/' + USER + '/submitted')
+		posts = redditor.get_submitted(limit=None)
+		worku(posts)
+	
+		print('Scanning /u/' + USER + '/comments')
+		posts = redditor.get_comments(limit=None)
+		worku(posts)
+	
+		print('\nFinished')
+		input()
 	except:
 		print('That user does not exist')
-		print('Press enter to close')
 		input()
-		quit()
-	print('\nBeginning scrub in 5 seconds...')
-	time.sleep(5)
-	print('Scrubbing /u/' + USER + ' from /r/' + SUBREDDIT + '\n')
-	subreddit = r.get_subreddit(SUBREDDIT)
-	print('Scanning /r/' + SUBREDDIT + '/New')
-	posts = subreddit.get_new(limit=None)
-	work(posts)
-
-	print('Scanning /r/' + SUBREDDIT + '/top')
-	posts = subreddit.get_top(limit=None)
-	work(posts)
-
-	print('Scanning /r/' + SUBREDDIT + '/comments')
-	posts = subreddit.get_comments(limit=None)
-	work(posts)
-
-	redditor = r.get_redditor(USER,fetch=True)
-	print('Scanning /u/' + USER + '/submitted')
-	posts = redditor.get_submitted(limit=None)
-	worku(posts)
-
-	print('Scanning /u/' + USER + '/comments')
-	posts = redditor.get_comments(limit=None)
-	worku(posts)
-
-	print('\nFinished')
-	input()
 
 while True:
 	start()
