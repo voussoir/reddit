@@ -95,7 +95,7 @@ def scanSub():
     for post in posts:
         pid = post.id
         plink = post.permalink
-        if not post.is_self or ALLOWSELF == False:
+        if not post.is_self or ALLOWSELF == True:
             ptitle = post.title
             purl = post.url
             cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
