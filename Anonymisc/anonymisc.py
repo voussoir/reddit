@@ -116,7 +116,7 @@ r.login(USERNAME, PASSWORD)
 
 def scanPM():
     banlist = []
-    whitelist = [ADMIN.lower()]
+    whitelist = ADMIN
     cur.execute('SELECT * FROM banned')
     fetched = cur.fetchall()
     for m in fetched:
