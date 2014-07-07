@@ -32,18 +32,20 @@ PMFAILURE = "Your comment has been rejected for the following reason(s):\n\n"
 PMTITLE = "Anonymisc"
 #This is the title of the message that will be returned to the user
 
-ERRBANNED = "- You have been banned from using this service"
+ERRBANNED = '- You have been banned from using this service'
 #If an admin has placed this user on the banlist, return this error
-ERRFETCH = "- Failed to fetch comment object given that permalink. You should use the permalink exactly as it appears when you cut / copy from your address bar. The last 7 characters are the comment's id number."
+ERRFETCH = '- Failed to fetch comment object given that permalink. You should use the permalink exactly as it appears when you cut / copy from your address bar. The last 7 characters are the comments id number.'
 #If praw fails in fetching the object from ID, return this error
-ERRNOPERMA = "- The first line of your PM must be a permalink to a comment."
+ERRNOPERMA = '- The first line of your PM must be a permalink to a comment.'
 #If the first line does not contain any visible permalink, return this error
-ERRFORMATTING = "- Your message does not follow the proper format"
+ERRFORMATTING = '- Your message does not follow the proper format'
 #If line formatting is wrong or lines are missing, return this error
-ERRSUBREST = "- The bot will not go to that subreddit"
+ERRSUBREST = '- The bot will not go to that subreddit'
 #If the bot is sent to an unapproved subreddit, return this error
-ERRWHITELIST = "- The bot is currently running in whitelist mode. You have not been added to the whitelist"
+ERRWHITELIST = '- The bot is currently running in whitelist mode. You have not been added to the whitelist'
 #If WHITEMODE is set to True and the user is not on the whitelist, return this error
+ERRTWICE = '- That comment has already been replied to through this service. The bot does not allow multiple replies at this time'
+#If ALLOWTWICE is False and a second user tries to make a reply, return this error
 
 WHITEMODE = False
 #If set to True, the bot will only allow users who are registered in the whitelist.
@@ -72,6 +74,10 @@ FIELDTEXT = ["Link Text:", "Hyperlink Text:", "Text:"]
 FIELDURL = ["Link URL:", "Hyperlink URL:", "URL:"]
 #These are the three fields the user needs to fill.
 
+ALLOWTWICE = True
+#Is it okay for multiple people to reply to the same comment?
+#If this is False, only one person will be able to create a reply to a permalink
+#Use True or False (With Capitals! No quotation marks!)
 
 DISTINGUISHCOMMENT = False
 #If your bot is going to be operating in a sub where it is a moderator, you may choose to distinguish the comment
@@ -197,6 +203,11 @@ def scanPM():
                                         print('\t[   ] ' + link)
                                 try:
                                     cobj = r.get_info(thing_id='t1_' + link)
+                                    if ALLOWTWICE == False and not any(author == admin.lower() for admin in ADMIN):
+                                        cur.execute('SELECT * FROM oldposts WHERE id=?', [cobj.id])
+                                        if cur.fetchone():
+                                            print('\t[ERR] This comment has already been replied to')
+                                            failresult.append(ERRTWICE)
                                     print('\t[   ] Found comment object')
                                     if SUBRESTRICT == [] or any(cobj.subreddit.display_name.lower() == sub.lower() for sub in SUBRESTRICT):
                                         print('\t[   ] Passed sub restriction')
@@ -244,6 +255,8 @@ def scanPM():
             elif len(failresult) == 0:
                 print('\t[   ] Creating comment')
                 reply = cobj.reply(COMHEADER.replace('_username_', author) + '\n\n[' + ltext + '](' + lurl + ')\n\n' + COMFOOTER.replace('_username_', author))
+                if ALLOWTWICE == False:
+                    cur.execute('INSERT INTO oldposts VALUES(?)', [cobj.id])
                 if DISTINGUISHCOMMENT == True:
                     try:
                         reply.distinguish()
