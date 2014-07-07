@@ -8,3 +8,5 @@ By sending this bot a PM, it can post comments for you
 To display the name of the user who commissioned the comment (defeating the anonymity I guess) you can place "\_username_" (without quotes!) in COMHEADER or COMFOOTER and it will be automatically replaced.
 
 The end result is an account which multiple people can comment from without ever knowing the password
+
+[Example](http://i.imgur.com/673idpl.png)
