@@ -20,7 +20,7 @@ FOOTER = "[In operating Newsletterly](http://redd.it/26xset)"
 #This will be the footer of every message sent by the bot.
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 90
+WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 ADMIN = "GoldenSights"
 '''All done!'''
@@ -113,7 +113,13 @@ def scanSub():
             if not cur.fetchone():
                 if post.subreddit.display_name.lower() in usersubs:
                     print('\t' + post.id)
-                    result.append('[' + post.subreddit.display_name + ': ' + post.title + '](' + post.permalink + ')')
+                    try:
+                        pauthor = ' /u/' + post.author.name
+                    except:
+                        pauthor = ' DELETED'
+                    f= '[/r/' + post.subreddit.display_name + pauthor + ': ' + post.title + '](' + post.permalink + ')'
+                    result.append(f)
+
         if len(result) > 0:
             final = 'Your subscribed subreddits have had some new posts: \n\n' + '\n\n'.join(result)
             final = final[:9900]
