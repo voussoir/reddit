@@ -32,19 +32,19 @@ PMFAILURE = "Your comment has been rejected for the following reason(s):\n\n"
 PMTITLE = "Anonymisc"
 #This is the title of the message that will be returned to the user
 
-ERRBANNED = '- You have been banned from using this service'
+ERRBANNED = "- You have been banned from using this service"
 #If an admin has placed this user on the banlist, return this error
-ERRFETCH = '- Failed to fetch comment object given that permalink. You should use the permalink exactly as it appears when you cut / copy from your address bar. The last 7 characters are the comments id number.'
+ERRFETCH = "- Failed to fetch comment object given that permalink. You should use the permalink exactly as it appears when you cut / copy from your address bar. The last 7 characters are the comments id number."
 #If praw fails in fetching the object from ID, return this error
-ERRNOPERMA = '- The first line of your PM must be a permalink to a comment.'
+ERRNOPERMA = "- The first line of your PM must be a permalink to a comment."
 #If the first line does not contain any visible permalink, return this error
-ERRFORMATTING = '- Your message does not follow the proper format'
+ERRFORMATTING = "- Your message does not follow the proper format"
 #If line formatting is wrong or lines are missing, return this error
-ERRSUBREST = '- The bot will not go to that subreddit'
+ERRSUBREST = "- The bot will not go to that subreddit"
 #If the bot is sent to an unapproved subreddit, return this error
-ERRWHITELIST = '- The bot is currently running in whitelist mode. You have not been added to the whitelist'
+ERRWHITELIST = "- The bot is currently running in whitelist mode. You have not been added to the whitelist"
 #If WHITEMODE is set to True and the user is not on the whitelist, return this error
-ERRTWICE = '- That comment has already been replied to through this service. The bot does not allow multiple replies at this time'
+ERRTWICE = "- That comment has already been replied to through this service. The bot does not allow multiple replies at this time"
 #If ALLOWTWICE is False and a second user tries to make a reply, return this error
 
 WHITEMODE = False
