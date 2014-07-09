@@ -73,7 +73,7 @@ clist.sort(key=lambda x: x.created_utc)
 printfile = open(PRINTFILE, 'w')
 m = 1
 rand = random.randint(1,len(clist))
-print('Thread: ' + pid + '\n\n' + str(len(clist)) + ' comments\n\nRandom Number: ' + str(rand) + ' : ' + clist[rand-1].author.name + '\n', file=printfile)
+print('Thread: ' + pid + '\n\n' + str(len(clist)) + ' root comments\n\nRandom Number: ' + str(rand) + ' : ' + clist[rand-1].author.name + '\n', file=printfile)
 for name in clist:
     print(str(m) + ' : ' + name.author.name, file=printfile)
     m+=1
