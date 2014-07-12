@@ -225,6 +225,7 @@ def scanPM():
                                                     lurl = lurl.replace(field.lower(), '')
                                                 lurl = lurl.replace('(', '')
                                                 lurl = lurl.replace(')', '')
+                                                lurl.replace(' ','')
                                                 if lurl[:4] == 'www.':
                                                     lurl = 'http://' + lurl
                                                 print('\t[   ] Found Link URL')
