@@ -132,7 +132,7 @@ def scan():
 					print(pid + ', ' + pauthor + ': Ignoring Moderator')
 					cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
-			if post.is_self == True and IGNORESELFPOST == True:
+			else:
 				print(pid + ', ' + pauthor + ': Ignoring post')
 				cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
