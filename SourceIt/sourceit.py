@@ -14,7 +14,7 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter Bot".
 SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-MAXPOSTS = 30
+MAXPOSTS = 1
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
@@ -24,7 +24,7 @@ MESSAGE = "You have not made a comment within the timelimit. Your post has been 
 #This is what the bot tells you when your post gets removed. Uses reddit's usual Markdown formatting
 MINLENGTH = 50
 #The minimum length of a Source comment to count as valid. You can set this to 0 for any comment to be valid.
-TOOSHORT = "Your comment is pretty short. Might want to beef it up"
+TOOSHORT = "You have added a source comment, but it is under the character requirement. Try to add some more info.\n\nYour post has not been removed."
 #This is what gets replied when MINLENGTH is not met.
 IGNOREMODS = False
 #Do you want the bot to ignore posts made by moderators? Use True or False (With capitals! No quotations!)
@@ -87,6 +87,7 @@ def scan():
 	for post in posts:
 		found = False
 		short = False
+		opc = []
 		pid = post.id
 		try:
 			pauthor = post.author.name
@@ -114,16 +115,13 @@ def scan():
 							found = True
 							cbody = comment.body
 							clength = len(cbody)
-							if clength <= MINLENGTH:
-								short = True
-								cur.execute('SELECT * FROM oldposts WHERE id=?', [cid])
-								if not cur.fetchone():
-									print('\tComment is too short. Replying...')
-									response = comment.reply(TOOSHORT)
-									response.distinguish()
-									cur.execute('INSERT INTO oldposts VALUES(?)', [cid])
-								else:
-									print('\tOP has already been warned.')
+							opc.append(clength)
+
+					if found == True:
+						if all(num < MINLENGTH for num in opc):
+							print('\tAll OP comments too short')
+							short = True
+
 									
 					
 					if difference > DELAY:		 
@@ -138,6 +136,8 @@ def scan():
 						if found == True and short == True:
 							print('\tFound comment, but reporting for length')
 							post.report()
+							response = post.add_comment(TOOSHORT)
+							response.distinguish()
 						
 						if found == True and short == False:
 							print('\tComment is okay. Passing')
