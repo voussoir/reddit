@@ -31,7 +31,7 @@ IGNOREFLAGS = ['[meta]', '[modpost]']
 #If the title of the post contains any of these flags, ignore it
 #Useful for moderator posts, meta posts, or updates.
 
-MAXPOSTS = 1
+MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
