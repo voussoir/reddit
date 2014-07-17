@@ -1,7 +1,6 @@
 #/u/GoldenSights
 import praw # simple interface to the reddit API, also handles rate limiting of requests
 import time
-import datetime
 import sqlite3
 
 '''USER CONFIGURATION'''
@@ -64,14 +63,6 @@ sql.commit()
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
-
-def getTime(bool):
-    timeNow = datetime.datetime.now(datetime.timezone.utc)
-    timeUnix = timeNow.timestamp()
-    if bool == False:
-        return timeNow
-    else:
-        return timeUnix
 
 def scanSub():
     print('Searching '+ SUBREDDIT + '.')
