@@ -87,7 +87,7 @@ def scanSub():
                             result = []
                             ilist = []
                             print('\tBeginning search on /u/' + pauthor)
-                            search = r.search('author:"' + pauthor + '"', subreddit=SUBREDDIT, sort='new')
+                            search = r.search('author:"' + pauthor + '"', subreddit=SUBREDDIT, sort='new', limit=1000)
                             for item in search:
                                 if item.id != pid and all(flag.lower() not in item.title.lower() for flag in IGNOREFLAGS) and item.id not in ilist:
                                     if (item.is_self == True and IGNORESELF == False) or (item.is_self == False and IGNORELINK == False):

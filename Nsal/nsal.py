@@ -153,11 +153,11 @@ def discussions():
             if curtime - ptime > DELAY:
                 purl = post.url
                 print(pid + ': Trying OD box')
-                search = r.search('url:"' + purl + '"', sort='new')
+                search = r.search('url:"' + purl + '"', sort='new', limit=None)
                 for item in search:
                     if item.id != pid:
                         timestamp = item.created_utc
-                        timestamp = datetime.datetime.fromtimestamp(int(timestamp)).strftime("%A %B %d, %Y %H:%M UTC")
+                        timestamp = datetime.datetime.utcfromtimestamp(int(timestamp)).strftime("%A %B %d, %Y %H:%M UTC")
                         try:
                             iauthor = '/u/' + item.author.name
                         except AttributeError:
