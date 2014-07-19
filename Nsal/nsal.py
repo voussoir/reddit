@@ -137,7 +137,7 @@ def scanSub():
         else:
             print(pid + ': Ignoring selfpost')
         
-    sql.commit()
+        sql.commit()
 
 def discussions():
     print('\nScanning ' + NSUB)
@@ -176,6 +176,7 @@ def discussions():
                 cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
             else:
                 print(pid + ': Too young')
+        sql.commit()
 
 
 
