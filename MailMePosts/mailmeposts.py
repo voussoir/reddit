@@ -9,15 +9,15 @@ USERNAME  = ""
 #This is the bot's Username. In order to send mail, he must have some amount of Karma.
 PASSWORD  = ""
 #This is the bot's Password. 
-RECIPIENT = ""
+RECIPIENT = "GoldenSights"
 #The username that will receive this PM. It can be the same as USERNAME if you want to
-MTITLE = ""
+MTITLE = "MailMePost"
 #This will be the title of the PM that you get
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "all"
+SUBREDDIT = "buildapc"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-PARENTSTRING = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
+PARENTSTRING = ["[Build Complete]"]
 #These are the words that you are looking for
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
@@ -33,9 +33,9 @@ WAIT = 20
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getu()
-    PASSWORD = bot.getp()
-    USERAGENT = bot.geta()
+    USERNAME = bot.getuG()
+    PASSWORD = bot.getpG()
+    USERAGENT = bot.getaG()
 except ImportError:
     pass
 
@@ -55,6 +55,7 @@ def scanSub():
     print('Searching '+ SUBREDDIT + '.')
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_new(limit=MAXPOSTS)
+    result = []
     for post in posts:
         pid = post.id
         try:
@@ -65,7 +66,6 @@ def scanSub():
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
             try:
-                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
                 ptitle = post.title.lower()
                 try:
                     ptext = post.selftext.lower()
@@ -73,10 +73,13 @@ def scanSub():
                     ptext = "0"
                 if any(key.lower() in ptitle for key in PARENTSTRING) or any(key.lower() in ptext for key in PARENTSTRING):
                     print('Found ' + pid + ' by ' + pauthor)
-                    r.send_message(RECIPIENT, MTITLE, pauthor + ' has said one of your keywords.\n\n[Find it here.](' + plink + ')', captcha=None)
-
+                    result.append('[' + pauthor + '](' + plink + ')')
+                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
             except IndexError:
                 pass
+    if len(result) > 0:
+        print('Sending results')
+        r.send_message(RECIPIENT, MTITLE, '\n\n'.join(result), captcha=None)
     sql.commit()
 
 

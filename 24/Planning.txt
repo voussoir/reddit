@@ -1,0 +1,44 @@
+Planning
+
+
+"Submission" is defined as a link or selfpost submitted to the subreddit
+"Thread" is defined as a chain of comments starting with a "Root" which is a comment which directly replies to the submission
+"Comment" is defined as any comments within each Thread.
+
+1. Bot is controlled by Moderators by sending it PMs. Candidates should not have to interact directly with the bot
+
+2. Redditor makes a [REQUEST] submission to /r/24Minutes
+
+3. Bot immediately crossposts the request thread to a relevant sub
+
+3.1 Redditors and Moderators discuss this request, Moderators decide whether to reject immediately or pursue further action
+
+3.2 A final conclusions is reached by Redditors and Mods to approve / reject
+
+4. Mods reach out to the Candidate by whatever means and invite him to participate, showing him the public's interest.
+
+5. Candidate returns proof of identity to the Mods; discuss the date and time of the event.
+
+6. Mods instruct the Bot to register the Candidate. PM to the Bot will include Candidate's name and username, date and time of the event, and all of the questions to be asked in the event.
+
+7. Candidate receives flair and a PM indicating successful registration. Candidates may not be familiar with Reddit, so it is important to tell them exactly what will be visible to the public when the discussion goes live. Candidate may contact the Mods for any edits.
+
+8. Bot will give the [Request] thread a flair indicating that it has been approved. It will leave a comment with the date and time of the event.?
+
+-NOT YET- 9. Sidebar is updated with the Candidate's event
+
+10. On the specified date and time, the Bot makes the Submission for the candidate's event including all relevant details. This allows the bot to edit the selftext with information and timers as the event goes on. Submission will become the Sticky. A link to the event will be posted on the relevant subs just like before.
+
+11. Bot immediately posts 1st question as a Root. "This will become open to the public at HH:MM UTC"
+
+12. Bot saves the ID of every Root and the submission itself
+
+13. Any Comment which is not written by a registered Candidate or a moderator, and is attached to the Submission or is part of a closed Thread will be removed
+
+14. After X minutes, the Root will be edited to say "This is now open to the public". Comments will no longer be removed.
+
+15. The next question is posted as another Root.
+
+16. Repeat until end of questions. Submission is edited to note the end of the event.
+
+17. Thread is added to a Wiki page of past events. Sidebar is updated.

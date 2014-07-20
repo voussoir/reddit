@@ -42,7 +42,7 @@ DELAY = 10
 #How many SECONDS old must a post be on your sub before it receives an Other Discussion box?
 DISTINGUISHN = False
 #Do you want the bot to mod-distinguish the comment?
-HEADER = "**Other Discussions on reddit:**\n\nSubreddit | Author | Post | Time\n:- | - | - | -:\n"
+HEADER = "**Other Discussions on reddit:**\n\nSubreddit | Author | Post | Comments | Time\n:- | - | - | -:\n"
 #This will be at the top of the Other Discussions comment. This formatting will prepare the box.
 
 
@@ -165,7 +165,7 @@ def discussions():
                         subreddit = '/r/' + item.subreddit.display_name
                         ilink = item.permalink
                         ilink = ilink.replace('http://www', 'http://np')
-                        result.append(subreddit + ' | ' + iauthor + ' | [post](' + ilink + ') | ' + timestamp)
+                        result.append(subreddit + ' | ' + iauthor + ' | [post](' + ilink + ') | ' str(item.num_comments) + ' | ' + timestamp)
                 if len(result) > 0:
                     final = HEADER + '\n'.join(result)
                     if len(final) < 10000:
