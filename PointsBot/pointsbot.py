@@ -11,7 +11,7 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "GoldTesting"
+SUBREDDIT = "msclippy"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 PARENTSTRING = ["Solution Verified"]
 #These are the words you are looking for. If User says this, Parent gets 1 point in his flair
@@ -44,10 +44,10 @@ WAIT = 20
 
 WAITS = str(WAIT)
 try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.uG
-    PASSWORD = bot.pG
-    USERAGENT = bot.aG
+	import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
+	USERNAME = bot.uG
+	PASSWORD = bot.pG
+	USERAGENT = bot.aG
 except ImportError:
     pass
 
@@ -71,7 +71,7 @@ def flair(subreddit, username):
 	print('\tChecking flair for ' + username)
 	flairs = subreddit.get_flair(username)
 	flairs = flairs['flair_text']
-	if flairs != None:
+	if flairs != None and flairs != '':
 		print('\t -' + flairs)
 		try:
 			flairs = int(flairs)
