@@ -11,7 +11,7 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "msclippy"
+SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 PARENTSTRING = ["Solution Verified"]
 #These are the words you are looking for. If User says this, Parent gets 1 point in his flair
@@ -21,7 +21,7 @@ REPLYSTRING = "You have awarded one point to _parent_"
 EXEMPT = []
 #Any usernames in this list will not receive points. Perhaps they have special flair.
 
-OPONLY = False
+OPONLY = True
 #Is OP the only person who can give points?
 #I recommend setting this to False. Other users might have the same question and would like to reward a good answer.
 
@@ -98,12 +98,15 @@ def scan():
 	comments = subreddit.get_comments(limit=MAXPOSTS)
 	for comment in comments:
 		cid = comment.id
+		#Check if it's in the database
 		cur.execute('SELECT * FROM oldposts WHERE ID=?', [cid])
 		if not cur.fetchone():
 			print(cid)
 			cbody = comment.body.lower()
+			#Check if it has the keyword
 			if any(flag.lower() in cbody for flag in PARENTSTRING):
 				print('\tFlagged.')
+				#Check if it's a root
 				if not comment.is_root:
 					try:
 						print('\tFetching parent and Submission data.')
@@ -112,18 +115,27 @@ def scan():
 						pauthor = parentcom.author.name
 						op = comment.submission.author.name
 						opid = comment.submission.id
+						#Check if the person is giving points to himself
 						if pauthor != cauthor:
+							#Check if the person is Exempt
 							if not any(exempt.lower() == pauthor.lower() for exempt in EXEMPT):
-								if OPONLY == False or cauthor == op:
+								moderators = subreddit.get_moderators()
+								mods = []
+								for moderator in moderators:
+									mods.append(moderator.name)
+								#Pass anyone if OPONLY is False. Pass only OP or moderators when OPONLY is True
+								if OPONLY == False or cauthor == op or cauthor in mods:
 									cur.execute('SELECT * FROM submissions WHERE ID=?', [opid])
 									fetched = cur.fetchone()
+									#Check if this submission is in the database. Add it if not
 									if not fetched:
 										cur.execute('INSERT INTO submissions VALUES(?, ?)', [opid, 0])
 										fetched = 0
 									else:
 										fetched = fetched[1]
-
+									#Check if too many points have been given out yet
 									if fetched < MAXPERTHREAD:
+										#Attempt to do flair
 										if flair(subreddit, pauthor):
 											print('\tWriting reply')
 											comment.reply(REPLYSTRING.replace('_parent_', pauthor))

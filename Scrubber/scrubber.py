@@ -18,9 +18,9 @@ SUBREDDIT = "GoldTesting"
 
 try:
 	import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-	USERNAME = bot.getuG()
-	PASSWORD = bot.getpG()
-	USERAGENT = bot.getaG()
+	USERNAME = bot.uG
+	PASSWORD = bot.pG
+	USERAGENT = bot.aG
 except ImportError:
     pass
 
@@ -39,6 +39,7 @@ def start():
 		SCRUB(USER)
 	
 def work(posts):
+	#By subreddit
 	for post in posts:
 		try:
 			pauthor = post.author.name
@@ -52,6 +53,7 @@ def work(posts):
 			pass
 
 def worku(posts):
+	#By user's profile page
 	for post in posts:
 		try:
 			psub = post.subreddit.display_name
@@ -63,6 +65,31 @@ def worku(posts):
 				print('\r' + pid + ' - Done    ')
 		except:
 			pass
+
+def works(USER):
+	#By subreddit search bar
+	number = 1
+	stage = 1
+	print('Searching /r/' + SUBREDDIT + ' by author:"' + USER + '" || Stage ' + str(stage))
+	while number > 0:
+		stage+=1
+		number = 0
+		posts = r.search('author:"' + USER + '"', subreddit=SUBREDDIT,limit=1000)
+		for post in posts:
+			number +=1
+			try:
+				pauthor = post.author.name
+				pid = post.id
+				if pauthor.lower() == USER.lower() and post.banned_by == None:
+					print(pid + ' - Removing', end='')
+					sys.stdout.flush()
+					post.remove()
+					print('\r' + pid + ' - Done    ')
+			except:
+				pass
+		print('Found ' + str(number) + ' items this run.')
+		print('Waiting 15s to give the cache a moment to refresh...\n')
+		time.sleep(15)
 
 def SCRUB(USER):
 	try:
@@ -91,10 +118,12 @@ def SCRUB(USER):
 		print('Scanning /u/' + USER + '/comments')
 		posts = redditor.get_comments(limit=None)
 		worku(posts)
+
+		works(USER)
 	
 		print('\nFinished')
 		input()
-	except:
+	except praw.requests.exceptions.HTTPError:
 		print('That user does not exist')
 		input()
 
