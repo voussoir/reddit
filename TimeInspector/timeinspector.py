@@ -1,7 +1,7 @@
 import praw
 import datetime
 
-USERAGENT = "/u/Goldensights writing a script for /u/bmoc. Scanning user's comments and submissions to determine their posting habits"
+USERAGENT = "/u/Goldensights TimeInspector script. Scanning user's comments and submissions to determine their posting habits"
 MAXPOSTS  = 1000
 
 r = praw.Reddit(USERAGENT)
