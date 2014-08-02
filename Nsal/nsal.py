@@ -12,11 +12,11 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "Test"
+SUBREDDIT = "NSALeaksbot"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subs, use "sub1+sub2+sub3+...". For all use "all"
 KEYWORDS = ["snowden", "greenwald", "nsa"]
 #Any comment containing these words will be saved.
-KEYDOMAINS = ["theguardian.com", "techdirt.com"]
+KEYDOMAINS = []
 
 SUBDUMP = True
 #Do you want the bot to dump into a subreddit as posts? Use True or False (Use capitals! No quotations!)
@@ -42,14 +42,18 @@ DELAY = 10
 #How many SECONDS old must a post be on your sub before it receives an Other Discussion box?
 DISTINGUISHN = False
 #Do you want the bot to mod-distinguish the comment?
-HEADER = "**Other Discussions on reddit:**\n\nSubreddit | Author | Post | Comments | Time\n:- | - | - | -:\n"
+HEADER = "**Other Discussions on reddit:**\n\nSubreddit | Author | Post | Comments | Time\n:- | - | - | - | -:\n"
 #This will be at the top of the Other Discussions comment. This formatting will prepare the box.
 
 
-MAXPOSTS = 100
+MAXPOSTS = 1
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
+
+EDITPASTMAX = 172800
+#How far back do you want to go when editing posts, in seconds?
+#A value of 172800 will only edit comments that are less than 2 days old
 
 
 '''All done!'''
@@ -60,9 +64,9 @@ WAIT = 20
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
-    USERAGENT = bot.getaG()
+    USERNAME = bot.uG
+    PASSWORD = bot.pG
+    USERAGENT = bot.aG
 except ImportError:
     pass
 
@@ -76,6 +80,7 @@ print('Loaded Completed table')
 
 sql.commit()
 
+print('Logging in')
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
@@ -102,7 +107,7 @@ def scanSub():
             if not cur.fetchone():
                 cur.execute('SELECT * FROM oldlinks WHERE ID=?', [purl])
                 if not cur.fetchone():
-                    if any(key.lower() in ptitle.lower() for key in KEYWORDS) and any(key.lower() in purl.lower() for key in KEYDOMAINS):
+                    if (KEYWORDS == [] or any(key.lower() in ptitle.lower() for key in KEYWORDS)) and (KEYDOMAINS == [] or any(key.lower() in purl.lower() for key in KEYDOMAINS)):
                         try:
                             pauthor = post.author.name
                             psub = post.subreddit.display_name
@@ -136,6 +141,7 @@ def scanSub():
                     print(pid + ': Already linked somewhere else')  
         else:
             print(pid + ': Ignoring selfpost')
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
         
         sql.commit()
 
@@ -151,32 +157,65 @@ def discussions():
             ptime = post.created_utc
             curtime = getTime(True)
             if curtime - ptime > DELAY:
-                purl = post.url
-                print(pid + ': Trying OD box')
-                search = r.search('url:"' + purl + '"', sort='new', limit=None)
-                for item in search:
-                    if item.id != pid:
-                        timestamp = item.created_utc
-                        timestamp = datetime.datetime.utcfromtimestamp(int(timestamp)).strftime("%A %B %d, %Y %H:%M UTC")
-                        try:
-                            iauthor = '/u/' + item.author.name
-                        except AttributeError:
-                            pauthor = '[deleted]'
-                        subreddit = '/r/' + item.subreddit.display_name
-                        ilink = item.permalink
-                        ilink = ilink.replace('http://www', 'http://np')
-                        result.append(subreddit + ' | ' + iauthor + ' | [post](' + ilink + ') | ' str(item.num_comments) + ' | ' + timestamp)
+                generatebox(post, result)
                 if len(result) > 0:
                     final = HEADER + '\n'.join(result)
                     if len(final) < 10000:
                         print('\tCreating comment')
                         post.add_comment(final)
+                        cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
                 else:
                     print('\tNo results!')
-                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+                if post.is_self:
+                    cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
             else:
                 print(pid + ': Too young')
         sql.commit()
+
+def editpast():
+    print('\nUpdating previous comments')
+    user = r.get_redditor(USERNAME)
+    comments = user.get_comments(limit=MAXPOSTS)
+    for comment in comments:
+        result = []
+        ctime = comment.created_utc
+        curtime = getTime(True)
+        if curtime - ctime > EDITPASTMAX:
+            print('\tReached end')
+            break
+        else:
+            print(comment.id)
+            post = comment.submission
+            generatebox(post, result)
+            if len(result) > 0:
+                final = HEADER + '\n'.join(result)
+                if len(final) < 10000:
+                    if final != comment.body:
+                        print('\tUpdating')
+                        comment.edit(final)
+                    else:
+                        print('\tDoes not need updating')
+            else:
+                print('\tNone!')
+
+
+def generatebox(post, result):
+    purl = post.url
+    print(post.id + ': Trying OD box')
+    search = r.search('url:"' + purl + '"', sort='new', limit=None)
+    for item in search:
+        if item.id != post.id:
+            timestamp = item.created_utc
+            timestamp = datetime.datetime.utcfromtimestamp(int(timestamp)).strftime("%A %B %d, %Y %H:%M UTC")
+            try:
+                iauthor = '/u/' + item.author.name
+            except AttributeError:
+                pauthor = '[deleted]'
+            subreddit = '/r/' + item.subreddit.display_name
+            ilink = item.permalink
+            ilink = ilink.replace('http://www', 'http://np')
+            result.append(subreddit + ' | ' + iauthor + ' | [post](' + ilink + ') | ' + str(item.num_comments) + ' | ' + timestamp)
+
 
 
 
@@ -185,6 +224,7 @@ while True:
     try:
         scanSub()
         discussions()
+        editpast()
     except Exception as e:
         print('An error has occured:', str(e))
     print('Running again in ' + WAITS + ' seconds \n')

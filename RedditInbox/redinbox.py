@@ -23,7 +23,7 @@ WAIT = 30
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERAGENT = bot.getaG()
+    USERAGENT = bot.aG
 except ImportError:
     pass
 
@@ -94,3 +94,4 @@ while True:
 			num = '0' + num
 		print('\rRunning again in ' + num + ' seconds', end='')
 		time.sleep(1)
+	print()
