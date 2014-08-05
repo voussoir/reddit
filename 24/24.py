@@ -6,6 +6,7 @@ import sqlite3
 
 config = configparser.ConfigParser()
 config.read('config.ini')
+#If you want to hide your credentials, you could put the file elsewhere and call it in.
 print('Loaded Config file.')
 
 USERNAME = config['24']['USERNAME']
