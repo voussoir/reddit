@@ -2,6 +2,7 @@ import praw
 import time
 import html.entities
 import tkinter
+import datetime
 import string
 from tkinter import Tk, BOTH, Entry, PhotoImage, OptionMenu, Spinbox
 from tkinter.ttk import Frame, Button, Style, Label
@@ -172,7 +173,7 @@ class Example(Frame):
 
                     self.newrowindex +=1
 
-                self.morerowbutton = Button(self,text="+row",command=self.morerows)
+                self.morerowbutton = Button(self,text="+row",command=lambda: self.morerows('/r/', 0, 1, 20))
                 self.morerowbutton.grid(row=898,column=0,columnspan=2)
 
                 self.verifybutton = Button(self,text="Verify",command= lambda: self.updategui(False))
@@ -187,19 +188,27 @@ class Example(Frame):
                 self.misclist.append(self.verifybutton)
 
             if self.curmode == self.optionRegister:
-                self.newrowindex = 4
+                self.newrowindex = 6
                 self.labelCanUsername = Label(self, text="Candidate's Username:  /u/")
                 self.entryCanUsername = Entry(self)
                 self.labelCanRealname = Label(self, text="Candidate's Realname:")
                 self.entryCanRealname = Entry(self)
+                self.labelCanFlair = Label(self, text="Candidate's Flair:")
+                self.entryCanFlair = Entry(self)
                 self.entryMo = Spinbox(self, width=9, values=('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'))
                 self.entryDa = Spinbox(self, width=2, from_=1, to=31)
                 self.entryYr = Spinbox(self, width=4, from_=2014, to=2500)
                 self.labelHH = Label(self, text="Schedule time UTC:")
-                self.entryHH = Spinbox(self, from_=0, to=24, width=2)
+                self.entryHH = Spinbox(self, from_=0, to=23, width=2)
                 self.entryMM = Spinbox(self, from_=0, to=59, width=2)
                 self.entryYr.delete(0,'end')
                 self.entryYr.insert(0,2014)
+
+                self.morerowbutton = Button(self,text="+question",command=lambda: self.morerows('Q:', 0, 1, 25))
+                self.morerowbutton.grid(row=898,column=0,columnspan=8)
+
+                self.verifybutton = Button(self,text="Verify",command= lambda: self.updategui(False))
+                self.verifybutton.grid(row=899,column=0,columnspan=8)
 
                 self.misclist.append(self.labelCanUsername)
                 self.misclist.append(self.labelCanRealname)
@@ -283,17 +292,51 @@ class Example(Frame):
 
                 print(verifies)
 
-    def morerows(self, *args):
-        self.redditlabel = Label(self,text="/r/")
-        self.redditlabel.grid(row=self.newrowindex,column=0, sticky="e")
+
+            if self.curmode == self.optionRegister:
+
+                verifies = []
+                u=self.entryCanUsername.get()
+                print('Fetching /u/' + u)
+                if not all(char in string.ascii_letters+string.digits+'_-' for char in u):
+                    self.redditlabel = Label(self, image=self.indicatorRed)
+                    self.redditlabel.grid(row=2, column=4)
+                    self.verifylist.append(self.redditlabel)
+                    verifies.append(False)
+                    print('\tBad characterage')
+                else:
+                    try:
+                        u = self.r.get_redditor(u)
+                        print(u)
+                        self.redditlabel = Label(self, image=self.indicatorGreen)
+                        self.redditlabel.grid(row=2,column=4)
+                        self.verifylist.append(self.redditlabel)
+                        verifies.append(True)
+                        print('\tSuccess')
+                    except:
+                        self.redditlabel = Label(self, image=self.indicatorRed)
+                        self.redditlabel.grid(row=2,column=4)
+                        self.verifylist.append(self.redditlabel)
+                        verifies.append(False)
+                        print('\tFailed')
+
+                t = self.entryMo.get() + ' ' + self.entryDa.get() + ' ' + self.entryYr.get() + ' ' + self.entryHH.get() + ':' + self.entryMM.get()
+                plandate = datetime.datetime.strptime(t, "%B %d %Y %H:%M")
+                plandate = datetime.datetime.utcfromtimestamp(plandate.timestamp())
+                print(plandate.timestamp())
+
+
+    def morerows(self, label, columnm, columnn, limit, *args):
+        self.redditlabel = Label(self,text=label)
+        self.redditlabel.grid(row=self.newrowindex,column=columnm, sticky="e")
         self.labellist.append(self.redditlabel)
 
         self.redditentry = Entry(self)
-        self.redditentry.grid(row=self.newrowindex,column=1)
+        self.redditentry.grid(row=self.newrowindex,column=columnn, columnspan=8)
         self.entrylist.append(self.redditentry)
 
         self.newrowindex += 1
-        if self.newrowindex >= 20:
+        if self.newrowindex >= limit:
             self.morerowbutton.grid_forget()
         print(self.newrowindex)
 
