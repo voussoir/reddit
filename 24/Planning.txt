@@ -7,11 +7,11 @@ Planning
 
 1. Bot is controlled by Moderators by sending it PMs. Candidates should not have to interact directly with the bot
 
-2. Redditor makes a [REQUEST] submission to /r/24Minutes
+2. Redditor makes a [REQUEST] submission
 
-3. Bot immediately crossposts the request thread to a relevant sub
+NO: 3. Bot immediately crossposts the request thread to a relevant sub
 
-3.1 Redditors and Moderators discuss this request, Moderators decide whether to reject immediately or pursue further action
+YES: 3.1 Redditors and Moderators discuss this request, Moderators decide whether to reject immediately or pursue further action
 
 3.2 A final conclusions is reached by Redditors and Mods to approve / reject
 

@@ -1,10 +1,9 @@
 import praw 
 import time
-import winsound
 import html.entities
 import tkinter
 import string
-from tkinter import Tk, BOTH, Entry, PhotoImage
+from tkinter import Tk, BOTH, Entry, PhotoImage, OptionMenu, Spinbox
 from tkinter.ttk import Frame, Button, Style, Label
 
 class Program():
@@ -99,21 +98,28 @@ class Example(Frame):
                 self.newbutton.grid_forget()
                 self.quitbutton.grid_forget()
                 self.usernamelabel = Label(self, text=username + ', Sending to /u/' + self.mailrecipient)
-                self.usernamelabel.grid(row=0, column=0, pady = 5, columnspan=2)
+                self.usernamelabel.grid(row=0, column=0, columnspan=8)
                 self.quitbutton.grid(row=900, column=0)
 
 
-                self.optionDiscuss = "Discussion Flair + Crosposting"
+                self.labellist = []
+                self.entrylist = []
+                self.verifylist = []
+                self.misclist = []
+                
+                self.optionDiscuss = "Discussion Flair + Crossposting"
+                self.optionRegister = "Register a new Candidate"
+
                 self.prevmode = self.optionDiscuss
                 self.curmode = self.optionDiscuss
                 self.optionvar = tkinter.StringVar(self)
                 self.optionvar.trace("w",self.permaloop)
                 self.optionvar.set(self.optionDiscuss)
-                self.option = tkinter.OptionMenu(self, self.optionvar, self.optionDiscuss, "two", "three", "four")
+                self.option = OptionMenu(self, self.optionvar, self.optionDiscuss, self.optionRegister, "three", "four")
                 self.newbutton.unbind("<Return>")
                 self.entryUsername.unbind("<Return>")
                 self.entryPassword.unbind("<Return>")
-                self.option.grid(row=1,column=0,columnspan=2)
+                self.option.grid(row=1,column=0,columnspan=8,pady=8)
                 self.updategui(True)
             except praw.errors.InvalidUserPass:
                 pass
@@ -129,100 +135,157 @@ class Example(Frame):
             self.updategui(True)
 
     def updategui(self, *args):
-        print('Updating GUI')
-        if self.curmode == self.optionDiscuss and args[0] == True:
+        if args[0] == True:
+            print('Cleaning GUI')
+            for item in self.labellist:
+                item.grid_forget()
+            for item in self.entrylist:
+                item.grid_forget()
+            for item in self.verifylist:
+                item.grid_forget()
+            for item in self.misclist:
+                item.grid_forget()
             self.labellist = []
             self.entrylist = []
             self.verifylist = []
-            self.newrowindex = 4
-            self.labelPermalink = Label(self, text="Thread Permalink:")
-            self.entryPermalink = Entry(self)
-            self.rowconfigure(2,weight=2)
-            self.labelPermalink.grid(row=2,column=0)
-            self.entryPermalink.grid(row=2,column=1)
-            self.labelcrossposting = Label(self,text="Crosspost to:")
-            self.labelcrossposting.grid(row=3,column=0,columnspan=2)
-            for m in range(5):
-                self.redditlabel = Label(self,text="/r/")
-                self.redditlabel.grid(row=self.newrowindex,column=0)
-                self.labellist.append(self.redditlabel)
+            self.misclist = []
 
-                self.redditentry = Entry(self)
-                self.redditentry.grid(row=self.newrowindex,column=1)
-                self.entrylist.append(self.redditentry)
 
-                self.newrowindex +=1
+            if self.curmode == self.optionDiscuss:
+                self.newrowindex = 4
+                self.labelPermalink = Label(self, text="Thread Permalink:")
+                self.entryPermalink = Entry(self)
+                self.rowconfigure(2,weight=2)
+                self.labelPermalink.grid(row=2,column=0)
+                self.entryPermalink.grid(row=2,column=1)
+                self.labelcrossposting = Label(self,text="Crosspost to:")
+                self.labelcrossposting.grid(row=3,column=0,columnspan=2,sticky="w")
 
-            self.morerowbutton = Button(self,text="+row",command=self.morerows)
-            self.morerowbutton.grid(row=898,column=0,columnspan=2)
+                for m in range(5):
+                    self.redditlabel = Label(self,text="/r/")
+                    self.redditlabel.grid(row=self.newrowindex,column=0, sticky="e")
+                    self.labellist.append(self.redditlabel)
 
-            self.verifybutton = Button(self,text="Verify",command= lambda: self.updategui(False))
-            self.verifybutton.grid(row=899,column=0,columnspan=2)
+                    self.redditentry = Entry(self)
+                    self.redditentry.grid(row=self.newrowindex,column=1)
+                    self.entrylist.append(self.redditentry)
 
-            self.newrowindex += 2
+                    self.newrowindex +=1
 
-        if self.curmode == self.optionDiscuss and args[0] == False:
-            verifies = []
+                self.morerowbutton = Button(self,text="+row",command=self.morerows)
+                self.morerowbutton.grid(row=898,column=0,columnspan=2)
 
-            i = self.entryPermalink.get()
-            if len(i) == 6:
-                pid = i
-            else:
-                if 'www.reddit.com/r/' in i and '/comments/' in i:
-                    pid = i.split('/comments/')[1].split('/')[0]
-                if 'http://redd.it/' in i:
-                    pid = i.split('redd.it/')[1]
+                self.verifybutton = Button(self,text="Verify",command= lambda: self.updategui(False))
+                self.verifybutton.grid(row=899,column=0,columnspan=2)
 
-            for flag in self.verifylist:
-                flag.grid_forget()
-                self.verifylist.remove(flag)
+                self.newrowindex += 2
 
-            try:
-                print('Fetching Submission ' + pid)
-                self.r.get_info(thing_id="t3_" + pid).title + 'Check'
-                self.redditlabel = Label(self, image=self.indicatorGreen)
-                self.redditlabel.grid(row=2,column=2)
-                self.verifylist.append(self.redditlabel)
-                verifies.append(True)
-                print('\tSuccess')
-            except:
-                print('Failed. Make sure to include the http://. Copy and paste straight from your browser for best result')
-                self.redditlabel = Label(self, image=self.indicatorRed)
-                self.redditlabel.grid(row=2,column=2)
-                self.verifylist.append(self.redditlabel)
-                verifies.append(False)
+                self.misclist.append(self.labelPermalink)
+                self.misclist.append(self.labelcrossposting)
+                self.misclist.append(self.entryPermalink)
+                self.misclist.append(self.morerowbutton)
+                self.misclist.append(self.verifybutton)
 
-            for entry in self.entrylist:
-                i = entry.get()
-                if i != '':
-                    print('Fetching /r/' + i)
-                    if all(char in string.ascii_letters+string.digits+'_-' for char in i):
-                        try:
-                            sub = self.r.get_subreddit(i,fetch=True)
-                            self.redditlabel = Label(self, image=self.indicatorGreen)
-                            self.redditlabel.grid(row=entry.grid_info()['row'],column=2)
-                            self.verifylist.append(self.redditlabel)
-                            verifies.append(True)
-                            print('\tSuccess')
-                        except:
+            if self.curmode == self.optionRegister:
+                self.newrowindex = 4
+                self.labelCanUsername = Label(self, text="Candidate's Username:  /u/")
+                self.entryCanUsername = Entry(self)
+                self.labelCanRealname = Label(self, text="Candidate's Realname:")
+                self.entryCanRealname = Entry(self)
+                self.entryMo = Spinbox(self, width=9, values=('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'))
+                self.entryDa = Spinbox(self, width=2, from_=1, to=31)
+                self.entryYr = Spinbox(self, width=4, from_=2014, to=2500)
+                self.labelHH = Label(self, text="Schedule time UTC:")
+                self.entryHH = Spinbox(self, from_=0, to=24, width=2)
+                self.entryMM = Spinbox(self, from_=0, to=59, width=2)
+                self.entryYr.delete(0,'end')
+                self.entryYr.insert(0,2014)
+
+                self.misclist.append(self.labelCanUsername)
+                self.misclist.append(self.labelCanRealname)
+                self.misclist.append(self.entryCanUsername)
+                self.misclist.append(self.entryCanRealname)
+                self.misclist.append(self.labelHH)
+                self.misclist.append(self.entryHH)
+                self.misclist.append(self.entryMM)
+                self.misclist.append(self.entryMo)
+                self.misclist.append(self.entryDa)
+                self.misclist.append(self.entryYr)
+
+                self.labelCanUsername.grid(row=2, column=0, sticky="e")
+                self.labelCanRealname.grid(row=3, column=0, sticky="e")
+                self.entryCanUsername.grid(row=2, column=1, columnspan=3)
+                self.entryCanRealname.grid(row=3, column=1, columnspan=3)
+                self.entryMo.grid(row=4, column=1,sticky="e")
+                self.entryDa.grid(row=4, column=2)
+                self.entryYr.grid(row=4, column=3)
+                self.labelHH.grid(row=4, column=0, sticky="se", pady=5)
+                self.entryHH.grid(row=5, column=1, sticky="e")
+                self.entryMM.grid(row=5, column=2, sticky="w")
+        else:
+            if self.curmode == self.optionDiscuss:
+
+                verifies = []
+
+                i = self.entryPermalink.get()
+                if len(i) == 6:
+                    pid = i
+                else:
+                    if 'www.reddit.com/r/' in i and '/comments/' in i:
+                        pid = i.split('/comments/')[1].split('/')[0]
+                    if 'http://redd.it/' in i:
+                        pid = i.split('redd.it/')[1]
+
+                for flag in self.verifylist:
+                    flag.grid_forget()
+                    self.verifylist.remove(flag)
+
+                try:
+                    print('Fetching Submission ' + pid)
+                    self.r.get_info(thing_id="t3_" + pid).title + 'Check'
+                    self.redditlabel = Label(self, image=self.indicatorGreen)
+                    self.redditlabel.grid(row=2,column=2)
+                    self.verifylist.append(self.redditlabel)
+                    verifies.append(True)
+                    print('\tSuccess')
+                except:
+                    print('Failed. Make sure to include the http://. Copy and paste straight from your browser for best result')
+                    self.redditlabel = Label(self, image=self.indicatorRed)
+                    self.redditlabel.grid(row=2,column=2)
+                    self.verifylist.append(self.redditlabel)
+                    verifies.append(False)
+
+                for entry in self.entrylist:
+                    i = entry.get()
+                    if i != '':
+                        print('Fetching /r/' + i)
+                        if all(char in string.ascii_letters+string.digits+'_-' for char in i):
+                            try:
+                                sub = self.r.get_subreddit(i,fetch=True)
+                                self.redditlabel = Label(self, image=self.indicatorGreen)
+                                self.redditlabel.grid(row=entry.grid_info()['row'],column=2)
+                                self.verifylist.append(self.redditlabel)
+                                verifies.append(True)
+                                print('\tSuccess')
+                            except:
+                                self.redditlabel = Label(self, image=self.indicatorRed)
+                                self.redditlabel.grid(row=entry.grid_info()['row'],column=2)
+                                self.verifylist.append(self.redditlabel)
+                                verifies.append(False)
+                                print('\tFailed')
+                            time.sleep(2)
+                        else:
                             self.redditlabel = Label(self, image=self.indicatorRed)
                             self.redditlabel.grid(row=entry.grid_info()['row'],column=2)
                             self.verifylist.append(self.redditlabel)
                             verifies.append(False)
                             print('\tFailed')
-                        time.sleep(2)
-                    else:
-                        self.redditlabel = Label(self, image=self.indicatorRed)
-                        self.redditlabel.grid(row=entry.grid_info()['row'],column=2)
-                        self.verifylist.append(self.redditlabel)
-                        verifies.append(False)
-                        print('\tFailed')
 
-            print(verifies)
+                print(verifies)
 
     def morerows(self, *args):
         self.redditlabel = Label(self,text="/r/")
-        self.redditlabel.grid(row=self.newrowindex,column=0)
+        self.redditlabel.grid(row=self.newrowindex,column=0, sticky="e")
         self.labellist.append(self.redditlabel)
 
         self.redditentry = Entry(self)
@@ -230,8 +293,9 @@ class Example(Frame):
         self.entrylist.append(self.redditentry)
 
         self.newrowindex += 1
-        if self.newrowindex == 20:
+        if self.newrowindex >= 20:
             self.morerowbutton.grid_forget()
+        print(self.newrowindex)
 
 
 
