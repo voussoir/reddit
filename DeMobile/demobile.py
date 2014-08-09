@@ -22,6 +22,9 @@ MAXPOSTS = 100
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
+DOMAINBLACKLIST = ["imgur"]
+#These are domains that you do not want to demobile, ever.
+
 '''All done!'''
 
 
@@ -30,9 +33,9 @@ WAIT = 20
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
-    USERAGENT = bot.geta()
+    USERNAME = bot.uG
+    PASSWORD = bot.pG
+    USERAGENT = bot.aG
 except ImportError:
     pass
 
@@ -66,13 +69,20 @@ def scanSub():
             pbodysplit = pbody.split()
             for word in pbodysplit:
                 if any(mobile in word for mobile in MOBILES):
-                    word = word.replace('http://m.', 'http://')
-                    word = word.replace('http://i.reddit', 'http://reddit')
-                    word = word.replace('http://en.m.', 'http://en.')
-                    word = word.replace('http://mobile.', 'http://')
-                    corrections.append(word)
+                    print(pid)
+                    if all(domain not in word for domain in DOMAINBLACKLIST):
+                        if '](' in word:
+                            word = word[word.index('(')+1:]
+                            word = word.replace(')','')
+                        word = word.replace('http://m.', 'http://')
+                        word = word.replace('http://i.reddit', 'http://reddit')
+                        word = word.replace('http://en.m.', 'http://en.')
+                        word = word.replace('http://mobile.', 'http://')
+                        corrections.append(word)
+                    else:
+                        print('\tDomain is blacklisted.')
             if len(corrections) > 0:
-                print(pid + ' by ' + pauthor + ': Fixed ' + str(len(corrections)) + ' links.')
+                print('\t' + pid + ' by ' + pauthor + ': Fixed ' + str(len(corrections)) + ' links.')
                 f = '\n\n'.join(corrections)
                 post.reply(RESPONSE + f)
 

@@ -320,10 +320,25 @@ class Example(Frame):
                         verifies.append(False)
                         print('\tFailed')
 
-                t = self.entryMo.get() + ' ' + self.entryDa.get() + ' ' + self.entryYr.get() + ' ' + self.entryHH.get() + ':' + self.entryMM.get()
-                plandate = datetime.datetime.strptime(t, "%B %d %Y %H:%M")
-                plandate = datetime.datetime.utcfromtimestamp(plandate.timestamp())
-                print(plandate.timestamp())
+                try:
+                    print('Checking Time')
+                    t = self.entryMo.get() + ' ' + self.entryDa.get() + ' ' + self.entryYr.get() + ' ' + self.entryHH.get() + ':' + self.entryMM.get()
+                    plandate = datetime.datetime.strptime(t, "%B %d %Y %H:%M")
+                    plandate = datetime.datetime.utcfromtimestamp(plandate.timestamp())
+                    print('\t' + str(plandate.timestamp()))
+
+                    self.redditlabel = Label(self, image=self.indicatorGreen)
+                    self.redditlabel.grid(row=5,column=3)
+                    self.verifylist.append(self.redditlabel)
+                    verifies.append(True)
+                except:
+                    print('\tFailed')
+                    self.redditlabel = Label(self, image=self.indicatorRed)
+                    self.redditlabel.grid(row=5,column=3)
+                    self.verifylist.append(self.redditlabel)
+                    verifies.append(False)
+
+                print(verifies)
 
 
     def morerows(self, label, columnm, columnn, limit, *args):
