@@ -16,9 +16,9 @@ SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 MAXPOSTS = 60
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 10
+WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
-DELAY = 180
+DELAY = 129600
 #This is the time, IN SECONDS, which the post will hold the active flair
 IGNOREMODS = False
 #Do you want the bot to ignore posts made by moderators? Use True or False (With capitals! No quotations!)
