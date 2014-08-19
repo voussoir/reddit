@@ -6,10 +6,6 @@ import time
 
 USERAGENT = '/u/Goldensights ScoreStats. Collecting information from the top posts from multiple subreddits to see how various criteria may affect score'
 
-
-SUBREDDIT = "mildlyinteresting"
-
-
 r = praw.Reddit(USERAGENT)
 
 sql = sqlite3.connect('sql.db')
@@ -34,11 +30,9 @@ SUBREDDITMODE = 1
 #0 = Use String, effectively a single sub
 #1 = Use list, each sub independent
 SUBREDDITS = 'pics'
-SUBREDDITL = ['technology','politics','nfl','leagueoflegends','minecraft',\
-'gaming','soccer', 'aww', 'todayilearned', 'worldnews', 'science', 'movies', \
-'music', 'pics', 'gifs', 'funny', 'videos', 'pcmasterrace', 'askscience']
+SUBREDDITL = ['news']
 
-BROWSEBY = 'top all'
+BROWSEBY = ['top month', 'top all']
 #hot
 #new
 #top all
@@ -79,52 +73,53 @@ def buildlist(generator):
 
 
 def gatherposts():
-	print('Browseby ' + BROWSEBY)
+	for browseby in BROWSEBY:
+		print('Browseby ' + browseby)
 
-	if SUBREDDITMODE == 0:
-		subreddit = [SUBREDDITS]
-	else:
-		subreddit = SUBREDDITL[:]
-
-	for sub in subreddit:
-		print('Subreddit: ' + sub)
-		s = r.get_subreddit(sub)
-		print('Gathering ' + str(MAXPOSTS) + ' items. Est ' + "%0.0f" % (MAXPOSTS * 2 / 100) + ' seconds.')
-		if BROWSEBY == 'new':
-			n = buildlist(s.get_new(limit=MAXPOSTS))
-		elif BROWSEBY == 'hot':
-			n = buildlist(s.get_hot(limit=MAXPOSTS))
-		elif BROWSEBY[:3] == 'top':
-			if BROWSEBY[4:] == 'all':
-				n = buildlist(s.get_top_from_all(limit=MAXPOSTS))
-			if BROWSEBY[4:] == 'day':
-				n = buildlist(s.get_top_from_day(limit=MAXPOSTS))
-			if BROWSEBY[4:] == 'week':
-				n = buildlist(s.get_top_from_week(limit=MAXPOSTS))
-			if BROWSEBY[4:] == 'month':
-				n = buildlist(s.get_top_from_month(limit=MAXPOSTS))
+		if SUBREDDITMODE == 0:
+			subreddit = [SUBREDDITS]
 		else:
-			raise Exception("You have entered an improper browseby setting.")
-		now = getTime(True)
-		successes = 0
-		fails = 0
-		for post in n:
-			if now - post.created_utc > MINAGE:
-				try:
-					pauthor = post.author.name
-				except:
-					pauthor = '[[DELETED]]'
-				print('New: ' + post.id + '\t' + pauthor + ('.' * (22-len(pauthor))) + str(post.score))
-				cur.execute('INSERT INTO oldposts VALUES(?)', [post.id])
-				cur.execute('INSERT INTO submissiondata VALUES(?,?,?,?,?, ?)', [post.id, post.created_utc, post.title, post.score, post.subreddit.display_name, pauthor])
-				successes += 1
+			subreddit = SUBREDDITL[:]
+
+		for sub in subreddit:
+			print('Subreddit: ' + sub)
+			s = r.get_subreddit(sub)
+			print('Gathering ' + str(MAXPOSTS) + ' items. Est ' + "%0.0f" % (MAXPOSTS * 2 / 100) + ' seconds.')
+			if browseby == 'new':
+				n = buildlist(s.get_new(limit=MAXPOSTS))
+			elif browseby == 'hot':
+				n = buildlist(s.get_hot(limit=MAXPOSTS))
+			elif browseby[:3] == 'top':
+				if browseby[4:] == 'all':
+					n = buildlist(s.get_top_from_all(limit=MAXPOSTS))
+				if browseby[4:] == 'day':
+					n = buildlist(s.get_top_from_day(limit=MAXPOSTS))
+				if browseby[4:] == 'week':
+					n = buildlist(s.get_top_from_week(limit=MAXPOSTS))
+				if browseby[4:] == 'month':
+					n = buildlist(s.get_top_from_month(limit=MAXPOSTS))
 			else:
-				fails += 1
-		print('[   ] Added ' + str(successes) + '.\tFailed ' + str(fails) + '\n')
-		sql.commit()
-		if not subreddit.index(sub) == (len(subreddit) - 1):
-			print('Sleeping ' + str(SLOWDOWN) + '\n')
-			time.sleep(SLOWDOWN)
+				raise Exception("You have entered an improper browseby setting.")
+			now = getTime(True)
+			successes = 0
+			fails = 0
+			for post in n:
+				if now - post.created_utc > MINAGE:
+					try:
+						pauthor = post.author.name
+					except:
+						pauthor = '[[DELETED]]'
+					print('New: ' + post.id + '\t' + pauthor + ('.' * (22-len(pauthor))) + str(post.score))
+					cur.execute('INSERT INTO oldposts VALUES(?)', [post.id])
+					cur.execute('INSERT INTO submissiondata VALUES(?,?,?,?,?, ?)', [post.id, post.created_utc, post.title, post.score, post.subreddit.display_name, pauthor])
+					successes += 1
+				else:
+					fails += 1
+			print('[   ] Added ' + str(successes) + '.\tFailed ' + str(fails) + '\n')
+			sql.commit()
+			if not subreddit.index(sub) == (len(subreddit) - 1):
+				print('Sleeping ' + str(SLOWDOWN) + '\n')
+				time.sleep(SLOWDOWN)
 
 gatherposts()
 quit()
