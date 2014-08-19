@@ -34,7 +34,9 @@ SUBREDDITMODE = 1
 #0 = Use String, effectively a single sub
 #1 = Use list, each sub independent
 SUBREDDITS = 'pics'
-SUBREDDITL = ['technology','politics','nfl','leagueoflegends','minecraft','gaming','soccer', 'aww', 'todayilearned', 'worldnews', 'science', 'movies', 'music', 'pics', 'gifs', 'funny', 'videos', 'pcmasterrace']
+SUBREDDITL = ['technology','politics','nfl','leagueoflegends','minecraft',\
+'gaming','soccer', 'aww', 'todayilearned', 'worldnews', 'science', 'movies', \
+'music', 'pics', 'gifs', 'funny', 'videos', 'pcmasterrace', 'askscience']
 
 BROWSEBY = 'top all'
 #hot
@@ -121,6 +123,7 @@ def gatherposts():
 		print('[   ] Added ' + str(successes) + '.\tFailed ' + str(fails) + '\n')
 		sql.commit()
 		if not subreddit.index(sub) == (len(subreddit) - 1):
+			print('Sleeping ' + str(SLOWDOWN) + '\n')
 			time.sleep(SLOWDOWN)
 
 gatherposts()
