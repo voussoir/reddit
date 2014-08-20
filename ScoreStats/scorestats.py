@@ -30,9 +30,9 @@ SUBREDDITMODE = 1
 #0 = Use String, effectively a single sub
 #1 = Use list, each sub independent
 SUBREDDITS = 'pics'
-SUBREDDITL = ['news']
+SUBREDDITL = ['news', 'askreddit', 'pics', 'gifs', 'videos', 'funny', 'mildlyinteresting', 'movies', 'aww', 'worldnews', 'mildlyinteresting', 'todayIlearned', 'gaming', 'notinteresting', 'minecraft', 'reactiongifs']
 
-BROWSEBY = ['top month', 'top all']
+BROWSEBY = ['hot', 'top day', 'top week']
 #hot
 #new
 #top all
