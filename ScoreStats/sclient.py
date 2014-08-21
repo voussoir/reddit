@@ -75,6 +75,30 @@ def hourofweek(timestamp):
 	f = (24 * day) + hour
 	return f
 
+def pressaverages(x,y):
+	print('x:',x)
+	print('y:',y)
+	class Value(object):
+	    value = 0
+	    nums = 0
+	d={}
+	for i in range(len(x)):
+		if x[i] not in d:
+			d[x[i]] = Value()
+		else:
+			d[x[i]].value += y[i]
+			d[x[i]].nums +=1
+	m = []
+	n = []
+	for i in d:
+		try:
+			#print(i, d[i].value / d[i].nums)
+			m.append(i)
+			n.append(d[i].value / d[i].nums)
+		except:
+			#print(i, 0)
+	return m, n
+
 
 def plot(xvalue, yvalue, xlabel="", ylabel="", title=""):
 	g.xlabel(xlabel)
