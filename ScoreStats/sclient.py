@@ -61,6 +61,19 @@ def secondofweek(timestamp):
 	f = (86400 * day) + (3600 * hour) + (60 * minute) + (second)
 	return f
 
+def minuteofday(timestamp):
+	d= datetime.datetime.utcfromtimestamp(timestamp)
+	hour = int(datetime.datetime.strftime(d, '%H'))
+	minute = int(datetime.datetime.strftime(d, '%M'))
+	f = (60 * hour) + minute
+	return f
+
+def hourofweek(timestamp):
+	d= datetime.datetime.utcfromtimestamp(timestamp)
+	hour = int(datetime.datetime.strftime(d, '%H'))
+	day = dayofweek(timestamp)
+	f = (24 * day) + hour
+	return f
 
 
 def plot(xvalue, yvalue, xlabel="", ylabel="", title=""):
