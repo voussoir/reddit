@@ -33,7 +33,8 @@ SUBREDDITS = 'pics'
 SUBREDDITL = ['news', 'askreddit', 'pics', 'gifs', \
 'videos', 'funny', 'mildlyinteresting', 'movies', 'aww', \
 'worldnews', 'todayIlearned', 'gaming', 'all'\
-'minecraft', 'reactiongifs', 'circlejerk', 'notinteresting']
+'minecraft', 'reactiongifs', 'circlejerk', 'notinteresting', \
+'lifeprotips']
 
 BROWSEBY = ['hot']
 #hot

@@ -96,7 +96,7 @@ def pressaverages(x,y):
 			m.append(i)
 			n.append(d[i].value / d[i].nums)
 		except:
-			#print(i, 0)
+			pass
 	return m, n
 
 
