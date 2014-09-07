@@ -13,7 +13,7 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "all"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subs, use "sub1+sub2+sub3+...". For all use "all"
-KEYWORDS ["flying cat"]
+KEYWORDS = ["flying cat"]
 #Any comment containing these words will be saved.
 
 RSAVE = False
@@ -34,6 +34,12 @@ SUBDUMP = False
 #Do you want the bot to dump into a subreddit as posts? Use True or False (Use capitals! No quotations!)
 DSUB = "GoldTesting"
 #If SUBDUMP is set to True, you will need to choose a subreddit to submit to.
+POSTTITLE = "_author_ in /r/_subreddit_"
+#This is the title of the post that will go in DSUB
+#You may use the following injectors to create a dynamic title
+#_author_
+#_subreddit_
+#_score_
 
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
@@ -49,9 +55,9 @@ WAIT = 20
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
-    USERAGENT = bot.getaG()
+    USERNAME = bot.uG
+    PASSWORD = bot.pG
+    USERAGENT = bot.aG
 except ImportError:
     pass
 
@@ -75,26 +81,30 @@ def scanSub():
     authors = []
     for post in posts:
         pid = post.id
-        plink = post.permalink
-        pbody = post.body
+        pbody = post.body.lower()
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])    
-            if any(key.lower() in pbody.lower() for key in KEYWORDS):
+            if KEYWORDS == [] or any(key.lower() in pbody for key in KEYWORDS):
                 try:
                     pauthor = post.author.name
                     print(pid + ', ' + pauthor)
+                    plink = post.permalink
                     result.append(plink)
-                    authors.append(pauthor + ' in /r/' + post.submission.subreddit.display_name)
+                    authors.append(pauthor + ' in /r/' + post.subreddit.display_name)
                     if RSAVE == True:
                         submission = post.submission
                         submission.save()
                         print('\tSaved submission')
                     if SUBDUMP == True:
-                        create = r.submit(DSUB, pauthor + ' in /r/' + post.submission.subreddit.display_name, url=plink, captcha = None)
+                        newtitle = POSTTITLE
+                        newtitle = newtitle.replace('_author_', pauthor)
+                        newtitle = newtitle.replace('_subreddit_', post.subreddit.display_name)
+                        newtitle = newtitle.replace('_score_', str(post.score) + ' points')
+                        create = r.submit(DSUB, newtitle, url=plink, captcha = None)
                         print('\tDumped to ' + DSUB)
                 except AttributeError:
                     print(pid + ': Author deleted. Ignoring comment')
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])    
     if len(result) > 0 and MAILME == True:
         for m in range(len(result)):
             result[m] = '- [' + authors[m] + '](' + result[m] + ')'

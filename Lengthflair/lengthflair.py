@@ -65,7 +65,7 @@ r.login(USERNAME, PASSWORD)
 
 
 def lengthflair(string):
-    l = len(string)
+    l = len(string.split())
     keys = sorted(list(LENGTHS.keys()))
     for member in keys:
         if l <= member:

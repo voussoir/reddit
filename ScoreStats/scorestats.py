@@ -36,7 +36,7 @@ SUBREDDITL = ['news', 'askreddit', 'pics', 'gifs', \
 'minecraft', 'reactiongifs', 'circlejerk', 'notinteresting', \
 'lifeprotips']
 
-BROWSEBY = ['hot']
+BROWSEBY = ['hot', 'top day', 'top week']
 #hot
 #new
 #top all
