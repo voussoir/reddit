@@ -13,10 +13,10 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter Bot".
-SUBREDDIT = "CopperplateGothic"
+SUBREDDIT = "Goldtesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 
-DOMAINS = ["i.imgur"]
+DOMAINS = ["imgur"]
 #Domains from which the bot will download images
 
 FILENAME = "_counter_ Copperplate _redditid_"
@@ -34,15 +34,13 @@ FILEPATH = "Images"
 LEADINGZEROS = 3
 #If you use the counter, you may want the number to have leading zeros.
 
-MAXPOSTS = 100
+MAXPOSTS = 10
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
 
 '''All done!'''
-
-
 
 
 WAITS = str(WAIT)
@@ -80,6 +78,22 @@ else:
     COUNTER = int(f[1])
     print('Counter = ' + str(COUNTER))
 
+def determinefiletype(path):
+    #I don't know what I'm doing.
+    filea = open(path, 'rb')
+    a = filea.read()
+    filea.close()
+    b = list(a[:4])
+    if b[:3] == [255, 216, 255]:
+        return '.jpg'
+    if b[:4] == [137, 80, 78, 71]:
+        return '.png'
+    if b[:3] == [71, 73, 70]:
+        return '.gif'
+    else:
+        return '.jpg'
+
+
 def scanSub():
     global COUNTER
     print('Searching '+ SUBREDDIT + '.')
@@ -92,6 +106,12 @@ def scanSub():
             purl = post.url
             if any(domain in purl for domain in DOMAINS):
                 print(pid, purl)
+                mustrename = False
+                if 'imgur' in purl and 'i.imgur' not in purl:
+                    purl = purl.replace('imgur', 'i.imgur') + '.jpg'
+                    print('\tIndirect link. Assuming .jpg file format')
+                    mustrename = True
+
                 fileextension = '.' + purl.split('.')[-1]
                 imgurid = purl.split('/')[-1].replace(fileextension, '')
                 filename = FILENAME
@@ -105,9 +125,15 @@ def scanSub():
                 print('\tDownloading image to', '"' + fullpath + '"')
 
                 urllib.request.urlretrieve(purl, fullpath)
+
+                if mustrename == True:
+                    fileextension = determinefiletype(fullpath)
+                    print('\tFixing filename to ' + fileextension)
+                    os.rename(fullpath, fullpath.replace('.jpg', fileextension))
+
                 
                 COUNTER +=1
-                cur.execute('UPDATE oldposts SET ID=? WHERE NAME=?', [COUNTER+1, 'countervar'])
+                cur.execute('UPDATE oldposts SET ID=? WHERE NAME=?', [COUNTER, 'countervar'])
                 #print('\tTicked Counter')
             cur.execute('INSERT INTO oldposts VALUES(?,?)', ['post', pid])
         sql.commit()
