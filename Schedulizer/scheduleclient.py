@@ -5,8 +5,9 @@ import tkinter
 import datetime
 import string
 import sqlite3
-from tkinter import Tk, BOTH, Entry, PhotoImage, OptionMenu, Spinbox, Text
+from tkinter import Tk, BOTH, Entry, PhotoImage, OptionMenu, Spinbox, Text, Scrollbar, Listbox
 from tkinter.ttk import Frame, Button, Style, Label
+from tkinter.tix import ScrolledWindow
 
 class Program():
     def __init__(self, name, path):
@@ -57,7 +58,8 @@ class Example(Frame):
         self.labelText = Label(self, text='Selftext:')
         self.entryText = Text(self)
         self.labelURL = Label(self, text='URL:')
-        self.entryURL = Entry(self)  
+        self.entryURL = Entry(self)
+        self.entryURL.configure(width=60)  
 
         self.sql = sqlite3.connect('sql.db')
         print('Loaded SQL Database')
@@ -85,7 +87,7 @@ class Example(Frame):
         sh = self.parent.winfo_screenheight()
 
 
-        w=600
+        w=853
         h=480
         x = (sw - w) / 2
         y = (sh - h) / 2
@@ -99,11 +101,11 @@ class Example(Frame):
 
         try:
             self.quitbutton.grid_forget()
-            self.quitbutton.grid(row=900, column=0, columnspan=20)          
+            self.quitbutton.grid(row=9000, column=0, columnspan=20)          
 
             self.option.grid(row=1,column=0,columnspan=8,pady=8)
 
-            self.updategui(True)
+            self.updategui(fullclean=True)
         except praw.errors.InvalidUserPass:
             pass
             print('Invalid username or password')
@@ -115,7 +117,7 @@ class Example(Frame):
         print('Was: ' + self.prevmode + ' | Now: ' + self.curmode)
         if self.curmode != self.prevmode:
             self.prevmode = self.curmode
-            self.updategui(True)
+            self.updategui(fullclean=True)
         else:
             self.updategui(False)
 
@@ -140,7 +142,7 @@ class Example(Frame):
         if mode == 'url':
             url = self.entryURL.get()
             body = ""
-            if 'http://' not in url:
+            if 'http://' not in url and 'https://' not in url:
                 print('Please enter a proper URL')
                 return False
         if mode == 'text':
@@ -176,17 +178,41 @@ class Example(Frame):
         print('Post Saved!')
         self.entryText.delete("1.0", "end")
         self.entryURL.delete(0, 'end')
-        self.updategui(True)
+        self.entryTitle.delete(0, 'end')
+        #self.updategui(halfclean=True)
 
     def dropentryfrombase(self, ID):
+        try:
+            ID = int(ID)
+        except ValueError:
+            print('You must enter a number')
+            return
         print('Dropping Item ' + str(ID) + ' from Upcoming')
         self.cur.execute('DELETE FROM upcoming WHERE ID=?', [ID])
         self.sql.commit()
-        self.updategui(True)
+        self.updategui(fullclean=True)
+
+    def printbasetofile(self, db):
+        filea = open(db + '.txt', 'w')
+        if db == 'past':
+            self.cur.execute('SELECT * FROM past')
+        if db == 'upcoming':
+            self.cur.execute('SELECT * FROM upcoming')
+        f = self.cur.fetchall()
+        print('Printed ' + db + ' unimpeded to file')
+        for item in f:
+            i = list(item)
+            d = datetime.datetime.fromtimestamp(i[2])
+            i[2] = datetime.datetime.strftime(d, "%b %d %H:%M")
+            i.remove('')
+
+            print(str(i)[1:-1], file=filea)
+        filea.close()
+
         
 
 
-    def updategui(self, *args):
+    def updategui(self, halfclean=False, fullclean=False):
 
         if self.curmode == self.optionCreate:
             try:
@@ -211,7 +237,7 @@ class Example(Frame):
             except AttributeError:
                 pass
 
-        if args[0] == True:
+        if fullclean == True:
             print('Cleaning GUI')
             for item in self.labellist:
                 item.grid_forget()
@@ -232,16 +258,33 @@ class Example(Frame):
                 self.labelTitle = Label(self, text="Post title:  ")
                 self.entrySubreddit = Entry(self)
                 self.entryTitle = Entry(self)
+
+
+                self.labelHH = Label(self, text="Schedule time (Local timezone):")
+                nowlist = datetime.datetime.strftime(datetime.datetime.now(), "%B %d %Y %H %M").split()
+
                 self.entryMo = Spinbox(self, width=9, values=('January', 'February', 'March', 'April', 'May', 'June', 'July', \
                     'August', 'September', 'October', 'November', 'December'))
+                self.entryMo.delete(0,'end')
+                self.entryMo.insert(0, nowlist[0])
+
 
                 self.entryDa = Spinbox(self, width=2, from_=1, to=31)
+                self.entryDa.delete(0,'end')
+                self.entryDa.insert(0, nowlist[1])
+
                 self.entryYr = Spinbox(self, width=4, from_=2014, to=2500)
-                self.labelHH = Label(self, text="Schedule time (Local timezone):")
-                self.entryHH = Spinbox(self, from_=0, to=23, width=2)
-                self.entryMM = Spinbox(self, from_=0, to=59, width=2)
                 self.entryYr.delete(0,'end')
-                self.entryYr.insert(0,2014)
+                self.entryYr.insert(0, nowlist[2])
+
+                self.entryHH = Spinbox(self, from_=0, to=23, width=2)
+                self.entryHH.delete(0,'end')
+                self.entryHH.insert(0, nowlist[3])
+
+                self.entryMM = Spinbox(self, from_=0, to=59, width=2)
+                self.entryMM.delete(0,'end')
+                self.entryMM.insert(0, nowlist[4])
+
                 self.buttonAddentry = Button(self, text='Save', command=lambda: self.addentrytobase(self.entrySubreddit.get(), self.entryTitle.get(),\
                     mode=self.optionpostmodevar.get()))
 
@@ -285,28 +328,60 @@ class Example(Frame):
                 dobutton = False
 
             if self.curmode == self.optionPast or self.curmode == self.optionUpcoming:
+
+                
+                self.listboxId = Listbox(self)
+                self.listboxId.configure(width=118, height=20, font=("Courier 8"))
+                self.misclist.append(self.listboxId)
+
+                self.listboxScroller = Scrollbar(self, orient='horizontal', command=self.listboxId.xview)
+                self.listboxScroller.grid(row=4, column=0, columnspan=900)
+                self.listboxId.grid(row=3, column=0, columnspan=10)
+
+                self.listboxId.configure(xscrollcommand=self.listboxScroller.set)
+                self.misclist.append(self.listboxScroller)
+
+                self.buttonPrinter = Button(self, text="Print to .txt file")
+                if self.curmode == self.optionPast:
+                    self.buttonPrinter.configure(command=lambda: self.printbasetofile('past'))
+                if self.curmode == self.optionUpcoming:
+                    self.buttonPrinter.configure(command=lambda: self.printbasetofile('upcoming'))   
+
+                self.buttonPrinter.grid(row = 6, column=0, columnspan=90)
+                self.misclist.append(self.buttonPrinter)
+
+                if dobutton == True:
+                    self.entryDelete = Entry(self)
+                    self.buttonDelete = Button(self, text="Delete Item: ", command=lambda: self.dropentryfrombase(self.entryDelete.get()))
+                    self.buttonDelete.grid(row=5, column=0, sticky='e')
+                    self.entryDelete.grid(row=5, column=1, sticky='w')
+                    self.misclist.append(self.entryDelete)
+                    self.misclist.append(self.buttonDelete)
+
+
                 fetched = self.cur.fetchall()
-                indexy = 2
                 for item in fetched:
-                    indexx = 0
-                    for info in item:
-                        if indexx == 2:
-                            d = datetime.datetime.fromtimestamp(info)
-                            info = datetime.datetime.strftime(d, "%b %d %H:%M")
-                        info = str(info)
-                        if info != '':
-                            if len(info) > 30:
-                                info = info[:27] + '...'
-                            self.labelUpcoming = Label(self, text=str(info).strip())
-                            self.labelUpcoming.grid(row=indexy, column=indexx, padx = 5, pady=5)
-                            self.misclist.append(self.labelUpcoming)
-                            indexx += 1
-                    if dobutton:
-                        ix = item[0]
-                        self.buttonDeleteUpcoming = Button(self, text="Delete " + str(item[0]), command= lambda ix=ix: self.dropentryfrombase(ix))
-                        self.buttonDeleteUpcoming.grid(row=indexy, column=indexx+1, padx=5, pady=5)
-                        self.misclist.append(self.buttonDeleteUpcoming)
-                    indexy += 1
+                    d = datetime.datetime.fromtimestamp(item[2])
+                    info = datetime.datetime.strftime(d, "%b %d %H:%M")
+
+                    if item[4] == '':
+                        infx = item[5]
+                    if item[5] == '':
+                        infx = item[4]
+                    if self.curmode == self.optionPast:
+                        infy = '.' + item[6]
+                    else:
+                        infy = ''
+
+                    self.listboxId.insert('end', \
+                        item[0] + '.'*(6 - len(item[0])) \
+                        + item[1][:10] + '.'*(12 - len(item[1][:10])) \
+                        + info + '.'*(15 - len(info[:14])) \
+                        + item[3][:18] + '.'*(20 - len(item[3][:14])) \
+                        + infx[:45] + '.'*(47-len(infx[:45])) \
+                        + infy)
+
+                    
                 
 
 
