@@ -155,6 +155,10 @@ class Example(Frame):
             print('Subreddit contains invalid characters')
             return False
 
+        if len(subreddit) == 0:
+            print('You must enter a subreddit')
+            return False
+
         if len(title) == 0:
             print('You must enter a title')
             return False
