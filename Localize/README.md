@@ -1,6 +1,9 @@
 Localize
 ==========
 
+This bot is only certified to work with Imgur Links
+
+
 Downloads images from a subreddit.
 
 I've left the images I tested with in this repository so you can see how it looks. Compare the names of the files inside the Images folder with the FILENAME variable from localize.py

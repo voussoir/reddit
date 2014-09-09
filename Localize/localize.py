@@ -104,11 +104,12 @@ def scanSub():
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
             purl = post.url
-            if any(domain in purl for domain in DOMAINS):
+            if any(domain.lower() in purl.lower() for domain in DOMAINS):
                 print(pid, purl)
                 mustrename = False
                 if 'imgur' in purl and 'i.imgur' not in purl:
-                    purl = purl.replace('imgur', 'i.imgur') + '.jpg'
+                    purl = purl.replace('imgur', 'i.imgur')
+                    purl = purl.replace('gallery/', '') + '.jpg'
                     print('\tIndirect link. Assuming .jpg file format')
                     mustrename = True
 

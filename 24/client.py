@@ -220,17 +220,21 @@ class Example(Frame):
                 self.misclist.append(self.entryMo)
                 self.misclist.append(self.entryDa)
                 self.misclist.append(self.entryYr)
+                self.misclist.append(self.morerowbutton)
+                self.misclist.append(self.verifybutton)
 
                 self.labelCanUsername.grid(row=2, column=0, sticky="e")
                 self.labelCanRealname.grid(row=3, column=0, sticky="e")
+                self.labelCanFlair.grid(row=4, column=0, sticky="e")
                 self.entryCanUsername.grid(row=2, column=1, columnspan=3)
                 self.entryCanRealname.grid(row=3, column=1, columnspan=3)
-                self.entryMo.grid(row=4, column=1,sticky="e")
-                self.entryDa.grid(row=4, column=2)
-                self.entryYr.grid(row=4, column=3)
-                self.labelHH.grid(row=4, column=0, sticky="se", pady=5)
-                self.entryHH.grid(row=5, column=1, sticky="e")
-                self.entryMM.grid(row=5, column=2, sticky="w")
+                self.entryCanFlair.grid(row=4, column=1, columnspan=3)
+                self.entryMo.grid(row=5, column=1,sticky="e")
+                self.entryDa.grid(row=5, column=2)
+                self.entryYr.grid(row=5, column=3)
+                self.labelHH.grid(row=5, column=0, sticky="se", pady=5)
+                self.entryHH.grid(row=6, column=1, sticky="e")
+                self.entryMM.grid(row=6, column=2, sticky="w")
         else:
             if self.curmode == self.optionDiscuss:
 
@@ -347,7 +351,7 @@ class Example(Frame):
         self.labellist.append(self.redditlabel)
 
         self.redditentry = Entry(self)
-        self.redditentry.grid(row=self.newrowindex,column=columnn, columnspan=8)
+        self.redditentry.grid(row=self.newrowindex,column=columnn, columnspan=9)
         self.entrylist.append(self.redditentry)
 
         self.newrowindex += 1
