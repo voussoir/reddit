@@ -178,6 +178,7 @@ class Example(Frame):
         print('Dropping Item ' + str(ID) + ' from Upcoming')
         self.cur.execute('DELETE FROM upcoming WHERE ID=?', [ID])
         self.sql.commit()
+        self.updategui(True)
         
 
 
@@ -273,9 +274,11 @@ class Example(Frame):
 
             if self.curmode == self.optionUpcoming:
                 self.cur.execute('SELECT * FROM upcoming')
+                dobutton = True
 
             if self.curmode == self.optionPast:
                 self.cur.execute('SELECT * FROM past')
+                dobutton = False
 
             if self.curmode == self.optionPast or self.curmode == self.optionUpcoming:
                 fetched = self.cur.fetchall()
@@ -294,6 +297,11 @@ class Example(Frame):
                             self.labelUpcoming.grid(row=indexy, column=indexx, padx = 5, pady=5)
                             self.misclist.append(self.labelUpcoming)
                             indexx += 1
+                    if dobutton:
+                        ix = item[0]
+                        self.buttonDeleteUpcoming = Button(self, text="Delete " + str(item[0]), command= lambda ix=ix: self.dropentryfrombase(ix))
+                        self.buttonDeleteUpcoming.grid(row=indexy, column=indexx+1, padx=5, pady=5)
+                        self.misclist.append(self.buttonDeleteUpcoming)
                     indexy += 1
                 
 
