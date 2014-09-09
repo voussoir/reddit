@@ -13,18 +13,19 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter Bot".
-SUBREDDIT = "Goldtesting"
+SUBREDDIT = "Krush"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 
 DOMAINS = ["imgur"]
 #Domains from which the bot will download images
 
-FILENAME = "_counter_ Copperplate _redditid_"
+FILENAME = "_counter_ _subreddit_ _redditid_"
 #The name of the file
 #Extension will be added automatically
 #You may use these following injectors to create dynamic titles:
 #_redditid_ = The 6 digit ID of the reddit post
 #_imgurid_ = The 7 digit ID of the imgur image
+#_subreddit_ = The name of the subreddit it was posted in
 #_counter_ = A counter which will tick upward by 1 every time.
 
 FILEPATH = "Images"
@@ -93,6 +94,51 @@ def determinefiletype(path):
     else:
         return '.jpg'
 
+def readalbum(pid, purl, subreddit):
+    #I DON'T KNOW WHAT I'M DOING
+    print('Reading HTML for album page')
+    reada = urllib.request.urlopen(purl)
+    a = reada.readlines()
+    reada.close()
+    l = []
+    for line in a:
+        line = str(line, encoding='utf-8')
+        if '"og:image" content="' in line:
+            l.append(line.strip().split('"')[-2])
+    for image in l:
+        print('\tFound ' + image)
+        downloadimage(pid, image, subreddit, False)
+
+
+
+def downloadimage(pid, purl, subreddit, mustrename):
+    global COUNTER
+    fileextension = '.' + purl.split('.')[-1]
+    imgurid = purl.split('/')[-1].replace(fileextension, '')
+    filename = FILENAME
+    filename = filename.replace('_counter_', ("%0" + str(LEADINGZEROS+1) + "d") % COUNTER)
+    filename = filename.replace('_redditid_', pid)
+    filename = filename.replace('_imgurid_', imgurid)
+    filename = filename.replace('_subreddit_', subreddit)
+
+    fullpath = FILEPATH + "\\" +  filename + fileextension
+
+    print('\tImgur ID:', imgurid, '|| Extension:', fileextension)
+    print('\tDownloading image to', '"' + fullpath + '"\n')
+
+
+    urllib.request.urlretrieve(purl, fullpath)
+
+    if mustrename == True:
+        fileextension = determinefiletype(fullpath)
+        print('\tFixing filename to ' + fileextension)
+        os.rename(fullpath, fullpath.replace('.jpg', fileextension))
+
+    COUNTER +=1
+    cur.execute('UPDATE oldposts SET ID=? WHERE NAME=?', [COUNTER, 'countervar'])
+    #print('\tTicked Counter')
+    sql.commit()
+
 
 def scanSub():
     global COUNTER
@@ -107,35 +153,19 @@ def scanSub():
             if any(domain.lower() in purl.lower() for domain in DOMAINS):
                 print(pid, purl)
                 mustrename = False
-                if 'imgur' in purl and 'i.imgur' not in purl:
+
+                if 'imgur' in purl and 'i.imgur' not in purl and 'imgur.com/a/' not in purl:
                     purl = purl.replace('imgur', 'i.imgur')
                     purl = purl.replace('gallery/', '') + '.jpg'
                     print('\tIndirect link. Assuming .jpg file format')
                     mustrename = True
 
-                fileextension = '.' + purl.split('.')[-1]
-                imgurid = purl.split('/')[-1].replace(fileextension, '')
-                filename = FILENAME
-                filename = filename.replace('_counter_', ("%0" + str(LEADINGZEROS+1) + "d") % COUNTER)
-                filename = filename.replace('_redditid_', pid)
-                filename = filename.replace('_imgurid_', imgurid)
+                if 'imgur.com/a/' in purl:
+                    readalbum(pid, purl, post.subreddit.display_name)
 
-                fullpath = FILEPATH + "\\" +  filename + fileextension
+                else:
+                    downloadimage(pid, purl, post.subreddit.display_name, mustrename)
 
-                print('\tImgur ID:', imgurid, '|| Extension:', fileextension)
-                print('\tDownloading image to', '"' + fullpath + '"')
-
-                urllib.request.urlretrieve(purl, fullpath)
-
-                if mustrename == True:
-                    fileextension = determinefiletype(fullpath)
-                    print('\tFixing filename to ' + fileextension)
-                    os.rename(fullpath, fullpath.replace('.jpg', fileextension))
-
-                
-                COUNTER +=1
-                cur.execute('UPDATE oldposts SET ID=? WHERE NAME=?', [COUNTER, 'countervar'])
-                #print('\tTicked Counter')
             cur.execute('INSERT INTO oldposts VALUES(?,?)', ['post', pid])
         sql.commit()
 

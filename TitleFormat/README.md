@@ -1,6 +1,10 @@
 TitleFormat
 ==========
 
+**USE AUTOMODERATOR INSTEAD**
+
+http://www.reddit.com/r/RequestABot/comments/29ejj3/looking_for_a_bot_for_rsoundcloud_that_forces/cikbe59
+
 This bot will enforce the use of one or more title structures on your subreddit. By adding more entries to `FORMATS` you can add more permitted structures
 
 For example:
