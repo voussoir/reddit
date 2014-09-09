@@ -105,6 +105,7 @@ def readalbum(pid, purl, subreddit):
         line = str(line, encoding='utf-8')
         if 'view full resolution' in line.lower():
             l.append('http://i.imgur.com/' + line.strip().split('"')[1].split('/')[-1])
+    print('Found ' + str(len(l)) + ' items')
     for image in l:
         print('\tFound ' + image)
         downloadimage(pid, image, subreddit, False)
