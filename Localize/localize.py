@@ -13,7 +13,7 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter Bot".
-SUBREDDIT = "Krush"
+SUBREDDIT = "CopperplateGothic"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 
 DOMAINS = ["imgur"]
@@ -103,8 +103,8 @@ def readalbum(pid, purl, subreddit):
     l = []
     for line in a:
         line = str(line, encoding='utf-8')
-        if '"og:image" content="' in line:
-            l.append(line.strip().split('"')[-2])
+        if 'view full resolution' in line.lower():
+            l.append('http://i.imgur.com/' + line.strip().split('"')[1].split('/')[-1])
     for image in l:
         print('\tFound ' + image)
         downloadimage(pid, image, subreddit, False)
