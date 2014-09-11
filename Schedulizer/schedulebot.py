@@ -87,9 +87,9 @@ def runtime():
 				url =None
 			try:
 				if text != None:
-					newpost = r.submit(member[1], title, text=text, captcha=None, resubmit=True)
+					newpost = r.submit(member[1], title, text=text, captcha=None, resubmit=True, send_replies=True)
 				if url != None:
-					newpost = r.submit(member[1], title, url=url, captcha=None, resubmit=True)
+					newpost = r.submit(member[1], title, url=url, captcha=None, resubmit=True, send_replies=True)
 				cur.execute('DELETE FROM upcoming WHERE ID=?', [iid])
 				cur.execute('INSERT INTO past VALUES(?, ?, ?, ?, ?, ?, ?)', [iid, member[1], member[2], member[3], member[4], member[5], newpost.id])
 				sql.commit()

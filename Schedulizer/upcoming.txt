@@ -10,4 +10,3 @@
 '26', 'Heyhoo', 'Oct 09 03:08', 'jkjk', '\n'
 '28', 'Heyhoo', 'Oct 09 03:08', 'jkjk', '\n'
 '29', 'Heyhoo', 'Oct 09 03:08', 'jkjk', '\n'
-'31', 'Goldtesting', 'Oct 09 03:56', 'Heyo', 'https://www.reddit.com/r/RequestABot/comments/2frbbv/imgur_download_bot/ckdafpl'
