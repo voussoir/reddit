@@ -1,3 +1,5 @@
 '1', 'GoldTesting', 'Sep 08 19:30', 'Schedulizer Test III', 'This post is being made fully automatically with Schedulizer!!\n', '2fvbzh'
 '2', 'GoldTesting', 'Sep 08 19:50', 'Schedulizer Test IV', 'How many of you have robots to do your reddit posting for you?\n', '2fvdyx'
 '3', 'CopperplateGothic', 'Sep 08 20:00', 'Mile 1 Real Estate', 'http://i.imgur.com/pq201mF.jpg', '2fvexi'
+'33', 'Goldtesting', 'Sep 11 14:40', 'Two posts at the same time', '\n', '2g57ia'
+'34', 'Goldtesting', 'Sep 11 14:40', 'Two posts At the also same time', '\n', '2g57ik'

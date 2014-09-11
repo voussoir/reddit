@@ -51,6 +51,7 @@ sql.commit()
 
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
+print(r.user)
 
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)

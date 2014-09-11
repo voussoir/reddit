@@ -15,6 +15,7 @@ class Program():
         self.path = path
 
 class Example(Frame):
+
     def __init__(self, parent):
         Frame.__init__(self, parent)
 
@@ -103,7 +104,7 @@ class Example(Frame):
             self.quitbutton.grid_forget()
             self.quitbutton.grid(row=9000, column=0, columnspan=20)          
 
-            self.option.grid(row=1,column=0,columnspan=8,pady=8)
+            self.option.grid(row=1,column=0,columnspan=80,pady=8)
 
             self.updategui(fullclean=True)
         except praw.errors.InvalidUserPass:
@@ -175,21 +176,49 @@ class Example(Frame):
         self.idcounter += 1
         self.cur.execute('UPDATE internal SET ID=? WHERE NAME=?', [self.idcounter, 'counter'])
         self.sql.commit()
-        print('Post Saved!')
+        print('\nPost Saved!')
+        print(self.idcounter, subreddit, self.timestamptoday(int(plandate)))
+        print(title)
+        print(url, body)
+        print()
         self.entryText.delete("1.0", "end")
         self.entryURL.delete(0, 'end')
         self.entryTitle.delete(0, 'end')
         #self.updategui(halfclean=True)
 
+    def timestamptoday(self, timestamp):
+        d = datetime.datetime.fromtimestamp(timestamp)
+        info = datetime.datetime.strftime(d, "%b %d %H:%M")
+        return info
+
+
     def dropentryfrombase(self, ID):
-        try:
-            ID = int(ID)
-        except ValueError:
-            print('You must enter a number')
-            return
-        print('Dropping Item ' + str(ID) + ' from Upcoming')
-        self.cur.execute('DELETE FROM upcoming WHERE ID=?', [ID])
-        self.sql.commit()
+        if '-' not in ID:
+            try:
+                ID = int(ID)
+                l = [ID]
+            except ValueError:
+                print('You must enter a number')
+                return
+        else:
+            if ID.count('-') == 1:
+                try:
+                    ID = ID.replace(' ', '')
+                    ID = ID.split('-')
+                    ID[0] = int(ID[0])
+                    ID[1] = int(ID[1])
+                    if ID[1] > ID[0]:
+                        l = list(range(ID[0], ID[1]+1))
+                    else:
+                        return
+                except ValueError:
+                    return
+
+        for item in l:
+            item = str(item)
+            print('Dropping Item ' + item + ' from Upcoming')
+            self.cur.execute('DELETE FROM upcoming WHERE ID=?', [item])
+            self.sql.commit()
         self.updategui(fullclean=True)
 
     def printbasetofile(self, db):
@@ -202,8 +231,7 @@ class Example(Frame):
         print('Printed ' + db + ' unimpeded to file')
         for item in f:
             i = list(item)
-            d = datetime.datetime.fromtimestamp(i[2])
-            i[2] = datetime.datetime.strftime(d, "%b %d %H:%M")
+            i[2] = self.timestamptoday(i[2])
             i.remove('')
 
             print(str(i)[1:-1], file=filea)
@@ -361,8 +389,8 @@ class Example(Frame):
 
                 fetched = self.cur.fetchall()
                 for item in fetched:
-                    d = datetime.datetime.fromtimestamp(item[2])
-                    info = datetime.datetime.strftime(d, "%b %d %H:%M")
+
+                    info = self.timestamptoday(item[2])
 
                     if item[4] == '':
                         infx = item[5]
