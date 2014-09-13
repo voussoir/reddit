@@ -14,6 +14,7 @@ USERAGENT = ""
 SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 PARENTSTRING = ["Solution Verified"]
+MODSTRING = ["+1 Point"]
 #These are the words you are looking for. If User says this, Parent gets 1 point in his flair
 REPLYSTRING = "You have awarded one point to _parent_"
 #This is the phrase that User will receive
@@ -21,7 +22,7 @@ REPLYSTRING = "You have awarded one point to _parent_"
 EXEMPT = []
 #Any usernames in this list will not receive points. Perhaps they have special flair.
 
-OPONLY = True
+OPONLY = False
 #Is OP the only person who can give points?
 #I recommend setting this to False. Other users might have the same question and would like to reward a good answer.
 
@@ -43,6 +44,7 @@ WAIT = 20
 
 
 WAITS = str(WAIT)
+
 try:
 	import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
 	USERNAME = bot.uG
@@ -64,6 +66,18 @@ sql.commit()
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
+print('Collecting subreddit moderators')
+MODERATORS = []
+s = SUBREDDIT.split('+')
+for x in s:
+	x = r.get_subreddit(x)
+	m = list(x.get_moderators())
+	for p in range(len(m)):
+		m[p] = m[p].name
+
+	MODERATORS += m
+print(MODERATORS)
+
 def flair(subreddit, username):
 	#Subreddit must be the sub object, not a string
 	#Returns True if the operation was successful
@@ -72,7 +86,7 @@ def flair(subreddit, username):
 	flairs = subreddit.get_flair(username)
 	flairs = flairs['flair_text']
 	if flairs != None and flairs != '':
-		print('\t -' + flairs)
+		print('\t :' + flairs)
 		try:
 			flairs = int(flairs)
 			flairs += 1
@@ -86,10 +100,8 @@ def flair(subreddit, username):
 		success = True
 	print('\tAssigning Flair: ' + flairs)
 	subreddit.set_flair(username, flairs)
-	if success == True:
-		return True
-	else:
-		return False
+
+	return success
 
 
 def scan():
@@ -98,44 +110,35 @@ def scan():
 	comments = subreddit.get_comments(limit=MAXPOSTS)
 	for comment in comments:
 		cid = comment.id
-		#Check if it's in the database
 		cur.execute('SELECT * FROM oldposts WHERE ID=?', [cid])
 		if not cur.fetchone():
 			print(cid)
 			cbody = comment.body.lower()
-			#Check if it has the keyword
-			if any(flag.lower() in cbody for flag in PARENTSTRING):
-				print('\tFlagged.')
-				#Check if it's a root
+			try:
 				if not comment.is_root:
-					try:
+					cauthor = comment.author.name
+					
+					if (cauthor not in MODERATORS and any(flag.lower() in cbody for flag in PARENTSTRING)) or\
+					   (cauthor in MODERATORS and any(flag.lower() in cbody for flag in MODSTRING)):
+						print('\tFlagged.')
 						print('\tFetching parent and Submission data.')
-						cauthor = comment.author.name
 						parentcom = r.get_info(thing_id=comment.parent_id)
 						pauthor = parentcom.author.name
 						op = comment.submission.author.name
 						opid = comment.submission.id
-						#Check if the person is giving points to himself
+
 						if pauthor != cauthor:
-							#Check if the person is Exempt
 							if not any(exempt.lower() == pauthor.lower() for exempt in EXEMPT):
-								moderators = subreddit.get_moderators()
-								mods = []
-								for moderator in moderators:
-									mods.append(moderator.name)
-								#Pass anyone if OPONLY is False. Pass only OP or moderators when OPONLY is True
-								if OPONLY == False or cauthor == op or cauthor in mods:
+								if OPONLY == False or cauthor == op or cauthor in MODERATORS:
 									cur.execute('SELECT * FROM submissions WHERE ID=?', [opid])
 									fetched = cur.fetchone()
-									#Check if this submission is in the database. Add it if not
 									if not fetched:
 										cur.execute('INSERT INTO submissions VALUES(?, ?)', [opid, 0])
 										fetched = 0
 									else:
 										fetched = fetched[1]
-									#Check if too many points have been given out yet
+
 									if fetched < MAXPERTHREAD:
-										#Attempt to do flair
 										if flair(subreddit, pauthor):
 											print('\tWriting reply')
 											comment.reply(REPLYSTRING.replace('_parent_', pauthor))
@@ -151,16 +154,20 @@ def scan():
 								print('\tParent is on the exempt list.')
 						else:
 							print('\tCannot give points to self.')
-					except AttributeError:
-						print('\tCould not fetch usernames. Cannot proceed.')
 				else:
 					print('\tRoot comment. Ignoring.')
+
+			except AttributeError:
+				print('\tCould not fetch usernames. Cannot proceed.')
 
 
 			cur.execute('INSERT INTO oldposts VALUES(?)', [cid])
 		sql.commit()
 	
 while True:
-	scan()
+	try:
+		scan()
+	except Exception as e:
+		print('ERROR:', e)
 	print('Running again in ' + WAITS + ' seconds.\n')
 	time.sleep(WAIT)
