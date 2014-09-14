@@ -1,4 +1,4 @@
-AutoMail
+DeleteMe
 =========
 
-Send a PM to this bot. If the PM contains a certain keyword, it will reply to you with a preset response based on that keyword
+This is a tool which lets you delete items off your profile with a score below a set threshold. After the initial run-through, you can tell the bot to act continuously using the same threshold.
