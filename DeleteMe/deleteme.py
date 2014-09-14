@@ -37,7 +37,7 @@ def create():
 		if confirm == 'y':
 			while True:
 				deletion(user, THRESHOLD)
-				tprint('Sleeping 120 seconds')
+				tprint('\nSleeping 120 seconds')
 				time.sleep(120)
 
 def deletion(user, THRESHOLD):
