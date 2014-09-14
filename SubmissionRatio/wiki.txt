@@ -11,6 +11,8 @@ This page was updated __STRFTIME("%B %d, %Y at %H:%M:%S UTC")__
 #Inserting __BUILDTABLE__ anywhere in this document will give the wiki a table containing usernames, submission count, and comment count
 #The order of the table is controled by the TABLESORT variable in submissionratio.py
 
-The following information comes from /r/letsplaycritiques and /r/GoldTesting
+[See here for more information](https://github.com/voussoir/reddit/tree/master/SubmissionRatio)
+
+The following data comes from /r/letsplaycritiques and /r/GoldTesting
 
 __BUILDTABLE__
