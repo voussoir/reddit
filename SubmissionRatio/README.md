@@ -1,9 +1,9 @@
 SubmissionRatio
 ===
 
-This measures the ratio of users' comments-to-submissions on your subreddit. If a users' ratio falls below a certain threshold, you may enact one or more punishment -- reporting, removing, or commenting.
+This measures the ratio of users' comments-to-submissions on your subreddit. If a users' ratio falls below a certain threshold, you may enact one or more punishments -- reporting, removing, or commenting.
 
-The ratios can then be published to a subreddit wiki page.
+The ratios can then be published to a subreddit [wiki page](http://www.reddit.com/r/GoldTesting/wiki/heyo).
 
 #SETTING UP
 
