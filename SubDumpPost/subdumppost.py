@@ -13,7 +13,7 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "CopperplateGothic"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subs, use "sub1+sub2+sub3+...". For all use "all"
-KEYWORDS = []
+KEYWORDS = ['lanyard']
 #Any post containing these words will be saved.
 
 RSAVE = False
@@ -34,12 +34,13 @@ SUBDUMP = True
 #Do you want the bot to dump into a subreddit as posts? Use True or False (Use capitals! No quotations!)
 DSUB = "GoldTesting"
 #If SUBDUMP is set to True, you will need to choose a subreddit to submit to.
-POSTTITLE = "_author_ in /r/_subreddit_"
+POSTTITLE = "_title_"
 #This is the title of the post that will go in DSUB
 #You may use the following injectors to create a dynamic title
 #_author_
 #_subreddit_
 #_score_
+#_title_
 TRUEURL = False
 #If this is True, the dumped post will point to the URL that the orginal submission used.
 #If this is False the dumped post will point to the reddit submission permalink
@@ -110,6 +111,7 @@ def scanSub():
                         newtitle = newtitle.replace('_author_', pauthor)
                         newtitle = newtitle.replace('_subreddit_', post.subreddit.display_name)
                         newtitle = newtitle.replace('_score_', str(post.score) + ' points')
+                        newtitle = newtitle.replace('_title_', post.title)
                         create = r.submit(DSUB, newtitle, url=plink, captcha = None)
                         print('\tDumped to ' + DSUB + '.')
                 except AttributeError:
