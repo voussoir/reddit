@@ -13,7 +13,7 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "CopperplateGothic"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subs, use "sub1+sub2+sub3+...". For all use "all"
-KEYWORDS = ['lanyard']
+KEYWORDS = ['Request', 'Submitted', 'Release', 'Concept']
 #Any post containing these words will be saved.
 
 RSAVE = False
