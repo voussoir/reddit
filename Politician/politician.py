@@ -152,25 +152,25 @@ def scan():
 					if not fetched:
 						cur.execute('INSERT INTO oldthreads VALUES(?, ?, ?)', [submissionid, 0, ''])
 						fetched = [submissionid, 0, '']
+					
+					if fetched[1] <= MAXPERTHREAD:
+						if type(post) == praw.objects.Submission:
+							pbody = post.title.lower() + '\n\n' + post.selftext.lower()
+						if type(post) == praw.objects.Comment:
+							pbody = post.body.lower()
+						#print(pbody)
+						for member in FULL:
+							if member.lower() in pbody:
+								idd = FULL[member]
+								if idd not in ids:
+									ids.append(idd)
+						for member in NICK:
+							if member.lower() in pbody:
+								idd = NICK[member]
+								if idd not in ids:
+									ids.append(idd)
 					else:
-						if fetched[1] <= MAXPERTHREAD:
-							if type(post) == praw.objects.Submission:
-								pbody = post.title.lower() + '\n\n' + post.selftext.lower()
-							if type(post) == praw.objects.Comment:
-								pbody = post.body.lower()
-							#print(pbody)
-							for member in FULL:
-								if member.lower() in pbody:
-									idd = FULL[member]
-									if idd not in ids:
-										ids.append(idd)
-							for member in NICK:
-								if member.lower() in pbody:
-									idd = NICK[member]
-									if idd not in ids:
-										ids.append(idd)
-						else:
-							print(submissionid + ': Already reached limit for thread')
+						print(submissionid + ': Already reached limit for thread')
 				else:
 					print(post.fullname + ': Author ' + pauthor + ' is blacklisted.')
 			except AttributeError:
