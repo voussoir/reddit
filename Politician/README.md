@@ -1,8 +1,6 @@
-Countries
+Politician
 ==========
 
-Good luck finding a way to repurpose this bot for yourself. Written for /u/dont_mind_the_matter on behalf of /r/countrychallenge
+When the bot sees a comment or submission that mentions the name of a US congressperson, it will provide some info from http://opensecrets.org, giving a brief rundown of their fundraising efforts and largest contributors.
 
-The txt file contains a list of countries, and today's number at the top. Every day, the computer has a new number, so when midnight strikes, the program will notice that the current date and the written date are not the same, and it will post the next country to reddit as a Feeling-Lucky Google search.
-
-This might not be the cleanest of code. I don't handle txt files very often, so I did what made the most sense to me.
+[See here](http://www.reddit.com/r/GoldTesting/comments/2gj3mu/politician_info_testing/) for examples.
