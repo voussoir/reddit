@@ -24,7 +24,7 @@ COMMENTHEADER = ""
 #At the top of the comment
 COMMENTALSOSEE = "**Also see:**"
 #After the first individual's full rundown
-COMMENTFOOTER = "This comment was automatically generated. [Source Code]()"
+COMMENTFOOTER = "This comment was automatically generated. [Source Code](https://github.com/voussoir/reddit/tree/master/Politician)"
 #At the bottom of the comment
 #Newline characters will be managed automatically in all three
 
