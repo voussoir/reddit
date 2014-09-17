@@ -14,8 +14,8 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "GoldTesting"
-#This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
+
+#This bot gets its subreddits from subreddit.txt
 
 MAXPERTHREAD = 4
 #This is the maximum number of individuals to be fetched in a single thread
@@ -121,11 +121,43 @@ def generatepolitician(iid, terminate=False):
 
 	return comment
 
+def dropfrom(filename, content):
+	print('Dropping ' + content + ' from ' + filename)
+	f = open(filename, 'r')
+	l = [line.strip() for line in f.readlines()]
+	f.close()
+	for i in range(len(l)):
+		item = l[i]
+		if content.lower() == item.lower():
+			l[i] = ''
+	while '' in l:
+		l.remove('')
+	while '\n' in l:
+		l.remove('\n')
+	f = open(filename, 'w')
+	for item in l:
+		print(item, file=f)
+	f.close()
+
+
 def scan():
 	print('\nChecking blacklist')
 	blackfile = open('blacklist.txt', 'r')
 	blacklist = blackfile.readlines()
 	blackfile.close()
+
+	print('Checking subreddits\n')
+	subfile = open('subreddit.txt', 'r')
+	sublist = subfile.readlines()
+	while '' in sublist:
+		sublist.remove('')
+	subfile.close()
+
+	if sublist == []:
+		print('Subreddit list is empty')
+		return
+		
+	SUBREDDIT = '+'.join(sublist)
 
 	print('Scanning ' + SUBREDDIT)
 	subreddit = r.get_subreddit(SUBREDDIT)
@@ -201,10 +233,14 @@ def scan():
 				newcomment += '\n\n' + COMMENTFOOTER
 
 				print(post.fullname + ': Writing reply.')
-				if type(post) == praw.objects.Submission:
-					post.add_comment(newcomment)
-				if type(post) == praw.objects.Comment:
-					post.reply(newcomment)
+				try:
+					if type(post) == praw.objects.Submission:
+						post.add_comment(newcomment)
+					if type(post) == praw.objects.Comment:
+						post.reply(newcomment)
+				except praw.request.exceptions.HTTPError:
+					print('HTTPError. Probably banned in this sub')
+					dropfrom(subreddit.txt, post.subreddit.display_name)
 
 				alreadyseen = ' '.join(alreadyseen) + ' ' + ' '.join(ids)
 
