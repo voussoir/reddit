@@ -76,14 +76,14 @@ def process(sr):
 		else:
 			olds += 1
 
-def news():
+def news(limit=20):
 	global olds
 	subreddit = r.get_subreddit('all')
 	listed = []
 	print('Getting new')
-	new = list(subreddit.get_new(limit=20))
+	new = list(subreddit.get_new(limit=limit))
 	print('Getting comments')
-	coms = list(subreddit.get_comments(limit=20))
+	coms = list(subreddit.get_comments(limit=limit))
 	listed += new + coms
 	olds = 0
 	for item in listed:

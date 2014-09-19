@@ -1,1 +1,2 @@
 python.exe
+cmd
