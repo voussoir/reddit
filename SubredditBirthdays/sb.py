@@ -95,6 +95,7 @@ def news(limit=20):
 def show():
 	filea = open('showt.txt', 'w')
 	fileb = open('showd.txt', 'w')
+	filec = open('shown.txt', 'w')
 	cur.execute('SELECT * FROM subreddits')
 	f = cur.fetchall()
 
@@ -103,10 +104,16 @@ def show():
 	for member in f:
 		print(member, file=filea)
 
+	f.sort(key=lambda x: x[3].lower())
+	print('Sorted by name', file=filec)
+	for member in f:
+		print(member, file=filec)
+
 	l = list(f)
 	for m in range(len(l)):
 		l[m] = list(l[m])
 		#This is disgusting.
+		#Replacing the month names "Jan" with numbers "01"
 		l[m][2] = l[m][2].replace(l[m][2][:3], d[l[m][2][:3]])
 
 	l.sort(key=lambda x: x[2])
@@ -115,6 +122,7 @@ def show():
 		print(member, file=fileb)
 	filea.close()
 	fileb.close()
+	filec.close()
 
 
 def nearby(ranged=7):
