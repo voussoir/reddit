@@ -239,7 +239,7 @@ def scan():
 					if type(post) == praw.objects.Comment:
 						post.reply(newcomment)
 				except praw.requests.exceptions.HTTPError:
-					print('HTTPError. Probably banned in this sub')
+					print('HTTPError: Probably banned in this sub')
 					dropfrom(subreddit.txt, post.subreddit.display_name)
 
 				alreadyseen = ' '.join(alreadyseen) + ' ' + ' '.join(ids)
