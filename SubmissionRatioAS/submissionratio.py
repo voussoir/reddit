@@ -21,7 +21,7 @@ PUSHTOWIKIFILE = "wiki.txt"
 PUSHTOWIKISUBREDDIT = "GoldTesting"
 PUSHTOWIKIPAGE = "batman"
 #Should the database be displayed on a subreddit wiki page?
-#The wiki page (PUSHTOWIKIPAGE) will be updated in accordance to a file (PUSHTOWIKIFILE) stored in the same directory as this .py
+#The wiki page (/r/PUSHTOWIKISUBREDDIT/wiki/PUSHTOWIKIPAGE) will be updated in accordance to a file (PUSHTOWIKIFILE) stored in the same directory as this .py
 #You must restart this bot if you edit the wiki file
 PUSHTOWIKIWAIT = 60
 #This is how many seconds you will wait between wiki page updates. The wiki does not need to be updated on every run
