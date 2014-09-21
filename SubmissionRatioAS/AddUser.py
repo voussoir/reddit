@@ -4,6 +4,10 @@ import time
 import sqlite3
 
 '''USER CONFIGURATION'''
+USERNAME  = ""
+#This is the bot's Username. In order to send mail, he must have some amount of Karma.
+PASSWORD  = ""
+#This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "goldtesting"
@@ -29,11 +33,12 @@ sql = sqlite3.connect('sql.db')
 print('Loaded SQL Database')
 cur = sql.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
-cur.execute('CREATE TABLE IF NOT EXISTS users(NAME TEXT, COMMENTS INT, SUBMISSIONS INT, RATIO REAL)')
+cur.execute('CREATE TABLE IF NOT EXISTS users(NAME TEXT, COMMENTS INT, SUBMISSIONS INT, RATIO REAL, FLAIR TEXT)')
 print('Loaded Completed table')
 sql.commit()
 
 r = praw.Reddit(USERAGENT)
+r.login(USERNAME, PASSWORD) 
 
 
 def work(l, user):
@@ -74,41 +79,49 @@ def operate():
 	print("Adding /u/" + username + ". Is this correct? Y/N")
 	confirm = input('>> ').lower()
 	if confirm == 'y':
-		user = r.get_redditor(username, fetch=True)
-		cur.execute('SELECT * FROM users WHERE NAME=?', [user.name])
-		fetched = cur.fetchone()
-		if not fetched:
-			print('New user')
-			cur.execute('INSERT INTO users VALUES(?, ?, ?, ?)', [user.name, 0, 0, 0])
-			fetched = [user.name, 0, 0, 0]
-
-		comments = fetched[1]
-		submissions = fetched[2]
-
 		subreddit = r.get_subreddit(SUBREDDIT)
+		userflair = subreddit.get_flair(username)['flair_text']
+		if userflair != '' and userflair != None:
+			try:
+				user = r.get_redditor(username, fetch=True)
+				cur.execute('SELECT * FROM users WHERE NAME=?', [user.name])
+				fetched = cur.fetchone()
+				if not fetched:
+					print('New user')
+					cur.execute('INSERT INTO users VALUES(?, ?, ?, ?, ?)', [user.name, 0, 0, 0, userflair])
+					fetched = [user.name, 0, 0, 0]
 
-		print('Gathering /new')
-		new = subreddit.get_new(limit=1000)
-		work(new, user)
+				comments = fetched[1]
+				submissions = fetched[2]
 
-		print('Gathering /comments')
-		coms = subreddit.get_comments(limit=1000)
-		work(coms, user)
 
-		print('Gathering user submissions')
-		submitted = user.get_submitted(limit=1000)
-		work(submitted, user)
+				print('Gathering /new')
+				new = subreddit.get_new(limit=1000)
+				work(new, user)
 
-		print('Gathering user comments')
-		coms = user.get_comments(limit=1000)
-		work(coms, user)
+				print('Gathering /comments')
+				coms = subreddit.get_comments(limit=1000)
+				work(coms, user)
 
-		denominator = (1 if submissions == 0 else submissions)
-		ratio = "%0.2f" % (comments / denominator)
-		print('\t' + user.name)
-		print('\t' + str(comments) + 'c / ' + str(denominator) + 's = ' + str((comments / denominator))[:3])
-		ratio = float(ratio)
-		cur.execute('UPDATE users SET COMMENTS=?, SUBMISSIONS=?, RATIO=? WHERE NAME=?', [comments, submissions, ratio, user.name])
+				print('Gathering user submissions')
+				submitted = user.get_submitted(limit=1000)
+				work(submitted, user)
+
+				print('Gathering user comments')
+				coms = user.get_comments(limit=1000)
+				work(coms, user)
+
+				denominator = (1 if submissions == 0 else submissions)
+				ratio = "%0.2f" % (comments / denominator)
+				print('\t' + user.name)
+				print('\t' + str(comments) + 'c / ' + str(denominator) + 's = ' + str((comments / denominator))[:3])
+				ratio = float(ratio)
+				cur.execute('UPDATE users SET COMMENTS=?, SUBMISSIONS=?, RATIO=?, FLAIR=? WHERE NAME=?', [comments, submissions, ratio, userflair, user.name])
+
+			except praw.requests.exceptions.HTTPError:
+				print('Could not fetch user')
+		else:
+			print('User has no flair')
 
 	sql.commit()
 

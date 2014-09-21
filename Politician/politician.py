@@ -238,7 +238,7 @@ def scan():
 						post.add_comment(newcomment)
 					if type(post) == praw.objects.Comment:
 						post.reply(newcomment)
-				except praw.request.exceptions.HTTPError:
+				except praw.requests.exceptions.HTTPError:
 					print('HTTPError. Probably banned in this sub')
 					dropfrom(subreddit.txt, post.subreddit.display_name)
 
