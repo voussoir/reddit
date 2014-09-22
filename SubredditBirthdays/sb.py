@@ -110,6 +110,7 @@ def show():
 		print(member, file=filec)
 
 	l = list(f)
+	print(str(len(l)) + ' items.')
 	for m in range(len(l)):
 		l[m] = list(l[m])
 		#This is disgusting.
