@@ -66,7 +66,7 @@ def process(sr):
 		subs.append(sr)
 
 	for sub in subs:
-		cur.execute('SELECT * FROM subreddits WHERE NAME=?', [sub.display_name])
+		cur.execute('SELECT * FROM subreddits WHERE ID=?', [sub.id])
 		f = cur.fetchone()
 		if not f:
 			h = human(sub.created_utc)
