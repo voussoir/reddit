@@ -52,6 +52,14 @@ def human(timestamp):
 	human = datetime.datetime.strftime(day, "%b %d %Y %H:%M:%S UTC")
 	return human
 
+def processi(sr):
+	sr = r.get_info(thing_id= 't5_' + sr)
+	try:
+		sr.id
+		process(sr)
+	except:
+		print('Could not fetch subreddit')
+
 def process(sr):
 	global olds
 	subs = []
@@ -61,6 +69,7 @@ def process(sr):
 			splitted = splitted.replace(' ', '')
 			splitted = r.get_subreddit(splitted)
 			subs.append(splitted)
+
 
 	else:
 		subs.append(sr)
