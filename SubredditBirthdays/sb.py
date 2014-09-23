@@ -122,12 +122,12 @@ def show():
 	fetch.sort(key=lambda x: x[1])
 	print('Sorted by true time', file=filea)
 	for member in fetch:
-		print(member, file=filea)
+		print(str(member).replace("'", ''), file=filea)
 
 	fetch.sort(key=lambda x: x[3].lower())
 	print('Sorted by name', file=filec)
 	for member in fetch:
-		print(member, file=filec)
+		print(str(member).replace("'", ''), file=filec)
 
 	l = list(fetch)
 	print(str(len(l)) + ' items.')
@@ -137,41 +137,47 @@ def show():
 		#I cleaned it up, guys
 		fulldate = l[m][2]
 		monthname = fulldate[:3]
-
 		l[m][2] = fulldate.replace(monthname, monthnumbers[monthname])
 
 	l.sort(key=lambda x: x[2])
 	print('Sorted by day of month', file=fileb)
 	for member in l:
-		print(member, file=fileb)
+		print(str(member).replace("'", ''), file=fileb)
 	filea.close()
 	fileb.close()
 	filec.close()
 
 
-def nearby(ranged=7):
-	#finds entries within range days of a birthday
+def nearby(ranged=16):
+	#find upcoming birthdays
 	cur.execute('SELECT * FROM subreddits')
 	fetched = cur.fetchall()
-	fetched.sort(key=lambda x: x[2])
 
 	results = []
 	now = datetime.datetime.utcnow()
-	for member in fetched:
-		member = list(member)
-		then = datetime.datetime.strptime(member[2], "%b %d %Y %H:%M:%S UTC")
 
-		diff = abs((then-now).days)
+	for m in range(len(fetched)):
+		member = list(fetched[m])
 
-		#There's probably a better way to do this
-		while diff > 365:
-			diff -= 365
-		#There's definitely a better way to do this
-		rd = 365 - ranged
-		while diff > rd:
-			diff -= rd
+		membertime = member[2]
+		membermonth = membertime[:3]
+		membertime = membertime.replace(membermonth, monthnumbers[membermonth])
 
-		if diff <= ranged:
-			results.append(member)
-	return results
+		member[2] = membertime
 
+		fetched[m] = member
+		
+	nowentry = ['Today', int("%0.0f" % now.timestamp()), datetime.datetime.strftime(now, "%m %d %Y %H:%M:%S UTC"), '##########']
+	fetched.append(nowentry)
+	fetched.sort(key=lambda x: (x[2][:6] + x[2][11:]))
+
+	nowindex = fetched.index(nowentry)
+	results.append(nowentry)
+	results.append('')
+	for item in fetched[nowindex+1:nowindex+ranged+1]:
+		results.append(item)
+
+
+	#return results
+	for item in results:
+		print(item)
