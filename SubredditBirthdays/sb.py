@@ -3,6 +3,7 @@ import praw # simple interface to the reddit API, also handles rate limiting of 
 import time
 import sqlite3
 import datetime
+import sys
 
 '''USER CONFIGURATION'''
 
@@ -32,7 +33,7 @@ r = praw.Reddit(USERAGENT)
 print('Connected to reddit.')
 
 olds = 0
-d = {
+monthnumbers = {
 	"Jan":"01",
 	"Feb":"02",
 	"Mar":"03",
@@ -53,12 +54,19 @@ def human(timestamp):
 	return human
 
 def processi(sr):
-	sr = r.get_info(thing_id= 't5_' + sr)
-	try:
-		sr.id
-		process(sr)
-	except:
-		print('Could not fetch subreddit')
+	global olds
+	if 't5_' not in sr:
+		sr = 't5_' + sr
+	cur.execute('SELECT * FROM subreddits WHERE ID=?', [sr[3:]])
+	if not cur.fetchone():
+		sr = r.get_info(thing_id=sr)
+		try:
+			sr.id
+			process(sr)
+		except ValueError:
+			print('Could not fetch subreddit')
+	else:
+		olds += 1
 
 def process(sr):
 	global olds
@@ -67,9 +75,12 @@ def process(sr):
 	if type(sr) == str:
 		for splitted in sr.split(','):
 			splitted = splitted.replace(' ', '')
-			splitted = r.get_subreddit(splitted)
-			subs.append(splitted)
+			sr = r.get_subreddit(splitted)
+			subs.append(sr)
 
+	elif type(sr) == praw.objects.Submission or type(sr) == praw.objects.Comment:
+		sr = sr.subreddit
+		subs.append(sr)
 
 	else:
 		subs.append(sr)
@@ -96,9 +107,9 @@ def news(limit=20):
 	listed += new + coms
 	olds = 0
 	for item in listed:
-		sub = item.subreddit
-		process(sub)
-		sql.commit()
+		sub = item.subreddit_id
+		processi(sub)
+	sql.commit()
 	print('Rejected', olds)
 
 def show():
@@ -106,25 +117,28 @@ def show():
 	fileb = open('showd.txt', 'w')
 	filec = open('shown.txt', 'w')
 	cur.execute('SELECT * FROM subreddits')
-	f = cur.fetchall()
+	fetch = cur.fetchall()
 
-	f.sort(key=lambda x: x[1])
+	fetch.sort(key=lambda x: x[1])
 	print('Sorted by true time', file=filea)
-	for member in f:
+	for member in fetch:
 		print(member, file=filea)
 
-	f.sort(key=lambda x: x[3].lower())
+	fetch.sort(key=lambda x: x[3].lower())
 	print('Sorted by name', file=filec)
-	for member in f:
+	for member in fetch:
 		print(member, file=filec)
 
-	l = list(f)
+	l = list(fetch)
 	print(str(len(l)) + ' items.')
 	for m in range(len(l)):
 		l[m] = list(l[m])
-		#This is disgusting.
-		#Replacing the month names "Jan" with numbers "01"
-		l[m][2] = l[m][2].replace(l[m][2][:3], d[l[m][2][:3]])
+
+		#I cleaned it up, guys
+		fulldate = l[m][2]
+		monthname = fulldate[:3]
+
+		l[m][2] = fulldate.replace(monthname, monthnumbers[monthname])
 
 	l.sort(key=lambda x: x[2])
 	print('Sorted by day of month', file=fileb)
