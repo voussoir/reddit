@@ -1,2 +1,3 @@
-python.exe
-cmd
+echo off
+cls
+python -i sb.py
