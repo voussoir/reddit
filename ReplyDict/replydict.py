@@ -20,7 +20,7 @@ COMMENTFOOTER = "This is at the bottom of the comment"
 #These can be blank if you don't want them.
 
 DICTFILE = 'snakes.txt'
-#The file with the Questions/Answers
+#The file with the Keys/Values
 
 RESULTFORM = "[_key_](_value_)"
 #This is the form that the result will take
