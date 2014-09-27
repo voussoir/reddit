@@ -28,9 +28,13 @@ RESULTFORM = "[_key_](_value_)"
 #This preset will create a link where the text is the snake name and the url is the wiki link
 #You may delete one or both of these injectors.
 
+LEVENMODE = True
+#If this is True it will use a function that is slow but can find misspelled keys
+#If this is False it will use a simple function that is very fast but can only find keys which are spelled exactly
+
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 20
+WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
 
@@ -64,6 +68,71 @@ sql.commit()
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
+
+def levenshtein(s1, s2):
+    #Levenshtein algorithm to figure out how close two strings are two each other
+    #Courtesy http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python
+    if len(s1) < len(s2):
+        return levenshtein(s2, s1)
+ 
+    # len(s1) >= len(s2)
+    if len(s2) == 0:
+        return len(s1)
+ 
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[j + 1] + 1 # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 1       # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+ 
+    return previous_row[-1]
+
+
+
+def findsuper(comment, tolerance= 3):
+    results = []
+    used = []
+    for itemname in DICT:
+        itemlength = len(itemname.split())
+        pos = 0
+        commentsplit = comment.split()
+        #print(commentsplit)
+        end = False
+        while not end:
+            try:
+                gram = commentsplit[pos:pos+itemlength]
+                gramjoin = ' '.join(gram)
+                lev = levenshtein(itemname, gramjoin)
+                #print(snakename, gramjoin)
+                #print(lev)
+                if lev <= tolerance:
+                    if itemname not in used:
+                        used.append(itemname)
+                        result = RESULTFORM
+                        result = result.replace('_key_', itemname)
+                        result = result.replace('_value_', DICT[itemname])
+                        results.append(result)
+                pos += 1
+                if pos > len(commentsplit):
+                    end = True
+            except IndexError:
+                end = True
+    return results
+
+def findsimple(comment):
+    results = []
+    for itemname in DICT:
+        if itemname.lower() in comment.lower():
+            result = RESULTFORM
+            result = result.replace('_key_', itemname)
+            result = result.replace('_value_', DICT[itemname])
+            results.append(result)
+    return results
+
 def scanSub():
     print('Searching '+ SUBREDDIT + '.')
     subreddit = r.get_subreddit(SUBREDDIT)
@@ -77,23 +146,22 @@ def scanSub():
             pauthor = '[DELETED]'
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
-            pbody = post.body.lower()
-            for item in DICT:
-                if item.lower() in pbody:
-                    result = RESULTFORM
-                    result = result.replace('_key_', item)
-                    result = result.replace('_value_', DICT[item])
-                    results.append(result)
-
-            if len(results) > 0:
-                if pauthor.lower() != USERNAME.lower():
-                    newcomment = COMMENTHEADER
-                    newcomment += '\n\n' + '\n\n'.join(results) + '\n\n'
-                    newcomment += COMMENTFOOTER
-                    print('Replying to ' + pid + ' by ' + pauthor + ' with ' + str(len(results)) + ' items')
-                    post.reply(newcomment)
+            if pauthor.lower() != USERNAME.lower():
+                pbody = post.body
+            
+                if LEVENMODE == True:
+                    results = findsuper(pbody)
                 else:
-                    print('Will not reply to self')
+                    results = findsimple(pbody)
+
+                if len(results) > 0:
+                        newcomment = COMMENTHEADER
+                        newcomment += '\n\n' + '\n\n'.join(results) + '\n\n'
+                        newcomment += COMMENTFOOTER
+                        print('Replying to ' + pid + ' by ' + pauthor + ' with ' + str(len(results)) + ' items')
+                        post.reply(newcomment)
+            else:
+                print('Will not reply to self')
             cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
     sql.commit()
 
