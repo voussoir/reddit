@@ -1,0 +1,869 @@
+/*
+
+        #-----------------------------------------------------------------------------------#
+        #-------------------- This subreddit is using the SIMPLIT theme --------------------#
+        #----------------------------- made by /u/titleproblems ----------------------------#
+        #---------------------- go to /r/titleproblems for more themes ---------------------#
+        #-----------------------------------------------------------------------------------#
+        #-----------------------------------------------------------------------------------#
+        #---------------------------------Simplit v1_23May14--------------------------------#
+        #-----------------------------------------------------------------------------------#
+
+*/
+
+
+
+/*COLORS
+AE81FF = purple Link
+E6DB74 = yellow Code
+469451 = Main Green
+346d3c = Dark Green
+ac3939 = NSFW Red
+9494FF = Downvote Periwinkle
+FF8B60 = Upvote Orange
+272822 = Sublime Browngray
+*/
+
+/*Text Styles*/
+
+strong
+{
+    color: #F0FFFF;
+}
+
+body
+{
+    margin-left:  25px;
+    margin-right: 25px;
+    background-color: #121212;
+}
+
+code
+{
+    color: #E6DB74;
+    padding: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+blockquote 
+{
+    background-color: transparent;
+    border: 3px solid transparent;
+    border-left: 3px solid #469451!important;
+    border-radius: 3px;
+}
+
+/*End Text Styles*/
+
+
+
+
+
+
+
+/* ### HEADER ### */
+
+#header
+{
+    background-color: #469451;
+    border-bottom: 30px solid #346d3c;
+    border-radius: 3px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#sr-header-area
+{
+    margin-left: -30px !important;
+    margin-right: -30px !important;
+}
+
+#header-bottom-right
+{
+    position: absolute !important;
+    top: 77px !important;
+    right: 0px;
+    background: transparent;
+}
+
+#header-bottom-right a,
+#header-bottom-right .user {color: #FFF;}
+#header-bottom-left .redditname a {vertical-align:middle;font-size:18px;text-decoration:none;}
+#header-bottom-left a#header-img-a {position: relative;top: 8px !important;}
+
+#userbarToggle { display: none !important; }
+
+                                  /* ### END HEADER ### */
+
+                                  /* ### TABMENU ### */
+
+#header .tabmenu
+{
+    position: absolute;
+    top: 73px;
+    left: 0px;
+}
+
+#header .tabmenu a
+{
+    font-family:Calibri,Candara,Segoe,"Segoe UI",Optima,Arial,sans-serif;
+}
+
+#header .tabmenu li a
+{
+    background-color: transparent;
+    color: #fff;
+    text-decoration: none;
+    border: 0px;
+}
+
+#header .tabmenu li.selected a
+{
+    background-color: transparent;
+    color: #fff;
+    text-decoration: underline;
+    border: 0px;
+}
+
+#header .user a
+{
+    background-color: transparent;
+    color: #fff;
+    text-decoration: none;
+    border: 0px;
+}
+
+#header .user
+{
+    background-color: transparent;
+    color: #fff;
+    text-decoration: none;
+    border: 0px;
+}
+
+#header .flat-list li
+{
+    background-color: transparent;
+    color: #f00;
+    text-decoration: none;
+    border: 0px;
+}
+
+/* ### END TABMENU ### */
+
+/* ### SIDEBAR ### */
+
+.side 
+{
+    background-color: #f9f8f8;
+    background: #121212;
+    margin-top: 35px;
+    padding: 0px;
+    padding-left: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    color: #FFFFFF;
+    font-family:Calibri,Candara,Segoe,"Segoe UI",Optima,Arial,sans-serif;
+}
+
+.side .titlebox .bottom .age
+{
+    float: none;
+    content:'heyo';
+    font-size: 0px;
+}
+
+.side .titlebox .bottom .age:after
+{
+    font-size:12px;
+    content:'on May 25, 2014';
+}
+
+.side .md a { color: #AE81FF !important; }
+.side .md a:hover { color: #AE81FF !important; text-decoration: underline;}
+
+.side .login-form {border: 0px; }
+
+.side .create .morelink,
+.side .create .spacer,
+
+.side .spacer .titlebox .tagline .flairselectbtn{color: #AE81FF;}
+.side .spacer .account-activity-box p a{color:#AE81FF;font-size:0px}
+.side .spacer .account-activity-box p a:after{font-size:10px;content:'View your account activity';}
+.side .spacer .sidecontentbox .helplink{font-size:0px;color:#ac3939;}
+
+.side .spacer .sidecontentbox .helplink:hover:after
+{
+    color: #000;
+    background-color:#ac3939;
+    border:1px solid #ac3939;
+    border-radius:3px;
+}
+
+.side .spacer .sidecontentbox .helplink:after
+{
+    /*MESSAGE THE MODERATORS*/
+    content:'Get help';
+    font-size:12px;
+    margin-top:0px;
+    color:#ac3939;
+
+}
+.side p { color: #FFFFFF; }
+
+.wiki-page-content {color: #EEE;}
+.content .menuarea .spacer .lightdrop {color: #EEE;}
+.content .commentarea .panestack-title {display: none;}
+.content .stylesheet-customize-container {color: #FFF;}
+
+.nub,  .titlebox form.toggle, .leavemoderator, .icon-menu li a, .sidebox .spacer {
+    background-color: transparent !important;
+}
+
+#search input[type="text"] {
+    border: 1px solid #343434;
+    color: #b2b2b2;
+    background: #333333;
+    font-family:Calibri,Candara,Segoe,"Segoe UI",Optima,Arial,sans-serif;
+}
+#header-img.default-header { width: 35px; }
+#searchexpando { background: transparent; border: 0px; }
+
+.morelink 
+{
+    z-index: 50;
+    border: 0px;
+    border-bottom: 3px solid #346d3c;
+    border-radius: 2px;
+    background: #469451;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    overflow: hidden;
+}
+
+.morelink:hover 
+{
+    background: none;
+    background-color: #469451 !important;
+    color: #000;
+    border-bottom: 0px solid #26502c;
+    border-top: 3px solid #26502c;
+}
+
+.morelink a 
+{
+    background-color: #469451 !important;
+    color: #f9f8f8 !important;
+    font-size: 15px;
+    font-family: verdana, sans-serif;
+}
+
+.morelink a:hover 
+{
+    color: #f9f8f8 !important;
+}
+
+.morelink .nub { display: none; }
+
+
+
+
+/* Sidebar elements */
+
+.titlebox .md h1 
+{
+    background-color: #469451;
+    color: #121212;
+    padding: 5px;
+    text-align: center;
+    font-size: 17px;
+    text-shadow: 2px 1px #7c7c7c;
+}
+
+.titlebox .md h2 
+{
+    background-color: #121212;
+    color: #272727;
+    padding: 5px;
+    text-align: center;
+    font-size: 17px;
+}
+
+.titlebox .md h3 
+{
+    color: #AE81FF ;
+    text-align: center;
+    font-size: 17px;
+}
+
+.titlebox .md h4 
+{
+    color: #121212;
+    font-size: 17px;
+    border-bottom: 1px solid #5a6eaa;
+}
+
+.titlebox .md h5 
+{
+    text-align: center;
+    font-size: 17px;
+    color: #272727;
+}
+
+.titlebox .md,
+.titlebox .tagline
+{
+    font-size: 14px;
+}
+
+
+.titlebox .age,
+.titlebox .bottom,
+.titlebox form.toggle
+{
+    font-size: 12px;
+}
+
+div.side .titlebox form.toggle input
+{
+    top: -2px;
+    vertical-align: bottom;
+    border: 2px solid #FFF;
+    font-size: 14px;
+}
+
+/* END Sidebar elements */
+
+.sidecontentbox .content 
+{
+    border: 0px;
+}
+
+.subscribe-button, 
+.fancy-toggle-button .add, 
+.fancy-toggle-button .remove, 
+.RESshortcutside, 
+.RESDashboardToggle 
+{
+    margin-left: 55px;
+    margin-right: 55px;
+    text-align: center;
+    background: transparent !important;
+    color: #469451 !important;
+    border: 0px !important;
+    font-size: 12px;
+}
+
+.titlebox h1.redditname 
+{
+    text-align: center;
+    color: #FFFFFF;
+    font-size: 30px;
+    font-family:Calibri,Candara,Segoe,"Segoe UI",Optima,Arial,sans-serif;
+}
+
+.titlebox h1 a 
+{
+    color: #FFFFFF; /*Choose the color for it when hovering over it*/
+    text-decoration:none !important;
+}
+
+hr 
+{
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    border-color: #f9f8f8 !important;
+}
+
+/* Edited from /u/Ian32's CSS snippets: http://www.reddit.com/r/csshelp/wiki/moresnippets#wiki_52.__clickable_sidebar_boxes */
+
+.side h6 
+{
+   /* list button */
+    position: relative;
+    margin: 0 0 10px 0;
+    padding: 5px;
+    background: #469451;
+    border: 1px solid #6e9ddd;
+    font-size: 12px;
+    color: #f9f8f8;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.side h6:after 
+{
+    /* "click to expand" text */
+    content: "click to expand";
+    position: absolute;
+    top: 8px;
+    right: 5px;
+    font-size: 9px;
+    font-weight: normal;
+    color: #f9f8f8;
+}
+
+.side h6 + ul 
+{
+    /* styles (+ hides) the list */
+    position: relative;
+    margin: -40px 0 5px;
+    padding: 28px 0 0;
+    list-style: none;
+    border: 1px solid #6e9ddd;
+    display: none;
+}
+
+.side h6:active + ul,
+.side h6 + ul:hover
+{
+    display: block;
+}
+
+.side h6 + ul li 
+{
+  position: relative;
+  padding: 5px;
+  border-top: 1px solid #DDD;
+  font-size: 14px;
+}
+
+                                  /* ### END SIDEBAR ### */
+
+                                  /* ### CONTENT ### */
+
+.content 
+{
+    margin-top: 35px;
+}
+
+.link 
+{
+    margin-bottom: 5px;
+    background-color: #272822;
+    border-bottom: 3px solid #222222;
+    border-radius: 3px;
+    padding: 9px;
+    color: #FFFFFF;
+    overflow: hidden !important;
+    box-shadow: 0px 6px 10px -7px #000;
+}
+
+
+.link .title a 
+{
+    color: #ccc !important;
+}
+
+.link .title a:visited 
+{
+    color: #bbbbbb !important;
+}
+
+
+.link.stickied 
+{
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.tagline .stickied-tagline 
+{
+    color: #6e9ddd;
+}
+
+/* New voting arrows */
+.arrow.up 
+{
+    background-image: none !important;
+    background: transparent !important;
+}
+
+.arrow.up:after 
+{
+    content: '•' !important;
+    display: inline-block !important;
+    text-decoration: bold;
+    color: #c6c6c6 !important;
+    font-size: 15px;
+    margin-left: 2px;
+}
+
+.arrow.upmod 
+{ 
+    background-image: none !important;
+    background: transparent !important;
+}
+
+.arrow.upmod:after 
+{
+    content: '•' !important;
+    display: inline-block !important;
+    color: #FF8B60!important;
+    font-size: 15px;
+    margin-left: 2px;
+}
+
+.arrow.down 
+{
+    background-image: none !important;
+    background: transparent !important;
+}
+
+.arrow.down:after 
+{
+    content: '•' !important;
+    display: inline-block !important;
+    color: #c6c6c6 !important;
+    font-size: 15px;
+    margin-left: 2px;
+}
+
+.arrow.downmod 
+{ 
+    background-image: none !important;
+    background: transparent !important;
+}
+
+.arrow.downmod:after 
+{
+    content: '•' !important;
+    display: inline-block !important;
+    color: #9494FF!important;
+    font-size: 15px;
+    margin-left: 2px;
+}
+
+div.score.likes, 
+div.score.unvoted, 
+div.scores.dislikes, 
+.dislikes div.score.dislikes 
+{
+    margin-top: 6px;
+}
+
+/* END New voting arrows */
+
+.nsfw-stamp acronym { display: none; }
+.nsfw-stamp:after
+{
+    background: #ac3939;
+    text-decoration: bold;
+    content: 'NSFW';
+    color: #232323;
+    padding:2px;
+    padding-right:3px;
+    border-radius: 3px;
+} 
+
+ul.flat-list.buttons a 
+{
+    font-weight: bold;
+}
+
+.flat-list.buttons a.comments 
+{
+    color: #ccc !important;
+    font-weight: bold !important;
+}
+
+.flat-list.buttons form.toggle.report-button:after
+{
+
+}
+
+
+.roundfield, .linefield 
+{
+    background-color: #f9f8f8;
+    border-radius: 0px;
+}
+
+.linefield .title 
+{
+    color: #272727;
+}
+
+.thing .tagline .author.submitter, 
+.thing .tagline .author.moderator { border-radius: 0px !important; }
+
+                                  /* ### END CONTENT ### */
+
+                                  /* ### COMMENT PAGE ### */
+
+.linkinfo 
+{
+    background: transparent;
+    border: 0px;
+}
+
+.link .usertext .md 
+{
+    border: 0px solid  #e0dfdf;
+    background: transparent;
+    color: #ECECEC;
+    border-radius: 0px;
+}
+
+.link .md a { color: #AE81FF !important; }
+.link .md a:hover { color: #AE81FF !important; text-decoration: underline;}
+.link .md a:visited { color: #AE81FF !important; }
+
+.comment .md a { color: #AE81FF !important; }
+.comment .md a:hover { color: #AE81FF !important; text-decoration: underline;}
+.comment .md a:visited { color: #AE81FF !important; }
+
+.content .commentarea .comment { margin-right: 6px !important; }
+.sitetable .link .rank{margin-top: 22px;}
+.sitetable .link .entry{margin-top: 7px;}
+.sitetable .link .entry .buttons{padding: 0px;}
+.sitetable .link .entry .expando{color: #ccc;}
+.sitetable .link .entry .expando-button{width: 0px; margin: 0px 0px 0px 0;}
+
+.sitetable .link .thumbnail.self
+{
+width: 0px;
+height: 0px;
+padding-bottom: 60px;
+}
+
+//.sitetable .link .unvoted .score{color:transparent;font-size:0px;padding-bottom:-1px;}
+//.sitetable .link .unvoted .score:after{background-color:#323232;content:' ';color:#fff;font-size:13px;}
+
+
+.sitetable .comment .may-blank-within { background-color: transparent; }
+.sitetable .comment
+{
+    right: -400;
+    background-color: #121212!important;
+    border-color: transparent !important;
+    border-right: 315px solid transparent!important;
+    border-left: 3px solid #232323 !important;
+    color: #ECECEC;
+}
+
+.sitetable .comment .comment .comment,
+.sitetable .comment .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment {
+    background-color: #121212!important;
+    border-radius: 3px !important;
+    padding-right: 0px solid transparent!important;
+    color: #ECECEC;
+    margin-top: 2px;
+    margin-bottom: 9px;
+}
+
+.sitetable .comment .comment, 
+.sitetable .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment, 
+.sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment {
+    background-color: #222323!important;
+    border-color: #121212!important;
+    border-right: 0px solid #232323 !important;
+    box-shadow: 0px 6px 10px -7px #000;
+    border-radius: 3px !important;
+}
+
+.panestack-title { margin-right: 350px; }
+
+textarea, #sr-autocomplete 
+{ 
+    background-color: #232323; 
+    color: #ffffff;
+    border: #33333 !important;
+}
+
+/* ### END COMMENT PAGE ### */
+
+
+
+
+/* ### REDDIT ENHANCEMENT SUITE ### */
+
+.res .RES-keyNav-activeElement,
+.res .keyHighlight,
+.res .commentarea .keyHighlight.entry .noncollapsed
+{
+    outline: 0px solid !important;
+    background: transparent !important;
+    border-right: 3px solid #469451;
+}
+
+.commentarea .RES-keyNav-activeElement .md, 
+.res .commentarea .RES-keyNav-activeElement.entry .noncollapsed 
+{
+    background: transparent !important;
+    border: 0px !important;
+}
+
+/* END of RES post highlight */
+
+/* ### END REDDIT ENHANCEMENT SUITE ### */
+
+/* ### LINK FLAIR ### */
+
+.linkflairlabel 
+{
+    color: #000;
+    border: 0px;
+    border-radius: 3px;
+}
+
+.linkflair-otn .linkflairlabel, 
+.linkflair.linkflair-otn > .linkflairlabel  { background-position: 0 0; } 
+
+.linkflair-info .linkflairlabel, 
+.linkflair.linkflair-info > .linkflairlabel { background-position: 0 -27px; } 
+
+.linkflair-mod .linkflairlabel, 
+.linkflair.linkflair-mod > .linkflairlabel { background-position: 0 -52px; }
+
+.linkflair-daily .linkflairlabel, 
+.linkflair.linkflair-daily > .linkflairlabel { background-position: 0 -77px; }
+
+                                  /* ### END LINK FLAIR ### */
+
+                                  /* ### USER FLAIR ### */
+
+.flair 
+{
+    border-radius: 3px;
+}
+
+                                  /* ### END USER FLAIR ### */
+
+                                  /* ### OTHER ### */
+
+.titlebox { padding-top: 5px; }
+
+
+.footer.rounded 
+{
+    border-radius: 0px;
+    border: 0px;
+    background-color: #121212;
+}
+
+.footer.rounded:before 
+{
+    display: block;
+    background: transparent;
+    content: 'Simplit theme by /r/titleproblems, butchered by /u/GoldenSights';
+    font-size: 10px;
+    color: #469451;
+}
+
+/* If you remove this, please be sure to credit me in the sidebar, linking to /r/titleproblems. Thank you! */
+
+/* stylesheet fix */
+#subreddit_stylesheet { display: block; overflow: hidden; }
+.sheets { margin: 0;}
+/* END stylesheet fix */
+
+                                  /* ### END OTHER ### */
+/*Changes the name of your subscribers/users here now*/
+  .titlebox .word { display: none }
+  .titlebox .number { display: block !important; } 
+  .titlebox .subscribers .number:before{ content: " ";}
+  .titlebox .number:after { content: " frozen";}
+  .titlebox .users-online:before{ background-image: url(%%transparent%%); content: ""; width: 0px; margin-right: 0px;} 
+  .titlebox .users-online { overflow: hidden; }
+  .titlebox .users-online .number:after { content: " fresh"; }
+
+/*How to change your mail icons*/
+#mail 
+{
+    position: relative;
+    display: inline-block;
+    text-indent: -9999px;
+    overflow: hidden;
+    width: 15px; /*These values for the standard mail icon, customize to your own*/
+    height: 10px;
+}
+
+body .commentarea .sitetable .comment 
+{
+  padding: 5px 8px 0 5px;
+  margin: 0 0 8px 10px;
+  border: 1px #EEE solid;
+  background: #222222;
+  color: #ae57c2
+  background-color: #222222;
+  border-radius: 2px!important;
+}
+
+.comment .comment 
+{
+  margin-right: 0;
+  background-color: #222222;
+  background: #222222;
+}
+
+.comment .child 
+{
+  margin: 10px 0 0 10px;
+  border: 0px solid #FFFFFF;
+}
+
+a.author, .res a.author 
+{
+color:#469451!important;
+background-color: transparent!important;
+}
+
+@keyframes swapdown 
+{
+  from 
+  {
+    margin-left: 100%;
+    width: 300%; 
+  }
+
+  to 
+  {
+    margin-left: 0%;
+    width: 100%;
+  }
+}
+
+
+
+/*github icon. based on /r/politics's icon css*/
+a.title:before, .md a:before
+{
+    background-image:url(%%person%%);
+    height:0px;
+    width:0px;
+    position:relative;
+    content:"";
+    display:inline-block;
+    margin-right:0px;
+    margin-top:0px;
+    vertical-align:bottom;
+}
+
+a[href*="/person"]:before
+{
+    background-position:0;
+    width:14px;
+    height:14px;
+}
+
+.roundfield, 
+.content.submit .info-notice
+{
+background-color:#323232;
+color:#ddd;
+border: 0px;
+}
+ 

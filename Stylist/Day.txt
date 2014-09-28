@@ -1,0 +1,473 @@
+/*
+
+        #-----------------------------------------------------------------------------------#
+        #-------------------- This subreddit is using the SIMPLIT theme --------------------#
+        #----------------------------- made by /u/titleproblems ----------------------------#
+        #---------------------- go to /r/titleproblems for more themes ---------------------#
+        #-----------------------------------------------------------------------------------#
+        #-----------------------------------------------------------------------------------#
+        #---------------------------------Simplit v1_23May14--------------------------------#
+        #-----------------------------------------------------------------------------------#
+
+*/
+
+                                  /* ### BODY ### */
+
+body {
+    margin-left: 50px;
+    margin-right: 50px;
+    background-color: #e5e0e0;
+}
+
+                                  /* ### END BODY ### */
+
+                                  /* ### HEADER ### */
+
+#header {
+    background-color: #7baff6;
+    border-bottom: 1px solid #628cc4;
+    border-right: 1px solid #628cc4;
+    border-left: 1px solid #628cc4;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#sr-header-area {
+    margin-left: -55px !important;
+    margin-right: -55px !important;
+}
+
+#header-bottom-right {
+    position: absolute !important;
+    top: 73px !important;
+    right: 0px;
+    background: transparent;
+}
+
+#header-bottom-right a { color: #838383; }
+
+#userbarToggle { display: none !important; }
+
+                                  /* ### END HEADER ### */
+
+                                  /* ### TABMENU ### */
+
+#header .tabmenu {
+    position: absolute;
+    top: 73px;
+    left: 0px;
+}
+
+#header .tabmenu a {
+    font-family:Calibri,Candara,Segoe,"Segoe UI",Optima,Arial,sans-serif;
+}
+
+#header .tabmenu li a {
+    background-color: transparent;
+    color: #838383;
+    border: 0px;
+}
+
+#header .tabmenu li.selected a {
+    background-color: transparent;
+    color: #272727;
+    border: 0px;
+}
+
+                                  /* ### END TABMENU ### */
+
+                                  /* ### SIDEBAR ### */
+
+.side {
+    background-color: #f9f8f8;
+    margin-top: 35px;
+    padding: 12px;
+    font-family:Calibri,Candara,Segoe,"Segoe UI",Optima,Arial,sans-serif;
+}
+
+.side p { color: #5e5b5b; }
+
+.nub,  .titlebox form.toggle, .leavemoderator, .icon-menu li a, .sidebox .spacer {
+    background-color: transparent !important;
+}
+
+#search input[type="text"] {
+    border: 1px solid #dbdbdb;
+    color: #b2b2b2;
+    font-family:Calibri,Candara,Segoe,"Segoe UI",Optima,Arial,sans-serif;
+}
+
+#searchexpando { background: transparent; border: 0px; }
+
+.morelink {
+    z-index: 50;
+    border: 0px;
+    border-bottom: 3px solid #628cc4;
+    border-radius: 2px;
+    background: #7baff6;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    overflow: hidden;
+}
+
+    .morelink:hover {
+        background: none;
+        background-color: #628cc4 !important;
+        color: #000;
+        border-bottom: 3px solid #567aac;
+    }
+
+    .morelink a {
+        color: #f9f8f8 !important;
+        font-size: 15px;
+        font-family: verdana, sans-serif;
+    }
+
+        .morelink a:hover {
+            color: #f9f8f8 !important;
+        }
+
+.morelink .nub { display: none; }
+
+/* Sidebar elements */
+
+.titlebox .md h1 {
+    background-color: #7baff6;
+    color: #f9f8f8;
+    padding: 5px;
+    text-align: center;
+    text-shadow: 0px 1px #7c7c7c;
+}
+
+.titlebox .md h2 {
+    background-color: #f9f8f8;
+    color: #272727;
+    padding: 5px;
+    text-align: center;
+    font-size: 17px;
+}
+
+.titlebox .md h3 {
+    color: #5a6eaa;
+    text-align: center;
+    font-size: 17px;
+}
+
+.titlebox .md h4 {
+    color: #5a6eaa;
+    font-size: 17px;
+    border-bottom: 1px solid #5a6eaa;
+}
+
+.titlebox .md h5 {
+    text-align: center;
+    font-size: 17px;
+    color: #272727;
+}
+
+/* END Sidebar elements */
+
+.sidecontentbox .content {
+    border: 0px;
+}
+
+.fancy-toggle-button .add, .fancy-toggle-button .remove, .RESshortcutside, .RESDashboardToggle {
+    background: transparent !important;
+    color: #7baff6 !important;
+    border: 0px !important;
+}
+
+.titlebox h1.redditname {
+    text-align: center;
+    font-size: 30px;
+    font-family:Calibri,Candara,Segoe,"Segoe UI",Optima,Arial,sans-serif;
+}
+
+hr {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    border-color: #f9f8f8 !important;
+}
+
+/* Edited from /u/Ian32's CSS snippets: http://www.reddit.com/r/csshelp/wiki/moresnippets#wiki_52.__clickable_sidebar_boxes */
+
+.side h6 { /* list button */
+  position: relative;
+  margin: 0 0 10px 0;
+  padding: 5px;
+  background: #7baff6;
+  border: 1px solid #6e9ddd;
+  font-size: 12px;
+  color: #f9f8f8;
+  cursor: pointer;
+  font-size: 14px;
+}
+.side h6:after { /* "click to expand" text */
+  content: "click to expand";
+  position: absolute;
+  top: 8px;
+  right: 5px;
+  font-size: 9px;
+  font-weight: normal;
+  color: #f9f8f8;
+}
+.side h6 + ul { /* styles (+ hides) the list */
+  position: relative;
+  margin: -40px 0 5px;
+  padding: 28px 0 0;
+  list-style: none;
+  border: 1px solid #6e9ddd;
+  display: none;
+}
+.side h6:active + ul, /* displays list when button is clicked */
+.side h6 + ul:hover { /* and when hovering over expanded list */
+  display: block;
+}
+.side h6 + ul li { /* styles list items */
+  position: relative;
+  padding: 5px;
+  border-top: 1px solid #DDD;
+  font-size: 11px;
+}
+
+                                  /* ### END SIDEBAR ### */
+
+                                  /* ### CONTENT ### */
+
+.content {
+    margin-top: 35px;
+}
+
+.link {
+    margin-bottom: 5px;
+    background-color: #f9f8f8;
+    border-bottom: 3px solid #d4d4d4;
+    padding: 5px;
+    overflow: hidden !important;
+}
+
+    .link .title a {
+        color: #5a6eaa !important;
+    }
+
+        .link .title a:visited {
+            color: #485888 !important;
+        }
+
+/* Stickied posts */
+    .link.stickied {
+        padding: 5px;
+        margin-bottom: 10px;
+    }
+
+        .tagline .stickied-tagline {
+            color: #6e9ddd;
+        }
+
+/* New voting arrows */
+    .arrow.up {
+        background-image: none !important;
+        background: transparent !important;
+    }
+
+        .arrow.up:after {
+            content: '' !important;
+            display: inline-block !important;
+            color: #c6c6c6 !important;
+            font-size: 15px;
+    }
+
+    .arrow.upmod { 
+        background-image: none !important;
+        background: transparent !important;
+    }
+
+        .arrow.upmod:after {
+            content: '' !important;
+            display: inline-block !important;
+            color: #ff8b60 !important;
+            font-size: 15px;
+        }
+
+    .arrow.down {
+        background-image: none !important;
+        background: transparent !important;
+    }
+
+        .arrow.down:after {
+            content: '' !important;
+            display: inline-block !important;
+            color: #c6c6c6 !important;
+            font-size: 15px;
+        }
+
+    .arrow.downmod { 
+        background-image: none !important;
+        background: transparent !important;
+    }
+
+
+        .arrow.downmod:after {
+            content: '' !important;
+            display: inline-block !important;
+            color: #9494ff !important;
+            font-size: 15px;
+        }
+
+    div.score.likes, div.score.unvoted, div.scores.dislikes, .dislikes div.score.dislikes {
+        margin-top: 5px;
+    }
+
+/* END New voting arrows */
+
+.nsfw-stamp acronym {
+    border-radius: 0px;
+    color: #b02929;
+    font-family:Calibri,Candara,Segoe,"Segoe UI",Optima,Arial,sans-serif;
+}
+
+ul.flat-list.buttons a {
+    font-weight: normal;
+}
+
+.flat-list.buttons a.comments {
+    color: #5a6eaa !important;
+    font-weight: bold !important;
+}
+
+/* Text formatting */
+
+blockquote {
+    background-color: #f9f8f8;
+    border: 1px solid #d0cece;
+    border-left: 3px solid #5a6eaa !important;
+    border-radius: 3px;
+}
+
+strong {
+    color: #5a6eaa;
+}
+
+code {
+    background-color: #eeeaea;
+    padding: 5px;
+    border-radius: 3px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: block !important;
+}
+
+/* END Text formatting */
+
+.roundfield, .linefield {
+    background-color: #f9f8f8;
+    border-radius: 0px;
+}
+
+.linefield .title {
+    color: #272727;
+}
+
+.thing .tagline .author.submitter, .thing .tagline .author.moderator { border-radius: 0px !important; }
+
+                                  /* ### END CONTENT ### */
+
+                                  /* ### COMMENT PAGE ### */
+
+.linkinfo {
+    background: transparent;
+    border: 0px;
+}
+
+.link .usertext .md {
+    border: 1px solid  #e0dfdf;
+    border-radius: 0px;
+}
+
+.sitetable .comment, .sitetable .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment {
+    background-color: #f9f8f8 !important;
+    border-color: #eceaea !important;
+    border-radius: 0px !important;
+}
+
+.sitetable .comment .comment, .sitetable .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment, .sitetable .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment .comment {
+    background-color: #f9f8f8 !important;
+    border-color: #eceaea !important;
+    border-radius: 0px !important;
+}
+
+                                  /* ### END COMMENT PAGE ### */
+
+                                  /* ### REDDIT ENHANCEMENT SUITE ### */
+
+.res .RES-keyNav-activeElement,
+.res .keyHighlight,
+.res .commentarea .keyHighlight.entry .noncollapsed {
+    outline: 0px solid !important;
+    background: transparent !important;
+    border-right: 3px solid #7baff6;
+}
+
+.commentarea .RES-keyNav-activeElement .md, 
+.res .commentarea .RES-keyNav-activeElement.entry .noncollapsed {
+    background: transparent !important;
+    border: 0px !important;
+}
+
+/* END of RES post highlight */
+
+                                  /* ### END REDDIT ENHANCEMENT SUITE ### */
+
+                                  /* ### LINK FLAIR ### */
+
+.linkflairlabel {
+    color: #000;
+    border: 0px;
+    border-radius: 0px;
+}
+
+                                  /* ### END LINK FLAIR ### */
+
+                                  /* ### USER FLAIR ### */
+
+.flair {
+    border-radius: 0px;
+}
+
+                                  /* ### END USER FLAIR ### */
+
+                                  /* ### OTHER ### */
+
+.titlebox { padding-top: 5px; }
+
+.loggedin:not(.subscriber) h1.redditname:before {
+    content: 'Looks like you are not subscribed, subscribe!';
+    position: absolute;
+    right: 182px !important;
+    top: 252px;
+    color: #777;
+    font-size: 10px;
+    font-family:Calibri,Candara,Segoe,"Segoe UI",Optima,Arial,sans-serif;
+}
+
+.footer.rounded {
+    border-radius: 0px;
+    border: 1px solid #e0dfdf;
+    background-color: #f9f8f8;
+}
+
+.footer.rounded:before {
+    display: block;
+    content: 'This subreddit is using the Simplit theme made by /r/titleproblems <3';
+    font-size: 12px;
+    color: #7baff6;
+}
+/* If you remove this, please be sure to credit me in the sidebar, linking to /r/titleproblems. Thank you! */
+
+/* stylesheet fix */
+#subreddit_stylesheet { display: block; overflow: hidden; }
+.sheets { margin: 0;}
+/* END stylesheet fix */
+
+                                  /* ### END OTHER ### */
