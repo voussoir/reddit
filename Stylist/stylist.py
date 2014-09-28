@@ -20,11 +20,7 @@ TIMES = {'00:00':'Midnight.txt', '06:00':'Day.txt', '18:00':'Night.txt'}
 #http://www.timeanddate.com/time/map/
 #Times must be written as HH:MM, zero-padded, in 24h style
 
-
-
-MAXPOSTS = 100
-#This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 30
+WAIT = 60
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
 
