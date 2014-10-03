@@ -103,7 +103,7 @@ def SCRUB(USER):
 		work(posts)
 	
 		print('Scanning /r/' + SUBREDDIT + '/top')
-		posts = subreddit.get_top(limit=None)
+		posts = subreddit.get_top_from_all(limit=None)
 		work(posts)
 	
 		print('Scanning /r/' + SUBREDDIT + '/comments')
