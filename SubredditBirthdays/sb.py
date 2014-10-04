@@ -6,10 +6,12 @@ import datetime
 import urllib
 import json
 import sys
+import random
 
 '''USER CONFIGURATION'''
 
-USERAGENT = ""
+USERAGENT = "/u/GoldenSights SubredditBirthdays data collection: Gathering the creation dates of subreddits in the interest of information.\
+ More at https://github.com/voussoir/reddit/tree/master/SubredditBirthdays"
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 
 WAIT = 20
@@ -19,11 +21,6 @@ WAIT = 20
 
 WAITS = str(WAIT)
 
-try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERAGENT = bot.aG
-except ImportError:
-    pass
 
 sql = sqlite3.connect('sql.db')
 cur = sql.cursor()
@@ -82,6 +79,7 @@ def process(sr):
 				sr = r.get_subreddit(splitted)
 				subs.append(sr)
 			else:
+				olds += 1
 				pass
 
 	elif type(sr) == praw.objects.Submission or type(sr) == praw.objects.Comment:
@@ -124,11 +122,15 @@ def news(limit=20):
 	print('Rejected', olds)
 
 def show():
-	filea = open('showt.txt', 'w')
-	fileb = open('showd.txt', 'w')
-	filec = open('shown.txt', 'w')
-	filed = open('shoxn.txt', 'w')
-	filee = open('shoxt.txt', 'w')
+	filea = open('show\\all-time.txt', 'w')
+	fileb = open('show\\all-dom.txt', 'w')
+	filec = open('show\\all-name.txt', 'w')
+	filed = open('show\\allz-name.txt', 'w')
+	filee = open('show\\allz-time.txt', 'w')
+	filef = open('show\\clean-time.txt', 'w')
+	fileg = open('show\\clean-name.txt', 'w')
+	fileh = open('show\\dirty-time.txt', 'w')
+	filei = open('show\\dirty-name.txt', 'w')
 	cur.execute('SELECT * FROM subreddits')
 	fetch = cur.fetchall()
 
@@ -137,16 +139,24 @@ def show():
 	for member in fetch:
 		print(str(member).replace("'", ''), file=filea)
 	shown(fetch, 'Sorted by nsfw by true time', filee)
+	shown(fetch, 'Clean only sorted by true time', filef, nsfwmode=0)
+	shown(fetch, 'Nsfw only sorted by true time', fileh, nsfwmode=1)
 	filea.close()
 	filee.close()
+	filef.close()
+	fileh.close()
 
 	fetch.sort(key=lambda x: x[4].lower())
 	print('Sorted by name', file=filec)
 	for member in fetch:
 		print(str(member).replace("'", ''), file=filec)
 	shown(fetch, 'Sorted by nsfw by name', filed)
+	shown(fetch, 'Clean only sorted by name', fileg, nsfwmode=0)
+	shown(fetch, 'Nsfw only sorted by name', filei, nsfwmode=1)
 	filec.close()
 	filed.close()
+	fileg.close()
+	filei.close()
 
 	l = list(fetch)
 	print(str(len(l)) + ' items.')
@@ -166,7 +176,7 @@ def show():
 
 
 
-def shown(startinglist, header, fileobj):
+def shown(startinglist, header, fileobj, nsfwmode=2):
 	nsfwyes = []
 	nsfwno = []
 	nsfwq = []
@@ -178,14 +188,19 @@ def shown(startinglist, header, fileobj):
 		else:
 			nsfwno.append(item)
 	print(header, file=fileobj)
-	for member in nsfwno:
-		print(str(member).replace("'", ''), file=fileobj)
-	print('\n' + ('#'*64 + '\n')*5, file=fileobj)
-	for member in nsfwyes:
-		print(str(member).replace("'", ''), file=fileobj)
-	print('\n' + ('#'*64 + '\n')*5, file=fileobj)
-	for member in nsfwq:
-		print(str(member).replace("'", ''), file=fileobj)
+	if nsfwmode == 0 or nsfwmode == 2:
+		for member in nsfwno:
+			print(str(member).replace("'", ''), file=fileobj)
+		print('\n' + ('#'*64 + '\n')*5, file=fileobj)
+
+	if nsfwmode == 1 or nsfwmode == 2:
+		for member in nsfwyes:
+			print(str(member).replace("'", ''), file=fileobj)
+		print('\n' + ('#'*64 + '\n')*5, file=fileobj)
+
+	if nsfwmode == 2:
+		for member in nsfwq:
+			print(str(member).replace("'", ''), file=fileobj)
 
 
 def nearby(ranged=16, nsfwmode=2):
@@ -254,6 +269,8 @@ def b36(i):
 
 def processir(startingpoint, ranger):
 	#Take subreddit ID as starting point and grab the next ranger items
+	global olds
+	olds = 0
 	if type(startingpoint) == str:
 		startingpoint = b36(startingpoint)
 	for pos in range(startingpoint, startingpoint+ranger):
@@ -261,7 +278,8 @@ def processir(startingpoint, ranger):
 		try:
 			processi(newpoint)
 		except:
-			pass
+			print(newpoint, "failed")
+	print("Rejected", olds)
 
 def processmulti(user, multiname):
 	multiurl = 'http://www.reddit.com/api/multi/user/' + user + '/m/' + multiname
@@ -269,3 +287,22 @@ def processmulti(user, multiname):
 	multijson = json.loads(multipage.read().decode('utf-8'))
 	for key in multijson['data']['subreddits']:
 		process(key['name'])
+
+def processrand(count):
+	global olds
+	olds = 0
+	lower = 4594300
+	cur.execute('SELECT * FROM subreddits')
+	fetched = cur.fetchall()
+	fetched.sort(key=lambda x:x[1])
+	upper = fetched[-1][0]
+	upper = b36(upper)
+	rands = [random.randint(lower, upper) for x in range(count)]
+	for randid in rands:
+		randid = b36(randid).lower()
+		#print(randid)
+		try:
+			processi(randid)
+		except AttributeError:
+			print(randid,'Failed')
+	print('Rejected', olds)
