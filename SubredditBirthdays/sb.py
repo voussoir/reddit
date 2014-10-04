@@ -171,10 +171,10 @@ def shown(startinglist, header, fileobj):
 	print(header, file=fileobj)
 	for member in nsfwno:
 		print(str(member).replace("'", ''), file=fileobj)
-	print('•', file=fileobj)
+	print('\n--\n', file=fileobj)
 	for member in nsfwyes:
 		print(str(member).replace("'", ''), file=fileobj)
-	print('•', file=fileobj)
+	print('\n--\n', file=fileobj)
 	for member in nsfwq:
 		print(str(member).replace("'", ''), file=fileobj)
 

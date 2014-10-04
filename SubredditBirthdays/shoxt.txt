@@ -6821,7 +6821,9 @@ Sorted by nsfw by true time
 (33um1, 1412373990, Oct 03 2014 22:06:30 UTC, NSFW:0, byuUS)
 (33um8, 1412374268, Oct 03 2014 22:11:08 UTC, NSFW:0, Gavinism)
 (33uma, 1412374822, Oct 03 2014 22:20:22 UTC, NSFW:0, UnexpectedThugLife)
-•
+
+--
+
 (vf2, 1137700161, Jan 19 2006 19:49:21 UTC, NSFW:1, nsfw)
 (2qh3q, 1201243924, Jan 25 2008 06:52:04 UTC, NSFW:1, porn)
 (2qj7g, 1214153324, Jun 22 2008 16:48:44 UTC, NSFW:1, hentai)
@@ -7391,7 +7393,9 @@ Sorted by nsfw by true time
 (33t47, 1412149878, Oct 01 2014 07:51:18 UTC, NSFW:1, extremelymild)
 (33u3v, 1412290342, Oct 02 2014 22:52:22 UTC, NSFW:1, VictoriaTiffani)
 (33ug9, 1412351647, Oct 03 2014 15:54:07 UTC, NSFW:1, LeaksJenniferLawrence)
-•
+
+--
+
 (2qqq0, 1230749592, Dec 31 2008 18:53:12 UTC, NSFW:?, Primaryposition)
 (2qqq9, 1230760206, Dec 31 2008 21:50:06 UTC, NSFW:?, Minway)
 (2qqqb, 1230765247, Dec 31 2008 23:14:07 UTC, NSFW:?, xboxlivepoints)
