@@ -3,6 +3,8 @@ import praw # simple interface to the reddit API, also handles rate limiting of 
 import time
 import sqlite3
 import datetime
+import urllib
+import json
 import sys
 
 '''USER CONFIGURATION'''
@@ -75,8 +77,12 @@ def process(sr):
 	if type(sr) == str:
 		for splitted in sr.split(','):
 			splitted = splitted.replace(' ', '')
-			sr = r.get_subreddit(splitted)
-			subs.append(sr)
+			cur.execute('SELECT * FROM subreddits WHERE LOWER(NAME)=?', [splitted.lower()])
+			if not cur.fetchone():
+				sr = r.get_subreddit(splitted)
+				subs.append(sr)
+			else:
+				pass
 
 	elif type(sr) == praw.objects.Submission or type(sr) == praw.objects.Comment:
 		sr = sr.subreddit
@@ -86,17 +92,20 @@ def process(sr):
 		subs.append(sr)
 
 	for sub in subs:
-		cur.execute('SELECT * FROM subreddits WHERE ID=?', [sub.id])
-		f = cur.fetchone()
-		if not f:
-			h = human(sub.created_utc)
-			print('New: ' + sub.id + ' : ' + h + ' : ' + sub.display_name)
-			isnsfw = '1' if sub.over18 else '0'
-			isnsfw = 'NSFW:' + isnsfw
-			cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?)', [sub.id, sub.created_utc, h, isnsfw, sub.display_name])
-			sql.commit()
-		else:
-			olds += 1
+		try:
+			cur.execute('SELECT * FROM subreddits WHERE ID=?', [sub.id])
+			f = cur.fetchone()
+			if not f:
+				h = human(sub.created_utc)
+				isnsfw = '1' if sub.over18 else '0'
+				print('New: ' + sub.id + ' : ' + h + ' : ' + isnsfw + ' : '+ sub.display_name)
+				isnsfw = 'NSFW:' + isnsfw
+				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?)', [sub.id, sub.created_utc, h, isnsfw, sub.display_name])
+				sql.commit()
+			else:
+				olds += 1
+		except praw.requests.exceptions.HTTPError:
+			print('HTTPError:', sub)
 
 def news(limit=20):
 	global olds
@@ -171,10 +180,10 @@ def shown(startinglist, header, fileobj):
 	print(header, file=fileobj)
 	for member in nsfwno:
 		print(str(member).replace("'", ''), file=fileobj)
-	print('\n--\n', file=fileobj)
+	print('\n' + ('#'*64 + '\n')*5, file=fileobj)
 	for member in nsfwyes:
 		print(str(member).replace("'", ''), file=fileobj)
-	print('\n--\n', file=fileobj)
+	print('\n' + ('#'*64 + '\n')*5, file=fileobj)
 	for member in nsfwq:
 		print(str(member).replace("'", ''), file=fileobj)
 
@@ -253,3 +262,10 @@ def processir(startingpoint, ranger):
 			processi(newpoint)
 		except:
 			pass
+
+def processmulti(user, multiname):
+	multiurl = 'http://www.reddit.com/api/multi/user/' + user + '/m/' + multiname
+	multipage = urllib.request.urlopen(multiurl)
+	multijson = json.loads(multipage.read().decode('utf-8'))
+	for key in multijson['data']['subreddits']:
+		process(key['name'])
