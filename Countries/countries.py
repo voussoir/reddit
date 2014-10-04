@@ -7,7 +7,7 @@ from datetime import datetime
 '''USER CONFIGURATION'''
 USERNAME  = "CountryChallengeBot"
 #This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = "superM3G4_bot!"
+PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = "Written by /u/GoldenSights. Posts a new wikipedia link to /r/countrychallenge every day at 0:00 GMT so that people may study other parts of the world and discuss them"
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
