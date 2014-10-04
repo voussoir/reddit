@@ -1,91 +1,91 @@
-*2014-06-13
-Georgia
-Bahrain
-Cyprus
-Iran
-Iraq
-Israel
-Jordan
-Kuwait
-Lebanon
-Oman
-Palestine
-Qatar
-Saudi Arabia
-Syria
-Turkey
-United Arab Emirates
-Yemen
-Australia
-New Zealand
-Argentina
-Bolivia
-Brazil
-Chile
-Colombia
-Ecuador
-Guyana
-Paraguay
-Peru
-Suriname
-Uruguay
-Venezuela
-Algeria
-Egypt
-Libya
-Morocco
-Sudan
-Tunisia
-Belarus
-Bulgaria
-Czech Republic
-Hungary
-Moldova
-Poland
-Romania
-Russia
-Slovakia
-Ukraine
-Kazakhstan
-Kyrgyzstan
-Tajikistan
-Turkmenistan
-Uzbekistan
-Fiji
-Papua New Guinea
-Solomon Islands
-Vanuatu
-Costa Rica
-Belize
-El Salvador
-Guatemala
-Honduras
-Nicaragua
-Panama
-Benin
-Burkina Faso
-Cape Verde
-Cote d'Ivoire
-Gambia
-Ghana
-Guinea
-Guinea-Bissau
-Liberia
-Mali
-Mauritania
-Niger
-Nigeria
-Senegal
-Sierra Leone
-Togo
-Albania
-Bosnia and Herzegovina
-Bulgaria
-Croatia
-Greece
-Kosovo
-Macedonia
-Montenegro
+*2014-10-03
+*Georgia
+*Bahrain
+*Cyprus
+*Iran
+*Iraq
+*Israel
+*Jordan
+*Kuwait
+*Lebanon
+*Oman
+*Palestine
+*Qatar
+*Saudi Arabia
+*Syria
+*Turkey
+*United Arab Emirates
+*Yemen
+*Australia
+*New Zealand
+*Argentina
+*Bolivia
+*Brazil
+*Chile
+*Colombia
+*Ecuador
+*Guyana
+*Paraguay
+*Peru
+*Suriname
+*Uruguay
+*Venezuela
+*Algeria
+*Egypt
+*Libya
+*Morocco
+*Sudan
+*Tunisia
+*Belarus
+*Bulgaria
+*Czech Republic
+*Hungary
+*Moldova
+*Poland
+*Romania
+*Russia
+*Slovakia
+*Ukraine
+*Kazakhstan
+*Kyrgyzstan
+*Tajikistan
+*Turkmenistan
+*Uzbekistan
+*Fiji
+*Papua New Guinea
+*Solomon Islands
+*Vanuatu
+*Costa Rica
+*Belize
+*El Salvador
+*Guatemala
+*Honduras
+*Nicaragua
+*Panama
+*Benin
+*Burkina Faso
+*Cape Verde
+*Cote d'Ivoire
+*Gambia
+*Ghana
+*Guinea
+*Guinea-Bissau
+*Liberia
+*Mali
+*Mauritania
+*Niger
+*Nigeria
+*Senegal
+*Sierra Leone
+*Togo
+*Albania
+*Bosnia and Herzegovina
+*Bulgaria
+*Croatia
+*Greece
+*Kosovo
+*Macedonia
+*Montenegro
 Romania
 Serbia
 Slovenia

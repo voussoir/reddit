@@ -5,13 +5,13 @@ import pytz
 from datetime import datetime
 
 '''USER CONFIGURATION'''
-USERNAME  = ""
+USERNAME  = "CountryChallengeBot"
 #This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = ""
+PASSWORD  = "superM3G4_bot!"
 #This is the bot's Password. 
-USERAGENT = ""
+USERAGENT = "Written by /u/GoldenSights. Posts a new wikipedia link to /r/countrychallenge every day at 0:00 GMT so that people may study other parts of the world and discuss them"
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "GoldTesting"
+SUBREDDIT = "CountryChallenge"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 TITLE = "Country of the day for %B %d, %Y: _country_"
 #This is the title of the submission to your subreddit. _country_ will be replaced by the country
@@ -27,11 +27,11 @@ LEAVECOMMENT = True
 COMMENT = "Next up is _newcountry_. Remember, a new country is only posted Mon-Fri.\n\nFind the full schedule [here](http://redd.it/27bxwi).\n\n^This ^is ^a ^bot! ^For ^issues, ^contact [^GoldenSights](http://www.reddit.com/u/GoldenSights) ^| [^Source ^Code](https://github.com/voussoir/reddit/tree/master/Countries)"
 #If LEAVECOMMENT is true, this is the comment that will be posted.
 #_newcountry_ will be replaced by the next country on the list, if available.
-DISTINGUISHPOST = True
+DISTINGUISHPOST = False
 #Do you want the post to be moderator-distinguished?
-DISTINGUISHCOMMENT = True
+DISTINGUISHCOMMENT = False
 #Do you want the comment to be moderator-distinguished?
-WAIT = 300
+WAIT = 600
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 PRINTFILE = "country_list.txt"
 #This is the file, in the same directory as the .py file, where the names are stored
@@ -50,9 +50,7 @@ clistfile.close()
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
-    USERAGENT = bot.getaG()
+
 except ImportError:
     pass
 
