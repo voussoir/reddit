@@ -125,44 +125,46 @@ def show():
 	filea = open('show\\all-time.txt', 'w')
 	fileb = open('show\\all-dom.txt', 'w')
 	filec = open('show\\all-name.txt', 'w')
-	filed = open('show\\allz-name.txt', 'w')
-	filee = open('show\\allz-time.txt', 'w')
+	filed = open('show\\allx-name.txt', 'w')
+	filee = open('show\\allx-time.txt', 'w')
 	filef = open('show\\clean-time.txt', 'w')
 	fileg = open('show\\clean-name.txt', 'w')
 	fileh = open('show\\dirty-time.txt', 'w')
 	filei = open('show\\dirty-name.txt', 'w')
+	filej = open('show\\allx-dom.txt', 'w')
+	filek = open('show\\clean-dom.txt', 'w')
+	filel = open('show\\dirty-dom.txt', 'w')
 	cur.execute('SELECT * FROM subreddits')
 	fetch = cur.fetchall()
+	print(str(len(fetch)) + ' items.')
 
 	fetch.sort(key=lambda x: x[1])
 	print('Sorted by true time', file=filea)
 	for member in fetch:
 		print(str(member).replace("'", ''), file=filea)
-	shown(fetch, 'Sorted by nsfw by true time', filee)
-	shown(fetch, 'Clean only sorted by true time', filef, nsfwmode=0)
-	shown(fetch, 'Nsfw only sorted by true time', fileh, nsfwmode=1)
 	filea.close()
+	shown(fetch, 'Sorted by nsfw by true time', filee)
 	filee.close()
+	shown(fetch, 'Clean only sorted by true time', filef, nsfwmode=0)
 	filef.close()
+	shown(fetch, 'Nsfw only sorted by true time', fileh, nsfwmode=1)
 	fileh.close()
 
 	fetch.sort(key=lambda x: x[4].lower())
 	print('Sorted by name', file=filec)
 	for member in fetch:
 		print(str(member).replace("'", ''), file=filec)
-	shown(fetch, 'Sorted by nsfw by name', filed)
-	shown(fetch, 'Clean only sorted by name', fileg, nsfwmode=0)
-	shown(fetch, 'Nsfw only sorted by name', filei, nsfwmode=1)
 	filec.close()
+	shown(fetch, 'Sorted by nsfw by name', filed)
 	filed.close()
+	shown(fetch, 'Clean only sorted by name', fileg, nsfwmode=0)
 	fileg.close()
+	shown(fetch, 'Nsfw only sorted by name', filei, nsfwmode=1)
 	filei.close()
 
 	l = list(fetch)
-	print(str(len(l)) + ' items.')
 	for m in range(len(l)):
 		l[m] = list(l[m])
-
 		#I cleaned it up, guys
 		fulldate = l[m][2]
 		monthname = fulldate[:3]
@@ -173,6 +175,12 @@ def show():
 	for member in l:
 		print(str(member).replace("'", ''), file=fileb)
 	fileb.close()
+	shown(l, 'Sorted by nsfw by day of month', filej)
+	filej.close()
+	shown(l, 'Clean only sorted by day of month', filek, nsfwmode=0)
+	filek.close()
+	shown(l, 'Nsfw only sorted by day of month', filel, nsfwmode=1)
+	filel.close()
 
 
 
