@@ -105,7 +105,7 @@ def process(sr):
 		except praw.requests.exceptions.HTTPError:
 			print('HTTPError:', sub)
 
-def news(limit=20):
+def get(limit=20):
 	global olds
 	subreddit = r.get_subreddit('all')
 	listed = []
@@ -283,10 +283,7 @@ def processir(startingpoint, ranger):
 		startingpoint = b36(startingpoint)
 	for pos in range(startingpoint, startingpoint+ranger):
 		newpoint = b36(pos).lower()
-		try:
-			processi(newpoint)
-		except:
-			print(newpoint, "failed")
+		processi(newpoint)
 	print("Rejected", olds)
 
 def processmulti(user, multiname):
@@ -314,3 +311,15 @@ def processrand(count):
 		except AttributeError:
 			print(randid,'Failed')
 	print('Rejected', olds)
+
+def processnew():
+	cur.execute('SELECT * FROM subreddits')
+	fetched = cur.fetchall()
+	fetched.sort(key=lambda x:x[1])
+	upper = fetched[-1][0]
+	while True:
+		try:
+			processir(upper, 100000)
+		except AttributeError:
+			print('Break')
+			break
