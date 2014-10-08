@@ -134,11 +134,14 @@ def show():
 	filej = open('show\\allx-dom.txt', 'w')
 	filek = open('show\\clean-dom.txt', 'w')
 	filel = open('show\\dirty-dom.txt', 'w')
-	cur.execute('SELECT * FROM subreddits')
+	filem = open('show\\statistics.txt', 'w')
+	filen = open('show\\missing.txt', 'w')
+	cur.execute('SELECT * FROM subreddits WHERE CREATED !=?', [0])
 	fetch = cur.fetchall()
 	print(str(len(fetch)) + ' items.')
 
 	fetch.sort(key=lambda x: x[1])
+	print('Writing time files')
 	print('Sorted by true time', file=filea)
 	for member in fetch:
 		print(str(member).replace("'", ''), file=filea)
@@ -151,6 +154,7 @@ def show():
 	fileh.close()
 
 	fetch.sort(key=lambda x: x[4].lower())
+	print('Writing name files')
 	print('Sorted by name', file=filec)
 	for member in fetch:
 		print(str(member).replace("'", ''), file=filec)
@@ -172,6 +176,7 @@ def show():
 
 	l.sort(key=lambda x: x[2])
 	print('Sorted by day of month', file=fileb)
+	print('Writing day files')
 	for member in l:
 		print(str(member).replace("'", ''), file=fileb)
 	fileb.close()
@@ -182,6 +187,43 @@ def show():
 	shown(l, 'Nsfw only sorted by day of month', filel, nsfwmode=1)
 	filel.close()
 
+	print('Writing statistics')
+	statisticoutput = ""
+	dowdict = {}
+	moydict = {}
+	hoddict = {}
+	for item in l:
+		itemdate = datetime.datetime.utcfromtimestamp(item[1])
+		dowdict = dictadding(dowdict, datetime.datetime.strftime(itemdate, "%A"))
+		moydict = dictadding(moydict, datetime.datetime.strftime(itemdate, "%B"))
+		hoddict = dictadding(hoddict, datetime.datetime.strftime(itemdate, "%H"))
+
+	for d in [dowdict, moydict, hoddict]:
+		sd = sorted(list(d.keys()))
+		for k in sd:
+			statisticoutput += k + ': ' + str(d[k])
+			statisticoutput += '\n'
+		statisticoutput += '\n\n'
+
+	print(statisticoutput, file=filem)
+	filem.close()
+
+
+	print('Writing missingnos')
+	cur.execute('SELECT * FROM subreddits WHERE CREATED=?', [0])
+	fetch = cur.fetchall()
+	fetch.sort(key=lambda x: b36(x[0]))
+	for member in fetch:
+		print(str(member).replace("'", ''), file=filen)
+	filen.close()
+
+
+def dictadding(targetdict, item):
+	if item not in targetdict:
+		targetdict[item] = 1
+	else:
+		targetdict[item] = targetdict[item] + 1
+	return targetdict
 
 
 def shown(startinglist, header, fileobj, nsfwmode=2):
@@ -283,7 +325,14 @@ def processir(startingpoint, ranger):
 		startingpoint = b36(startingpoint)
 	for pos in range(startingpoint, startingpoint+ranger):
 		newpoint = b36(pos).lower()
-		processi(newpoint)
+		try:
+			processi(newpoint)
+		except:
+			print('Failure', newpoint)
+			cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?)', [newpoint, 0, '', '', '?'])
+			olds += 1
+			sql.commit()
+
 	print("Rejected", olds)
 
 def processmulti(user, multiname):
@@ -293,23 +342,43 @@ def processmulti(user, multiname):
 	for key in multijson['data']['subreddits']:
 		process(key['name'])
 
-def processrand(count):
+def processrand(count, doublecheck=False, sleepy=0):
 	global olds
 	olds = 0
-	lower = 4594300
+	lower = 4594411
+	#4594300 = 2qgzg
+	#4594411 = 2qh2j
 	cur.execute('SELECT * FROM subreddits')
 	fetched = cur.fetchall()
 	fetched.sort(key=lambda x:x[1])
 	upper = fetched[-1][0]
 	upper = b36(upper)
-	rands = [random.randint(lower, upper) for x in range(count)]
+	rands = []
+	if doublecheck:
+		allids = [x[0] for x in fetched]
+	for x in range(count):
+		rand = random.randint(lower, upper)
+		rand = b36(rand).lower()
+		if doublecheck:
+			while rand in allids or rand in rands:
+				if rand in allids:
+					print('Old:', rand, 'Rerolling: in allid')
+				else:
+					print('Old:', rand, 'Rerolling: in rands')
+				rand = random.randint(lower, upper)
+				rand = b36(rand).lower()
+				olds += 1
+		rands.append(rand)
+
 	for randid in rands:
-		randid = b36(randid).lower()
 		#print(randid)
 		try:
 			processi(randid)
+			time.sleep(sleepy)
 		except AttributeError:
-			print(randid,'Failed')
+			print(randid, 'Failed')
+		except praw.requests.exceptions.HTTPError:
+			print(randid, 'HTTPError')
 	print('Rejected', olds)
 
 def processnew():
