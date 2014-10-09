@@ -61,7 +61,7 @@ def scanSub():
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
             try:
-                messagesuccess = False
+                success = False
                 pauthor = post.author.name
                 cur.execute('SELECT * FROM oldposts WHERE USERNAME=?', [pauthor])
                 if not cur.fetchone():
