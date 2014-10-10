@@ -8,3 +8,11 @@ When you run scheduleclient.py, it will open a console window as well. This cons
 The Client does not connect to reddit, meaning it's not going to know if you've spelled a subreddit incorrectly, or if the subreddit is private. That's for you to know and the bot to find out during runtime.
 
 In order for the posts to actually get made, you have to leave schedulebot.py running. You may open and close scheduleclient.py as much as you wish. You may use the client while the bot is off.
+
+
+###Images
+
+![Create tab](/../.GitImages/Schedulizer00.png)
+![Making a post](/../.GitImages/Schedulizer01.png)
+![Check upcoming](/../.GitImages/Schedulizer02.png)
+![Check history](/../.GitImages/Schedulizer03.png)

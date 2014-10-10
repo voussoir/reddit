@@ -327,7 +327,7 @@ def processir(startingpoint, ranger):
 		newpoint = b36(pos).lower()
 		try:
 			processi(newpoint)
-		except:
+		except AttributeError:
 			print('Failure', newpoint)
 			cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?)', [newpoint, 0, '', '', '?'])
 			olds += 1
@@ -386,9 +386,7 @@ def processnew():
 	fetched = cur.fetchall()
 	fetched.sort(key=lambda x:x[1])
 	upper = fetched[-1][0]
-	while True:
-		try:
-			processir(upper, 100000)
-		except AttributeError:
-			print('Break')
-			break
+	try:
+		processir(upper, 100000)
+	except AttributeError:
+		print('Break')
