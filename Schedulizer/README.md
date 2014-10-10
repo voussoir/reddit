@@ -12,7 +12,7 @@ In order for the posts to actually get made, you have to leave schedulebot.py ru
 
 ###Images
 
-![Create tab](/../.GitImages/Schedulizer00.png)
-![Making a post](/../.GitImages/Schedulizer01.png)
-![Check upcoming](/../.GitImages/Schedulizer02.png)
-![Check history](/../.GitImages/Schedulizer03.png)
+![Create tab](/../.GitImages/Schedulizer00.png?raw=true)
+![Making a post](/../.GitImages/Schedulizer01.png?raw=true)
+![Check upcoming](/../.GitImages/Schedulizer02.png?raw=true)
+![Check history](/../.GitImages/Schedulizer03.png?raw=true)
