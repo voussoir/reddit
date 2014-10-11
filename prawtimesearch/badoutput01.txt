@@ -1,0 +1,12 @@
+Starting r
+Now: 1412998804.588911
+/r/GoldTesting
+Created: 1400997940.0, 25 May 2014 06:05 UTC
+Interval: 86400 seconds
+Lower: 1400997940, 25 May 2014 06:05 UTC
+Upper: 1401084340, 26 May 2014 06:05 UTC
+http://api.reddit.com/r/GoldTesting/search?sort=new&q=timestamp%3A1400997940..1401084340&restrict_sr=on&syntax=cloudsearch
+Caught HTTPError
+HTTP Error 429: Too Many Requests
+Dumping results:
+[Finished in 4.8s]
