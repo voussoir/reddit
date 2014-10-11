@@ -255,7 +255,7 @@ def shown(startinglist, header, fileobj, nsfwmode=2):
 
 def nearby(ranged=16, nsfwmode=2):
 	#find upcoming birthdays
-	cur.execute('SELECT * FROM subreddits')
+	cur.execute('SELECT * FROM subreddits WHERE NAME!=?', ['?'])
 	fetched = cur.fetchall()
 
 	results = []
