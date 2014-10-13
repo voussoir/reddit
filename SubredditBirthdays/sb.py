@@ -138,11 +138,12 @@ def show():
 	filen = open('show\\missing.txt', 'w')
 	cur.execute('SELECT * FROM subreddits WHERE CREATED !=?', [0])
 	fetch = cur.fetchall()
-	print(str(len(fetch)) + ' items.')
+	itemcount = str(len(fetch))
+	print(itemcount + ' items.')
 
 	fetch.sort(key=lambda x: x[1])
 	print('Writing time files')
-	print('Sorted by true time', file=filea)
+	print(itemcount + ' subreddits sorted by true time', file=filea)
 	for member in fetch:
 		print(str(member).replace("'", ''), file=filea)
 	filea.close()
