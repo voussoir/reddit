@@ -136,6 +136,7 @@ def show():
 	filel = open('show\\dirty-dom.txt', 'w')
 	filem = open('show\\statistics.txt', 'w')
 	filen = open('show\\missing.txt', 'w')
+	fileo = open('show\\all-marked.txt', 'w')
 	cur.execute('SELECT * FROM subreddits WHERE CREATED !=?', [0])
 	fetch = cur.fetchall()
 	itemcount = str(len(fetch))
@@ -153,6 +154,17 @@ def show():
 	filef.close()
 	shown(fetch, 'Nsfw only sorted by true time', fileh, nsfwmode=1)
 	fileh.close()
+
+	previd = fetch[0][0]
+	print('Writing marked file')
+	print('Sorted by true time with ID gaps marked', file=fileo)
+	for member in fetch:
+		curid = member[0]
+		if b36(curid) - b36(previd) != 1:
+			print('#', file=fileo)
+		print(str(member).replace("'", ''), file=fileo)
+		previd = curid
+	fileo.close()
 
 	fetch.sort(key=lambda x: x[4].lower())
 	print('Writing name files')
@@ -228,6 +240,17 @@ def dictadding(targetdict, item):
 
 
 def shown(startinglist, header, fileobj, nsfwmode=2):
+	"""
+	Creating Show files with filters
+	*lst startinglist= the unfiltered list
+	*str header= the header at the top of the file
+	*obj fileobj= the file object to write to
+	*int nsfwmode=
+	  0 - Clean only
+	  1 - Dirty only
+	  2 - All
+	"""
+
 	nsfwyes = []
 	nsfwno = []
 	nsfwq = []
@@ -255,6 +278,14 @@ def shown(startinglist, header, fileobj, nsfwmode=2):
 
 
 def nearby(ranged=16, nsfwmode=2):
+	"""
+	Find subreddits whose birthdays are coming up
+	int ranged= How many subs to attempt showing
+	int nsfwmode=
+	  0 - Clean only
+	  1 - Dirty only
+	  2 - All
+     """
 	#find upcoming birthdays
 	cur.execute('SELECT * FROM subreddits WHERE NAME!=?', ['?'])
 	fetched = cur.fetchall()
@@ -318,7 +349,13 @@ def b36(i):
 	if type(i) == str:
 		return base36decode(i)
 
-def processir(startingpoint, ranger):
+def processir(startingpoint, ranger, newmode=False):
+	"""
+	Process a range of values starting from a specified point
+	*str startingpoint= The ID of the subreddit to start at
+	**int startingpoint= The b36 value of the subreddit's ID
+	*int ranger= The number of subs after startingpoint to collect
+	"""
 	#Take subreddit ID as starting point and grab the next ranger items
 	global olds
 	olds = 0
@@ -328,15 +365,23 @@ def processir(startingpoint, ranger):
 		newpoint = b36(pos).lower()
 		try:
 			processi(newpoint)
-		except AttributeError:
-			print('Failure', newpoint)
-			cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?)', [newpoint, 0, '', '', '?'])
-			olds += 1
-			sql.commit()
+		except (AttributeError, praw.requests.exceptions.HTTPError):
+			if not newmode:
+				print('Failure', newpoint)
+				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?)', [newpoint, 0, '', '', '?'])
+				olds += 1
+				sql.commit()
+			else:
+				break
 
 	print("Rejected", olds)
 
 def processmulti(user, multiname):
+	"""
+	Process a user's multireddit
+	*str user= username
+	*str multiname= the name of the multireddit
+	"""
 	multiurl = 'http://www.reddit.com/api/multi/user/' + user + '/m/' + multiname
 	multipage = urllib.request.urlopen(multiurl)
 	multijson = json.loads(multipage.read().decode('utf-8'))
@@ -344,6 +389,12 @@ def processmulti(user, multiname):
 		process(key['name'])
 
 def processrand(count, doublecheck=False, sleepy=0):
+	"""
+	Gets random IDs between a known lower bound and the newest collection
+	*int count= How many you want
+	bool doublecheck= Should it reroll duplicates before running
+	int sleepy= Used to sleep longer than the reqd 2 seconds
+	"""
 	global olds
 	olds = 0
 	lower = 4594411
@@ -383,11 +434,72 @@ def processrand(count, doublecheck=False, sleepy=0):
 	print('Rejected', olds)
 
 def processnew():
+	"""
+	Take the newest subreddit available, and start searching for ones newer
+	"""
 	cur.execute('SELECT * FROM subreddits')
 	fetched = cur.fetchall()
 	fetched.sort(key=lambda x:x[1])
 	upper = fetched[-1][0]
 	try:
-		processir(upper, 100000)
+		processir(upper, 100000, newmode=True)
 	except AttributeError:
 		print('Break')
+
+def search(query, casesense=False, filterout=[], nsfwmode=2):
+	"""
+	Search for a subreddit by name
+	*str query= The search query
+	    "query"    = results where "query" is in the name
+	    ":query"   = results where "query" is at the end of the name
+	    "query:"   = results where "query" is at the beginning of the name
+	    ":querry:" = results where "query" is in the middle of the name
+	bool casesense = is the search case sensitive
+	list filterout = [list, of, words] to omit from search. Follows casesense
+	int nsfwmode=
+	  0 - Clean only
+	  1 - Dirty only
+	  2 - All
+	"""
+	cur.execute('SELECT * FROM subreddits WHERE NAME !=?', ['?'])
+	fetched = cur.fetchall()
+	fetched.sort(key=lambda x: x[4].lower())
+
+	results = []
+	if not casesense:
+		query = query.lower()
+		for x in range(len(filterout)):
+			filterout[x] = filterout[x].lower()
+
+	#print(len(fetched))
+	for subreddit in fetched:
+		item = subreddit[4]
+		if nsfwmode==2 or (subreddit[3] == "NSFW:1" and nsfwmode == 1) or (subreddit[3] == "NSFW:0" and nsfwmode == 0):
+			if not casesense:
+				item = item.lower()
+			querl = query.replace(':', '')
+			if querl in item:
+				#print(item)
+				if all(filters not in item for filters in filterout):
+					itemsplit = item.split(querl)
+					if ':' in query:
+						if (query[-1] == ':' and query[0] != ':') and itemsplit[0] == '':
+							results.append(subreddit)
+			
+						if (query[0] == ':' and query[-1] != ':') and itemsplit[-1] == '':
+							results.append(subreddit)
+			
+						if (query[-1] == ':' and query[0] == ':') and (itemsplit[0] != '' and itemsplit[-1] != ''):
+							results.append(subreddit)
+		
+					else:
+						results.append(subreddit)
+				else:
+					#print('Filtered', item)
+					pass
+
+	for item in results:
+		item = str(item)
+		item = item.replace("'", '')
+		print(item)
+	print()
