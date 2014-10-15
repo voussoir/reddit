@@ -138,6 +138,7 @@ def show():
 	filem = open('show\\statistics.txt', 'w')
 	filen = open('show\\missing.txt', 'w')
 	fileo = open('show\\all-marked.txt', 'w')
+	filep = open('README.md', 'r')
 	cur.execute('SELECT * FROM subreddits WHERE CREATED !=?', [0])
 	fetch = cur.fetchall()
 	itemcount = len(fetch)
@@ -163,14 +164,15 @@ def show():
 		curid = member[0]
 		iddiff = b36(curid) - b36(previd)
 		if iddiff != 1:
-			print('#' + str(iddiff), file=fileo)
+			print('#' + str(iddiff-1), file=fileo)
 		print(str(member).replace("'", ''), file=fileo)
 		previd = curid
 	fileo.close()
 
 	print('Writing statistics')
 	totalpossible = b36(fetch[-1][0]) - 4594411
-	print('Collected ' + str(itemcount) + ' of ' + str(totalpossible) + ' subreddits (' + "%0.03f"%(100*itemcount/totalpossible) + '%)\n', file=filem)
+	headliner= 'Collected ' + str(itemcount) + ' of ' + str(totalpossible) + ' subreddits (' + "%0.03f"%(100*itemcount/totalpossible) + '%)\n'
+	print(headliner, file=filem)
 	#Call the PEP8 police on me, I don't care
 	statisticoutput = ""
 	dowdict = {}
@@ -193,6 +195,13 @@ def show():
 
 	print(statisticoutput, file=filem)
 	filem.close()
+
+	readmeread = filep.readlines()
+	filep.close()
+	readmeread[3] = headliner
+	filep = open('README.md', 'w')
+	filep.write(''.join(readmeread))
+	filep.close()
 
 
 	fetch.sort(key=lambda x: x[4].lower())
