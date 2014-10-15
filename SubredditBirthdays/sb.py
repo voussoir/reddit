@@ -161,8 +161,9 @@ def show():
 	print('Sorted by true time with ID gaps marked', file=fileo)
 	for member in fetch:
 		curid = member[0]
-		if b36(curid) - b36(previd) != 1:
-			print('#', file=fileo)
+		iddiff = b36(curid) - b36(previd)
+		if iddiff != 1:
+			print('#' + str(iddiff), file=fileo)
 		print(str(member).replace("'", ''), file=fileo)
 		previd = curid
 	fileo.close()
