@@ -1,6 +1,6 @@
-Collected 44697 of 632090 subreddits (7.071%)
+Collected 44761 of 632090 subreddits (7.081%)
 
-Friday: 6511
+Friday: 6575
 Monday: 7187
 Saturday: 5385
 Sunday: 6589
@@ -12,7 +12,7 @@ Wednesday: 6010
 April: 3015
 August: 3812
 December: 2501
-February: 3249
+February: 3313
 January: 3699
 July: 3451
 June: 3147
@@ -42,10 +42,10 @@ September: 3913
 16: 1989
 17: 2191
 18: 2221
-19: 2417
-20: 2383
-21: 2387
-22: 2365
+19: 2427
+20: 2402
+21: 2417
+22: 2370
 23: 2334
 
 
@@ -56,7 +56,7 @@ September: 3913
 2010: 2987
 2011: 3646
 2012: 7297
-2013: 9205
+2013: 9269
 2014: 17021
 
 
