@@ -163,7 +163,7 @@ def show():
 	for member in fetch:
 		curid = member[0]
 		iddiff = b36(curid) - b36(previd)
-		if iddiff != 1:
+		if iddiff != 1 and iddiff != 0:
 			print('#' + str(iddiff-1), file=fileo)
 		print(str(member).replace("'", ''), file=fileo)
 		previd = curid
@@ -171,9 +171,9 @@ def show():
 
 	print('Writing statistics')
 	totalpossible = b36(fetch[-1][0]) - 4594411
-	headliner= 'Collected ' + str(itemcount) + ' of ' + str(totalpossible) + ' subreddits (' + "%0.03f"%(100*itemcount/totalpossible) + '%)\n'
-	print(headliner, file=filem)
+	headliner= 'Collected '+'{0:,}'.format(itemcount)+' of '+'{0:,}'.format(totalpossible)+' subreddits ('+"%0.03f"%(100*itemcount/totalpossible)+'%)\n'
 	#Call the PEP8 police on me, I don't care
+	print(headliner, file=filem)
 	statisticoutput = ""
 	dowdict = {}
 	moydict = {}
@@ -198,7 +198,7 @@ def show():
 
 	readmeread = filep.readlines()
 	filep.close()
-	readmeread[3] = headliner
+	readmeread[3] = '#####' + headliner
 	filep = open('README.md', 'w')
 	filep.write(''.join(readmeread))
 	filep.close()
