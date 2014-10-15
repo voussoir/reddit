@@ -7,6 +7,7 @@ import urllib
 import json
 import sys
 import random
+import os
 
 '''USER CONFIGURATION'''
 
@@ -139,12 +140,12 @@ def show():
 	fileo = open('show\\all-marked.txt', 'w')
 	cur.execute('SELECT * FROM subreddits WHERE CREATED !=?', [0])
 	fetch = cur.fetchall()
-	itemcount = str(len(fetch))
-	print(itemcount + ' items.')
+	itemcount = len(fetch)
+	print(str(itemcount) + ' items.')
 
 	fetch.sort(key=lambda x: x[1])
 	print('Writing time files')
-	print(itemcount + ' subreddits sorted by true time', file=filea)
+	print(str(itemcount) + ' subreddits sorted by true time', file=filea)
 	for member in fetch:
 		print(str(member).replace("'", ''), file=filea)
 	filea.close()
@@ -165,6 +166,33 @@ def show():
 		print(str(member).replace("'", ''), file=fileo)
 		previd = curid
 	fileo.close()
+
+	print('Writing statistics')
+	totalpossible = b36(fetch[-1][0]) - 4594411
+	print('Collected ' + str(itemcount) + ' of ' + str(totalpossible) + ' subreddits (' + "%0.03f"%(100*itemcount/totalpossible) + '%)\n', file=filem)
+	#Call the PEP8 police on me, I don't care
+	statisticoutput = ""
+	dowdict = {}
+	moydict = {}
+	hoddict = {}
+	yerdict = {}
+	for item in fetch:
+		itemdate = datetime.datetime.utcfromtimestamp(item[1])
+		dowdict = dictadding(dowdict, datetime.datetime.strftime(itemdate, "%A"))
+		moydict = dictadding(moydict, datetime.datetime.strftime(itemdate, "%B"))
+		hoddict = dictadding(hoddict, datetime.datetime.strftime(itemdate, "%H"))
+		yerdict = dictadding(yerdict, datetime.datetime.strftime(itemdate, "%Y"))
+
+	for d in [dowdict, moydict, hoddict, yerdict]:
+		sd = sorted(list(d.keys()))
+		for k in sd:
+			statisticoutput += k + ': ' + str(d[k])
+			statisticoutput += '\n'
+		statisticoutput += '\n\n'
+
+	print(statisticoutput, file=filem)
+	filem.close()
+
 
 	fetch.sort(key=lambda x: x[4].lower())
 	print('Writing name files')
@@ -199,28 +227,6 @@ def show():
 	filek.close()
 	shown(l, 'Nsfw only sorted by day of month', filel, nsfwmode=1)
 	filel.close()
-
-	print('Writing statistics')
-	statisticoutput = ""
-	dowdict = {}
-	moydict = {}
-	hoddict = {}
-	for item in l:
-		itemdate = datetime.datetime.utcfromtimestamp(item[1])
-		dowdict = dictadding(dowdict, datetime.datetime.strftime(itemdate, "%A"))
-		moydict = dictadding(moydict, datetime.datetime.strftime(itemdate, "%B"))
-		hoddict = dictadding(hoddict, datetime.datetime.strftime(itemdate, "%H"))
-
-	for d in [dowdict, moydict, hoddict]:
-		sd = sorted(list(d.keys()))
-		for k in sd:
-			statisticoutput += k + ': ' + str(d[k])
-			statisticoutput += '\n'
-		statisticoutput += '\n\n'
-
-	print(statisticoutput, file=filem)
-	filem.close()
-
 
 	print('Writing missingnos')
 	cur.execute('SELECT * FROM subreddits WHERE CREATED=?', [0])
@@ -404,7 +410,10 @@ def processrand(count, doublecheck=False, sleepy=0):
 	fetched = cur.fetchall()
 	fetched.sort(key=lambda x:x[1])
 	upper = fetched[-1][0]
+	print('<' + b36(lower).lower() + ',',  upper + '>', end=', ')
 	upper = b36(upper)
+	totalpossible = upper-lower
+	print(totalpossible, 'possible')
 	rands = []
 	if doublecheck:
 		allids = [x[0] for x in fetched]
@@ -503,3 +512,6 @@ def search(query, casesense=False, filterout=[], nsfwmode=2):
 		item = item.replace("'", '')
 		print(item)
 	print()
+
+def cls():
+	os.system('cls')
