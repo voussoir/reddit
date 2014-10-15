@@ -17,15 +17,15 @@ ______
 
 ###Interesting Anomalies
 
-- [/r/basement](http://reddit.com/r/basement)
-- - (2qho7, 1206628926, Mar 27 2008 14:42:06 UTC, NSFW:0, selfhelp)  
+- [/r/basement](http://reddit.com/r/basement)  
+(2qho7, 1206628926, Mar 27 2008 14:42:06 UTC, NSFW:0, selfhelp)  
 (2qho8, 1206628935, Mar 27 2008 14:42:15 UTC, NSFW:0, CoolSiteOfTheDay)  
 (2qho9, 1301555473, Mar 31 2011 07:11:13 UTC, NSFW:0, basement)  
 (2qhoa, 1206632156, Mar 27 2008 15:35:56 UTC, NSFW:0, WebGames)  
 (2qhob, 1206634488, Mar 27 2008 16:14:48 UTC, NSFW:0, InDepth)  
 
-- The 2wf** gap
-- - (2wfuu, 1361574351, Feb 22 2013 23:05:51 UTC, NSFW:0, TOmapsarchives)  
+- The 2wf** gap  
+ (2wfuu, 1361574351, Feb 22 2013 23:05:51 UTC, NSFW:0, TOmapsarchives)  
 (2wfuv, 1361574397, Feb 22 2013 23:06:37 UTC, NSFW:0, picsofgunnar)  
 33 missing  
 (2wfvs, 1361574740, Feb 22 2013 23:12:20 UTC, NSFW:0, ReddiquetteCouncil)  
