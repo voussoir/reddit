@@ -56,6 +56,7 @@ def scanInbox():
 	print('Scanning Received')
 	inbox = r.get_inbox(limit=MAXPOSTS)
 	listo = []
+	selfuser = r.user
 	for item in inbox:
 		iid = item.fullname
 		cur.execute('SELECT * FROM oldposts WHERE id=?', [iid])
@@ -63,6 +64,8 @@ def scanInbox():
 			if ITEMTYPE in iid:
 				print('\tIn ' + iid)
 				listo.append(item)
+				if selfuser.has_mail:
+					item.mark_as_read()
 			cur.execute('INSERT INTO oldposts VALUES(?)', [iid])
 	sql.commit()
 	return listo
