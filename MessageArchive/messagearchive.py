@@ -13,7 +13,7 @@ PASSWORD  = ""
 #This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-MAXPOSTS = 2000
+MAXPOSTS = 300
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
@@ -34,9 +34,9 @@ clistfile.close()
 WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
-    USERAGENT = bot.getaG()
+    USERNAME = bot.uG
+    PASSWORD = bot.pG
+    USERAGENT = bot.aG
 except ImportError:
     pass
 
@@ -147,7 +147,7 @@ def work():
 		for m in messagelist:
 			print(m, file=messagefile)
 		messagefile.close()
-		time.sleep(0.1)
+		#time.sleep(0.1)
 
 
 
