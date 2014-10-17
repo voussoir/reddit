@@ -525,3 +525,7 @@ def search(query, casesense=False, filterout=[], nsfwmode=2):
 
 def cls():
 	os.system('cls')
+
+def count():
+	cur.execute('SELECT * FROM subreddits WHERE NAME!=?', ['?'])
+	print(len(cur.fetchall()))
