@@ -61,18 +61,21 @@ def scan():
 		try:
 			pauthor = post.author.name
 			try:
-				pflair = str(post.author_flair_text)
-				cur.execute('SELECT * FROM users WHERE NAME=?', [pauthor])
-				fetched = cur.fetchone()
-				if not fetched:
-					cur.execute('INSERT INTO users VALUES(?, ?)', [pauthor, pflair])
-					print('New user flair: ' + pauthor + ' : ' + pflair)
+				pflair = post.author_flair_text
+				if pflair != None:
+					cur.execute('SELECT * FROM users WHERE NAME=?', [pauthor])
+					fetched = cur.fetchone()
+					if not fetched:
+						cur.execute('INSERT INTO users VALUES(?, ?)', [pauthor, pflair])
+						print('New user flair: ' + pauthor + ' : ' + pflair)
+					else:
+						oldflair = fetched[1]
+						if pflair != oldflair:
+							cur.execute('UPDATE users SET FLAIR=? WHERE NAME=?', [pflair, pauthor])
+							print('Updating user flair: ' + pauthor + ' : ' + pflair)
+					sql.commit()
 				else:
-					oldflair = fetched[1]
-					if pflair != oldflair:
-						cur.execute('UPDATE users SET FLAIR=? WHERE NAME=?', [pflair, pauthor])
-						print('Updating user flair: ' + pauthor + ' : ' + pflair)
-				sql.commit()
+					print(post.id, "No flair")
 			except AttributeError:
 				print(post.id, "No flair")
 		except AttributeError:
@@ -90,8 +93,12 @@ def scan():
 		else:
 			flaircounts[itemflair] += 1
 	print('FLAIR: NO. OF USERS WITH THAT FLAIR', file=flairfile)
+	presorted = []
 	for flairkey in flaircounts:
-		print(flairkey + ': ' + str(flaircounts[flairkey]), file=flairfile)
+		presorted.append(flairkey + ': ' + str(flaircounts[flairkey]))
+	presorted.sort()
+	for flair in presorted:
+		print(flair, file=flairfile)
 	print('\n\n', file=flairfile)
 	print('USERNAME: USER\'S FLAIR', file=flairfile)
 	for user in fetch:

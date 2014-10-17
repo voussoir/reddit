@@ -1,151 +1,125 @@
 FLAIR: NO. OF USERS WITH THAT FLAIR
-Spiderman: 2
-Book: 3
-Godzilla: 6
-Youtube Two: 1
-Youtube One: 1
-Hotline: 1
-Check: 1
-Liam Neeson: 15
-Iron Man: 5
-Fist: 2
-CHUCKY...: 2
-Reddit: 2
-Pencil: 5
-Matthew Santoro: 1
-1000!: 5
-Gem: 2
-Clapper: 7
-Golden Gun: 3
-BotBot: 1
-Batman: 20
-Ding: 6
-Ding!: 6
-Moderator: 3
-None: 88
-Youtube Image: 1
-Lap Dance: 11
-Bomb: 1
 007: 3
-The Flair Bot: 1
-Movie Reel: 5
-Elsa: 2
-Youtube: 1
-Damage: 2
-Jill Valentine: 1
-Shield: 9
-Youtube Icon: 1
-Disney Logo: 1
-The Fault In Our Stars: 1
-Logo: 17
+1000!: 5
+Batman: 20
+Bomb: 1
+Book: 3
+BotBot: 1
+CHUCKY...: 2
+Check: 1
 CinemaSins Jeremy: 1
-Run: 2
-Minions: 4
-Green Lantern: 2
-Van: 2
-Newbie Needs New Flair!: 70
+Clapper: 7
+Damage: 2
 Dear H: 3
+Ding!: 6
+Ding: 6
+Disney Logo: 1
+Elsa: 2
+Fist: 2
+Gem: 2
+Godzilla: 6
+Golden Gun: 3
+Green Lantern: 2
+Hotline: 1
+Iron Man: 5
+Jill Valentine: 1
+Lap Dance: 11
+Liam Neeson: 15
+Logo: 17
+Matthew Santoro: 1
+Minions: 4
+Moderator: 3
+Movie Reel: 5
+Newbie Needs New Flair!: 70
+Pencil: 5
+Reddit: 2
+Run: 2
+Shield: 9
+Spiderman: 2
+The Fault In Our Stars: 1
+The Flair Bot: 1
+Van: 2
+Youtube Icon: 1
+Youtube Image: 1
+Youtube One: 1
+Youtube Two: 1
+Youtube: 1
 
 
 
 USERNAME: USER'S FLAIR
 123qwet1: Newbie Needs New Flair!
 15chainz: Shield
-7777777_777777777777: None
 A-Pi: Newbie Needs New Flair!
 AMeowingCat: Batman
 Aavenell: Ding
-AgeOfWomen: None
 Agent_Fabulous: 1000!
 AhrmiintheUnseen: Moderator
 AlecRobertson: Newbie Needs New Flair!
 Amoress: Liam Neeson
 AnnaLemma: Book
-ArcheryCole99: None
 Ardvarkeating101: Lap Dance
 ArrogantWhale: Clapper
-Arzeg: None
-AssassiN_DUDE: None
 Austinpike446: Logo
 AutoModerator: Check
 AutotuneJezus: Movie Reel
 BZCoolness: Liam Neeson
-BeardoftheManwhore: None
-BeatrixKlddo: None
 Bergekatze: 1000!
 BlondishMist748: Logo
 BlueDevil19: 1000!
 Bodewadmi: Newbie Needs New Flair!
-Bookworm12k: None
 BoringCode: Liam Neeson
 BrezaFTW: 1000!
 BrotonamoBay: Run
-Caleb_M: None
-CaptainCharlieDowns: None
 Caveat53: Newbie Needs New Flair!
 Cheatshaman: Run
 CinemaSinsMods: Moderator
-Coletransit: None
-Competence-Yenz: None
 CoolTom: Pencil
 Countchrisdo: Newbie Needs New Flair!
 D4M1: Liam Neeson
 Daantjeeuh: Newbie Needs New Flair!
-Dan314159: None
 Darahas: Clapper
 DariaMorgendorfer1: Newbie Needs New Flair!
 DarkLiberator: Batman
 Dead_Starks: Logo
 Deathranger1: Newbie Needs New Flair!
-Derigor: None
 DieSowjetZwiebel: Movie Reel
 DigbyMayor: Newbie Needs New Flair!
-DiscoWolf: None
 DistortedLines: Logo
 Doctorboffin: Godzilla
 Doomsday11: Shield
-Doty1154_: None
 DrResolute: Youtube Image
 Dr_StrangeLovePHD: Newbie Needs New Flair!
 Drowned_In_Spaghetti: Lap Dance
 Dunnersstunner: Batman
 Duraan84: Newbie Needs New Flair!
-EvilGeek0013: None
 Explorer2142: Iron Man
 Fantastic_Doom: Batman
 Fenrakk101: Clapper
 Fetus_In_A_Tube: Ding!
 Fradyo: Hotline
-Freezinghero: None
 Gamelover10: Newbie Needs New Flair!
 Gamerax: Liam Neeson
-GaryBuseySpaceNazi: None
 GearPhreak: Newbie Needs New Flair!
 Gen_Hazard: Book
 Gontomak-177: Ding
 GrandChristian: Newbie Needs New Flair!
 GrantWontFindThis: Fist
-Guy_Hero: None
 HUGEBORGCUBE: Godzilla
-Haedox: None
 Handuer: Gem
 Hexofin: Newbie Needs New Flair!
 HowieGaming: Iron Man
 IAJAKI: Newbie Needs New Flair!
 IChawt: Newbie Needs New Flair!
 IPman0128: Elsa
-I_Need_To_Go_To_Bed: None
 Iamafraidofseagulls: Newbie Needs New Flair!
 IceTiger7: Iron Man
 Incignito: Batman
 Infinite_Bananas: Lap Dance
-ItsNotValyrianSteel: None
 JD9940: Shield
 JazzNeurotic: Ding
 Jellysound: Batman
 JoeTrue: Liam Neeson
-Jsahl: None
-Jsphrtsng: None
 Justplainpineapples: Ding!
 KnightModern: Liam Neeson
 KrishaCZ: Movie Reel
@@ -154,57 +128,41 @@ Lambert2191: Lap Dance
 Larkin91: Clapper
 Lint6: Dear H
 Loathing_: Batman
-Lukiyano: None
-Magicalbean: None
 MarcelleGriffin: Newbie Needs New Flair!
 Marmalade6: Batman
 Mechfire11: Newbie Needs New Flair!
-MillionGunman: None
 Minifig81: Logo
 MishRae: 007
 Missingnose: Logo
-Mobys_D: None
 MoreOne: Newbie Needs New Flair!
 MrDinosaurjeff: Newbie Needs New Flair!
 MrRandomnez: Lap Dance
 MrTayten: Clapper
 Mrcollaborator: Newbie Needs New Flair!
 MrsCookieMonster: Batman
-NathanLuxeGamer: None
 Nekonax: Logo
 Neosovereign: Lap Dance
 NightRaider93: Newbie Needs New Flair!
-Ninjas_Always_Win: None
 OG6: Newbie Needs New Flair!
 Onslow_Skils: Liam Neeson
-Outdoormusicisfun: None
 Pazzo7: Batman
 Peetrius: Damage
 Pepsuber188: Dear H
 PerthInStockholm: Moderator
-Pianoplunkster: None
 Pickles256: Ding!
-PirateOldwin: None
 President_Kim: Newbie Needs New Flair!
 Quentanamo_Bay: Ding!
 RRopemaker: Logo
 RaceCarGrin: Green Lantern
 Reference_Dude: Bomb
 RelevantPerson: Newbie Needs New Flair!
-Revel1020: None
 RiddlerFish: Ding
-Rilandaras: None
 RonaldCharles: Newbie Needs New Flair!
-Sephirath: None
 Sevenecks: Batman
 ShaunaStereoLust: Newbie Needs New Flair!
 Shawken: Lap Dance
 Shoelacess: Batman
 SingularityGuy: Green Lantern
-SmileyFaceInk: None
-SpiderScott: None
-StringEpsilon: None
-SusieSusan: None
 Swayhaven: Shield
 TMA-3: Clapper
 Tagard_McStone: Logo
@@ -214,12 +172,8 @@ ThatsNotFroot: Disney Logo
 TheBlackLuffy: Shield
 TheDamnBoyWonder: 007
 TheDudeBeto: Newbie Needs New Flair!
-TheEdThing: None
-TheInfectedHunter: None
 TheKrazyCanuck: Minions
 TheLikeGuys: Newbie Needs New Flair!
-TheSneakyBaldGuy: None
-TheZet: None
 Thomassaurus: Youtube Icon
 ThreeBigTacos: Newbie Needs New Flair!
 Tinflyer3: Damage
@@ -233,7 +187,6 @@ UltraDangerLord: Newbie Needs New Flair!
 WallopyJoe: Minions
 War_Messiah: Liam Neeson
 XBrokefootX: Newbie Needs New Flair!
-XGX787: None
 XI_Ki11JoY_IX: Shield
 Xionpig: Pencil
 YawgmothForPresident: Newbie Needs New Flair!
@@ -246,16 +199,12 @@ alex_dlc: Liam Neeson
 alexsafc8: Newbie Needs New Flair!
 alienfrog: Ding!
 altrocks: Liam Neeson
-amarcoe: None
 an_brazilian_guy: Reddit
 armsdragon05: Newbie Needs New Flair!
-autowikibot: None
 bat_mite51: Newbie Needs New Flair!
-bellava: None
 billgasm: Newbie Needs New Flair!
 bion2: Newbie Needs New Flair!
 bluejaygo: Spiderman
-boxcarmessiah: None
 brunotbg: Clapper
 brycebsbyuphysics: Newbie Needs New Flair!
 cammorecruit: Logo
@@ -264,93 +213,62 @@ cbad: Newbie Needs New Flair!
 cinemasinbot: The Flair Bot
 cinemasins: CinemaSins Jeremy
 clareisse: Reddit
-classic__schmosby: None
-cleverusername86: None
-conradsymes: None
 corruptedPhoenix: Batman
 cortexstack: Newbie Needs New Flair!
 crazy88horse: Newbie Needs New Flair!
 ct_2004: Iron Man
 darianb1031: The Fault In Our Stars
-datenwolf: None
-ddixon97: None
 deadshadow: Lap Dance
-depecheabode: None
 diesel_time: Newbie Needs New Flair!
 dof_: Shield
-drwicksy: None
 duskhat: Batman
-electricbill360: None
 epicbot229: Newbie Needs New Flair!
 everyone_always: Batman
-fallenone85: None
 falmunction: Newbie Needs New Flair!
 firethequadlaser: Shield
 fpstuco: Newbie Needs New Flair!
-gamedemon24: None
-gawjess: None
 giaquintor: Ding
 greyoda: Godzilla
-guaranic: None
-guiludovice: None
 gwenseye: Newbie Needs New Flair!
-hamm3rofbuddha: None
 hansenberg_: Godzilla
 henrykazuka: Shield
 hopper31: Van
 impossiblefan: Movie Reel
-isafish: None
-iwishiwasaneagle: None
-jcembree: None
 johnnycrash986: Minions
 jortbru1299: Logo
 jsney20: Youtube One
-kamz_00: None
 kane2742: Batman
 kellbyb: Newbie Needs New Flair!
 keysersoze1015: Newbie Needs New Flair!
 kmg1500: Newbie Needs New Flair!
-kotorfan04: None
 krashmania: Godzilla
 lesi20: Pencil
 lexious: Van
 lukaomg: Newbie Needs New Flair!
-lukjad007: None
 lurco_purgo: Newbie Needs New Flair!
 maalicious: Newbie Needs New Flair!
 madjo: Pencil
-majoortje: None
 malador888: Logo
 matrio2cool: Godzilla
 matsunaga: Newbie Needs New Flair!
 maximalGames: Batman
 meirionh: Elsa
 mgrote: Logo
-mrspuff202: None
 mudk1p: Newbie Needs New Flair!
 nb314: Pencil
-nedrag: None
 neonraisin: Gem
-nic0lk: None
 nick2go: Movie Reel
-othnice1: None
 pelb: Spiderman
 physicistnate: Dear H
 poonslayer2000: Ding
 purupurupururinpuru: Newbie Needs New Flair!
-pyro-guy: None
-queensavior: None
 rapchee: Newbie Needs New Flair!
 row101: Newbie Needs New Flair!
-rtranum: None
 ryanbtw: Batman
 sbb618: Logo
 scinfeced2wolf: Newbie Needs New Flair!
-seth2: None
-shikhargpt: None
 sinsofmovies: Golden Gun
 skippythemoonrock: Golden Gun
-spikecastle: None
 starcksjoen: Book
 subnam: Iron Man
 supertoasty: CHUCKY...
@@ -363,18 +281,11 @@ vinkman6: Logo
 voltec14: Newbie Needs New Flair!
 vonmeth: Newbie Needs New Flair!
 waffles: Newbie Needs New Flair!
-wardstone8: None
-waylon_jones: None
 whangadude: Newbie Needs New Flair!
 wolfkin: Minions
 wrethlig: Liam Neeson
 wretlingrock392: CHUCKY...
-wwefan360: None
 xLowDown: 007
 xjimmehx: Newbie Needs New Flair!
-xxdofxx: None
 xxthedrachexx: Logo
-yidorian: None
-zachrywd: None
 zbot-: Newbie Needs New Flair!
-zombiegerbils: None
