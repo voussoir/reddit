@@ -1,7 +1,7 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 71,784 of 634,906 subreddits (11.306%)
+#####Collected 74,307 of 634,906 subreddits (11.704%)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -47,3 +47,16 @@ ______
     38 missing
     (2s6q8, 1289759310, Nov 14 2010 18:28:30 UTC, NSFW:0, PC_GrowBox)
     (2s6q9, 1289759515, Nov 14 2010 18:31:55 UTC, NSFW:0, Minarchy)
+
+
+.
+#####The 2wdt_ gap
+    (2wdt2, 1361097827, Feb 17 2013 10:43:47 UTC, NSFW:0, euroondy)
+    (2wdt3, 1361098023, Feb 17 2013 10:47:03 UTC, NSFW:0, 2YOON)
+    (2wdt4, 1361098384, Feb 17 2013 10:53:04 UTC, NSFW:0, gqmagazine)
+    (2wdt5, 1361098570, Feb 17 2013 10:56:10 UTC, NSFW:0, pvpmc)
+    27 missing
+    (2wdtx, 1361099376, Feb 17 2013 11:09:36 UTC, NSFW:0, Dudesbutts)
+    (2wdty, 1361100733, Feb 17 2013 11:32:13 UTC, NSFW:0, FMGEM)
+    (2wdtz, 1361100749, Feb 17 2013 11:32:29 UTC, NSFW:0, ScaredCats)
+    (2wdu0, 1361100799, Feb 17 2013 11:33:19 UTC, NSFW:0, trueNaruto)
