@@ -126,13 +126,13 @@ def show():
 	filea = open('show\\all-time.txt', 'w')
 	fileb = open('show\\all-dom.txt', 'w')
 	filec = open('show\\all-name.txt', 'w')
-	filed = open('show\\allx-name.txt', 'w')
-	filee = open('show\\allx-time.txt', 'w')
+	#filed = open('show\\allx-name.txt', 'w')
+	#filee = open('show\\allx-time.txt', 'w')
 	filef = open('show\\clean-time.txt', 'w')
 	fileg = open('show\\clean-name.txt', 'w')
 	fileh = open('show\\dirty-time.txt', 'w')
 	filei = open('show\\dirty-name.txt', 'w')
-	filej = open('show\\allx-dom.txt', 'w')
+	#filej = open('show\\allx-dom.txt', 'w')
 	filek = open('show\\clean-dom.txt', 'w')
 	filel = open('show\\dirty-dom.txt', 'w')
 	filem = open('show\\statistics.txt', 'w')
@@ -150,8 +150,8 @@ def show():
 	for member in fetch:
 		print(str(member).replace("'", ''), file=filea)
 	filea.close()
-	shown(fetch, 'Sorted by nsfw by true time', filee)
-	filee.close()
+	#shown(fetch, 'Sorted by nsfw by true time', filee)
+	#filee.close()
 	shown(fetch, 'Clean only sorted by true time', filef, nsfwmode=0)
 	filef.close()
 	shown(fetch, 'Nsfw only sorted by true time', fileh, nsfwmode=1)
@@ -190,9 +190,12 @@ def show():
 		yerdict = dictadding(yerdict, datetime.datetime.strftime(itemdate, "%Y"))
 
 	for d in [dowdict, moydict, hoddict, yerdict]:
-		sd = sorted(list(d.keys()))
-		for k in sd:
-			statisticoutput += k + ': ' + str(d[k])
+		reversedict = dict(zip(d.values(), d.keys()))
+		sorteddict = sorted(list(reversedict.keys()))
+		for k in sorteddict:
+			nk = reversedict[k]
+			nks = str(d[nk])
+			statisticoutput += nk + ': ' + ('.' * (10-len(nk))) + ('.' * (8-len(nks))) + nks
 			statisticoutput += '\n'
 		statisticoutput += '\n\n'
 
@@ -213,8 +216,8 @@ def show():
 	for member in fetch:
 		print(str(member).replace("'", ''), file=filec)
 	filec.close()
-	shown(fetch, 'Sorted by nsfw by name', filed)
-	filed.close()
+	#shown(fetch, 'Sorted by nsfw by name', filed)
+	#filed.close()
 	shown(fetch, 'Clean only sorted by name', fileg, nsfwmode=0)
 	fileg.close()
 	shown(fetch, 'Nsfw only sorted by name', filei, nsfwmode=1)
@@ -234,8 +237,8 @@ def show():
 	for member in l:
 		print(str(member).replace("'", ''), file=fileb)
 	fileb.close()
-	shown(l, 'Sorted by nsfw by day of month', filej)
-	filej.close()
+	#shown(l, 'Sorted by nsfw by day of month', filej)
+	#filej.close()
 	shown(l, 'Clean only sorted by day of month', filek, nsfwmode=0)
 	filek.close()
 	shown(l, 'Nsfw only sorted by day of month', filel, nsfwmode=1)
@@ -245,8 +248,9 @@ def show():
 	cur.execute('SELECT * FROM subreddits WHERE CREATED=?', [0])
 	fetch = cur.fetchall()
 	fetch.sort(key=lambda x: b36(x[0]))
+	fetch = (f[0] for f in fetch)
 	for member in fetch:
-		print(str(member).replace("'", ''), file=filen)
+		print(member, file=filen)
 	filen.close()
 
 
@@ -468,6 +472,10 @@ def processnew():
 	except AttributeError:
 		print('Break')
 
+def processnewest():
+	brandnewest = list(r.get_new_subreddits(limit=1))[0]
+	processi(brandnewest.id)
+
 def search(query="", casesense=False, filterout=[], nsfwmode=2, idd=""):
 	"""
 	Search for a subreddit by name
@@ -545,7 +553,6 @@ def findwrong():
 	fetch = cur.fetchall()
 	fetch.sort(key=lambda x: b36(x[0]))
 	#sorted by ID
-	
 	fetch = fetch[25:]
 	
 	pos = 0
@@ -560,3 +567,40 @@ def findwrong():
 
 	for x in l:
 		print(x)
+
+def findholes(count, doreturn=False):
+	cur.execute('SELECT * FROM subreddits WHERE NAME!=?', ['?'])
+	fetch = cur.fetchall()
+	fetch.sort(key=lambda x: b36(x[0]))
+	#sorted by ID
+	fetch = fetch[25:]
+	fetch = [f[0] for f in fetch]
+
+	current = 0
+	holes = []
+	pos = b36(fetch[0])
+	while pos < b36(fetch[-1]):
+		i = b36(pos).lower()
+		if i not in fetch:
+			current += 1
+			holes.append(i)
+		pos += 1
+
+		if current >= count:
+			break
+	if doreturn:
+		return holes
+	else:
+		for h in holes:
+			print(h)
+
+def fillholes(count):
+	"""
+	Used to fill ID gaps instead of relying on processrand or processir
+	Fills holes sequentially by ID
+	*int count = How many holes to fill
+	"""
+	holes = findholes(count, True)
+	for hole in holes:
+		processi(hole)
+		time.sleep(2.2)

@@ -1,7 +1,7 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 109,651 of 637,448 subreddits (17.202%)
+#####Collected 113,311 of 638,099 subreddits (17.758%)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -82,3 +82,11 @@ ______
     28 missing
     (2wfwp, 1361575051, Feb 22 2013 23:17:31 UTC, NSFW:0, snapthateo)
     (2wfwq, 1361575515, Feb 22 2013 23:25:15 UTC, NSFW:0, mitsuba)
+
+.
+#####The 2wg__ gaps
+    (2wg1p, 1361605573, Feb 23 2013 07:46:13 UTC, NSFW:0, randomplot)
+    (2wg1q, 1361605863, Feb 23 2013 07:51:03 UTC, NSFW:0, Employment4u)
+    22 missing
+    (2wg2d, 1361607227, Feb 23 2013 08:13:47 UTC, NSFW:0, foodoir)
+    (2wg2e, 1361607383, Feb 23 2013 08:16:23 UTC, NSFW:0, realforce)
