@@ -157,9 +157,11 @@ def show():
 	shown(fetch, 'Nsfw only sorted by true time', fileh, nsfwmode=1)
 	fileh.close()
 
+
+	fetch.sort(key=lambda x: b36(x[0]))
 	previd = fetch[0][0]
 	print('Writing marked file')
-	print('Sorted by true time with ID gaps marked', file=fileo)
+	print('Sorted by ID number gaps marked', file=fileo)
 	for member in fetch:
 		curid = member[0]
 		iddiff = b36(curid) - b36(previd)
@@ -168,6 +170,7 @@ def show():
 		print(str(member).replace("'", ''), file=fileo)
 		previd = curid
 	fileo.close()
+
 
 	print('Writing statistics')
 	totalpossible = b36(fetch[-1][0]) - 4594411
@@ -465,7 +468,7 @@ def processnew():
 	except AttributeError:
 		print('Break')
 
-def search(query, casesense=False, filterout=[], nsfwmode=2):
+def search(query="", casesense=False, filterout=[], nsfwmode=2, idd=""):
 	"""
 	Search for a subreddit by name
 	*str query= The search query
@@ -480,48 +483,55 @@ def search(query, casesense=False, filterout=[], nsfwmode=2):
 	  1 - Dirty only
 	  2 - All
 	"""
-	cur.execute('SELECT * FROM subreddits WHERE NAME !=?', ['?'])
-	fetched = cur.fetchall()
-	fetched.sort(key=lambda x: x[4].lower())
 
-	results = []
-	if not casesense:
-		query = query.lower()
-		for x in range(len(filterout)):
-			filterout[x] = filterout[x].lower()
+	if idd == "":
+		cur.execute('SELECT * FROM subreddits WHERE NAME !=?', ['?'])
+		fetched = cur.fetchall()
+		fetched.sort(key=lambda x: x[4].lower())
 
-	#print(len(fetched))
-	for subreddit in fetched:
-		item = subreddit[4]
-		if nsfwmode==2 or (subreddit[3] == "NSFW:1" and nsfwmode == 1) or (subreddit[3] == "NSFW:0" and nsfwmode == 0):
-			if not casesense:
-				item = item.lower()
-			querl = query.replace(':', '')
-			if querl in item:
-				#print(item)
-				if all(filters not in item for filters in filterout):
-					itemsplit = item.split(querl)
-					if ':' in query:
-						if (query[-1] == ':' and query[0] != ':') and itemsplit[0] == '':
-							results.append(subreddit)
+		results = []
+		if not casesense:
+			query = query.lower()
+			for x in range(len(filterout)):
+				filterout[x] = filterout[x].lower()
+
+		#print(len(fetched))
+		for subreddit in fetched:
+			item = subreddit[4]
+			if nsfwmode==2 or (subreddit[3] == "NSFW:1" and nsfwmode == 1) or (subreddit[3] == "NSFW:0" and nsfwmode == 0):
+				if not casesense:
+					item = item.lower()
+				querl = query.replace(':', '')
+				if querl in item:
+					#print(item)
+					if all(filters not in item for filters in filterout):
+						itemsplit = item.split(querl)
+						if ':' in query:
+							if (query[-1] == ':' and query[0] != ':') and itemsplit[0] == '':
+								results.append(subreddit)
+				
+							if (query[0] == ':' and query[-1] != ':') and itemsplit[-1] == '':
+								results.append(subreddit)
+				
+							if (query[-1] == ':' and query[0] == ':') and (itemsplit[0] != '' and itemsplit[-1] != ''):
+								results.append(subreddit)
 			
-						if (query[0] == ':' and query[-1] != ':') and itemsplit[-1] == '':
+						else:
 							results.append(subreddit)
-			
-						if (query[-1] == ':' and query[0] == ':') and (itemsplit[0] != '' and itemsplit[-1] != ''):
-							results.append(subreddit)
-		
 					else:
-						results.append(subreddit)
-				else:
-					#print('Filtered', item)
-					pass
+						#print('Filtered', item)
+						pass
 
-	for item in results:
-		item = str(item)
-		item = item.replace("'", '')
-		print(item)
-	print()
+		for item in results:
+			item = str(item)
+			item = item.replace("'", '')
+			print(item)
+		print()
+
+	else:
+		cur.execute('SELECT * FROM subreddits WHERE ID=?', [idd])
+		f = cur.fetchone()
+		print(f)
 
 def cls():
 	os.system('cls')
@@ -529,3 +539,24 @@ def cls():
 def count():
 	cur.execute('SELECT * FROM subreddits WHERE NAME!=?', ['?'])
 	print(len(cur.fetchall()))
+
+def findwrong():
+	cur.execute('SELECT * FROM subreddits WHERE NAME!=?', ['?'])
+	fetch = cur.fetchall()
+	fetch.sort(key=lambda x: b36(x[0]))
+	#sorted by ID
+	
+	fetch = fetch[25:]
+	
+	pos = 0
+	l = []
+
+	while pos < len(fetch)-5:
+		if fetch[pos][1] > fetch[pos+1][1]:
+			l.append(str(fetch[pos-1]))
+			l.append(str(fetch[pos]))
+			l.append(str(fetch[pos+1]) + "\n")
+		pos += 1
+
+	for x in l:
+		print(x)
