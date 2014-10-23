@@ -147,7 +147,7 @@ def scanSub():
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
             if pauthor.lower() != USERNAME.lower():
-                pbody = post.body
+                pbody = post.body.lower()
             
                 if LEVENMODE == True:
                     results = findsuper(pbody)
