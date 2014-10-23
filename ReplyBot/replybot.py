@@ -80,3 +80,5 @@ while True:
     print('Running again in ' + WAITS + ' seconds \n')
     sql.commit()
     time.sleep(WAIT)
+
+    
