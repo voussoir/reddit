@@ -7,7 +7,7 @@ Gathering some information on the creation dates of subreddits, so you don't hav
 
 Once a subreddit is added to the list, it will never be re-queried. Subreddits which have become private or have changed their nsfw status will not be properly reflected here.
 
-The earliest subreddit after which IDs are consistently incrementing is [/r/jedbergtest](http://reddit.com/r/jedbergtest) at 2qh0f. There are about 4.6 million ID numbers between 0 and 2qh0f which do not correspond to a subreddit.
+The earliest subreddit after which IDs are consistently incrementing is [/r/jedbergtest](http://reddit.com/r/234) at 2qh0j. There are about 4.6 million ID numbers between 0 and 2qh0j which do not correspond to a subreddit.
 
 The statistics file should be considered misleading until the number of collected subreddits is very near to the true count. `processnew()` favors subreddits created near the time of running, and `get()` favors larger / more active subreddits.
 
