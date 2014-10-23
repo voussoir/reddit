@@ -188,13 +188,14 @@ def show():
 		moydict = dictadding(moydict, datetime.datetime.strftime(itemdate, "%B"))
 		hoddict = dictadding(hoddict, datetime.datetime.strftime(itemdate, "%H"))
 		yerdict = dictadding(yerdict, datetime.datetime.strftime(itemdate, "%Y"))
+	#print(yerdict)
 
 	for d in [dowdict, moydict, hoddict, yerdict]:
-		reversedict = dict(zip(d.values(), d.keys()))
-		sorteddict = sorted(list(reversedict.keys()))
-		for k in sorteddict:
-			nk = reversedict[k]
-			nks = str(d[nk])
+		d = dict(zip(d.keys(), d.values()))
+		dkeys = list(d.keys())
+		dkeys.sort(key=d.get)
+		for nk in dkeys:
+			nks = str(d.get(nk))
 			statisticoutput += nk + ': ' + ('.' * (10-len(nk))) + ('.' * (8-len(nks))) + nks
 			statisticoutput += '\n'
 		statisticoutput += '\n\n'
