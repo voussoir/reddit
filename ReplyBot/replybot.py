@@ -57,18 +57,18 @@ def scanSub():
         pid = post.id
         try:
             pauthor = post.author.name
+            cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
+            if not cur.fetchone():
+                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+                pbody = post.body.lower()
+                if any(key.lower() in pbody for key in PARENTSTRING):
+                    if pauthor.lower() != USERNAME.lower():
+                        print('Replying to ' + pid + ' by ' + pauthor)
+                        post.reply(REPLYSTRING)
+                    else:
+                        print('Will not reply to self')
         except AttributeError:
             pauthor = '[DELETED]'
-        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
-        if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
-            pbody = post.body.lower()
-            if any(key.lower() in pbody for key in PARENTSTRING):
-                if pauthor.lower() != USERNAME.lower():
-                    print('Replying to ' + pid + ' by ' + pauthor)
-                    post.reply(REPLYSTRING)
-                else:
-                    print('Will not reply to self')
     sql.commit()
 
 
