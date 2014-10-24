@@ -301,7 +301,7 @@ def shown(startinglist, header, fileobj, nsfwmode=2):
 			print(str(member).replace("'", ''), file=fileobj)
 
 
-def nearby(ranged=16, nsfwmode=2):
+def nearby(ranged=16, nsfwmode=2, doreturn=False):
 	"""
 	Find subreddits whose birthdays are coming up
 	int ranged= How many subs to attempt showing
@@ -340,12 +340,14 @@ def nearby(ranged=16, nsfwmode=2):
 			results.append(item)
 
 
-	#return results
-	for item in results:
-		item = str(item)
-		item = item.replace("'", '')
-		print(item)
-
+	if doreturn:
+		return results
+	else:
+		for item in results:
+			item = str(item)
+			item = item.replace("'", '')
+			print(item)
+	
 
 def base36encode(number, alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
     """Converts an integer to a base36 string."""
