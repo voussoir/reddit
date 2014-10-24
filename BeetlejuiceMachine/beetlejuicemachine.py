@@ -55,6 +55,7 @@ def scanSub():
     print('Scanning ' + SUBREDDIT)
     subreddit = r.get_subreddit(SUBREDDIT)
     comments = list(subreddit.get_comments(limit=MAXPOSTS))
+    comments.reverse()
     for comment in comments:
         cid = comment.fullname
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [cid])
