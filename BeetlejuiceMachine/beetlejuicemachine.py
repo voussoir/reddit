@@ -104,7 +104,7 @@ def scanSub():
 while True:
     try:
         scanSub()
-    except AttributeError as e:
+    except Exception as e:
         print('An error has occured:', e)
     print('Running again in ' + WAITS + ' seconds \n')
     sql.commit()
