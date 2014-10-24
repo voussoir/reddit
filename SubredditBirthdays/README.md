@@ -92,4 +92,6 @@ ______
     (2wg2e, 1361607383, Feb 23 2013 08:16:23 UTC, NSFW:0, realforce)
 
 
-![Birthday Snoo](/../master/.GitImages/SubredditBirthdays000.png?raw=true)
+<p align="center">
+  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/SubredditBirthdays001.png?raw=true" alt="Happy Birthday"/>
+</p>
