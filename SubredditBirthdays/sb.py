@@ -177,7 +177,7 @@ def show():
 	headliner= 'Collected '+'{0:,}'.format(itemcount)+' of '+'{0:,}'.format(totalpossible)+' subreddits ('+"%0.03f"%(100*itemcount/totalpossible)+'%)\n'
 	#Call the PEP8 police on me, I don't care
 	print(headliner, file=filem)
-	statisticoutput = ""
+	statisticoutput = []
 	dowdict = {}
 	moydict = {}
 	hoddict = {}
@@ -196,9 +196,25 @@ def show():
 		dkeys.sort(key=d.get)
 		for nk in dkeys:
 			nks = str(d.get(nk))
-			statisticoutput += nk + ': ' + ('.' * (10-len(nk))) + ('.' * (8-len(nks))) + nks
-			statisticoutput += '\n'
-		statisticoutput += '\n\n'
+			statisticoutput.append(nk + ': ' + ('.' * (10-len(nk))) + ('.' * (8-len(nks))) + nks)
+		statisticoutput.append('\n')
+
+	#print(statisticoutput)
+	pos = 0
+	for d in [dowdict, moydict, hoddict, yerdict]:
+		d = dict(zip(d.keys(), d.values()))
+		dkeys = list(d.keys())
+		dkeys = specialsort(dkeys)
+		#print(dkeys)
+		for nk in dkeys:
+			nks = str(d.get(nk))
+			statisticoutput[pos] = statisticoutput[pos] + ' '*8 + nk + ': ' + ('.' * (10-len(nk))) + ('.' * (8-len(nks))) + nks
+			pos += 1
+		statisticoutput.append('\n')
+		pos += 1
+
+	#print(statisticoutput)
+	statisticoutput = '\n'.join(statisticoutput)
 
 	print(statisticoutput, file=filem)
 	filem.close()
@@ -261,6 +277,19 @@ def dictadding(targetdict, item):
 	else:
 		targetdict[item] = targetdict[item] + 1
 	return targetdict
+
+def specialsort(inlist):
+	if 'December' in inlist:
+		return ['January', 'February', 'March', \
+				'April', 'May', 'June', 'July', \
+				'August', 'September', 'October', \
+				'November', 'December']
+	if 'Monday' in inlist:
+		return ['Sunday', 'Monday', 'Tuesday', \
+				'Wednesday', 'Thursday', 'Friday', \
+				'Saturday']
+	else:
+		return sorted(inlist)
 
 
 def shown(startinglist, header, fileobj, nsfwmode=2):
