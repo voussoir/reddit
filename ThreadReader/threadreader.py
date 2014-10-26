@@ -37,7 +37,7 @@ post.replace_more_comments(limit=None, threshold=1)
 comments = post.comments
 
 print('Creating file')
-outfile = open('t3_' + pid + '.txt', 'w')
+outfile = open('t3_' + pid + '.txt', 'w', encoding='utf-8')
 
 print('/r/' + post.subreddit.display_name, file=outfile)
 print(post.title + '\n', file=outfile)
@@ -45,7 +45,7 @@ print(post.title + '\n', file=outfile)
 if post.selftext != "":
     pbody = post.selftext.replace('\n\n', '\n')
     pfinal = ''
-    for paragraph in pbody.split('\n'):
+    for paragraph in pbody.split('\n\n'):
         pfinal += '\n'.join(textwrap.wrap(paragraph))
         pfinal += '\n'    
     print(pfinal, file=outfile)
@@ -72,6 +72,7 @@ def recursivereplies(inlist, depth):
 
         cfinal = cfinal.replace('\n', '\n' + DEPTHSYMBOL*depth)
         print(cfinal, file=outfile)
+        print(DEPTHSYMBOL*depth + '-'*10, file=outfile)
         recursivereplies(reply.replies, depth+1)
 
 
