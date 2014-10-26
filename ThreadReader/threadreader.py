@@ -93,6 +93,7 @@ for comment in comments:
     #cbody = cbody.replace('\n\n', '\n')
     cbody = '\n'.join(textwrap.wrap(cbody))
     print(cbody, file=outfile)
+    print('-'*10, file=outfile)
     recursivereplies(comment.replies, 1)
     print('*'*50, file=outfile)
 
