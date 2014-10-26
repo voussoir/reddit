@@ -1,0 +1,37 @@
+/r/help
+Is there a way to download or copy an entire post/thread?
+
+[There was a thread made for this a year ago](http://www.reddit.com/r/
+help/comments/1aiyoa/is_there_a_way_to_download_or_easily_extract/),
+but it was never really answered. I have Notepad++ if anyone can
+explain /u/andytuba's idea. I'm illiterate when it comes to
+programming.
+
+http://www.reddit.com/r/help/comments/2k44u4/is_there_a_way_to_download_or_copy_an_entire/
+
+
+
+/u/GoldenSights, clj9is6, Oct 25 2014 09:03:58 UTC
+What is the end-product supposed to look like? /u/andytuba was saying
+that you could get the comments' data through the reddit API and then
+put all the text into a file. The biggest question is how you want it
+formatted. I'll write something up for you if you like. Also, you can
+ctrl+s in browser, and then just load that html file if you want to
+re-read the thread later.
+ 
+    /u/aeonws, clk3kaa, Oct 26 2014 11:17:01 UTC
+    Normal reddit format would be ideal, but if that's not achievable
+    just :
+    
+     &lt;Comment
+    
+                    &lt;All Child Comments
+    
+                                      &lt;All Child Comments
+    
+                                                           &lt;etc.
+    
+                                            Though, I'm not sure I gave
+    the sort of answer you were looking for.
+    *edit not sure why text is blue, but that'll do.
+**************************************************
