@@ -18,6 +18,7 @@ put all the text into a file. The biggest question is how you want it
 formatted. I'll write something up for you if you like.  Also, you can
 ctrl+s in browser, and then just load that html file if you want to
 re-read the thread later.
+----------
  
     /u/aeonws, clk3kaa, Oct 26 2014 11:17:01 UTC
     Normal reddit format would be ideal, but if that's not achievable
@@ -35,6 +36,7 @@ re-read the thread later.
     the sort of answer you were looking for.
     
     *edit not sure why text is blue, but that'll do.
+    ----------
  
         /u/GoldenSights, clkfib4, Oct 26 2014 19:38:52 UTC
         [Here is some output](https://github.com/voussoir/reddit/blob/
@@ -57,4 +59,5 @@ re-read the thread later.
         This is the 6-character string in the post url. Yours is 2k44u4. It
         will create txt files in the same folder as the .py file, so you might
         want to create a folder for it.
+        ----------
 **************************************************
