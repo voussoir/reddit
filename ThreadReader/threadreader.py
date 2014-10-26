@@ -4,20 +4,31 @@ import time
 import datetime
 
 
-FALLBACKID = ''
+FALLBACKID = ""
+USERNAME = ""
+
+if USERNAME == '':
+    print('Please open this file in a text editor and')
+    print('put your username between the quotes on line 8')
+    try:
+        input()
+    except EOFError:
+        time.sleep(9999)
+
 try:
     pid=input('Thread ID: ')
 except EOFError:
     if FALLBACKID == '':
         print('\nCannot run in this environment. Your device is not accepting input')
         print('You may run this program another way, or edit the FALLBACKID variable with the ID')
-        time.sleep(999999)
+        time.sleep(99999)
     else:
         pid = FALLBACKID
 
 print('Connecting to reddit')
-r=praw.Reddit('/u/GoldenSights ThreadReader script. Downloads a comment thread and prints it to a txt file\
-    Learn more at https://github.com/voussoir/reddit/tree/master/ThreadReader')
+r=praw.Reddit('ThreadReader script created by /u/Goldensights, being used by ' + USERNAME + '.\
+            Downloads a comment thread and prints it to a txt file\
+            Learn more at https://github.com/voussoir/reddit/tree/master/ThreadReader')
 
 print('Getting post')
 post = r.get_info(thing_id='t3_' + pid)
