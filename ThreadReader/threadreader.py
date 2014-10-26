@@ -63,7 +63,7 @@ def recursivereplies(inlist, depth):
         print(DEPTHSYMBOL * depth + '/u/' + cauthor + ', ' + reply.id + ', ' + humanize(reply.created_utc), file=outfile)
         cbody = reply.body
         cbody = DEPTHSYMBOL*depth + cbody
-        cbody = cbody.replace('\n\n', '\n')
+        #cbody = cbody.replace('\n\n', '\n')
         cfinal = ''
         for paragraph in cbody.split('\n'):
             cfinal += ('\n').join(textwrap.wrap(paragraph))
@@ -89,7 +89,7 @@ for comment in comments:
         cauthor = "[DELETED]"
     print('/u/' + cauthor + ', ' + comment.id + ', ' + humanize(comment.created_utc), file=outfile)
     cbody = comment.body
-    cbody = cbody.replace('\n\n', '\n')
+    #cbody = cbody.replace('\n\n', '\n')
     cbody = '\n'.join(textwrap.wrap(cbody))
     print(cbody, file=outfile)
     recursivereplies(comment.replies, 1)
