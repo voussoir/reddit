@@ -62,7 +62,7 @@ ______
 
     There are a ton of these in the 2008 range.
 
-    .
+.
 #####The 2wf__ gaps
     (2wfuu, 1361574351, Feb 22 2013 23:05:51 UTC, NSFW:0, TOmapsarchives)
     (2wfuv, 1361574397, Feb 22 2013 23:06:37 UTC, NSFW:0, picsofgunnar)
