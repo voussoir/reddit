@@ -1,7 +1,7 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 160,865 of 641,339 subreddits (25.083%)
+#####Collected 206,085 of 642,005 subreddits (32.100%)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -35,6 +35,34 @@ ______
     (2qxhx, 1240920547, Apr 28 2009 12:09:07 UTC, NSFW:0, chinee)
     
 .
+#####Did I stutter?
+    (2qjft, 1214562943, Jun 27 2008 10:35:43 UTC, NSFW:0, Seekers)
+    (2qjfu, 1214563517, Jun 27 2008 10:45:17 UTC, NSFW:1, Smartphoneking)
+    (2qjfv, 1214564906, Jun 27 2008 11:08:26 UTC, NSFW:0, wbsage)
+    (2qjfw, 1214564906, Jun 27 2008 11:08:26 UTC, NSFW:0, wbsage)
+    (2qjfx, 1214564907, Jun 27 2008 11:08:27 UTC, NSFW:0, wbsage)
+    (2qjfy, 1214565840, Jun 27 2008 11:24:00 UTC, NSFW:0, MCE)
+    (2qjfz, 1214566724, Jun 27 2008 11:38:44 UTC, NSFW:0, Cryptogon)
+    
+    (2qjgq, 1214600724, Jun 27 2008 21:05:24 UTC, NSFW:0, Layla007)
+    (2qjgr, 1214603171, Jun 27 2008 21:46:11 UTC, NSFW:0, Realty)
+    (2qjgs, 1214606215, Jun 27 2008 22:36:55 UTC, NSFW:0, mpwagner)
+    (2qjgt, 1214606226, Jun 27 2008 22:37:06 UTC, NSFW:0, mpwagner)
+    (2qjgu, 1214606266, Jun 27 2008 22:37:46 UTC, NSFW:0, mpwagner)
+    (2qjgv, 1214606838, Jun 27 2008 22:47:18 UTC, NSFW:0, killbill)
+    (2qjgw, 1214608305, Jun 27 2008 23:11:45 UTC, NSFW:0, unfunnypics)    
+
+    (2qjha, 1214636620, Jun 28 2008 07:03:40 UTC, NSFW:0, PICITTEN)
+    (2qjhb, 1214636987, Jun 28 2008 07:09:47 UTC, NSFW:0, osoveloz)
+    (2qjhc, 1214642036, Jun 28 2008 08:33:56 UTC, NSFW:0, nofaxpaydayloans)
+    (2qjhd, 1214642036, Jun 28 2008 08:33:56 UTC, NSFW:0, nofaxpaydayloans)
+    (2qjhe, 1214642036, Jun 28 2008 08:33:56 UTC, NSFW:0, nofaxpaydayloans)
+    (2qjhf, 1214647857, Jun 28 2008 10:10:57 UTC, NSFW:0, addme)
+    (2qjhg, 1214647905, Jun 28 2008 10:11:45 UTC, NSFW:0, ccnatraining)
+
+    There are a ton of these in the 2008 range.
+
+    .
 #####The 2wf__ gaps
     (2wfuu, 1361574351, Feb 22 2013 23:05:51 UTC, NSFW:0, TOmapsarchives)
     (2wfuv, 1361574397, Feb 22 2013 23:06:37 UTC, NSFW:0, picsofgunnar)
