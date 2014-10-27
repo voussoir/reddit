@@ -106,6 +106,124 @@ def process(sr):
 		except praw.requests.exceptions.HTTPError:
 			print('HTTPError:', sub)
 
+
+def chunklist(inputlist, chunksize):
+	if len(inputlist) < chunksize:
+		return [inputlist]
+	else:
+		outputlist = []
+		while len(inputlist) > 0:
+			outputlist.append(inputlist[:chunksize])
+			inputlist = inputlist[chunksize:]
+		return outputlist
+
+def processmega(srinput, isrealname=False, chunksize=100):
+	global olds
+	#This is the new standard in sr processing
+	#Other methods will be deprecated
+	#Heil
+	if type(srinput) == str:
+		srinput = srinput.replace(' ', '')
+		srinput = srinput.split(',')
+
+	if isrealname == False:
+		remaining = len(srinput)
+		for x in range(len(srinput)):
+			if 't5_' not in srinput[x]:
+				srinput[x] = 't5_' + srinput[x]
+		srinput = chunklist(srinput, chunksize)
+		for subset in srinput:
+			try:
+				print(subset[0] + ' - ' + subset[-1], remaining)
+				subreddits = r.get_info(thing_id=subset)
+				try:
+					for sub in subreddits:
+						process(sub)
+				except TypeError:
+					print('Received no info')
+				remaining -= len(subset)
+			except praw.requests.exceptions.HTTPError as e:
+				print(e)
+				print(vars(e))
+	else:
+		for subname in srinput:
+			process(subname)
+
+
+def processrand(count, doublecheck=False, sleepy=0):
+	"""
+	Gets random IDs between a known lower bound and the newest collection
+	*int count= How many you want
+	bool doublecheck= Should it reroll duplicates before running
+	int sleepy= Used to sleep longer than the reqd 2 seconds
+	"""
+	global olds
+	olds = 0
+	lower = 4599940
+	#4594300 = 2qgzg
+	#4594411 = 2qh2j
+	#4599940 = 2qlc4
+	cur.execute('SELECT * FROM subreddits')
+	fetched = cur.fetchall()
+	fetched.sort(key=lambda x:x[1])
+	upper = fetched[-1][0]
+	print('<' + b36(lower).lower() + ',',  upper + '>', end=', ')
+	upper = b36(upper)
+	totalpossible = upper-lower
+	print(totalpossible, 'possible')
+	rands = []
+	if doublecheck:
+		allids = [x[0] for x in fetched]
+	for x in range(count):
+		rand = random.randint(lower, upper)
+		rand = b36(rand).lower()
+		if doublecheck:
+			while rand in allids or rand in rands:
+				if rand in allids:
+					print('Old:', rand, 'Rerolling: in allid')
+				else:
+					print('Old:', rand, 'Rerolling: in rands')
+				rand = random.randint(lower, upper)
+				rand = b36(rand).lower()
+				olds += 1
+		rands.append(rand)
+
+	rands.sort()
+	processmega(rands)
+
+	print('Rejected', olds)
+
+def processir(startingpoint, ranger, chunksize=100, slowmode=False, enablekilling=False):
+	"""
+	Process a range of values starting from a specified point
+	*str startingpoint= The ID of the subreddit to start at
+	**int startingpoint= The b36 value of the subreddit's ID
+	*int ranger= The number of subs after startingpoint to collect
+	"""
+	#Take subreddit ID as starting point and grab the next ranger items
+	global olds
+	olds = 0
+	startingdigit = b36(startingpoint)
+	ranged = list(range(startingdigit, startingdigit+ranger))
+	for x in range(len(ranged)):
+		ranged[x] = b36(ranged[x]).lower()
+	#print(ranged)
+	if slowmode == False:
+		processmega(ranged, chunksize=chunksize)
+	else:
+		for slowsub in ranged:
+			try:
+				processi(slowsub)
+			except praw.requests.exceptions.HTTPError as e:
+				response = str(e.response)
+				if '[500]>' in response:
+					print('500 error:', slowsub)
+					if enablekilling:
+						cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?)', [slowsub, 0, '', '', '?'])
+						sql.commit()
+	print("Rejected", olds)
+
+
 def get(limit=20):
 	global olds
 	subreddit = r.get_subreddit('all')
@@ -177,31 +295,36 @@ def show():
 	headliner= 'Collected '+'{0:,}'.format(itemcount)+' of '+'{0:,}'.format(totalpossible)+' subreddits ('+"%0.03f"%(100*itemcount/totalpossible)+'%)\n'
 	#Call the PEP8 police on me, I don't care
 	print(headliner, file=filem)
+	cur.execute('SELECT * FROM subreddits WHERE NSFW=?', ['NSFW:1'])
+	nsfwyes = cur.fetchall()
+	nsfwyes = len(nsfwyes)
 	statisticoutput = []
 	dowdict = {}
 	moydict = {}
 	hoddict = {}
 	yerdict = {}
+	myrdict = {}
 	for item in fetch:
 		itemdate = datetime.datetime.utcfromtimestamp(item[1])
 		dowdict = dictadding(dowdict, datetime.datetime.strftime(itemdate, "%A"))
 		moydict = dictadding(moydict, datetime.datetime.strftime(itemdate, "%B"))
 		hoddict = dictadding(hoddict, datetime.datetime.strftime(itemdate, "%H"))
 		yerdict = dictadding(yerdict, datetime.datetime.strftime(itemdate, "%Y"))
+		myrdict = dictadding(myrdict, datetime.datetime.strftime(itemdate, "%b%Y"))
 	#print(yerdict)
 
-	for d in [dowdict, moydict, hoddict, yerdict]:
+	for d in [dowdict, moydict, hoddict, yerdict, myrdict]:
 		d = dict(zip(d.keys(), d.values()))
 		dkeys = list(d.keys())
 		dkeys.sort(key=d.get)
 		for nk in dkeys:
 			nks = str(d.get(nk))
-			statisticoutput.append(nk + ': ' + ('.' * (10-len(nk))) + ('.' * (8-len(nks))) + nks)
+			statisticoutput.append(nk + ': ' + ('.' * (14-len(nk))) + ('.' * (6-len(nks))) + nks)
 		statisticoutput.append('\n')
 
 	#print(statisticoutput)
 	pos = 0
-	for d in [dowdict, moydict, hoddict, yerdict]:
+	for d in [dowdict, moydict, hoddict, yerdict, myrdict]:
 		d = dict(zip(d.keys(), d.values()))
 		dkeys = list(d.keys())
 		dkeys = specialsort(dkeys)
@@ -210,8 +333,10 @@ def show():
 			nks = str(d.get(nk))
 			statisticoutput[pos] = statisticoutput[pos] + ' '*8 + nk + ': ' + ('.' * (10-len(nk))) + ('.' * (8-len(nks))) + nks
 			pos += 1
-		statisticoutput.append('\n')
 		pos += 1
+	statisticoutput.append('NSFW 0: ' + str(itemcount-nsfwyes))
+	statisticoutput.append('NSFW 1: ' + str(nsfwyes))
+
 
 	#print(statisticoutput)
 	statisticoutput = '\n'.join(statisticoutput)
@@ -288,6 +413,18 @@ def specialsort(inlist):
 		return ['Sunday', 'Monday', 'Tuesday', \
 				'Wednesday', 'Thursday', 'Friday', \
 				'Saturday']
+	if 'Oct2014' in inlist:
+		td = {}
+		for item in inlist:
+			nitem = item
+			nitem = item.replace(item[:3], monthnumbers[item[:3]])
+			nitem = nitem[3:] + nitem[:3]
+			td[item] = nitem
+		tdkeys = list(td.keys())
+		#print(td)
+		tdkeys.sort(key=td.get)
+		#print(tdkeys)
+		return tdkeys
 	else:
 		return sorted(inlist)
 
@@ -404,33 +541,6 @@ def b36(i):
 	if type(i) == str:
 		return base36decode(i)
 
-def processir(startingpoint, ranger, newmode=False):
-	"""
-	Process a range of values starting from a specified point
-	*str startingpoint= The ID of the subreddit to start at
-	**int startingpoint= The b36 value of the subreddit's ID
-	*int ranger= The number of subs after startingpoint to collect
-	"""
-	#Take subreddit ID as starting point and grab the next ranger items
-	global olds
-	olds = 0
-	if type(startingpoint) == str:
-		startingpoint = b36(startingpoint)
-	for pos in range(startingpoint, startingpoint+ranger):
-		newpoint = b36(pos).lower()
-		try:
-			processi(newpoint)
-		except (AttributeError, praw.requests.exceptions.HTTPError):
-			if not newmode:
-				print('Failure', newpoint)
-				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?)', [newpoint, 0, '', '', '?'])
-				olds += 1
-				sql.commit()
-			else:
-				break
-
-	print("Rejected", olds)
-
 def processmulti(user, multiname):
 	"""
 	Process a user's multireddit
@@ -443,53 +553,6 @@ def processmulti(user, multiname):
 	for key in multijson['data']['subreddits']:
 		process(key['name'])
 
-def processrand(count, doublecheck=False, sleepy=0):
-	"""
-	Gets random IDs between a known lower bound and the newest collection
-	*int count= How many you want
-	bool doublecheck= Should it reroll duplicates before running
-	int sleepy= Used to sleep longer than the reqd 2 seconds
-	"""
-	global olds
-	olds = 0
-	lower = 4594411
-	#4594300 = 2qgzg
-	#4594411 = 2qh2j
-	cur.execute('SELECT * FROM subreddits')
-	fetched = cur.fetchall()
-	fetched.sort(key=lambda x:x[1])
-	upper = fetched[-1][0]
-	print('<' + b36(lower).lower() + ',',  upper + '>', end=', ')
-	upper = b36(upper)
-	totalpossible = upper-lower
-	print(totalpossible, 'possible')
-	rands = []
-	if doublecheck:
-		allids = [x[0] for x in fetched]
-	for x in range(count):
-		rand = random.randint(lower, upper)
-		rand = b36(rand).lower()
-		if doublecheck:
-			while rand in allids or rand in rands:
-				if rand in allids:
-					print('Old:', rand, 'Rerolling: in allid')
-				else:
-					print('Old:', rand, 'Rerolling: in rands')
-				rand = random.randint(lower, upper)
-				rand = b36(rand).lower()
-				olds += 1
-		rands.append(rand)
-
-	for randid in rands:
-		#print(randid)
-		try:
-			processi(randid)
-			time.sleep(sleepy)
-		except AttributeError:
-			print(randid, 'Failed')
-		except praw.requests.exceptions.HTTPError:
-			print(randid, 'HTTPError')
-	print('Rejected', olds)
 
 def processnew():
 	"""
@@ -601,12 +664,13 @@ def findwrong():
 		print(x)
 
 def findholes(count, doreturn=False):
-	cur.execute('SELECT * FROM subreddits WHERE NAME!=?', ['?'])
+	cur.execute('SELECT * FROM subreddits')
 	fetch = cur.fetchall()
-	fetch.sort(key=lambda x: b36(x[0]))
-	#sorted by ID
-	fetch = fetch[25:]
 	fetch = [f[0] for f in fetch]
+	fetch.sort(key=lambda x: b36(x))
+	lower = fetch.index('2qlc4')
+	fetch = fetch[lower:]
+	#sorted by ID
 
 	current = 0
 	holes = []
@@ -614,12 +678,14 @@ def findholes(count, doreturn=False):
 	while pos < b36(fetch[-1]):
 		i = b36(pos).lower()
 		if i not in fetch:
+			print(i, '\r', end='')
 			current += 1
 			holes.append(i)
 		pos += 1
 
 		if current >= count:
 			break
+	print()
 	if doreturn:
 		return holes
 	else:
@@ -633,6 +699,4 @@ def fillholes(count):
 	*int count = How many holes to fill
 	"""
 	holes = findholes(count, True)
-	for hole in holes:
-		processi(hole)
-		time.sleep(2.2)
+	processmega(holes)
