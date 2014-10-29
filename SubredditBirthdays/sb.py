@@ -26,6 +26,7 @@ WAITS = str(WAIT)
 sql = sqlite3.connect('sql.db')
 cur = sql.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS subreddits(ID TEXT, CREATED INT, HUMAN TEXT, NSFW TEXT, NAME TEXT)')
+cur.execute('CREATE TABLE IF NOT EXISTS etc(LABEL TEXT, DATA TEXT, DATB TEXT, DATC TEXT)')
 print('Loaded SQL Database')
 sql.commit()
 
@@ -117,7 +118,7 @@ def chunklist(inputlist, chunksize):
 			inputlist = inputlist[chunksize:]
 		return outputlist
 
-def processmega(srinput, isrealname=False, chunksize=100):
+def processmega(srinput, isrealname=False, chunksize=100, docrash=False):
 	global olds
 	#This is the new standard in sr processing
 	#Other methods will be deprecated
@@ -141,10 +142,13 @@ def processmega(srinput, isrealname=False, chunksize=100):
 						process(sub)
 				except TypeError:
 					print('Received no info')
+					print(subset)
 				remaining -= len(subset)
 			except praw.requests.exceptions.HTTPError as e:
 				print(e)
 				print(vars(e))
+				if docrash:
+					raise Exception("I've been commanded to crash")
 	else:
 		for subname in srinput:
 			process(subname)
@@ -159,10 +163,10 @@ def processrand(count, doublecheck=False, sleepy=0):
 	"""
 	global olds
 	olds = 0
-	lower = 4599940
-	#4594300 = 2qgzg
-	#4594411 = 2qh2j
-	#4599940 = 2qlc4
+	cur.execute('SELECT * FROM etc WHERE LABEL=?', ['lowerbound'])
+	lower = cur.fetchone()
+	lower = int(lower[2])
+
 	cur.execute('SELECT * FROM subreddits')
 	fetched = cur.fetchall()
 	fetched.sort(key=lambda x:x[1])
@@ -207,21 +211,28 @@ def processir(startingpoint, ranger, chunksize=100, slowmode=False, enablekillin
 	ranged = list(range(startingdigit, startingdigit+ranger))
 	for x in range(len(ranged)):
 		ranged[x] = b36(ranged[x]).lower()
+	cur.execute('SELECT * FROM subreddits')
+	fetch = cur.fetchall()
+	for item in fetch:
+		if item[0] in ranged:
+			ranged.remove(item[0])
+			print("dropped")
 	#print(ranged)
-	if slowmode == False:
-		processmega(ranged, chunksize=chunksize)
-	else:
-		for slowsub in ranged:
-			try:
-				processi(slowsub)
-			except praw.requests.exceptions.HTTPError as e:
-				response = str(e.response)
-				if '[500]>' in response:
-					print('500 error:', slowsub)
-					if enablekilling:
-						cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?)', [slowsub, 0, '', '', '?'])
-						sql.commit()
-	print("Rejected", olds)
+	if len(ranged) > 0:
+		if slowmode == False:
+			processmega(ranged, chunksize=chunksize)
+		else:
+			for slowsub in ranged:
+				try:
+					processi(slowsub)
+				except praw.requests.exceptions.HTTPError as e:
+					response = str(e.response)
+					if '[500]>' in response:
+						print('500 error:', slowsub)
+						if enablekilling:
+							cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?)', [slowsub, 0, '', '', '?'])
+							sql.commit()
+		print("Rejected", olds)
 
 
 def get(limit=20):
@@ -246,12 +257,12 @@ def show():
 	filec = open('show\\all-name.txt', 'w')
 	#filed = open('show\\allx-name.txt', 'w')
 	#filee = open('show\\allx-time.txt', 'w')
-	filef = open('show\\clean-time.txt', 'w')
-	fileg = open('show\\clean-name.txt', 'w')
+	#filef = open('show\\clean-time.txt', 'w')
+	#fileg = open('show\\clean-name.txt', 'w')
 	fileh = open('show\\dirty-time.txt', 'w')
 	filei = open('show\\dirty-name.txt', 'w')
 	#filej = open('show\\allx-dom.txt', 'w')
-	filek = open('show\\clean-dom.txt', 'w')
+	#filek = open('show\\clean-dom.txt', 'w')
 	filel = open('show\\dirty-dom.txt', 'w')
 	filem = open('show\\statistics.txt', 'w')
 	filen = open('show\\missing.txt', 'w')
@@ -270,8 +281,8 @@ def show():
 	filea.close()
 	#shown(fetch, 'Sorted by nsfw by true time', filee)
 	#filee.close()
-	shown(fetch, 'Clean only sorted by true time', filef, nsfwmode=0)
-	filef.close()
+	#shown(fetch, 'Clean only sorted by true time', filef, nsfwmode=0)
+	#filef.close()
 	shown(fetch, 'Nsfw only sorted by true time', fileh, nsfwmode=1)
 	fileh.close()
 
@@ -360,8 +371,8 @@ def show():
 	filec.close()
 	#shown(fetch, 'Sorted by nsfw by name', filed)
 	#filed.close()
-	shown(fetch, 'Clean only sorted by name', fileg, nsfwmode=0)
-	fileg.close()
+	#shown(fetch, 'Clean only sorted by name', fileg, nsfwmode=0)
+	#fileg.close()
 	shown(fetch, 'Nsfw only sorted by name', filei, nsfwmode=1)
 	filei.close()
 
@@ -381,8 +392,8 @@ def show():
 	fileb.close()
 	#shown(l, 'Sorted by nsfw by day of month', filej)
 	#filej.close()
-	shown(l, 'Clean only sorted by day of month', filek, nsfwmode=0)
-	filek.close()
+	#shown(l, 'Clean only sorted by day of month', filek, nsfwmode=0)
+	#filek.close()
 	shown(l, 'Nsfw only sorted by day of month', filel, nsfwmode=1)
 	filel.close()
 
@@ -668,7 +679,10 @@ def findholes(count, doreturn=False):
 	fetch = cur.fetchall()
 	fetch = [f[0] for f in fetch]
 	fetch.sort(key=lambda x: b36(x))
-	lower = fetch.index('2qlc4')
+	cur.execute('SELECT * FROM etc WHERE LABEL=?', ['lowerbound'])
+	f = cur.fetchone()
+	lower = fetch.index(f[1])
+	print("lower: ", f[1])
 	fetch = fetch[lower:]
 	#sorted by ID
 
@@ -692,11 +706,31 @@ def findholes(count, doreturn=False):
 		for h in holes:
 			print(h)
 
-def fillholes(count):
+def fillholes(count, chunksize=100):
 	"""
 	Used to fill ID gaps instead of relying on processrand or processir
 	Fills holes sequentially by ID
 	*int count = How many holes to fill
 	"""
-	holes = findholes(count, True)
-	processmega(holes)
+	remainder = count
+	while remainder > 0:
+		if remainder > chunksize:
+			holes = findholes(chunksize, True)
+			remainder -= chunksize
+		else:
+			holes = findholes(remainder, True)
+			remainder = 0
+		try:
+			processmega(holes, docrash=True)
+			fin = holes[-1]
+			fin = fin[3:]
+			print(fin)
+			cur.execute('UPDATE etc SET DATA=?, DATB=? WHERE LABEL=?', [fin, b36(fin), 'lowerbound'])
+			sql.commit()
+		except:
+			pass
+		print(remainder, "remaining")
+
+def forcelowest(instring):
+	cur.execute('UPDATE etc SET DATA=?, DATB=? WHERE LABEL=?', [instring, b36(instring), 'lowerbound'])
+	sql.commit()
