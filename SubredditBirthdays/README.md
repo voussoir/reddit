@@ -1,7 +1,7 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 206,085 of 642,005 subreddits (32.100%)
+#####Collected 301,958 of 644,060 subreddits (46.884%)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -96,20 +96,6 @@ ______
     (2wdty, 1361100733, Feb 17 2013 11:32:13 UTC, NSFW:0, FMGEM)
     (2wdtz, 1361100749, Feb 17 2013 11:32:29 UTC, NSFW:0, ScaredCats)
     (2wdu0, 1361100799, Feb 17 2013 11:33:19 UTC, NSFW:0, trueNaruto)
-
-.
-#####The 2wf__ gaps
-    (2wfuu, 1361574351, Feb 22 2013 23:05:51 UTC, NSFW:0, TOmapsarchives)
-    (2wfuv, 1361574397, Feb 22 2013 23:06:37 UTC, NSFW:0, picsofgunnar)
-    32 missing
-    (2wfvs, 1361574740, Feb 22 2013 23:12:20 UTC, NSFW:0, ReddiquetteCouncil)
-    (2wfvt, 1361574755, Feb 22 2013 23:12:35 UTC, NSFW:0, Anti_Solvler)
-    (2wfvu, 1361574793, Feb 22 2013 23:13:13 UTC, NSFW:0, BraveMods)
-    (2wfvv, 1361574910, Feb 22 2013 23:15:10 UTC, NSFW:1, BookNymphs)
-    (2wfvw, 1361574949, Feb 22 2013 23:15:49 UTC, NSFW:0, memezXD)
-    28 missing
-    (2wfwp, 1361575051, Feb 22 2013 23:17:31 UTC, NSFW:0, snapthateo)
-    (2wfwq, 1361575515, Feb 22 2013 23:25:15 UTC, NSFW:0, mitsuba)
 
 .
 #####The 2wg__ gap
