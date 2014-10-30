@@ -329,8 +329,8 @@ def show():
 		dkeys = list(d.keys())
 		dkeys.sort(key=d.get)
 		for nk in dkeys:
-			nks = str(d.get(nk))
-			statisticoutput.append(nk + ': ' + ('.' * (14-len(nk))) + ('.' * (6-len(nks))) + nks)
+			nks = str('{0:,}'.format(d.get(nk)))
+			statisticoutput.append(nk + ': ' + ('.' * (14-len(nk))) + ('.' * (10-len(nks))) + nks)
 		statisticoutput.append('\n')
 
 	#print(statisticoutput)
@@ -341,12 +341,12 @@ def show():
 		dkeys = specialsort(dkeys)
 		#print(dkeys)
 		for nk in dkeys:
-			nks = str(d.get(nk))
-			statisticoutput[pos] = statisticoutput[pos] + ' '*8 + nk + ': ' + ('.' * (10-len(nk))) + ('.' * (8-len(nks))) + nks
+			nks = str('{0:,}'.format(d.get(nk)))
+			statisticoutput[pos] = statisticoutput[pos] + ' '*8 + nk + ': ' + ('.' * (10-len(nk))) + ('.' * (12-len(nks))) + nks
 			pos += 1
 		pos += 1
-	statisticoutput.append('NSFW 0: ' + str(itemcount-nsfwyes))
-	statisticoutput.append('NSFW 1: ' + str(nsfwyes))
+	statisticoutput.append('NSFW 0: ' + str('{0:,}'.format(itemcount-nsfwyes)))
+	statisticoutput.append('NSFW 1: ' + str('{0:,}'.format(nsfwyes)))
 
 
 	#print(statisticoutput)
@@ -403,7 +403,10 @@ def show():
 	fetch.sort(key=lambda x: b36(x[0]))
 	fetch = (f[0] for f in fetch)
 	for member in fetch:
-		print(member, file=filen)
+		stopchecking = False
+		if stopchecking == True or b36(member) >= 4594339:
+			print(member, file=filen)
+			stopchecking = True
 	filen.close()
 
 
@@ -582,7 +585,7 @@ def processnewest():
 	brandnewest = list(r.get_new_subreddits(limit=1))[0]
 	processi(brandnewest.id)
 
-def search(query="", casesense=False, filterout=[], nsfwmode=2, idd=""):
+def search(query="", casesense=False, filterout=[], nsfwmode=2, idd="", doreturn=False):
 	"""
 	Search for a subreddit by name
 	*str query= The search query
@@ -636,11 +639,14 @@ def search(query="", casesense=False, filterout=[], nsfwmode=2, idd=""):
 						#print('Filtered', item)
 						pass
 
-		for item in results:
-			item = str(item)
-			item = item.replace("'", '')
-			print(item)
-		print()
+		if not doreturn:
+			for item in results:
+				item = str(item)
+				item = item.replace("'", '')
+				print(item)
+			print()
+		else:
+			return results
 
 	else:
 		cur.execute('SELECT * FROM subreddits WHERE ID=?', [idd])
