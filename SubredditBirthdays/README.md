@@ -1,7 +1,7 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 301,958 of 644,060 subreddits (46.884%)
+#####Collected 319,239 of 644,060 subreddits (49.567%)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -104,6 +104,7 @@ ______
     22 missing
     (2wg2d, 1361607227, Feb 23 2013 08:13:47 UTC, NSFW:0, foodoir)
     (2wg2e, 1361607383, Feb 23 2013 08:16:23 UTC, NSFW:0, realforce)
+
 
 
 <p align="center">
