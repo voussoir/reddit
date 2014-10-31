@@ -1,7 +1,7 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 319,239 of 644,060 subreddits (49.567%)
+#####Collected 341,984 of 644,060 subreddits (53.098%)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -63,27 +63,12 @@ ______
     There are a ton of these in the 2008 range.
 
 .
-#####The 2wf__ gaps
-    (2wfuu, 1361574351, Feb 22 2013 23:05:51 UTC, NSFW:0, TOmapsarchives)
-    (2wfuv, 1361574397, Feb 22 2013 23:06:37 UTC, NSFW:0, picsofgunnar)
-    32 missing  
-    (2wfvs, 1361574740, Feb 22 2013 23:12:20 UTC, NSFW:0, ReddiquetteCouncil)  
-    (2wfvt, 1361574755, Feb 22 2013 23:12:35 UTC, NSFW:0, Anti_Solvler)  
-    (2wfvu, 1361574793, Feb 22 2013 23:13:13 UTC, NSFW:0, BraveMods)  
-    (2wfvv, 1361574910, Feb 22 2013 23:15:10 UTC, NSFW:1, BookNymphs)  
-    (2wfvw, 1361574949, Feb 22 2013 23:15:49 UTC, NSFW:0, memezXD)  
-    28 missing  
-    (2wfwp, 1361575051, Feb 22 2013 23:17:31 UTC, NSFW:0, snapthateo)  
-    (2wfwq, 1361575515, Feb 22 2013 23:25:15 UTC, NSFW:0, mitsuba)  
-
-.
 #####The 2s6__ gap
     (2s6p4, 1289727678, Nov 14 2010 09:41:18 UTC, NSFW:0, verydirtythings)
     (2s6p5, 1289730697, Nov 14 2010 10:31:37 UTC, NSFW:0, memehistory)
     38 missing
     (2s6q8, 1289759310, Nov 14 2010 18:28:30 UTC, NSFW:0, PC_GrowBox)
     (2s6q9, 1289759515, Nov 14 2010 18:31:55 UTC, NSFW:0, Minarchy)
-
 
 .
 #####The 2wdt_ gap
@@ -98,12 +83,29 @@ ______
     (2wdu0, 1361100799, Feb 17 2013 11:33:19 UTC, NSFW:0, trueNaruto)
 
 .
+#####The 2wf__ gaps
+    (2wfuu, 1361574351, Feb 22 2013 23:05:51 UTC, NSFW:0, TOmapsarchives)
+    (2wfuv, 1361574397, Feb 22 2013 23:06:37 UTC, NSFW:0, picsofgunnar)
+    32 missing  
+    (2wfvs, 1361574740, Feb 22 2013 23:12:20 UTC, NSFW:0, ReddiquetteCouncil)  
+    (2wfvt, 1361574755, Feb 22 2013 23:12:35 UTC, NSFW:0, Anti_Solvler)  
+    (2wfvu, 1361574793, Feb 22 2013 23:13:13 UTC, NSFW:0, BraveMods)  
+    (2wfvv, 1361574910, Feb 22 2013 23:15:10 UTC, NSFW:1, BookNymphs)  
+    (2wfvw, 1361574949, Feb 22 2013 23:15:49 UTC, NSFW:0, memezXD)  
+    28 missing  
+    (2wfwp, 1361575051, Feb 22 2013 23:17:31 UTC, NSFW:0, snapthateo)  
+    (2wfwq, 1361575515, Feb 22 2013 23:25:15 UTC, NSFW:0, mitsuba)  
+
+.
 #####The 2wg__ gap
     (2wg1p, 1361605573, Feb 23 2013 07:46:13 UTC, NSFW:0, randomplot)
     (2wg1q, 1361605863, Feb 23 2013 07:51:03 UTC, NSFW:0, Employment4u)
     22 missing
     (2wg2d, 1361607227, Feb 23 2013 08:13:47 UTC, NSFW:0, foodoir)
     (2wg2e, 1361607383, Feb 23 2013 08:16:23 UTC, NSFW:0, realforce)
+
+
+
 
 
 
