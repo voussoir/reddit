@@ -34,6 +34,7 @@ r = praw.Reddit(USERAGENT)
 print('Connected to reddit.')
 
 olds = 0
+noinfolist = []
 monthnumbers = {
 	"Jan":"01",
 	"Feb":"02",
@@ -120,6 +121,7 @@ def chunklist(inputlist, chunksize):
 
 def processmega(srinput, isrealname=False, chunksize=100, docrash=False):
 	global olds
+	global noinfolist
 	#This is the new standard in sr processing
 	#Other methods will be deprecated
 	#Heil
@@ -141,8 +143,8 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False):
 					for sub in subreddits:
 						process(sub)
 				except TypeError:
-					print('Received no info')
-					print(subset)
+					print('Received no info. See variable `noinfolist`')
+					noinfolist = subset[:]
 				remaining -= len(subset)
 			except praw.requests.exceptions.HTTPError as e:
 				print(e)
