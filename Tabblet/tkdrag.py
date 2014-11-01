@@ -4,7 +4,7 @@ import bot
 import threading
 import textwrap
 import tkinter
-from tkinter import Label, Frame
+from tkinter import Label, Frame, Button, Text
 
 prevx = 0
 prevy = 0
@@ -34,11 +34,13 @@ def framedrag(event):
 def resetdrag(event):
 	global samewidget
 	samewidget = False
-	if event.widget.winfo_x() > -10:
+	winx = event.widget.winfo_x()
+	if winx > -10:
 		event.widget.place(x=event.widget.wx)
-		event.widget.configure(bg="#555")
-		if event.widget.sourceitem.new:
-			event.widget.sourceitem.mark_as_read()
+		if winx > 50:
+			event.widget.configure(bg="#555")
+			if event.widget.sourceitem.new:
+				event.widget.sourceitem.mark_as_read()
 	else:
 		recycle(event.widget)
 		refreshscreen()
@@ -50,6 +52,8 @@ def recycle(widget):
 	global widgets
 	widgetpool.append(widget)
 	widgets.remove(widget)
+	widget.rt.grid_forget()
+	widget.rb.grid_forget()
 	widget.configure(width=1, height=1)
 
 def refreshscreen():
@@ -62,6 +66,8 @@ def refreshscreen():
 		wy = 20 + (coll) + (20*widgets.index(w))
 		w.configure(width=ww, height=wh)
 		w.place(x=wx, y=wy)
+		w.rt.place(x=450, y=10)
+		w.rb.place(x= 450, y=wh-30)
 		#print(coll)
 		#print(ww, wh, wx, wy)
 		coll += wh
@@ -105,9 +111,14 @@ def additems(i, doreturn=False, bgcolor="#555"):
 		ff.bind("<ButtonRelease-1>", resetdrag)
 		ff.pack_propagate(0)
 		l = Label(ff, text=item.body, bg="#777")
-		#l.bind("<B1-Motion>", framedrag)
-		#l.bind("<ButtonRelease-1>", resetdrag)
-		l.pack(anchor="c", expand=1)
+		l.place(x=10,y=10)
+		rt = Text(ff, width= 15, height= (len(ifinal.split('\n'))) - 2)
+		rt.sourceitem = item
+		rt.place(x=400,y=10)
+		rb = Button(ff, text="Reply", command= lambda rep=rt: reply(rep))
+		rb.place(x=400,y=wh-20)
+		ff.rt = rt
+		ff.rb = rb
 		if not doreturn:
 			widgets.append(ff)
 		else:
@@ -139,6 +150,19 @@ def grabunread():
 		for x in l:
 			print('\rNext update in ' + "%02d"%x, end="")
 			time.sleep(1)
+
+def reply(inwidget):
+	source = inwidget.sourceitem
+	text = inwidget.get(0.0, "end")
+	if len(text.replace('\n', '')) > 0:
+		if 't1_' in source.fullname:
+			print(source.fullname, text)
+			source.reply(text)
+		elif 't4_' in source.fullname:
+			print(source.fullname, text)
+			#Just give me a minute
+			source.reply(text)
+		inwidget.delete(0.0, "end")
 
 
 
