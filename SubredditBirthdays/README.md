@@ -112,3 +112,7 @@ ______
 <p align="center">
   <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/SubredditBirthdays001.png?raw=true" alt="Happy Birthday"/>
 </p>
+
+<p align="center">
+  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/redditcakerender128.png?raw=true" alt="Happy Birthday"/>
+</p>
