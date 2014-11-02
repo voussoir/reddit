@@ -11,7 +11,7 @@ PASSWORD = ""
 USERAGENT = ""
 #This is a short description of what the bot is doing
 
-FILE = "test.txt"
+FILE = "imaginary.txt"
 #Your network
 
 POSTTOSUBREDDIT = ""
