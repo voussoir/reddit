@@ -1,7 +1,7 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 400,661 of 645,572 subreddits (62.063%)
+#####Collected 431,480 of 646,448 subreddits (66.746%)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -62,6 +62,8 @@ ______
 
     There are a ton of these in the 2008 range.
 
+
+
 .
 #####The 2s6__ gap
     (2s6p4, 1289727678, Nov 14 2010 09:41:18 UTC, NSFW:0, verydirtythings)
@@ -104,6 +106,22 @@ ______
     (2wg2d, 1361607227, Feb 23 2013 08:13:47 UTC, NSFW:0, foodoir)
     (2wg2e, 1361607383, Feb 23 2013 08:16:23 UTC, NSFW:0, realforce)
 
+
+.
+
+#####Singular gaps
+    2qlc5
+    2qni5
+    2qnpj
+    2qosz
+    2qp29
+    2qpaa
+    2qq3z
+    2qr24
+    2qr56
+    2qr77
+    2qrfw
+    2qsl3
 
 
 
