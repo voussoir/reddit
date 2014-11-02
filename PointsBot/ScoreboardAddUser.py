@@ -41,7 +41,7 @@ def operate():
 	flair = flair['flair_text']
 	if flair:
 		print(flair)
-		cur.execute('SELECT * FROM users WHERE LOWER(NAME)=?', [name.lower()])
+		cur.execute('SELECT * FROM users WHERE NAME=?', [name])
 		f= cur.fetchone()
 		if f:
 			print('updating')
