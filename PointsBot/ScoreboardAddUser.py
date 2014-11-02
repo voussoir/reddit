@@ -37,14 +37,17 @@ def operate():
 	subreddit = r.get_subreddit(SUBREDDIT)
 	name = input('Get flair for /u/')
 	flair = subreddit.get_flair(name)
+	name = flair['user']
 	flair = flair['flair_text']
 	if flair:
 		print(flair)
 		cur.execute('SELECT * FROM users WHERE LOWER(NAME)=?', [name.lower()])
 		f= cur.fetchone()
 		if f:
+			print('updating')
 			cur.execute('UPDATE users SET POINTS=? WHERE NAME=?', [flair, name])
 		else:
+			print('new entry')
 			cur.execute('INSERT INTO users VALUES(?, ?)', [name, flair])
 		sql.commit()
 	else:
