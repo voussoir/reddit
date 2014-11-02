@@ -218,7 +218,7 @@ def processir(startingpoint, ranger, chunksize=100, slowmode=False, enablekillin
 	for item in fetch:
 		if item[0] in ranged:
 			ranged.remove(item[0])
-			print("dropped")
+			print("dropped", item[0])
 	#print(ranged)
 	if len(ranged) > 0:
 		if slowmode == False:
@@ -736,7 +736,8 @@ def fillholes(count, chunksize=100):
 			cur.execute('UPDATE etc SET DATA=?, DATB=? WHERE LABEL=?', [fin, b36(fin), 'lowerbound'])
 			sql.commit()
 		except:
-			pass
+			print('CRASH initiating slowmode')
+			processir(holes[0][3:], chunksize, slowmode=True, enablekilling=True)
 		print(remainder, "remaining")
 
 def forcelowest(instring):
