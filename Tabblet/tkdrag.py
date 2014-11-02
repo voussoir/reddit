@@ -177,7 +177,7 @@ sw = (sw - fw) / 2
 sh = (sh - fh) / 3
 t.geometry('%dx%d+%d+%d' % (fw, fh, sw, sh))
 f = Frame(t)
-f.configure(bg="black")
+f.configure(bg="#008888")
 f.pack(fill="both", expand=1)
 
 print('Reddit')
