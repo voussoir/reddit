@@ -5,7 +5,7 @@ import datetime
 
 
 FALLBACKID = ""
-USERNAME = ""
+USERNAME = "GoldenSights"
 
 if USERNAME == '':
     print('Please open this file in a text editor and')
@@ -43,12 +43,16 @@ print('/r/' + post.subreddit.display_name, file=outfile)
 print(post.title + '\n', file=outfile)
 
 if post.selftext != "":
+    selftext = post.selftext
     pbody = post.selftext.replace('\n\n', '\n')
     pfinal = ''
     for paragraph in pbody.split('\n\n'):
         pfinal += '\n'.join(textwrap.wrap(paragraph))
         pfinal += '\n'    
-    print(pfinal, file=outfile)
+else:
+    pfinal = post.url
+    
+print(pfinal, file=outfile)
 print(post.permalink + '\n\n\n', file=outfile)
 
 DEPTHSYMBOL = "    "
@@ -66,7 +70,7 @@ def recursivereplies(inlist, depth):
         #cbody = cbody.replace('\n\n', '\n')
         cfinal = ''
         for paragraph in cbody.split('\n'):
-            cfinal += ('\n').join(textwrap.wrap(paragraph))
+            cfinal += ('\n').join(textwrap.wrap(paragraph, 120))
             cfinal += '\n'
         cfinal = cfinal[:-1]
 

@@ -1,7 +1,7 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 431,480 of 646,448 subreddits (66.746%)
+#####Collected 447,882 of 646,448 subreddits (69.284%)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -13,6 +13,7 @@ The statistics file should be considered misleading until the number of collecte
 
 Some subreddits are not properly marked as NSFW. This is either the fault of the moderators or, in some cases, the data was collected while the subreddit was brand new.
 
+2 November 2014: Finally decided to start measuring subscribers. Numbers will be wrong for quite some time.
 
 ______
 
@@ -60,7 +61,7 @@ ______
     (2qjhf, 1214647857, Jun 28 2008 10:10:57 UTC, NSFW:0, addme)
     (2qjhg, 1214647905, Jun 28 2008 10:11:45 UTC, NSFW:0, ccnatraining)
 
-    There are a ton of these in the 2008 range.
+    There are a ton of these in the 2008 range. See show\dupes.txt for more
 
 
 
@@ -108,21 +109,6 @@ ______
 
 
 .
-
-#####Singular gaps
-    2qlc5
-    2qni5
-    2qnpj
-    2qosz
-    2qp29
-    2qpaa
-    2qq3z
-    2qr24
-    2qr56
-    2qr77
-    2qrfw
-    2qsl3
-
 
 
 
