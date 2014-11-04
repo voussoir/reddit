@@ -1,7 +1,7 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 447,882 of 646,448 subreddits (69.284%)
+#####Collected 472,982 of 648,148 subreddits (72.974%)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
