@@ -165,7 +165,7 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, delaysa
 			process(subname)
 
 
-def processrand(count, doublecheck=False, sleepy=0, delaysaving=False, doupdates=True):
+def processrand(count, doublecheck=False, sleepy=0, delaysaving=False, doupdates=False):
 	"""
 	Gets random IDs between a known lower bound and the newest collection
 	*int count= How many you want
