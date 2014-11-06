@@ -381,7 +381,7 @@ def show():
 	readmeread = filep.readlines()
 	filep.close()
 	readmeread[3] = '#####' + headliner
-	readmeread[5] = '#####' + "[Today's jumble](http://reddit.com/r/" + jumble(doreturn=True)[0] + ")"
+	readmeread[5] = '#####' + "[Today's jumble](http://reddit.com/r/" + jumble(doreturn=True)[0] + ")\n"
 	filep = open('README.md', 'w')
 	filep.write(''.join(readmeread))
 	filep.close()
