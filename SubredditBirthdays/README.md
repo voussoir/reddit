@@ -3,8 +3,9 @@ Subreddit Birthdays
 
 #####Collected 494,114 of 648,148 subreddits (76.235%)
 
-#####[Today's jumble](http://reddit.com/r/churchporn+MyChemicalRomance+GuessTheMovie+NatalieDormer+jpop+warcraftlore+pokemonshowdown+wallpaper+WikiLeaks+Parkour+nexus4+Dashcam+AnimalsBeingJerks+AussieHipHop+Nissan+alaska+Unity2D+theworldnews+dontstarve+JamesBond)
-Once a subreddit is added to the list, it will never be re-queried. Subreddits which have become private or have changed their nsfw status will not be properly reflected here.
+#####[Today's jumble](http://reddit.com/r/truetf2+GetStudying+hoggit+StarcraftCirclejerk+PixelDungeon+excel+QuotesPorn+Saints+whiskey+literature+parrots+TheBluePill+Diablo3witchdoctors+puns+TopGear+Military+beertrade+RPI+Groot+FuckYouImAShark)
+
+Gathering some information on the creation dates of subreddits, so you don't have to.
 
 The earliest subreddit after which IDs are consistently incrementing is [/r/234](http://reddit.com/r/234) at 2qh0j. There are about 4.6 million ID numbers between 0 and 2qh0j which do not correspond to a subreddit.
 
