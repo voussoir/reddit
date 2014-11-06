@@ -55,6 +55,7 @@ def scanSub():
     print('Searching '+ SUBREDDIT + '.')
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_comments(limit=MAXPOSTS)
+    result = []
     for post in posts:
         pid = post.id
         try:
@@ -65,12 +66,15 @@ def scanSub():
         print(pid)
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
             pbody = post.body.lower()
+            #
             if any(key.lower() in pbody for key in PARENTSTRING):
                 print('Found ' + pid + ' by ' + pauthor)
-                r.send_message(RECIPIENT, MTITLE, pauthor + ' has said one of your keywords.\n\n[Find it here.](' + plink + ')', captcha=None)
-
+                result.append('[' + pauthor + ' said your keyword](' + plink + ')')
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+    if len(result) > 0:
+        print('Sending results')
+        r.send_message(RECIPIENT, MTITLE, '\n\n'.join(result), captcha=None)
     sql.commit()
 
 

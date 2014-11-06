@@ -63,20 +63,15 @@ def scanSub():
         except AttributeError:
             pauthor = "[DELETED]"
         plink = post.permalink
+        #
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
-            try:
-                ptitle = post.title.lower()
-                try:
-                    ptext = post.selftext.lower()
-                except AttributeError:
-                    ptext = "0"
-                if any(key.lower() in ptitle for key in PARENTSTRING) or any(key.lower() in ptext for key in PARENTSTRING):
-                    print('Found ' + pid + ' by ' + pauthor)
-                    result.append('[' + pauthor + '](' + plink + ')')
-                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
-            except IndexError:
-                pass
+            ptitle = post.title.lower()
+            ptitle += ' '+post.selftext.lower()
+            if any(key.lower() in ptitle for key in PARENTSTRING):
+                print('Found ' + pid + ' by ' + pauthor)
+                result.append('[' + pauthor + '](' + plink + ')')
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
     if len(result) > 0:
         print('Sending results')
         r.send_message(RECIPIENT, MTITLE, '\n\n'.join(result), captcha=None)
