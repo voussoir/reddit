@@ -71,20 +71,24 @@ def processi(sr, doupdates=False):
 	else:
 		olds += 1
 
-def process(sr, database="subreddits", delaysaving=False, doupdates=True):
+def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumbled=False):
 	global olds
 	subs = []
 
 	if type(sr) == str:
 		for splitted in sr.split(','):
 			splitted = splitted.replace(' ', '')
-			cur.execute('SELECT * FROM subreddits WHERE LOWER(NAME)=?', [splitted.lower()])
-			if not cur.fetchone():
+			if doupdates==False:
+				cur.execute('SELECT * FROM subreddits WHERE LOWER(NAME)=?', [splitted.lower()])
+				if not cur.fetchone():
+					sr = r.get_subreddit(splitted)
+					subs.append(sr)
+				else:
+					olds += 1
+					pass
+			else:
 				sr = r.get_subreddit(splitted)
 				subs.append(sr)
-			else:
-				olds += 1
-				pass
 
 	elif type(sr) == praw.objects.Submission or type(sr) == praw.objects.Comment:
 		sr = sr.subreddit
@@ -101,8 +105,9 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True):
 				h = human(sub.created_utc)
 				isnsfw = '1' if sub.over18 else '0'
 				subscribers = sub.subscribers if sub.subscribers else 0
+				isjumbled = '1' if isjumbled else '0'
 				print('New: ' + sub.id + ' : ' + h + ' : ' + isnsfw + ' : '+ sub.display_name + ' : ' + str(subscribers))
-				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?)', [sub.id, sub.created_utc, h, isnsfw, sub.display_name, subscribers])
+				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?)', [sub.id, sub.created_utc, h, isnsfw, sub.display_name, subscribers,isjumbled])
 			elif doupdates:
 				if sub.subscribers != None:
 					subscribers = sub.subscribers
@@ -110,6 +115,8 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True):
 					subscribers = 0
 				print('Old: ' + sub.id + ' : ' + ' '*31 + sub.display_name + ' : ' + str(subscribers))
 				cur.execute('UPDATE subreddits SET SUBSCRIBERS=? WHERE ID=?', [subscribers, sub.id])
+				olds += 1
+			else:
 				olds += 1
 			if not delaysaving:
 				sql.commit()
@@ -242,7 +249,7 @@ def processir(startingpoint, ranger, chunksize=100, slowmode=False, enablekillin
 					if '[500]>' in response:
 						print('500 error:', slowsub)
 						if enablekilling:
-							cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?)', [slowsub, 0, '', '', '?', 0])
+							cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?)', [slowsub, 0, '', '', '?', 0, '0'])
 							sql.commit()
 		print("Rejected", olds)
 
@@ -374,6 +381,7 @@ def show():
 	readmeread = filep.readlines()
 	filep.close()
 	readmeread[3] = '#####' + headliner
+	readmeread[5] = '#####' + "[Today's jumble](http://reddit.com/r/" + jumble(doreturn=True)[0] + ")"
 	filep = open('README.md', 'w')
 	filep.write(''.join(readmeread))
 	filep.close()
@@ -443,12 +451,10 @@ def show():
 
 	print('Writing jumble')
 	print('These are the subreddits that can be found from /r/random', file=filer)
-	cur.execute('SELECT * FROM jumble')
+	cur.execute('SELECT * FROM subreddits WHERE JUMBLE=?', ['1'])
 	fetch = cur.fetchall()
-	fetch = [i[0] for i in fetch]
-	for member in l:
-		if member[0] in fetch:
-			print(memberformat(member), file=filer)
+	for member in fetch:
+		print(memberformat(member), file=filer)
 	filer.close()
 
 def memberformat(member):
@@ -457,7 +463,7 @@ def memberformat(member):
 	member = str(member[:4])[1:-1]
 	member += ', '
 	member += name
-	member += '.'*(74-len(member))
+	member += '.'*(78-len(member))
 	member += '.'* (10 - len(subscribers))
 	member += subscribers
 	member = member.replace("'", '')
@@ -822,23 +828,21 @@ def forcelowest(instring):
 def processjumble(count):
 	for x in range(count):
 		sub = r.get_random_subreddit()
-		cur.execute('SELECT * FROM jumble WHERE ID=?', [sub.id])
+		cur.execute('SELECT * FROM subreddits WHERE ID=?', [sub.id])
 		if not cur.fetchone():
-			h = human(sub.created_utc)
-			isnsfw = '1' if sub.over18 else '0'
-			print('New: ' + sub.id + ' : ' + h + ' : ' + isnsfw + ' : '+ sub.display_name + ' : ' + str(sub.subscribers))
-			cur.execute('INSERT INTO jumble VALUES(?, ?, ?, ?, ?, ?)', [sub.id, sub.created_utc, h, isnsfw, sub.display_name, sub.subscribers])
+			process(sub, isjumbled=True)
 		else:
-			printprint('Upd: ' + sub.id + sub.display_name + ' : ' + str(sub.subscribers))
-			cur.execute('UPDATE jumble SET SUBSCRIBERS=? WHERE ID=?', [sub.subscribers, sub.id])
+			print('Upd: ' + sub.id + ' '+ sub.display_name + ' : ' + str(sub.subscribers))
+			cur.execute('UPDATE subreddits SET SUBSCRIBERS=?, JUMBLE=? WHERE ID=?', [sub.subscribers, '1', sub.id])
 		sql.commit()
 
 
 def jumble(count=20, doreturn=False):
-	cur.execute('SELECT * FROM jumble')
+	cur.execute('SELECT * FROM subreddits WHERE JUMBLE=?', ['1'])
 	fetch = cur.fetchall()
 	random.shuffle(fetch)
 	fetch = fetch[:count]
+	fetch = [f[:-1] for f in fetch]
 	fetchstr = [i[4] for i in fetch]
 	fetchstr = '+'.join(fetchstr)
 	output = [fetchstr, fetch]
