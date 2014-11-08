@@ -36,6 +36,7 @@ print('Connected to reddit.')
 
 olds = 0
 noinfolist = []
+errormess = None
 monthnumbers = {
 	"Jan":"01",
 	"Feb":"02",
@@ -291,6 +292,7 @@ def show():
 	filer = open('show\\jumble.txt', 'w')
 	files = open('show\\all-subscribers.txt', 'w')
 	filet = open('show\\dirty-subscribers.txt', 'w')
+	fileu = open('show\\jumble-nsfw.txt', 'w')
 	cur.execute('SELECT * FROM subreddits WHERE CREATED !=?', [0])
 	fetch = cur.fetchall()
 	itemcount = len(fetch)
@@ -451,22 +453,32 @@ def show():
 
 	print('Writing jumble')
 	print('These are the subreddits that can be found from /r/random', file=filer)
+	print('These are the subreddits that can be found from /r/randnsfw', file=fileu)
 	cur.execute('SELECT * FROM subreddits WHERE JUMBLE=?', ['1'])
 	fetch = cur.fetchall()
+	fetch.sort(key= lambda x:x[4])
 	for member in fetch:
-		print(memberformat(member), file=filer)
+		if member[3] == '0':
+			print(memberformat(member), file=filer)
+		else:
+			print(memberformat(member), file=fileu)
 	filer.close()
+	fileu.close()
 
-def memberformat(member):
+def memberformat(member, spacer='.'):
 	subscribers = '{0:,}'.format(member[5])
 	name = member[4]
 	member = str(member[:4])[1:-1]
 	member += ', '
 	member += name
-	member += '.'*(78-len(member))
-	member += '.'* (10 - len(subscribers))
+	member += spacer* (78 - len(member))
+	if '\n' in member:
+		member = member[:-1]
+	member += spacer* (10 - len(subscribers))
 	member += subscribers
 	member = member.replace("'", '')
+	member = repr(member)
+	member = member[1:-1]
 	return member
 
 
@@ -825,9 +837,9 @@ def forcelowest(instring):
 	cur.execute('UPDATE etc SET DATA=?, DATB=? WHERE LABEL=?', [instring, b36(instring), 'lowerbound'])
 	sql.commit()
 
-def processjumble(count):
+def processjumble(count, nsfw=False):
 	for x in range(count):
-		sub = r.get_random_subreddit()
+		sub = r.get_random_subreddit(nsfw=nsfw)
 		cur.execute('SELECT * FROM subreddits WHERE ID=?', [sub.id])
 		if not cur.fetchone():
 			process(sub, isjumbled=True)
@@ -837,8 +849,9 @@ def processjumble(count):
 		sql.commit()
 
 
-def jumble(count=20, doreturn=False):
-	cur.execute('SELECT * FROM subreddits WHERE JUMBLE=?', ['1'])
+def jumble(count=20, doreturn=False, nsfw=False):
+	nsfw = '1' if nsfw else '0'
+	cur.execute('SELECT * FROM subreddits WHERE JUMBLE=? AND NSFW=?', ['1', nsfw])
 	fetch = cur.fetchall()
 	random.shuffle(fetch)
 	fetch = fetch[:count]
@@ -852,4 +865,11 @@ def jumble(count=20, doreturn=False):
 	for x in output[1]:
 		print(str(x).replace("'", ''))
 
-
+def modsfromid(subid):
+	if 't5_' not in subid:
+		subid = 't5_' + subid
+	sub = r.get_info(thing_id=subid)
+	mods = list(sub.get_moderators())
+	for m in mods:
+		print(m)
+	return mods
