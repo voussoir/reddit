@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 494,114 of 648,148 subreddits (76.235%)
+#####Collected 511,662 of 648,148 subreddits (78.942%)
 
-#####[Today's jumble](http://reddit.com/r/truetf2+GetStudying+hoggit+StarcraftCirclejerk+PixelDungeon+excel+QuotesPorn+Saints+whiskey+literature+parrots+TheBluePill+Diablo3witchdoctors+puns+TopGear+Military+beertrade+RPI+Groot+FuckYouImAShark)
+#####[Today's jumble](http://reddit.com/r/MDMA+CK2GameOfthrones+runescape+FreeGameFindings+snapchat+RobinWilliams+aves+russia+WikiLeaks+astrophotography+AnnieClark+GenderCritical+customcovers+Torontobluejays+LiftingVideos+wardrobepurge+SquaredCircle+Health+Wrasslin+progun)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -64,7 +64,38 @@ ______
     There are a ton of these in the 2008 range. See show\dupes.txt for more
 
 
-
+.
+#####Are you seeing this?
+    2quw7, 1237025633, Mar 14 2009 10:13:53 UTC, 1, Inbedwithmedia...................0
+    2quw8, 1237027829, Mar 14 2009 10:50:29 UTC, 0, MySingaporeTailor................0
+    2quw9, 1237028834, Mar 14 2009 11:07:14 UTC, 0, she4he\n.........................0
+    2quwa, 1237029259, Mar 14 2009 11:14:19 UTC, 0, nelag247.........................0
+    2quwb, 1237029337, Mar 14 2009 11:15:37 UTC, 0, MySingaporeTailor2...............0
+    ...
+    2r3z9, 1249374412, Aug 04 2009 08:26:52 UTC, 0, HerbaBelgie......................0
+    2r3za, 1249375411, Aug 04 2009 08:43:31 UTC, 0, majoringInVideoGames.............0
+    2r3zb, 1249375801, Aug 04 2009 08:50:01 UTC, 0, IAmA\n...........................2
+    2r3zc, 1249376750, Aug 04 2009 09:05:50 UTC, 0, allievoight......................0
+    2r3zd, 1249377115, Aug 04 2009 09:11:55 UTC, 0, jhasmine.........................0
+    ...
+    2rf8d, 1262392984, Jan 02 2010 00:43:04 UTC, 0, snippit..........................0
+    2rf8e, 1262393286, Jan 02 2010 00:48:06 UTC, 0, dothis...........................1
+    2rf8f, 1262394162, Jan 02 2010 01:02:42 UTC, 0, processing\n.....................0
+    2rf8g, 1262397458, Jan 02 2010 01:57:38 UTC, 0, baconsold........................0
+    2rf8h, 1262399254, Jan 02 2010 02:27:34 UTC, 0, WhiteKnuckleGames................0
+    ...
+    2s07k, 1281147857, Aug 07 2010 02:24:17 UTC, 0, manojar..........................0
+    2s07l, 1281148175, Aug 07 2010 02:29:35 UTC, 0, ShakeandBakeIt...................0
+    2s07m, 1281148625, Aug 07 2010 02:37:05 UTC, 0, cleaning\n.......................1
+    2s07n, 1281148743, Aug 07 2010 02:39:03 UTC, 0, Smokespots......................77
+    2s07o, 1281149275, Aug 07 2010 02:47:55 UTC, 0, cleaning1........................0
+    ...
+    2s0g0, 1281334298, Aug 09 2010 06:11:38 UTC, 0, blaaaah..........................0
+    2s0g1, 1281334409, Aug 09 2010 06:13:29 UTC, 0, Youridealself....................0
+    2s0g2, 1281334901, Aug 09 2010 06:21:41 UTC, 0, TRAVEL_ADVICE_HELP\n.............1
+    2s0g3, 1281335431, Aug 09 2010 06:30:31 UTC, 0, cfmonkey.........................0
+    2s0g4, 1281335500, Aug 09 2010 06:31:40 UTC, 0, handbagsspace....................0
+    Those are newline characters.
 .
 #####The 2s6__ gap
     (2s6p4, 1289727678, Nov 14 2010 09:41:18 UTC, NSFW:0, verydirtythings)
