@@ -1,94 +1,89 @@
-import urllib.request
-import json
-import time
 import praw
-import sys
+import time
 import datetime
-import bot
+
+print('Connecting to reddit')
+r = praw.Reddit('/u/GoldenSights automatic timestamp search program')
+
+def get_all_posts(subreddit, lower=None, maxupper=None):
+    subname = subreddit if type(subreddit)==str else subreddit.display_name
+    if lower==None or maxupper==None:
+        if isinstance(subreddit, praw.objects.Subreddit):
+            creation = subreddit.created_utc
+        else:
+            subreddit = r.get_subreddit(subreddit)
+            creation = subreddit.created_utc
+    
+        nowstamp = datetime.datetime.now(datetime.timezone.utc).timestamp()
+        lower = creation
+        maxupper = nowstamp
+        
+    interval = 86400
+    upper = lower + interval
 
 
-print('Starting r')
-r = bot.rG()
-
-def timesearch(lower, upper, subreddit):
-    url = 'http://api.reddit.com/r/' + subreddit + '/search?sort=new&q=timestamp%3A' + str(lower) + '..' + str(upper) +'&restrict_sr=on&syntax=cloudsearch'
-    print(url)
-    web = urllib.request.urlopen(url)
-    webresponse = web.read()
-    webresponse = webresponse.decode('utf-8', 'ignore')
-    js = json.loads(webresponse)
-    print(js)
-    results = []
-    for postjson in js['data']['children']:
-        postdata = postjson['data']
-        print(postdata)
-        results.append(postdata)
-    return results
-
-dtformat = "%d %B %Y %H:%M UTC"
-def get_all_posts(subredditname, intt):
-    interval = intt
-    now = datetime.datetime.now(datetime.timezone.utc).timestamp() 
-    print('Now: ' + str(now))
-    subreddit = r.get_subreddit(subredditname)
-    screated = subreddit.created_utc
-    stime = datetime.datetime.utcfromtimestamp(screated)
-    stime = datetime.datetime.strftime(stime, dtformat)
-    print('/r/' + subredditname)
-    print('Created: ' + str(screated) + ', ' + stime)
-
-    lowerbound = screated
-    upperbound = lowerbound + interval
-
-    results = []
-    print('Interval: ' + str(interval) + ' seconds')
-    while lowerbound < now:
-        lowerbound = int(lowerbound)
-        upperbound = int(upperbound)
-        #I was having float problems earlier.
-
-        lowert = datetime.datetime.utcfromtimestamp(lowerbound)
-        uppert = datetime.datetime.utcfromtimestamp(upperbound)
-        print("Lower: " + str(lowerbound) + ", " + datetime.datetime.strftime(lowert, dtformat))
-        print("Upper: " + str(upperbound) + ", " + datetime.datetime.strftime(uppert, dtformat))
-        try:
-            moreresults = timesearch(lowerbound, upperbound, subredditname)
-            moreresults.sort(key=lambda x:x['created_utc'])
-            results += moreresults
-
-            if len(moreresults) < 5:
+    allresults = []
+    outfile = open('%s-%d-%d.txt'%(subname, lower, maxupper), 'w')
+    try:
+        while lower < maxupper:
+            print('\nCurrent interval:', interval, 'seconds')
+            print('Lower', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(lower), "%b %d %Y %H:%M:%S"))
+            print('Upper', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(upper), "%b %d %Y %H:%M:%S"))
+            timestamps = [lower, upper]
+            searchresults = list(r.search('', subreddit=subreddit, sort='new', timestamps=timestamps))
+            allresults += searchresults
+    
+            print('Found', len(searchresults), ' items')
+            if len(searchresults) < 5:
+                print('Too few results, doubling interval')
                 interval *= 2
-                print('Doubling interval to ' + str(interval))
-                lowerbound = upperbound
-                upperbound = lowerbound + interval
-
-            elif len(moreresults) >= 24:
+            lower = upper
+            upper = lower + interval
+    
+            if len(searchresults) > 22:
+                print('Too many results, halving interval')
                 interval /= 2
-                print('Halving interval to ' + str(interval))
-                lowerbound = results[-1]['created_utc']
-                upperbound = lowerbound + interval
-                print('Resetting bounds to ' + str(lowerbound) + ', ' + str(upperbound))
+                lower = searchresults[3].created_utc
+                upper = lower + interval
+        print('Finished with', len(allresults), 'items')
+    except Exception as e:
+        print("ERROR:", e)
+        print('File will be printed and list returned')
 
-            else:
-                lowerbound += interval
-                upperbound += interval
+    outlist = []
+    for item in allresults:
+        if item not in outlist:
+            outlist.append(item)
+    print("Removed", len(allresults) - len(outlist), "duplicates")
+    outlist.sort(key=lambda x: x.created_utc)
+    outtofile(outlist, outfile)
+    return outlist
 
-            print("Items this round: " + str(len(moreresults)))
-        except urllib.error.HTTPError as e:
-            print('Caught HTTPError')
-            print(e)
-            print('Dumping results:')
-            for result in results:
-                print(result)
-            quit()
-        print("Items total: " + str(len(results)))
-        print('Sleeping 20\n')
-        time.sleep(20)
-    return results
+def outtofile(outlist, outfile):
+    pos = 0
+    for o in outlist:
+        try:
+            author = o.author.name
+        except AttributeError:
+            author = "[deleted]"
+        itemtime = datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(o.created_utc), "%b %d %Y %H:%M:%S")
+        print('[' + str(pos) + ':' + o.id, itemtime + ' - ' + author + ' - ' + o.title + '](http://redd.it/'+o.id + ')\n', file=outfile)
+        pos += 1
+    outfile.close()
 
 
-results = get_all_posts('GoldTesting', 86400)
-filea = open('timesearching.txt', 'w')
-for result in results:
-    print(str(result), file=filea)
-filea.close()
+print("Get posts from subreddit: /r/", end='')
+sub = input()
+print('Lower bound (Leave blank to get ALL POSTS)\n]: ', end='')
+lower  = input()
+if lower == '':
+    get_all_posts(sub)
+else:
+    print('Maximum upper bound\n]: ', end='')
+    maxupper = input()
+    try:
+        int(maxupper)
+        int(lower)
+    except ValueError:
+        print("lower and upper bounds must be unix timestamps")
+        input()

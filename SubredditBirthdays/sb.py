@@ -57,18 +57,22 @@ def human(timestamp):
 	human = datetime.datetime.strftime(day, "%b %d %Y %H:%M:%S UTC")
 	return human
 
-def processi(sr, doupdates=False):
+def processi(sr, doupdates=False, enablekilling=False):
 	global olds
 	if 't5_' not in sr:
 		sr = 't5_' + sr
 	cur.execute('SELECT * FROM subreddits WHERE ID=?', [sr[3:]])
 	if not cur.fetchone() or doupdates==True:
-		sr = r.get_info(thing_id=sr)
+		sro = r.get_info(thing_id=sr)
 		try:
-			sr.id
-			process(sr)
+			sro.id
+			process(sro)
 		except AttributeError:
 			print('Could not fetch subreddit')
+			if enablekilling:
+				i = input('Kill?\n> ')
+				if i.lower() == 'y':
+					kill(sr[3:])
 	else:
 		olds += 1
 
@@ -114,8 +118,9 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 					subscribers = sub.subscribers
 				else:
 					subscribers = 0
-				print('Old: ' + sub.id + ' : ' + ' '*31 + sub.display_name + ' : ' + str(subscribers))
-				cur.execute('UPDATE subreddits SET SUBSCRIBERS=? WHERE ID=?', [subscribers, sub.id])
+				isjumbled = '1' if isjumbled else '0'
+				print('Upd: ' + sub.id + ' : ' + ' '*31 + sub.display_name + ' : ' + str(subscribers))
+				cur.execute('UPDATE subreddits SET SUBSCRIBERS=?, JUMBLE=? WHERE ID=?', [subscribers, isjumbled, sub.id])
 				olds += 1
 			else:
 				olds += 1
@@ -250,12 +255,15 @@ def processir(startingpoint, ranger, chunksize=100, slowmode=False, enablekillin
 					if '[500]>' in response:
 						print('500 error:', slowsub)
 						if enablekilling:
-							cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?)', [slowsub, 0, '', '', '?', 0, '0'])
-							sql.commit()
+							kill(slowsub)
 		print("Rejected", olds)
 
+def kill(sr):
+	cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?)', [sr, 0, '', '', '?', 0, '0'])
+	sql.commit()
 
-def get(limit=20):
+
+def get(limit=20, doupdates=False):
 	global olds
 	subreddit = r.get_subreddit('all')
 	listed = []
@@ -265,9 +273,8 @@ def get(limit=20):
 	coms = list(subreddit.get_comments(limit=limit))
 	listed += new + coms
 	olds = 0
-	for item in listed:
-		sub = item.subreddit_id
-		processi(sub)
+	listed = [l.subreddit_id for l in listed]
+	processmega(listed)
 	sql.commit()
 	print('Rejected', olds)
 
@@ -311,24 +318,38 @@ def show():
 	shown(fetch, 'Nsfw only sorted by true time', fileh, nsfwmode=1)
 	fileh.close()
 
-
-	fetch.sort(key=lambda x: b36(x[0]))
-	previd = fetch[0][0]
+	cur.execute('SELECT * FROM subreddits')
+	allfetch = cur.fetchall()
+	allfetch.sort(key=lambda x: b36(x[0]))
+	previd = allfetch[0][0]
 	print('Writing marked file')
 	print('Sorted by ID number gaps marked', file=fileo)
-	for member in fetch:
+	print('#= Unknown subreddit.   $= Verified missing', file=fileo)
+	c=0
+	totalc = 0
+	for member in allfetch:
 		curid = member[0]
 		iddiff = b36(curid) - b36(previd)
-		if iddiff != 1 and iddiff != 0:
+		if iddiff > 1:
 			print('#' + str(iddiff-1), file=fileo)
-		print(memberformat(member), file=fileo)
+		if member[1] != 0:
+			if c > 0:
+				print('$' + str(c), file=fileo)
+			print(memberformat(member), file=fileo)
+			c=0
+		else:
+			if b36(member[0]) > 4594339:
+				c+=1
+				totalc += 1
 		previd = curid
 	fileo.close()
-
+	del allfetch
+	itemcount += totalc
 
 	print('Writing statistics')
 	totalpossible = b36(fetch[-1][0]) - 4594411
-	headliner= 'Collected '+'{0:,}'.format(itemcount)+' of '+'{0:,}'.format(totalpossible)+' subreddits ('+"%0.03f"%(100*itemcount/totalpossible)+'%)\n'
+	headliner = 'Collected '+'{0:,}'.format(itemcount)+' of '+'{0:,}'.format(totalpossible)+' subreddits ('+"%0.03f"%(100*itemcount/totalpossible)+'%)'
+	headliner+= ' ({0:,} remain)'.format(totalpossible-itemcount) + '\n'
 	#Call the PEP8 police on me, I don't care
 	print(headliner, file=filem)
 	cur.execute('SELECT * FROM subreddits WHERE NSFW=?', ['1'])
@@ -380,6 +401,7 @@ def show():
 	print(statisticoutput, file=filem)
 	filem.close()
 
+	print('Writing Readme')
 	readmeread = filep.readlines()
 	filep.close()
 	readmeread[3] = '#####' + headliner
@@ -840,12 +862,10 @@ def forcelowest(instring):
 def processjumble(count, nsfw=False):
 	for x in range(count):
 		sub = r.get_random_subreddit(nsfw=nsfw)
-		cur.execute('SELECT * FROM subreddits WHERE ID=?', [sub.id])
-		if not cur.fetchone():
-			process(sub, isjumbled=True)
-		else:
-			print('Upd: ' + sub.id + ' '+ sub.display_name + ' : ' + str(sub.subscribers))
-			cur.execute('UPDATE subreddits SET SUBSCRIBERS=?, JUMBLE=? WHERE ID=?', [sub.subscribers, '1', sub.id])
+		process(sub, isjumbled=True, doupdates=True)
+		#else:
+		#	print('Upd: ' + sub.id + ' '+ sub.display_name + ' : ' + str(sub.subscribers))
+		#cur.execute('UPDATE subreddits SET JUMBLE=? WHERE ID=?', [sub.subscribers, '1', sub.id])
 		sql.commit()
 
 

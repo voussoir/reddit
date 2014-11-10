@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 511,662 of 648,148 subreddits (78.942%)
+#####Collected 653,223 of 653,129 subreddits (100.014%) (-94 remain)
 
-#####[Today's jumble](http://reddit.com/r/MDMA+CK2GameOfthrones+runescape+FreeGameFindings+snapchat+RobinWilliams+aves+russia+WikiLeaks+astrophotography+AnnieClark+GenderCritical+customcovers+Torontobluejays+LiftingVideos+wardrobepurge+SquaredCircle+Health+Wrasslin+progun)
+#####[Today's jumble](http://reddit.com/r/HomeNetworking+ModernMagic+xbox360+ShittyTechSupport+DJs+ClassyPornstars+Warthunder+tattoo+urbanplanning+weezer+learnjavascript+vegas+Existentialism+oceans+OnePiece+AskPhilly+HighschoolDxD+weimaraner+transtimelines+heroesofthestorm)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -14,6 +14,12 @@ The statistics file should be considered misleading until the number of collecte
 Some subreddits are not properly marked as NSFW. This is either the fault of the moderators or, in some cases, the data was collected while the subreddit was brand new.
 
 2 November 2014: Finally decided to start measuring subscribers. Numbers will be wrong for quite some time.
+
+7 November 2014: 2009, 2010, and 2011 complete!
+
+8 November 2014: 2012 and 2013 complete!
+
+9 November 2014: 2014 up-to-date!!!!
 
 ______
 
@@ -34,6 +40,13 @@ ______
     (2qxhv, 1293172070, Dec 24 2010 06:27:50 UTC, NSFW:0, greed)
     (2qxhw, 1240919190, Apr 28 2009 11:46:30 UTC, NSFW:1, SmothRoy)
     (2qxhx, 1240920547, Apr 28 2009 12:09:07 UTC, NSFW:0, chinee)
+
+.
+#####[/r/t:heatdeathoftheuniverse](http://reddit.com/r/t:heatdeathoftheuniverse)
+    2ttsl, 1333250351, Apr 01 2012 03:19:11 UTC, 0, t:heatdeathoftheuniverse.....1,285
+    
+    At 24 characters, this is the longest subreddit name on the site.
+    It is the only subreddit which breaks the upper bound of 21 chars
     
 .
 #####Did I stutter?
@@ -65,7 +78,7 @@ ______
 
 
 .
-#####Are you seeing this?
+#####How?
     2quw7, 1237025633, Mar 14 2009 10:13:53 UTC, 1, Inbedwithmedia...................0
     2quw8, 1237027829, Mar 14 2009 10:50:29 UTC, 0, MySingaporeTailor................0
     2quw9, 1237028834, Mar 14 2009 11:07:14 UTC, 0, she4he\n.........................0
@@ -95,7 +108,36 @@ ______
     2s0g2, 1281334901, Aug 09 2010 06:21:41 UTC, 0, TRAVEL_ADVICE_HELP\n.............1
     2s0g3, 1281335431, Aug 09 2010 06:30:31 UTC, 0, cfmonkey.........................0
     2s0g4, 1281335500, Aug 09 2010 06:31:40 UTC, 0, handbagsspace....................0
-    Those are newline characters.
+    
+    Yes, those are newline characters.
+
+
+.
+#####There is a nsfw subreddit in Reddit's /r/random list
+    >>> processjumble(15)
+    Upd: 2vpth :                                Frozen : 10538
+    Upd: 2qi63 :                                toronto : 49876
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+      File "sb.py", line 864, in processjumble
+        sub = r.get_random_subreddit(nsfw=nsfw)
+      File "C:\Python34\lib\site-packages\praw\__init__.py", line 870, in get_random
+    _subreddit
+        raw_response=True)
+      File "C:\Python34\lib\site-packages\praw\__init__.py", line 382, in _request
+        response = handle_redirect()
+      File "C:\Python34\lib\site-packages\praw\__init__.py", line 356, in handle_red
+    irect
+        url = _raise_redirect_exceptions(response)
+      File "C:\Python34\lib\site-packages\praw\internal.py", line 159, in _raise_red
+    irect_exceptions
+        raise RedirectException(response.url, new_url)
+    praw.errors.RedirectException: Unexpected redirect from http://www.reddit.com/r/
+    Steroidsourcetalk/ to http://www.reddit.com/over18?dest=http%3A%2F%2Fwww.reddit.
+    com%2Fr%2FSteroidsourcetalk%2F
+
+    Remember that processjumble() queries /r/random *only* unlesss specified nsfw.
+
 .
 #####The 2s6__ gap
     (2s6p4, 1289727678, Nov 14 2010 09:41:18 UTC, NSFW:0, verydirtythings)
@@ -103,6 +145,16 @@ ______
     38 missing
     (2s6q8, 1289759310, Nov 14 2010 18:28:30 UTC, NSFW:0, PC_GrowBox)
     (2s6q9, 1289759515, Nov 14 2010 18:31:55 UTC, NSFW:0, Minarchy)
+
+
+
+.
+#####The 2w7v_ gap
+    2w7uz, 1359742360, Feb 01 2013 18:12:40 UTC, 0, Karma_mafia......................0
+    2w7v0, 1359742368, Feb 01 2013 18:12:48 UTC, 0, inferiorityjerk..................0
+    33 missing
+    2w7vy, 1359743840, Feb 01 2013 18:37:20 UTC, 0, lolfacespace.....................0
+    2w7vz, 1359743971, Feb 01 2013 18:39:31 UTC, 0, gunsMETAL........................0
 
 .
 #####The 2wdt_ gap
