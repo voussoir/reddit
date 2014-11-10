@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #################
 ## Eclipse
 #################
@@ -213,3 +214,15 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+=======
+*~
+*.egg
+*.pyc
+.coverage
+*.egg-info/
+_build/
+build/
+dist/
+.DS_Store
+
+>>>>>>> 6d673ccde561588b52d53ae6875c276f79341603
