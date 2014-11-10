@@ -67,7 +67,7 @@ def outtofile(outlist, outfile):
         except AttributeError:
             author = "[deleted]"
         itemtime = datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(o.created_utc), "%b %d %Y %H:%M:%S")
-        print('[' + str(pos) + ':' + o.id, itemtime + ' - ' + author + ' - ' + o.title + '](http://redd.it/'+o.id + ')\n', file=outfile)
+        print('[' + str(pos) + ':' + o.id, itemtime + ' - ' + author + ' - ' + o.title + '](http://redd.it/'+o.id + ')  ', file=outfile)
         pos += 1
     outfile.close()
 
@@ -87,3 +87,4 @@ else:
     except ValueError:
         print("lower and upper bounds must be unix timestamps")
         input()
+input()
