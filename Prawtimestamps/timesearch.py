@@ -23,7 +23,7 @@ def get_all_posts(subreddit, lower=None, maxupper=None):
 
 
     allresults = []
-    outfile = open('%s-%d-%d.txt'%(subname, lower, maxupper), 'w')
+    outfile = open('%s-%d-%d.txt'%(subname, lower, maxupper), 'w', encoding='utf-8')
     try:
         while lower < maxupper:
             print('\nCurrent interval:', interval, 'seconds')
@@ -36,18 +36,19 @@ def get_all_posts(subreddit, lower=None, maxupper=None):
     
             print('Found', len(searchresults), ' items')
             if len(searchresults) < 5:
-                print('Too few results, doubling interval')
+                print('Too few results, doubling interval', end='')
                 interval *= 2
 
 
-            if len(searchresults) > 22:
-                print('Too many results, halving interval')
+            if len(searchresults) > 23:
+                print('Too many results, halving interval', end='')
                 interval /= 2
                 upper = lower + interval
 
             else:
                 lower = upper
                 upper = lower + interval
+            print()
     
         print('Finished with', len(allresults), 'items')
     except Exception as e:
@@ -72,7 +73,8 @@ def outtofile(outlist, outfile):
         except AttributeError:
             author = "[deleted]"
         itemtime = datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(o.created_utc), "%b %d %Y %H:%M:%S")
-        print('[' + str(pos) + ':' + o.id, itemtime + ' - ' + author + ' - ' + o.title + '](http://redd.it/'+o.id + ')  ', file=outfile)
+        outstr = '[%d: %s %s - %s - %s](http://redd.it/%s)  \n' % (pos, o.id, itemtime, author, o.title, o.id)
+        outfile.write(outstr)
         pos += 1
     outfile.close()
 
@@ -92,4 +94,5 @@ else:
     except ValueError:
         print("lower and upper bounds must be unix timestamps")
         input()
+print("Done. Press Enter to close window")
 input()
