@@ -31,20 +31,24 @@ def get_all_posts(subreddit, lower=None, maxupper=None):
             print('Upper', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(upper), "%b %d %Y %H:%M:%S"))
             timestamps = [lower, upper]
             searchresults = list(r.search('', subreddit=subreddit, sort='new', timestamps=timestamps))
+            print([i.id for i in searchresults])
             allresults += searchresults
     
             print('Found', len(searchresults), ' items')
             if len(searchresults) < 5:
                 print('Too few results, doubling interval')
                 interval *= 2
-            lower = upper
-            upper = lower + interval
-    
+
+
             if len(searchresults) > 22:
                 print('Too many results, halving interval')
                 interval /= 2
-                lower = searchresults[3].created_utc
                 upper = lower + interval
+
+            else:
+                lower = upper
+                upper = lower + interval
+    
         print('Finished with', len(allresults), 'items')
     except Exception as e:
         print("ERROR:", e)
@@ -55,6 +59,7 @@ def get_all_posts(subreddit, lower=None, maxupper=None):
         if item not in outlist:
             outlist.append(item)
     print("Removed", len(allresults) - len(outlist), "duplicates")
+    print('Finished with', len(outlist), 'items')
     outlist.sort(key=lambda x: x.created_utc)
     outtofile(outlist, outfile)
     return outlist
