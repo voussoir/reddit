@@ -89,8 +89,9 @@ else:
     print('Maximum upper bound\n]: ', end='')
     maxupper = input()
     try:
-        int(maxupper)
-        int(lower)
+        maxupper = int(maxupper)
+        lower = int(lower)
+        get_all_posts(sub, lower, maxupper)
     except ValueError:
         print("lower and upper bounds must be unix timestamps")
         input()
