@@ -230,8 +230,12 @@ def processir(startingpoint, ranger, chunksize=100, slowmode=False, enablekillin
 	"""
 	#Take subreddit ID as starting point and grab the next ranger items
 	global olds
-	olds = 0
 	startingdigit = b36(startingpoint)
+	if isinstance(ranger, str):
+		ranger = b36(ranger)
+		ranger -= startingdigit
+		print('Created range', ranger)
+	olds = 0
 	ranged = list(range(startingdigit, startingdigit+ranger))
 	for x in range(len(ranged)):
 		ranged[x] = b36(ranged[x]).lower()
@@ -321,6 +325,9 @@ def show():
 	cur.execute('SELECT * FROM subreddits')
 	allfetch = cur.fetchall()
 	allfetch.sort(key=lambda x: b36(x[0]))
+
+	last20k = allfetch[-20000:]
+
 	previd = allfetch[0][0]
 	print('Writing marked file')
 	print('Sorted by ID number gaps marked', file=fileo)
@@ -338,7 +345,7 @@ def show():
 			print(memberformat(member), file=fileo)
 			c=0
 		else:
-			if b36(member[0]) > 4594339:
+			if b36(member[0]) > 4594300:
 				c+=1
 				totalc += 1
 		previd = curid
@@ -391,6 +398,17 @@ def show():
 			statisticoutput[pos] = statisticoutput[pos] + ' '*8 + nk + ': ' + ('.' * (10-len(nk))) + ('.' * (12-len(nks))) + nks
 			pos += 1
 		pos += 1
+
+	#See line 329 for the source of `last20k`
+	statisticoutput.append('Based on the last 20,000 subreddits, ' + last20k[0][0] + '-' + last20k[-1][0])
+	now = datetime.datetime.now(datetime.timezone.utc).timestamp()
+	then = last20k[0][1]
+	timediff = now-then
+	subsperhour = "%.2f" % (20000 / (timediff/3600))
+	subsperday = "%.2f" % (20000 / (timediff/86400))
+	statisticoutput.append(subsperhour + ' subs are created each hour')
+	statisticoutput.append(subsperday + ' subs are created each day\n')
+
 	statisticoutput.append('NSFW 0: ' + str('{0:,}'.format(itemcount-nsfwyes)))
 	statisticoutput.append('NSFW 1: ' + str('{0:,}'.format(nsfwyes)))
 
@@ -400,6 +418,9 @@ def show():
 
 	print(statisticoutput, file=filem)
 	filem.close()
+
+	if random.randint(0, 20) == 5:
+		print('Reticulating splines')
 
 	print('Writing Readme')
 	readmeread = filep.readlines()
@@ -681,6 +702,7 @@ def processnew():
 def processnewest():
 	brandnewest = list(r.get_new_subreddits(limit=1))[0]
 	processi(brandnewest.id)
+	return brandnewest.id
 
 def search(query="", casesense=False, filterout=[], nsfwmode=2, idd="", doreturn=False):
 	"""
@@ -893,3 +915,22 @@ def modsfromid(subid):
 	for m in mods:
 		print(m)
 	return mods
+
+def modernize():
+	cur.execute('SELECT * FROM subreddits')
+	f=cur.fetchall()
+	f.sort(key=lambda x: x[1])
+	finalitem = f[-1]
+	print('Current final item:')
+	print(finalitem[2], finalitem[4])
+	finalid = b36(finalitem[0])
+
+	print('Newest item:')
+	newestid = processnewest()
+	newestid = b36(newestid)
+	
+
+	modernlist = []
+	for x in range(finalid, newestid):
+		modernlist.append(b36(x).lower())
+	processmega(modernlist)
