@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 653,223 of 653,129 subreddits (100.014%) (-94 remain)
+#####Collected 654,724 of 654,597 subreddits (100.019%) (-127 remain)
 
-#####[Today's jumble](http://reddit.com/r/HomeNetworking+ModernMagic+xbox360+ShittyTechSupport+DJs+ClassyPornstars+Warthunder+tattoo+urbanplanning+weezer+learnjavascript+vegas+Existentialism+oceans+OnePiece+AskPhilly+HighschoolDxD+weimaraner+transtimelines+heroesofthestorm)
+#####[Today's jumble](http://reddit.com/r/hookah+CarAV+cinematography+ClassicScreenBeauties+Rabbits+ExposurePorn+TagPro+FreeCompliments+MusicBattlestations+SiliconValleyHBO+yugioh+Stormlight_Archive+randpaul+sydney+TexasRangers+BackYardChickens+Blacksmith+declutter+SkyPorn+gravityfalls)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -40,6 +40,14 @@ ______
     (2qxhv, 1293172070, Dec 24 2010 06:27:50 UTC, NSFW:0, greed)
     (2qxhw, 1240919190, Apr 28 2009 11:46:30 UTC, NSFW:1, SmothRoy)
     (2qxhx, 1240920547, Apr 28 2009 12:09:07 UTC, NSFW:0, chinee)
+
+.
+#####[/r/i18n](http://reddit.com/r/i18n)
+    (2rfde, 1262626934, Jan 04 2010 17:42:14 UTC, NSFW:0, ScandalsReddit)
+    (2rfdf, 1262627321, Jan 04 2010 17:48:41 UTC, NSFW:0, musicacristiana)
+    (2rfdg, 1321208402, Nov 13 2011 18:20:02 UTC, NSFW:0, i18n)
+    (2rfdh, 1262633373, Jan 04 2010 19:29:33 UTC, NSFW:0, adotk)
+    (2rfdi, 1262636046, Jan 04 2010 20:14:06 UTC, NSFW:0, riyl)
 
 .
 #####[/r/t:heatdeathoftheuniverse](http://reddit.com/r/t:heatdeathoftheuniverse)
