@@ -1,15 +1,13 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 654,724 of 654,597 subreddits (100.019%) (-127 remain)
+#####Collected 655,848 of 655,848 subreddits (100.000%) (0 remain)
 
-#####[Today's jumble](http://reddit.com/r/hookah+CarAV+cinematography+ClassicScreenBeauties+Rabbits+ExposurePorn+TagPro+FreeCompliments+MusicBattlestations+SiliconValleyHBO+yugioh+Stormlight_Archive+randpaul+sydney+TexasRangers+BackYardChickens+Blacksmith+declutter+SkyPorn+gravityfalls)
+#####[Today's jumble](http://reddit.com/r/Championship+ArcherFX+GuildWars+savannah+MMORPG+gonewildnegev+confession+candiceswanepoel+HI_Res+vaporents+ThisIsOurMusic+Mila_Kunis+GTA+Monstercat+HighschoolDxD+DiWHY+Blacksmith+londonontario+ModelsGoneMild+apink)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
 The earliest subreddit after which IDs are consistently incrementing is [/r/234](http://reddit.com/r/234) at 2qh0j. There are about 4.6 million ID numbers between 0 and 2qh0j which do not correspond to a subreddit.
-
-The statistics file should be considered misleading until the number of collected subreddits is very near to the true count. `processnew()` favors subreddits created near the time of running, and `get()` favors larger / more active subreddits.
 
 Some subreddits are not properly marked as NSFW. This is either the fault of the moderators or, in some cases, the data was collected while the subreddit was brand new.
 

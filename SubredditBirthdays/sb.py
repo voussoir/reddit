@@ -8,6 +8,8 @@ import json
 import sys
 import random
 import os
+import tkinter
+import subprocess
 
 '''USER CONFIGURATION'''
 
@@ -354,7 +356,7 @@ def show():
 	itemcount += totalc
 
 	print('Writing statistics')
-	totalpossible = b36(fetch[-1][0]) - 4594411
+	totalpossible = b36(fetch[-1][0]) - 4594284
 	headliner = 'Collected '+'{0:,}'.format(itemcount)+' of '+'{0:,}'.format(totalpossible)+' subreddits ('+"%0.03f"%(100*itemcount/totalpossible)+'%)'
 	headliner+= ' ({0:,} remain)'.format(totalpossible-itemcount) + '\n'
 	#Call the PEP8 police on me, I don't care
@@ -378,7 +380,7 @@ def show():
 	#print(yerdict)
 
 	for d in [dowdict, moydict, hoddict, yerdict, myrdict]:
-		d = dict(zip(d.keys(), d.values()))
+		#d = dict(zip(d.keys(), d.values()))
 		dkeys = list(d.keys())
 		dkeys.sort(key=d.get)
 		for nk in dkeys:
@@ -412,16 +414,27 @@ def show():
 	statisticoutput.append('NSFW 0: ' + str('{0:,}'.format(itemcount-nsfwyes)))
 	statisticoutput.append('NSFW 1: ' + str('{0:,}'.format(nsfwyes)))
 
-
 	#print(statisticoutput)
 	statisticoutput = '\n'.join(statisticoutput)
 
 	print(statisticoutput, file=filem)
 	filem.close()
+	tempvar = 0
+	for d in [dowdict, moydict, hoddict, yerdict, myrdict]:
+		dkeys = list(d.keys())
+		dkeys = specialsort(dkeys)
+		data = []
+		data.append(dkeys)
+		data.append([d[x] for x in dkeys])
+
+		plotdict(str(tempvar), data, colorbg="#272822", colorfg="#e0e6c3", colormid="#43443a")
+		tempvar += 1
+	subprocess.Popen('PNGCREATOR.bat', shell=True, cwd='spooky')
 
 	if random.randint(0, 20) == 5:
 		print('Reticulating splines')
 
+	sys.stdout.flush()
 	print('Writing Readme')
 	readmeread = filep.readlines()
 	filep.close()
@@ -499,7 +512,7 @@ def show():
 	print('These are the subreddits that can be found from /r/randnsfw', file=fileu)
 	cur.execute('SELECT * FROM subreddits WHERE JUMBLE=?', ['1'])
 	fetch = cur.fetchall()
-	fetch.sort(key= lambda x:x[4])
+	fetch.sort(key= lambda x:x[5])
 	for member in fetch:
 		if member[3] == '0':
 			print(memberformat(member), file=filer)
@@ -934,3 +947,89 @@ def modernize():
 	for x in range(finalid, newestid):
 		modernlist.append(b36(x).lower())
 	processmega(modernlist)
+
+def rounded(x, rounding=100):
+	return int(round(x/rounding)) * rounding
+
+def plotdict(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888"):
+	print('Printing', title)
+	t=tkinter.Tk()
+
+	canvas = tkinter.Canvas(t, width=3840, height=2160, bg=colorbg)
+	canvas.pack()
+	canvas.create_line(430, 250, 430,1755, width=10, fill=colorfg)
+	#Y axis
+	canvas.create_line(430,1750, 3590,1750, width=10, fill=colorfg)
+	#X axis
+
+	dkeys = inputdata[0]
+	dvals = inputdata[1]
+	entrycount = len(dkeys)
+	availablespace = 3140
+	availableheight= 1490
+	entrywidth = availablespace / entrycount
+	#print(dkeys, dvals, "Width:", entrywidth)
+
+	smallest = min(dvals)
+	bottom = int(smallest*0.75) - 5
+	bottom = 0 if bottom < 8 else rounded(bottom, 10)
+	largest = max(dvals)
+	top = int(largest + (largest/5))
+	top = rounded(top, 10)
+	print(bottom,top)
+	span = top-bottom
+	perpixel = span/availableheight
+
+	curx = 445
+	cury = 1735
+
+	labelx = 420
+	labely = 255
+	#canvas.create_text(labelx, labely, text=str(top), font=("Consolas", 72), anchor="e")
+	labelspan = 130#(1735-255)/10
+	canvas.create_text(labelx, 100, text="Subreddits", font=("Consolas", 72), anchor="e", fill=colorfg)
+	for x in range(12):
+		value = int(top -((labely - 245) * perpixel))
+		value = rounded(value, 10)
+		value = '{0:,}'.format(value)
+		canvas.create_text(labelx, labely, text=value, font=("Consolas", 72), anchor="e", fill=colorfg)
+		canvas.create_line(430, labely, 3590, labely, width=2, fill=colormid)
+		labely += labelspan
+
+	for entrypos in range(entrycount):
+		entry = dkeys[entrypos]
+		entryvalue = dvals[entrypos]
+		entryx0 = curx + 10
+		entryx1 = entryx0 + (entrywidth-10)
+		curx += entrywidth
+
+		entryy0 = cury
+		entryy1 = entryvalue - bottom
+		entryy1 = entryy1/perpixel
+		#entryy1 -= bottom
+		#entryy1 /= perpixel
+		entryy1 = entryy0 - entryy1
+		#print(perpixel, entryy1)
+		#print(entry, entryx0,entryy0, entryx1, entryy1)
+		canvas.create_rectangle(entryx0,entryy0, entryx1,entryy1, fill=colorfg, outline=colorfg)
+
+		font0x = entryx0 + (entrywidth / 2)
+		font0y = entryy1 - 5
+
+		font1y = 1760
+
+		entryvalue = round(entryvalue)
+		fontsize0 = len(str(entryvalue)) 
+		fontsize0 = round(entrywidth / fontsize0) + 3
+		fontsize0 = 100 if fontsize0 > 100 else fontsize0
+		fontsize1 = len(str(entry))
+		fontsize1 = round(1.5* entrywidth / fontsize1) + 5
+		fontsize1 = 60 if fontsize1 > 60 else fontsize1
+		canvas.create_text(font0x, font0y, text=entryvalue, font=("Consolas", fontsize0), anchor="s", fill=colorfg)
+		canvas.create_text(font0x, font1y, text=entry, font=("Consolas", fontsize1), anchor="n", fill=colorfg)
+		canvas.update()
+	print('\tDone')
+	canvas.postscript(file='spooky\\' +title+".ps", width=3840, height=2160)
+	t.geometry("1x1+1+1")
+	t.update()
+	t.destroy()
