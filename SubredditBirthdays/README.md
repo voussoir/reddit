@@ -7,8 +7,6 @@ Subreddit Birthdays
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
-[REDDIT POST!](http://www.reddit.com/r/dataisbeautiful/comments/2m6uvj/subredditbirthdays_a_catalogue_of_655000/)
-
 The earliest subreddit after which IDs are consistently incrementing is [/r/234](http://reddit.com/r/234) at 2qh0j. There are about 4.6 million ID numbers between 0 and 2qh0j which do not correspond to a subreddit.
 
 Some subreddits are not properly marked as NSFW. This is either the fault of the moderators or, in some cases, the data was collected while the subreddit was brand new.
