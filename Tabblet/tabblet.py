@@ -37,8 +37,8 @@ class Tabblet():
 		
 		self.velocityx = 0
 		self.velocityy = 0
-		self.mousepositionsx = []
-		self.mousepositionsy = []
+		self.mousepositionsx = [2]
+		self.mousepositionsy = [2]
 		self.ismousepressed = False
 		self.labelvelocityind = Label(self.tkvar, text='•')
 		velocitythread = threading.Thread(target=self.velocitymanager)
@@ -50,29 +50,37 @@ class Tabblet():
 		#print(event.x, event.y)
 		self.mousepositionsx.append(event.x)
 		self.mousepositionsy.append(event.y)
-		self.mousepositionsx = self.mousepositionsx[:20]
-		self.mousepositionsy = self.mousepositionsy[:20]
-
-		
-		self.velocityx = (sum(self.mousepositionsx)/len(self.mousepositionsx)) - event.x
-		self.velocityy = (sum(self.mousepositionsy)/len(self.mousepositionsy)) - event.y
+		self.mousepositionsx = self.mousepositionsx[-20:]
+		self.mousepositionsy = self.mousepositionsy[-20:]
+		print(event.x, event.y)
 
 	def mousestate(self, state):
 		self.ismousepressed = state
 
 	def velocitymanager(self):
 		while True:
-			self.velocityx = int(self.velocityx * 0.7)
-			self.velocityy = int(self.velocityy * 0.7)
-			print(self.velocityx, self.velocityy, self.ismousepressed)
+			if not self.ismousepressed:
+				try:
+					self.velocityx = (sum(self.mousepositionsx)/len(self.mousepositionsx)) - self.mousepositionsx[-1]
+					self.velocityy = (sum(self.mousepositionsy)/len(self.mousepositionsy)) - self.mousepositionsy[-1]
+				except:
+					self.velocityx = 0
+					self.velocityy = 0
+				self.velocityx = int(self.velocityx * 0.9)
+				self.velocityy = int(self.velocityy * 0.9)
+			#print(self.velocityx, self.velocityy, self.ismousepressed)
 			if abs(self.velocityx) < 2:
 				self.velocityx = 0
 			if abs(self.velocityy) < 2:
 				self.velocityy = 0
-			time.sleep(0.02)
-			self.labelvelocityind.configure(text=(str(self.velocityx) + " v " + str(self.velocityy)))
+			time.sleep(0.0165)
+			#60 fps baby
+			self.labelvelocityind.configure(text="•")
 			self.labelvelocityind.place(x=512+self.velocityx, y=288+self.velocityy)
 			self.mousepositionsx = self.mousepositionsx[1:]
 			self.mousepositionsy = self.mousepositionsy[1:]
+
+
+
 
 tabblet = Tabblet()
