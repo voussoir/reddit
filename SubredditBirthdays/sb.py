@@ -426,8 +426,8 @@ def show():
 		data = []
 		data.append(dkeys)
 		data.append([d[x] for x in dkeys])
-
-		plotdict(str(tempvar), data, colorbg="#272822", colorfg="#e0e6c3", colormid="#43443a")
+		#e0e6c3
+		plotdict(str(tempvar), data, colorbg="#272822", colorfg="#000", colormid="#43443a")
 		tempvar += 1
 	subprocess.Popen('PNGCREATOR.bat', shell=True, cwd='spooky')
 
