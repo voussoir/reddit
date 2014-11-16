@@ -1,4 +1,5 @@
 #/u/GoldenSights
+import traceback
 import praw # simple interface to the reddit API, also handles rate limiting of requests
 import time
 import sqlite3
@@ -170,7 +171,7 @@ while True:
     try:
         scanSub()
     except Exception as e:
-        print('An error has occured:', e)
+        traceback.print_exc()
     print('Running again in ' + WAITS + ' seconds \n')
     sql.commit()
     time.sleep(WAIT)

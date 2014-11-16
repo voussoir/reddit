@@ -1,4 +1,5 @@
 #/u/GoldenSights
+import traceback
 from dateutil.parser import parse as dateparse
 import string
 import datetime
@@ -451,6 +452,6 @@ while True:
 		manage_unread()
 		manage_schedule()
 	except Exception as e:
-		print("ERROR!!!", e)
+		traceback.print_exc()
 	print("Sleeping\n")
 	time.sleep(WAIT)
