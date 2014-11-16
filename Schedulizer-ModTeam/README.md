@@ -3,13 +3,13 @@ SchedulizerM
 
 Written for [/u/ApexRedditr](http://reddit.com/u/apexredditr) - [Req thread](http://www.reddit.com/r/RequestABot/comments/2m5abs/request_schedule_a_post/)
 
-Enormous overhaul of the Schedulizer system. This bot allows a team of moderators to put "Source Posts" in a centralized subreddit, and the content of those posts will immediately be dispersed at a desired time.
+Enormous overhaul of the Schedulizer system. This bot allows a team of moderators to put "Source Posts" in a centralized subreddit, and the content of those posts will immediately be dispersed at the desired time.
 
-#Creating a Schedule
+##Creating a Schedule
 
 See screenshot 1
 
-A Source post **must** have three elements - A time to post, a subreddit to post, and a title to post, in that order. They must be demarcated by a Separator which is chosen by the bot owner, and is `||` by default. I advise you to never put the separator as part of your title, but you still may be able to.
+A Source post **must** have three elements - A time to post, a subreddit to post to, and a title to post as, in that order. They must be demarcated by a Separator which is chosen by the bot owner, and is **||** by default. I advise you to never put the separator as part of your title, but you still may be able to.
 
 Additionally, if the bot is a moderator of the subreddit you are scheduling the post to, you may include the following flags in the subreddit section
 
@@ -25,7 +25,7 @@ You *can* tell the bot to schedule a post in the same subreddit that the schedul
 
 .
 
-#Editing Schedules
+##Editing Schedules
 
 See screenshot 2 and 3
 
@@ -60,7 +60,7 @@ There is some leniency in your key edits. For example, `flairtext: Heyo`, `flair
 
 .
 
-#Deleting Schedules
+##Deleting Schedules
 
 Just delete your source post, and the bot will remove it from the calendar on the next cycle.
 
@@ -68,9 +68,13 @@ Just delete your source post, and the bot will remove it from the calendar on th
 .
 
 
-#Post content
+##Post content
 
-The Post will mimick the Source. Selftext if it was a selfpost, or URL if it was a linkpost. The selftext and url data is NOT collected until the post is actually being made, so you can edit the post content as much as you like without having to notify the bot.
+The Post will mimick the Source. Selftext if it was a selfpost, or URL if it was a linkpost. The selftext and url data is NOT collected until the post is actually being made, so you can edit the post content as much as you like without having to notify the bot. Titles must be edited via discourse with the bot.
+
+.
+
+##Screenshots
 
 Click on any image to see the full size
 
