@@ -127,7 +127,8 @@ Click on any image to see the full size
   <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/SchedulizerM_02.png?raw=true" alt="SM"/>
 </p>
 
-#####4 - Setting a value to nothing (Just a few spaces after the colon.)
+#####4 - Setting a value to nothing 
+Just a few spaces after the colon. Ignore the error about datetime in this picture.
 <p align="center">
   <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/SchedulizerM_03.png?raw=true" alt="SM"/>
 </p>
