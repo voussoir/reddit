@@ -513,6 +513,7 @@ def show():
 	cur.execute('SELECT * FROM subreddits WHERE JUMBLE=?', ['1'])
 	fetch = cur.fetchall()
 	fetch.sort(key= lambda x:x[5])
+	fetch.reverse()
 	for member in fetch:
 		if member[3] == '0':
 			print(memberformat(member), file=filer)

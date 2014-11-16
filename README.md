@@ -17,6 +17,31 @@ Do not put multiple programs in the same folder. They use SQL databases to store
 
 ________
 
+
+###Concerned about your password?
+
+For the bots that require login information, I tell you to put your password in the Config area as `PASSWORD`. Understandably, you may be concerned about having your password stored in plain text on your computer.
+
+If you replace
+
+    PASSWORD = ""
+
+with
+
+    PASSWORD = input("Password: ")
+
+Then you will be asked to type in your bot's password when it starts. For additional security, you can put
+
+    del PASSWORD
+
+immediately after `r.login()` so that the password variable is nowhere in the namespace. If you want your password to be hidden while typing, use [the getpass module](https://docs.python.org/2/library/getpass.html#getpass.getpass) instead of the standard input. 
+
+Alternatively, for automated and semi-secure password storage, see Bot.py
+
+________
+
+
+
 ###Bot.py
 
 In a lot of my bots, you'll see 
