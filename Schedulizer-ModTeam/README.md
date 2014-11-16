@@ -46,10 +46,12 @@ There is some leniency in your key edits. For example, `flairtext: Heyo`, `flair
 **Title**  - 'title'
 
 **Distinguish** - 'distinguish', 'dist', 'd'
+
     '0', 'no', 'false', 'off'
     '1', 'yes', 'true', 'on'
 
 **Sticky** - 'sticky', 's'
+
     '0', 'no', 'false', 'off'
     '1', 'yes', 'true', 'on'
 
@@ -78,16 +80,19 @@ The Post will mimick the Source. Selftext if it was a selfpost, or URL if it was
 ##Examples
 
     25 December 2014 || Botwatch || Merry christmas, botwatch!
-    This post has the bare minimum. A time, subreddit, and title. Because an Hour:Minute was not specified, it is assumed Midnight.
+    This post has the bare minimum. A time, subreddit, and title. 
+    Because an Hour:Minute was not specified, it is assumed Midnight.
 
     25 December 2014 || Botwatch [d] || Merry christmas, botwatch!
     This post will look like the previous, but it will be distinguished
 
     09 January 2015 09:30 || Botwatch [d][f:Meta] || Botwatch, we need to talk.
-    This post will receive "Meta" flair. The flair CSS will automatically be set to this same string. It will happen at 9:30 AM UTC
+    This post will receive "Meta" flair. The flair CSS will automatically be set to 
+    this same string. It will happen at 9:30 AM UTC
 
     09 January 2015 18:30 || Botwatch [d][s][f:Meta][fc:special] || Botwatch, we need to get funky
-    This post will be stickied to the subreddit, REMOVING THE PREVIOUS STICKY. The flair CSS is explicitly set to "special". It will  happpen at 6:30 PM UTC
+    This post will be stickied to the subreddit, REMOVING THE PREVIOUS STICKY. 
+    The flair CSS is explicitly set to "special". It will  happpen at 6:30 PM UTC
 
     12 January 2015 18:30 || Botwatch [d][s][f:Meta][fc:] || Botwatch, we need to conquer the Soviets
     This post has it's flair css explicitly set to None.
