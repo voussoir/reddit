@@ -39,23 +39,23 @@ You may only edit one key:value per line. [See screenshot 3](https://github.com/
 
 There is some leniency in your key edits. For example, `flairtext: Heyo`, `flair-text: Heyo`, and `flair_text: Heyo` are all going to do the same thing. Here are the ways you can edit the values.
 
-	**Time** - 'time', 'timestamp'
+**Time** - 'time', 'timestamp'
 
-	**Subreddit** - 'reddit', 'subreddit', 'sr'
+**Subreddit** - 'reddit', 'subreddit', 'sr'
 	
-	**Title**  - 'title'
+**Title**  - 'title'
 
-	**Distinguish** - 'distinguish', 'dist', 'd'
-		'0', 'no', 'false', 'off'
-		'1', 'yes', 'true', 'on'
+**Distinguish** - 'distinguish', 'dist', 'd'
+    '0', 'no', 'false', 'off'
+    '1', 'yes', 'true', 'on'
 
-	**Sticky** - 'sticky', 's'
-		'0', 'no', 'false', 'off'
-		'1', 'yes', 'true', 'on'
+**Sticky** - 'sticky', 's'
+    '0', 'no', 'false', 'off'
+    '1', 'yes', 'true', 'on'
 
-	**flair-text** - 'flair-text', 'flairtext', 'flair_text'
+**flair-text** - 'flair-text', 'flairtext', 'flair_text'
 
-	**flair-css** - 'flair-css', 'flaircss', 'flair_css'
+**flair-css** - 'flair-css', 'flaircss', 'flair_css'
 
 
 .
