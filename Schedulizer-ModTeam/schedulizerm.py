@@ -440,6 +440,7 @@ def manage_schedule():
 			cur.execute('UPDATE schedules SET POST=? WHERE ID=?', [newid, postid])
 			sql.commit()
 			post.add_comment(newcomment)
+			post.set_flair(flair_text=POSTEDFLAIR)
 
 		else:
 			print(" : T-" + str(round(posttime - nowstamp)))
