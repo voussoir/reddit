@@ -1,0 +1,219 @@
+#/u/GoldenSights
+import praw
+import time
+import datetime
+import sqlite3
+
+'''USER CONFIGURATION'''
+
+USERNAME = "Clippy_Office_Asst"
+#This is the bot's Username. In order to send mail, he must have some amount of Karma.
+PASSWORD = ""
+#This is the bot's Password. 
+USERAGENT = "/r/Excel Clippy Office Assistant"
+#This is a short description of what the bot does.
+SUBREDDIT = "excel"
+#This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
+MAXPOSTS = 80
+#This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
+WAIT = 30
+WAIT = 30
+#This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
+DELAY = 86400
+#This is the time, IN SECONDS, the user has to make his comment. If he does not have a source by this time, post is removed.
+NCDELAY = 172800
+#This is the time, IN SECONDS, the user has to make his comment. If he does not have a source by this time, post is removed.
+MESSAGE = "Hi!\n\nIt looks like you are trying to ask a question!  Since you have not responded in the last 24 hours, I am here to assist you!\n\nIf your questions has been solved, please be sure to update the flair.\n\nWould you like help?\n\n[Help Changing Your Flair?](https://www.reddit.com/r/excel/wiki/flair)\n\n[Asking Question and Sharing Data](https://www.reddit.com/r/excel/wiki/sharingquestions)\n\n"
+#This is what the bot tells you when your post gets removed. Uses reddit's usual Markdown formatting
+IGNOREMODS = False
+#Do you want the bot to ignore posts made by moderators? Use True or False (With capitals! No quotations!)
+IGNORESELFPOST = False
+#Do you want the bot to ignore selfposts?
+FLAIRUNSOLVED = "unsolved"
+#The flair assigned to unsolved posts.
+FLAIRWAITING = "Waiting on OP"
+#The flair assigned to waiting posts.
+FLAIRNULL = "unsolved"
+#The flair assigned to waiting posts.
+FLAIRDIS = "discussion"
+FLAIRAD = "advertisement"
+FLAIRUT = "User Template"
+FLAIRPT = "pro tip"
+#All Ignored Posts
+PARENTSTRING = ["that works", "perfect", "thank you so much", "huge help", "figured it out", "got it", "thanks for your help"]
+#These are the words you are looking for
+REPLYSTRING = "Hi!\n\nIt looks like you received an answer to your question!  Since the top is still marked as unsolved, I am here to assist you!\n\nIf your questions has been solved, please be sure to update the flair.\n\nWould you like help?\n\n[Help Changing Your Flair?](http://www.reddit.com/r/excel/wiki/index)\n\n[Flair Descriptions](http://www.reddit.com/r/excel/wiki/index)\n\n"
+#This is your response
+'''All done!'''
+
+
+WAITS = str(WAIT)
+try:
+	import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
+	USERNAME = bot.getuG()
+	PASSWORD = bot.getpG()
+	USERAGENT = bot.getaG()
+except ImportError:
+	pass
+
+sql = sqlite3.connect('clippy_excel.db')
+print('Loaded SQL Database')
+cur = sql.cursor()
+cur.execute('CREATE TABLE IF NOT EXISTS flair(id TEXT)')
+print('Loaded flair')
+sql.commit()
+
+r = praw.Reddit(USERAGENT)
+
+Trying = True
+while Trying:
+	try:
+		r.login(USERNAME, PASSWORD)
+		print('Successfully logged in\n')
+		Trying = False
+	except praw.errors.InvalidUserPass:
+		print('Wrong Username or Password')
+		quit()
+	except Exception as e:
+		print("%s" % e)
+		time.sleep(5)
+
+def getTime(bool):
+	timeNow = datetime.datetime.now(datetime.timezone.utc)
+	timeUnix = timeNow.timestamp()
+	if bool == False:
+		return timeNow
+	else:
+		return timeUnix
+
+def scan():
+	now = datetime.datetime.now()
+	print('Scanning ' + SUBREDDIT + ' at ' + str(now))
+	subreddit = r.get_subreddit(SUBREDDIT)
+	moderators = subreddit.get_moderators()
+	mods = []
+	for moderator in moderators:
+		mods.append(moderator.name)
+	posts = subreddit.get_new(limit=MAXPOSTS)
+	for post in posts:
+		found = False
+		ctimes = []
+		pid = post.id
+		try:
+			pauthor = post.author.name
+		except AttributeError:
+			pauthor = '[deleted]'
+		ptime = post.created_utc
+		curtime = getTime(True)		
+		ctime = curtime
+		
+		cur.execute('SELECT * FROM flair WHERE id="%s"' % pid)
+		if not cur.fetchone():
+			if post.is_self == False or IGNORESELFPOST == False:
+				if pauthor not in mods or IGNOREMODS == False:
+					comments = praw.helpers.flatten_tree(post.comments)
+
+					try:
+						flair = post.link_flair_text.lower()
+					except AttributeError:
+						flair = ''
+					
+					if flair == FLAIRUNSOLVED.lower():
+						print(pid + ': Unsolved')
+						for comment in comments:
+							try:
+								cauthor = comment.author.name
+								
+							except AttributeError:
+								cauthor = '[deleted]'
+							if cauthor != pauthor:
+								found = True
+								break
+						if found == False:
+							print('\tNo comments by another user. No action taken.')
+						else:
+							print('\tFound comment by other user. Marking as Waiting.')
+							post.set_flair(flair_text=FLAIRWAITING, flair_css_class="waitingonop")
+							
+					elif flair == FLAIRWAITING.lower():
+						print(pid + ': Waiting')
+						for comment in comments:
+							try:
+								cauthor = comment.author.name
+							except AttributeError:
+								cauthor = '[deleted]'
+							if cauthor == pauthor:
+								found = True
+								pbody = comment.body.lower()
+							else:
+								ctimes.append(comment.created_utc)
+						if found == True:
+							print('\tFound comment by OP. All clear, chaning flair back to unsolved.')
+							post.set_flair(flair_text=FLAIRUNSOLVED, flair_css_class="notsolvedcase")
+							print('\tUpvoting comment..')
+							post.upvote()
+							cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+							if any(key.lower() in pbody for key in PARENTSTRING):
+								print('Replying to ' + pid + ' by ' + pauthor)
+								comment.reply(REPLYSTRING)
+								newcomment.distinguish()
+						elif found == False and len(ctimes) > 0:
+							print('\tNo comments by OP. Checking time limit.')
+							ctime = min(ctimes)
+							difference = curtime - ctime
+							if difference > DELAY:
+								print('\tTime is up.')
+								print('\tLeaving Comment')
+								newcomment = post.add_comment(MESSAGE)
+								print('\tDistinguishing Comment')
+								newcomment.distinguish()
+#								print('\tRemoving Post')
+#								post.remove()
+								cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+							else:
+								differences = str('%.0f' % (DELAY - difference))
+								print('\tStill has ' + differences + 's.')
+						elif found == False and len(ctimes) == 0:
+							print('\tNo comments by OP, but no other comments are available.')
+
+					else:
+						print(pid + ': Neither flair')
+						if flair == FLAIRDIS.lower():
+							print(pid + ': is a discussion post, adding to ignore list...')
+							cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+						if flair == FLAIRAD.lower():
+							print(pid + ': is an advertisement post, adding to ignore list...')
+							cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+						if flair == FLAIRUT.lower():
+							print(pid + ': is a User Template post, adding to ignore list...')
+							cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+						if flair == FLAIRPT.lower():
+							print(pid + ': is a ProTip post, adding to ignore list...')
+							cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+						else:
+							cur.execute('SELECT * FROM flair WHERE id="%s"' % pid)
+							if not cur.fetchone():
+								print('\tAssigning Flair')
+								post.set_flair(flair_text=FLAIRNULL, flair_css_class="notsolvedcase")
+							else:
+#								cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+
+								if pauthor in mods and IGNOREMODS == True:
+									print(pid + ', ' + pauthor + ': Ignoring Moderator')
+									cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+
+		if post.is_self == True and IGNORESELFPOST == True:
+			print(pid + ', ' + pauthor + ': Ignoring Selfpost')
+			cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+
+		sql.commit()
+
+
+
+while True:
+	try:
+		scan()
+	except Exception as e:
+		print('An error has occured:', str(e))
+	print('Running again in ' + WAITS + ' seconds.\n')
+	time.sleep(WAIT)
