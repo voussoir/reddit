@@ -12,7 +12,7 @@ import re
 
 USERAGENT = ""
 #Describe the bot and what it does. Include your username
-USERNAME = "75000"
+USERNAME = "GoldenSights"
 #This is the bot's username
 PASSWORD = ""
 #This is the bot's password
@@ -92,8 +92,8 @@ IMPOSSIBLETIME = 16756704000
 try:
 	import bot
 	#USERNAME = bot.uG
-	PASSWORD = bot.p7
-	USERAGENT = bot.a7
+	PASSWORD = bot.pG
+	USERAGENT = bot.aG
 except ImportError:
 	pass
 
@@ -439,6 +439,7 @@ def manage_schedule():
 			newcomment += '\n\n'.join(errors)
 			cur.execute('UPDATE schedules SET POST=? WHERE ID=?', [newid, postid])
 			sql.commit()
+			print('Flairing source.')
 			post.add_comment(newcomment)
 			post.set_flair(flair_text=POSTEDFLAIR)
 
