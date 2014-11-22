@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 655,872 of 655,848 subreddits (100.004%) (-24 remain)
+#####Collected 658,872 of 658,886 subreddits (99.998%) (14 remain)
 
-#####[Today's jumble](http://reddit.com/r/dykesgonemild+massage+bicycletouring+HFY+VanessaHudgens+urbanexploration+buildapcsales+modelmakers+mildyinteresting+MLPCCG+asoiafcirclejerk+AnaheimDucks+heraldry+diyaudio+auburn+SelenaGomez+ketogains+writingcritiques+shittyama+nl)
+#####[Today's jumble](http://reddit.com/r/melbourne+streetwear+minerapocalypse+Stoicism+chicago+gamegrumps+podemos+madisonwi+TrueReddit+MineralPorn+eu4+RioGrandeValley+tonightsdinner+plastidip+bullcity+battleparty+montageparodies+commandandconquer+AskCulinary+nflgifs)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
