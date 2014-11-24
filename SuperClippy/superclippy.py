@@ -19,10 +19,12 @@ PASSWORD  = ""
 USERAGENT = "/r/Excel Clippy Office Assistant all-in-one moderator."
 # This is a short description of what the bot does.
 # For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "Excel"
+SUBREDDIT = "Goldtesting"
 # This is the sub or list of subs to scan for new posts.
 # For a single sub, use "sub1".
 # For multiple subreddits, use "sub1+sub2+sub3+..."
+PLAY_BOOT_SOUND = True
+#Play boot.wav
 
 MAXPOSTS = 100
 # How many posts to get from the /new queue at once
@@ -40,6 +42,10 @@ POINT_STRING_USR = ["Solution Verified"]
 POINT_STRING_MOD = ["+1 Point"]
 # Moderators can use this to give points at any time.
 
+POINT_FLAIR_CSS = "points"
+# The CSS class associated with point flair
+# Set to "" for none
+
 POINT_REPLY = "You have awarded one point to _parent_"
 # This is the phrase that User will receive
 # _parent_ will be replaced by the username of the Parent.
@@ -54,7 +60,7 @@ POINT_OP_ONLY = True
 # and would like to reward a good answer.
 
 POINT_PER_THREAD = 200
-#How many points can be distributed in a single thread?
+# How many points can be distributed in a single thread?
 
 POINT_DO_EXPLAIN = True
 # If the max-per-thread is reached and someone tries to give a point, reply to
@@ -64,7 +70,8 @@ POINT_EXPLAIN = """
 Sorry, but %d point(s) have already been distributed in this thread.
 This is the maximum allowed at this time.
 """%POINT_PER_THREAD
-#If EXPLAINMAX is True, this will be said to someone who tries to give a point after max is reached
+# If EXPLAINMAX is True, this will be said to someone who tries to give a
+# point after max is reached
 
 POINT_EXPLAIN_OP_ONLY = """
 Hi!
@@ -109,11 +116,11 @@ Data](https://www.reddit.com/r/excel/wiki/sharingquestions)
 # This is what the bot tells you when you dont meet the DELAY. Uses reddit's
 # usual Markdown formatting
 
-FLAIR_WARN_IGNORE_MODS = False
+FLAIR_IGNORE_MODS = False
 # Do you want the bot to ignore posts made by moderators?
 # Use True or False (With capitals! No quotations!)
 
-FLAIR_WARN_IGNORE_SELF = False
+FLAIR_IGNORE_SELF = False
 #Do you want the bot to ignore selfposts?
 
 FLAIR_SOLVED = "solved"
@@ -151,16 +158,48 @@ Would you like help?
 """
 
 
+"""******************"""
+"""FUNCTION REFERENCE"""
+"""******************"""
+
+DICT_TRIGGER = "clippy: "
+# The trigger phrase for perfoming a lookup
+
+DICT_FILE = 'reference.txt'
+# The file with the Keys/Values
+
+DICT_RESULT_FORM = "_value_"
+# This is the form that the result will take
+# You may use _key_ and _value_ to inject the key/value from the dict.
+# You may delete one or both of these injectors.
+
+DICT_LEVENSHTEIN = False
+# If this is True it will use a function that is slow but can find
+# misspelled keys
+# If this is False it will use a simple function that is very fast but can
+# only find keys which are spelled exactly
+
+DICT_FAIL = """
+Hi!  It looks like you're looking for help with an Excel function!
+Unfortunately I have not learned that function yet. If you'd like to
+change that, [message the
+moderators](http://www.reddit.com/message/compose?to=%2Fr%2Fexcel)!
+"""
+# The comment which is created when a function is requested
+# but not in the file
+
+
 """***************"""
 """WELCOME MESSAGE"""
 """***************"""
+
 WELCOME_SUBJECT = """Welcome to /r/Excel, I am here to help!"""
 
 WELCOME_MESSAGE = """
 Hi %s!
 
 It looks like you are new to posting in /r/Excel.
-Did you know we have a few ways to help you recieve better help?
+Did you know we have a few ways to help you receive better help?
 
 How can I help you?
 
@@ -172,177 +211,111 @@ How can I help you?
 
 ^This ^message ^is ^auto-generated ^and ^is ^not ^monitored ^on ^a
 ^regular ^basis, ^replies ^to ^this ^message ^may ^not ^go ^answered.
+^Remember ^to [^contact ^the
+^moderators](http://www.reddit.com/message/compose?to=%2Fr%2Fexcel)
+^to ^guarantee ^a ^response
 """
-
-
-"""****************"""
-"""FUNCTION VLOOKUP"""
-"""****************"""
-
-DICT_FILE = 'reference.txt'
-#The file with the Keys/Values
-
-DICT_RESULT_FORM = "_value_"
-#This is the form that the result will take
-#You may use _key_ and _value_ to inject the key/value from the dict.
-#You may delete one or both of these injectors.
-
-DICT_LEVENSHTEIN = True
-#If this is True it will use a function that is slow but can find misspelled keys
-#If this is False it will use a simple function that is very fast but can only find keys which are spelled exactly
-
-DICT_FAIL = """
-"Hi!  It looks like you looking for help with an Excel function!
-Unfortunately I have not learned that function yet, but will get right on it!"
-"""
+# Sent to the user if he has created his first post in the subreddit
 
 '''All done!'''
 
 
-def getTime(bool):
-	timeNow = datetime.datetime.now(datetime.timezone.utc)
-	timeUnix = timeNow.timestamp()
-	if bool == False:
-		return timeNow
-	else:
-		return timeUnix
-
-sql = sqlite3.connect('sql.db')
-print('Loaded SQL Database')
-cur = sql.cursor()
-sql.commit()
-
-class ClippyManager:
-	def clippy_manager(self):
-		subreddit = r.get_subreddit(SUBREDDIT)
-		print('Getting new comments')
-		newcomments = subreddit.get_comments()
-	def begin(self):
-		print('Starting Points...', end="")
-		clippypoints = ClippyPoints()
-		print('done.')
-		print('Starting Welcome...', end="")
-		clippywelcome = ClippyWelcome()
-		print('done.')
-		print('Starting Flair...', end="")
-		clippyflair = ClippyFlairReminder()
-		print('done.')
-		print('Starting Reference...', end="")
-		clippyreference = ClippyReference()
-		print('done.')
-
-		try:
-			import bot
-			USERNAME = bot.uG
-			PASSWORD = bot.pG
-			USERAGENT = bot.aG
-		except ImportError:
-			pass
-		print('Logging in...', end="")
-		sys.stdout.flush()
-		r = praw.Reddit(USERAGENT)
-		r.login(USERNAME, PASSWORD)
-		del PASSWORD
-		print('Done.')
-
-
-class ClippyPoints(ClippyManager):
-	def incrementflair(subreddit, username):
-		#Subreddit must be the sub object, not a string
+class ClippyPoints:
+	def incrementflair(self, subreddit, username):
 		#Returns True if the operation was successful
+		if isinstance(subreddit, str):
+			subreddit = r.get_subreddit(subreddit)
 		success = False
-		print('\tChecking flair for ' + username)
+		print('\t\tChecking flair for ' + username)
 		flairs = subreddit.get_flair(username)
 		flairs = flairs['flair_text']
 		if flairs != None and flairs != '':
-			print('\t :' + flairs)
+			print('\t\t:' + flairs)
 			try:
 				flairs = int(flairs)
 				flairs += 1
 				flairs = str(flairs)
 				success = True
 			except ValueError:
-				print('\tCould not convert flair to a number.')
+				print('\t\tCould not convert flair to a number.')
 		else:
-			print('\tNo current flair. 1 point')
+			print('\t\tNo current flair. 1 point')
 			flairs = '1'
 			success = True
-		print('\tAssigning Flair: ' + flairs)
-		subreddit.set_flair(username, flair_text=flairs, flair_css_class='points')
-	
+		if success:
+			print('\t\tAssigning Flair: ' + flairs)
+			subreddit.set_flair(username, flair_text=flairs,
+								flair_css_class=POINT_FLAIR_CSS)
 		return success
 
-	def scan():
-		print("Scanning " + SUBREDDIT)
+	def receive(self, comments):
+		print('\tClippyPoints received comments.')
 		subreddit = r.get_subreddit(SUBREDDIT)
-		comments = subreddit.get_comments(limit=MAXPOSTS)
 		for comment in comments:
 			cid = comment.id
-			cur.execute('SELECT * FROM oldposts WHERE ID=?', [cid])
+			cur.execute('SELECT * FROM clippy_points WHERE ID=?', [cid])
 			if not cur.fetchone():
 				print(cid)
 				cbody = comment.body.lower()
 				try:
 					if not comment.is_root:
 						cauthor = comment.author.name
-						
-						if (cauthor not in MODERATORS and any(flag.lower() in cbody for flag in PARENTSTRING)) or\
-						(cauthor in MODERATORS and any(flag.lower() in cbody for flag in MODSTRING)):
-							print('\tFlagged.')
-							print('\tFetching parent and Submission data.')
+						print('\tChecking subreddit moderators')
+						moderators = [user.name for user in subreddit.get_moderators()]
+						if (cauthor not in moderators and any(flag.lower() in cbody for flag in POINT_STRING_USR)) or (
+						(cauthor in moderators and any(flag.lower() in cbody for flag in POINT_STRING_MOD))):
+							print('\tFlagged %s.' % cid)
+							print('\t\tFetching parent and Submission data.')
 							parentcom = r.get_info(thing_id=comment.parent_id)
 							pauthor = parentcom.author.name
 							op = comment.submission.author.name
 							opid = comment.submission.id
-	
 							if pauthor != cauthor:
-								if not any(exempt.laower() == pauthor.lower() for exempt in EXEMPT):
-									if OPONLY == False or cauthor == op or cauthor in MODERATORS:
-										cur.execute('SELECT * FROM submissions WHERE ID=?', [opid])
+								if not any(exempt.lower() == pauthor.lower() for exempt in POINT_EXEMPT):
+									if POINT_OP_ONLY == False or cauthor == op or cauthor in moderators:
+										cur.execute('SELECT * FROM clippy_points_s WHERE ID=?', [opid])
 										fetched = cur.fetchone()
 										if not fetched:
-											cur.execute('INSERT INTO submissions VALUES(?, ?)', [opid, 0])
+											cur.execute('INSERT INTO clippy_points_s VALUES(?, ?)', [opid, 0])
 											fetched = 0
 										else:
 											fetched = fetched[1]
 	
-										if fetched < MAXPERTHREAD:
-											if flair(subreddit, pauthor):
-												print('\tWriting reply')
-												comment_confirm = comment.reply(REPLYSTRING.replace('_parent_', pauthor))
+										if fetched < POINT_PER_THREAD:
+											if self.incrementflair(subreddit, pauthor):
+												print('\t\tWriting reply')
+												comment_confirm = comment.reply(POINT_REPLY.replace('_parent_', pauthor))
 												comment_confirm.distinguish()
-												cur.execute('UPDATE submissions SET count=? WHERE ID=?', [fetched+1, opid])
+												cur.execute('UPDATE clippy_points_s SET count=? WHERE ID=?', [fetched+1, opid])
 										else:
-											print('\tMaxPerThread has been reached')
+											print('\t\tMaxPerThread has been reached')
 											if EXPLAINMAX == True:
-												print('\tWriting reply')
-												comment.reply(EXPLAINREPLY)
+												print('\t\tWriting reply')
+												comment.reply(POINT_EXPLAIN)
 									else:
 										print('\tOther users cannot give points.')
 										#comment_confirm = comment.reply(EXPLAINOPONLY)
 										#comment_confirm.distinguish()
 								else:
-									print('\tParent is on the exempt list.')
+									print('\t\tParent is on the exempt list.')
 							else:
-								print('\tCannot give points to self.')
+								print('\t\tCannot give points to self.')
 					else:
-						print('\tRoot comment. Ignoring.')
+						print('\t\tRoot comment. Ignoring.')
 				except AttributeError:
-					print('\tCould not fetch usernames. Cannot proceed.')
-				cur.execute('INSERT INTO oldposts VALUES(?)', [cid])
+					print('\t\tCould not fetch usernames. Cannot proceed.')
+				cur.execute('INSERT INTO clippy_points VALUES(?)', [cid])
 			sql.commit()
+		print('\tClippyPoints finished')
 
 
-class ClippyFlairReminder(ClippyManager):
-	def scan():
+class ClippyFlairReminder:
+	def receive(self, posts):
+		print('\tClippyFlair received submissions')
 		now = datetime.datetime.now()
-		print('Scanning ' + SUBREDDIT + ' at ' + str(now))
 		subreddit = r.get_subreddit(SUBREDDIT)
-		moderators = subreddit.get_moderators()
-		mods = []
-		for moderator in moderators:
-			mods.append(moderator.name)
-		posts = subreddit.get_new(limit=MAXPOSTS)
+		print('\tChecking subreddit moderators')
+		moderators = [user.name for user in subreddit.get_moderators()]
 		for post in posts:
 			found = False
 			ctimes = []
@@ -355,10 +328,10 @@ class ClippyFlairReminder(ClippyManager):
 			curtime = getTime(True)     
 			ctime = curtime
 			
-			cur.execute('SELECT * FROM flair WHERE id="%s"' % pid)
+			cur.execute('SELECT * FROM clippy_flair WHERE id=?', [pid])
 			if not cur.fetchone():
-				if post.is_self == False or IGNORESELFPOST == False:
-					if pauthor not in mods or IGNOREMODS == False:
+				if post.is_self == False or FLAIR_IGNORE_SELF == False:
+					if pauthor not in moderators or FLAIR_IGNORE_MODS == False:
 						comments = praw.helpers.flatten_tree(post.comments)
 	
 						try:
@@ -366,7 +339,7 @@ class ClippyFlairReminder(ClippyManager):
 						except AttributeError:
 							flair = ''
 						
-						if flair == FLAIRUNSOLVED.lower():
+						if flair == FLAIR_UNSOLVED.lower():
 							print(pid + ': Unsolved')
 							for comment in comments:
 								try:
@@ -377,13 +350,13 @@ class ClippyFlairReminder(ClippyManager):
 								if cauthor != pauthor:
 									found = True
 									break
-							if found == False:
+							if not found:
 								print('\tNo comments by another user. No action taken.')
 							else:
 								print('\tFound comment by other user. Marking as Waiting.')
-								post.set_flair(flair_text=FLAIRWAITING, flair_css_class="waitingonop")
+								post.set_flair(flair_text=FLAIR_WAITING, flair_css_class="waitingonop")
 								
-						elif flair == FLAIRWAITING.lower():
+						elif flair == FLAIR_WAITING.lower():
 							print(pid + ': Waiting')
 							for comment in comments:
 								try:
@@ -396,76 +369,76 @@ class ClippyFlairReminder(ClippyManager):
 								else:
 									ctimes.append(comment.created_utc)
 							if found == True:
-								print('\tFound comment by OP. All clear, chaning flair back to unsolved.')
-								post.set_flair(flair_text=FLAIRUNSOLVED, flair_css_class="notsolvedcase")
-								print('\tUpvoting comment..')
-								post.upvote()
-								cur.execute('INSERT INTO flair VALUES("%s")' % pid)
-								if any(key.lower() in pbody for key in PARENTSTRING):
-									print('Replying to ' + pid + ' by ' + pauthor)
-									comment.reply(REPLYSTRING)
-									newcomment.distinguish()
+								if not any(trigger in pbody for trigger in POINT_STRING_USR):
+									print('\tFound comment by OP. All clear, changing flair back to unsolved.')
+									post.set_flair(flair_text=FLAIR_UNSOLVED, flair_css_class="notsolvedcase")
+									#print('\tUpvoting comment..')
+									#post.upvote()
+									cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
+									if any(key.lower() in pbody for key in FLAIR_TRIGGERS):
+										print('Replying to ' + pid + ' by ' + pauthor)
+										comment.reply(FLAIR_REMINDER)
+										newcomment.distinguish()
 							elif found == False and len(ctimes) > 0:
 								print('\tNo comments by OP. Checking time limit.')
 								ctime = min(ctimes)
 								difference = curtime - ctime
-								if difference > DELAY:
+								if difference > FLAIR_WARN_DELAY:
 									print('\tTime is up.')
 									print('\tLeaving Comment')
-									newcomment = post.add_comment(MESSAGE)
+									newcomment = post.add_comment(FLAIR_WARN_MESSAGE)
 									print('\tDistinguishing Comment')
 									newcomment.distinguish()
-	#                               print('\tRemoving Post')
-	#                               post.remove()
-									cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+									cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
 								else:
-									differences = str('%.0f' % (DELAY - difference))
+									differences = str('%.0f' % (FLAIR_WARN_DELAY - difference))
 									print('\tStill has ' + differences + 's.')
 							elif found == False and len(ctimes) == 0:
 								print('\tNo comments by OP, but no other comments are available.')
 	
 						else:
 							print(pid + ': Neither flair')
-							if flair == FLAIRDIS.lower():
+							if flair == FLAIR_DISCUSS.lower():
 								print(pid + ': is a discussion post, adding to ignore list...')
-								cur.execute('INSERT INTO flair VALUES("%s")' % pid)
-							if flair == FLAIRAD.lower():
+								cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
+							if flair == FLAIR_ADVERTISEMENT.lower():
 								print(pid + ': is an advertisement post, adding to ignore list...')
-								cur.execute('INSERT INTO flair VALUES("%s")' % pid)
-							if flair == FLAIRUT.lower():
+								cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
+							if flair == FLAIR_TEMPLATE.lower():
 								print(pid + ': is a User Template post, adding to ignore list...')
-								cur.execute('INSERT INTO flair VALUES("%s")' % pid)
-							if flair == FLAIRPT.lower():
+								cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
+							if flair == FLAIR_PROTIP.lower():
 								print(pid + ': is a ProTip post, adding to ignore list...')
-								cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+								cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
 							else:
-								cur.execute('SELECT * FROM flair WHERE id="%s"' % pid)
+								cur.execute('SELECT * FROM clippy_flair WHERE id=?', [pid])
 								if not cur.fetchone():
 									print('\tAssigning Flair')
-									post.set_flair(flair_text=FLAIRNULL, flair_css_class="notsolvedcase")
+									post.set_flair(flair_text=FLAIR_UNSOLVED, flair_css_class="notsolvedcase")
 								else:
 									#cur.execute('INSERT INTO flair VALUES("%s")' % pid)
 	
 									if pauthor in mods and IGNOREMODS == True:
 										print(pid + ', ' + pauthor + ': Ignoring Moderator')
-										cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+										cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
 	
-			if post.is_self == True and IGNORESELFPOST == True:
+			if post.is_self == True and FLAIR_IGNORE_SELF == True:
 				print(pid + ', ' + pauthor + ': Ignoring Selfpost')
-				cur.execute('INSERT INTO flair VALUES("%s")' % pid)
+				cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
 	
 			sql.commit()
+		print('\tClippyFlair finished')
 
 
-class ClippyReference(ClippyManager):
+class ClippyReference:
 	def __init__(self):
 		with open(DICT_FILE, 'r') as f:
 			self.DICT = json.loads(f.read())
-	def levenshtein(s1, s2):
+	def levenshtein(self, s1, s2):
 		#Levenshtein algorithm to figure out how close two strings are two each other
 		#Courtesy http://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python
 		if len(s1) < len(s2):
-			return levenshtein(s2, s1)
+			return self.levenshtein(s2, s1)
 		# len(s1) >= len(s2)
 		if len(s2) == 0:
 			return len(s1)
@@ -480,28 +453,25 @@ class ClippyReference(ClippyManager):
 			previous_row = current_row
 		return previous_row[-1]
 
-	def findsuper(comment, tolerance= 1):
+	def findsuper(self, comment, tolerance= 1):
 		results = []
 		used = []
-		for itemname in DICT:
+		for itemname in self.DICT:
 			itemlength = len(itemname.split())
 			pos = 0
 			commentsplit = comment.split()
-			#print(commentsplit)
 			end = False
 			while not end:
 				try:
 					gram = commentsplit[pos:pos+itemlength]
 					gramjoin = ' '.join(gram)
-					lev = levenshtein(itemname, gramjoin)
-					#print(snakename, gramjoin)
-					#print(lev)
+					lev = self.levenshtein(itemname, gramjoin)
 					if lev <= tolerance:
 						if itemname not in used:
 							used.append(itemname)
 							result = RESULTFORM
 							result = result.replace('_key_', itemname)
-							result = result.replace('_value_', DICT[itemname])
+							result = result.replace('_value_', self.DICT[itemname])
 							results.append(result)
 					pos += 1
 					if pos > len(commentsplit):
@@ -510,76 +480,151 @@ class ClippyReference(ClippyManager):
 					end = True
 		return results
 	
-	def findsimple(comment):
+	def findsimple(self, comment):
 		results = []
-		for itemname in DICT:
+		for itemname in self.DICT:
 			if itemname.lower() in comment.lower():
 				result = RESULTFORM
 				result = result.replace('_key_', itemname)
-				result = result.replace('_value_', DICT[itemname])
+				result = result.replace('_value_', self.DICT[itemname])
 				results.append(result)
 		return results
 
-	def scanSub():
-		print('Searching '+ SUBREDDIT + '.')
-		subreddit = r.get_subreddit(SUBREDDIT)
-		posts = subreddit.get_comments(limit=MAXPOSTS)
-		for post in posts:
+	def receive(self, comments):
+		lev = "True" if DICT_LEVENSHTEIN else "False"
+		print('\tClippyReference received comments (Lev: %s)'%lev)
+		for comment in comments:
 			results = []
-			pid = post.id
+			cid = comment.id
 			try:
-				pauthor = post.author.name
-			except AttributeError:
-				pauthor = '[DELETED]'
-			cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
-			if not cur.fetchone():
-				if pauthor.lower() != USERNAME.lower():
-					pbody = post.body.lower()
-				
-					if LEVENMODE == True:
-						results = findsuper(pbody)
-					else:
-						results = findsimple(pbody)
-					if "clippy: " in pbody.lower() and len(results) == 0:
-						#They must have made a request, but we didn't find anything
-						results.append()
+				cauthor = comment.author.name
+				cur.execute('SELECT * FROM clippy_reference WHERE ID=?',[cid])
+				if not cur.fetchone():
+					print('\t' + cid)
+					if cauthor.lower() != USERNAME.lower():
+						cbody = comment.body.lower()
 					
-					if len(results) > 0:
-							newcomment = COMMENTHEADER
-							newcomment += '\n\n' + '\n\n'.join(results) + '\n\n'
-							newcomment += COMMENTFOOTER
-							print('Replying to ' + pid + ' by ' + pauthor + ' with ' + str(len(results)) + ' items')
-							post.reply(newcomment)
-				else:
-					print('Will not reply to self')
-				cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
-		sql.commit()
+						if DICT_LEVENSHTEIN == True:
+							results = self.findsuper(cbody)
+						else:
+							results = self.findsimple(cbody)
+						if DICT_TRIGGER.lower() in cbody.lower() and (
+							len(results) == 0):
+							#They made a request, but we didn't find anything
+							results.append(DICT_FAIL)
+						
+						if len(results) > 0:
+								newcomment = '\n\n'.join(results)
+								print('\t\tReplying to %s with %d items...'%
+									(cauthor, len(results)), end="")
+								sys.stdout.flush()
+								comment.reply(newcomment)
+								print('done.')
+					else:
+						#Will not reply to self
+						pass
+					cur.execute('INSERT INTO clippy_reference VALUES(?)',[cid])
+				sql.commit()
+			except AttributeError:
+				# Comment Author is deleted
+				pass
+		print('\tClippyReference finished')
 
 
-class ClippyWelcome(ClippyManager):
-	def scan():
-		print('Scanning ' + SUBREDDIT)
-		subreddit = r.get_subreddit(SUBREDDIT)
-		posts = subreddit.get_new(limit=MAXPOSTS)
+class ClippyWelcome:
+	def receive(self, posts):
+		print('\tClippyWelcome received submissions')
 		for post in posts:
 			try:
 				pauthor = post.author.name
-			except Exception:
-				pauthor = '[deleted]'
-			pid = post.id
-			plink = post.short_link
-			ptime = post.created_utc
-			cur.execute('SELECT * FROM oldposts WHERE id=?', [pid])
-			if not cur.fetchone():
-				cur.execute('SELECT * FROM users WHERE name=?', [pauthor])
+				pid = post.id
+				cur.execute('SELECT * FROM clippy_welcome WHERE NAME=?', [pauthor])
 				if not cur.fetchone():
-					print('Found new user: ' + pauthor)
-					cur.execute('INSERT INTO users VALUES(?, ?)', (pauthor, pid))
-					r.send_message(pauthor, 'Welcome to /r/Excel, I am here to help!','Hi! ' + pauthor + ',\n\n It looks like you are new to posting in /r/Excel.  Did you know we have a few ways to help you recieve better help?\n\n\n How can I help you?\n\n\n[How to Share Your Questions](/r/excel/wiki/sharingquestions)\n\n[Changing Link Flair](/r/excel/wiki/flair)\n\n[ClippyPoints^TM](/r/excel/wiki/clippy)\n\n\n ^This ^message ^is ^auto-generated ^and ^is ^not ^monitored ^on ^a ^regular ^basis, ^replies ^to ^this ^message ^may ^not ^go ^answered.' , captcha=None)
-					sql.commit()
-					print('\t' + pauthor + ' has been added to the database.')
-					time.sleep(5)
-					
-			sql.commit()
-c = ClippyManager()
-c.begin()
+					print('\t' + pid)
+					print('\t\tFound new user: ' + pauthor)
+					print('\t\tSending message...', end="")
+					sys.stdout.flush()
+					#r.send_message(pauthor, WELCOME_SUBJECT, WELCOME_MESSAGE%pauthor, captcha=None)
+					cur.execute('INSERT INTO clippy_welcome VALUES(?, ?)', (pauthor, pid))
+					print('done.')
+				sql.commit()
+			except AttributeError:
+				#Post author is deleted
+				pass
+		print('\tClippyWelcome finished')
+
+
+
+def getTime(bool):
+	timeNow = datetime.datetime.now(datetime.timezone.utc)
+	timeUnix = timeNow.timestamp()
+	if bool == False:
+		return timeNow
+	else:
+		return timeUnix
+
+def clippy_manager():
+	try:
+		subreddit = r.get_subreddit(SUBREDDIT)
+		print('Getting new comments')
+		newcomments =list( subreddit.get_comments(limit=MAXPOSTS))
+		clippyreference.receive(newcomments)
+		clippypoints.receive(newcomments)
+		print('Getting new submissions')
+		newposts = list(subreddit.get_new(limit=MAXPOSTS))
+		clippywelcome.receive(newposts)
+		clippyflair.receive(newposts)
+	except Exception:
+		traceback.print_exc()
+
+if __name__ == "__main__":
+	sql = sqlite3.connect('superclippy.db')
+	cur = sql.cursor()
+	cur.execute('CREATE TABLE IF NOT EXISTS clippy_welcome(NAME TEXT, ID TEXT)')
+	cur.execute('CREATE TABLE IF NOT EXISTS clippy_reference(ID TEXT)')
+	cur.execute('CREATE TABLE IF NOT EXISTS clippy_points(ID TEXT)')
+	cur.execute('CREATE TABLE IF NOT EXISTS clippy_points_s(ID TEXT, count INT)')
+	cur.execute('CREATE TABLE IF NOT EXISTS clippy_flair(id TEXT)')
+	print('Loaded SQL Database')
+	sql.commit()
+	
+	if PLAY_BOOT_SOUND:
+		try:
+			import winsound
+			import threading
+			def bootsound():
+				winsound.PlaySound('boot.wav', winsound.SND_FILENAME)
+			soundthread = threading.Thread(target=bootsound)
+			soundthread.daemon = True
+			soundthread.start()
+		except Exception:
+			pass
+	print('Logging in...', end="")
+	try:
+		import bot
+		USERNAME = bot.uG
+		PASSWORD = bot.pG
+		USERAGENT = bot.aG
+	except ImportError:
+		pass
+	sys.stdout.flush()
+	r = praw.Reddit(USERAGENT)
+	r.login(USERNAME, PASSWORD)
+	del PASSWORD
+	print('done.')
+	print('Starting Points...', end="")
+	clippypoints = ClippyPoints()
+	print('done.')
+	print('Starting Welcome...', end="")
+	clippywelcome = ClippyWelcome()
+	print('done.')
+	print('Starting Flair...', end="")
+	clippyflair = ClippyFlairReminder()
+	print('done.')
+	print('Starting Reference...', end="")
+	clippyreference = ClippyReference()
+	print('done.')
+	while True:
+		clippy_manager()
+		print('Sleeping %d seconds.\n\n'%WAIT)
+		time.sleep(WAIT)
