@@ -262,7 +262,10 @@ class ClippyPoints:
 						cauthor = comment.author.name
 						print('\tChecking subreddit moderators')
 						moderators = [user.name for user in subreddit.get_moderators()]
-						if (cauthor not in moderators and any(flag.lower() in cbody for flag in POINT_STRING_USR)) or (
+						byuser = False
+						if cauthor not in moderators and any(flag.lower() in cbody for flag in POINT_STRING_USR):
+							byuser = True
+						if byuser or (
 						(cauthor in moderators and any(flag.lower() in cbody for flag in POINT_STRING_MOD))):
 							print('\tFlagged %s.' % cid)
 							print('\t\tFetching parent and Submission data.')
@@ -287,6 +290,8 @@ class ClippyPoints:
 												comment_confirm = comment.reply(POINT_REPLY.replace('_parent_', pauthor))
 												comment_confirm.distinguish()
 												cur.execute('UPDATE clippy_points_s SET count=? WHERE ID=?', [fetched+1, opid])
+											if byuser:
+												comment.submission.set_flair(flair_text=FLAIR_SOLVED, flair_css_class="solvedcase")
 										else:
 											print('\t\tMaxPerThread has been reached')
 											if EXPLAINMAX == True:
