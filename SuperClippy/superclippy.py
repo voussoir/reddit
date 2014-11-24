@@ -127,6 +127,12 @@ FLAIR_SOLVED = "solved"
 
 FLAIR_UNSOLVED = "unsolved"
 
+FLAIR_CHAL = "challenge"
+
+FLAIR_MANN = "Mod Announcement"
+
+FLAIR_MNEWS = "Mod News"
+
 FLAIR_WAITING = "Waiting on OP"
 
 FLAIR_DISCUSS = "discussion"
@@ -415,6 +421,15 @@ class ClippyFlairReminder:
 							if flair == FLAIR_PROTIP.lower():
 								print(pid + ': is a ProTip post, adding to ignore list...')
 								cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
+							if flair == FLAIR_SOLVED.lower():
+								print(pid + ': is a SOLVED post, adding to ignore list...')
+								cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
+							if flair == FLAIR_MANN.lower():
+								print(pid + ': is a Mod Annoucement post, adding to ignore list...')
+								cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
+							if flair == FLAIR_MNEWS.lower():
+								print(pid + ': is a Mod News post, adding to ignore list...')
+								cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
 							else:
 								cur.execute('SELECT * FROM clippy_flair WHERE id=?', [pid])
 								if not cur.fetchone():
@@ -423,7 +438,7 @@ class ClippyFlairReminder:
 								else:
 									#cur.execute('INSERT INTO flair VALUES("%s")' % pid)
 	
-									if pauthor in mods and IGNOREMODS == True:
+									if pauthor in moderators and FLAIR_IGNORE_MODS == True:
 										print(pid + ', ' + pauthor + ': Ignoring Moderator')
 										cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
 	
@@ -474,7 +489,7 @@ class ClippyReference:
 					if lev <= tolerance:
 						if itemname not in used:
 							used.append(itemname)
-							result = RESULTFORM
+							result = DICT_RESULT_FORM
 							result = result.replace('_key_', itemname)
 							result = result.replace('_value_', self.DICT[itemname])
 							results.append(result)
@@ -489,7 +504,7 @@ class ClippyReference:
 		results = []
 		for itemname in self.DICT:
 			if itemname.lower() in comment.lower():
-				result = RESULTFORM
+				result = DICT_RESULT_FORM
 				result = result.replace('_key_', itemname)
 				result = result.replace('_value_', self.DICT[itemname])
 				results.append(result)
