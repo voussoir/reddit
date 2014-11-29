@@ -8,10 +8,6 @@ import re
 
 '''USER CONFIGURATION'''
 
-USERNAME  = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = ""
-#This is the bot's Password. 
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "all"
@@ -33,9 +29,7 @@ WAIT = 20
 
 WAITS = str(WAIT)
 try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.uG
-    PASSWORD = bot.pG
+    import bot 
     USERAGENT = bot.aG
 except ImportError:
     pass
@@ -50,7 +44,7 @@ print('Loaded Completed table')
 sql.commit()
 
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD) 
+#r.login(USERNAME, PASSWORD) 
 
 def scanSub():
     print('Searching '+ SUBREDDIT + '.')
