@@ -5,7 +5,8 @@ import datetime
 print('Connecting to reddit')
 r = praw.Reddit('/u/GoldenSights automatic timestamp search program')
 
-def get_all_posts(subreddit, lower=None, maxupper=None):
+def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
+    offset = -time.timezone
     subname = subreddit if type(subreddit)==str else subreddit.display_name
     if lower==None or maxupper==None:
         if isinstance(subreddit, praw.objects.Subreddit):
@@ -18,12 +19,14 @@ def get_all_posts(subreddit, lower=None, maxupper=None):
         lower = creation
         maxupper = nowstamp
         
-    interval = 86400
+    outfile = open('%s-%d-%d.txt'%(subname, lower, maxupper), 'w', encoding='utf-8')
+    #lower -= offset
+    maxupper -= offset
+    cutlower = lower
+    cutupper = maxupper
     upper = lower + interval
 
-
     allresults = []
-    outfile = open('%s-%d-%d.txt'%(subname, lower, maxupper), 'w', encoding='utf-8')
     try:
         while lower < maxupper:
             print('\nCurrent interval:', interval, 'seconds')
@@ -58,8 +61,11 @@ def get_all_posts(subreddit, lower=None, maxupper=None):
     outlist = []
     for item in allresults:
         if item not in outlist:
-            outlist.append(item)
-    print("Removed", len(allresults) - len(outlist), "duplicates")
+            if item.created_utc >= cutlower and item.created_utc <= cutupper:
+                outlist.append(item)
+            else:
+                print(item.created_utc, cutlower)
+    print("Removed", len(allresults) - len(outlist), "bad items.")
     print('Finished with', len(outlist), 'items')
     outlist.sort(key=lambda x: x.created_utc)
     outtofile(outlist, outfile)
@@ -78,20 +84,24 @@ def outtofile(outlist, outfile):
         pos += 1
     outfile.close()
 
-
 print("Get posts from subreddit: /r/", end='')
 sub = input()
 print('Lower bound (Leave blank to get ALL POSTS)\n]: ', end='')
 lower  = input()
 if lower == '':
-    get_all_posts(sub)
+    x = get_all_posts(sub)
 else:
     print('Maximum upper bound\n]: ', end='')
     maxupper = input()
+    print('Starting interval (Leave blank for standard)\n]: ', end='')
+    interval = input()
+    if interval == '':
+        interval = 84600
     try:
         maxupper = int(maxupper)
         lower = int(lower)
-        get_all_posts(sub, lower, maxupper)
+        interval = int(interval)
+        x = get_all_posts(sub, lower, maxupper, interval)
     except ValueError:
         print("lower and upper bounds must be unix timestamps")
         input()
