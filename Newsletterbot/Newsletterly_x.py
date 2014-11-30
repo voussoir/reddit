@@ -268,6 +268,9 @@ def build_report(user, supermode=False):
 		fetch = cur.fetchall()
 		fetch = [f[0].lower() for f in fetch]
 		userlist = list(set(fetch))
+		status = get_subscription_reddits(None, join=True)
+		status = "ALL REDDITS: /r/" + status + '\n\n'
+		results.append(status)
 	for user in userlist:
 		status = get_subscription_reddits(user, join=False)
 		status.append(get_subscription_reddits(user, join=True))
