@@ -356,7 +356,7 @@ def show():
 	itemcount += totalc
 
 	print('Writing statistics')
-	totalpossible = b36(fetch[-1][0]) - 4594284
+	totalpossible = b36(fetch[-1][0]) - 4594260
 	headliner = 'Collected '+'{0:,}'.format(itemcount)+' of '+'{0:,}'.format(totalpossible)+' subreddits ('+"%0.03f"%(100*itemcount/totalpossible)+'%)'
 	headliner+= ' ({0:,} remain)'.format(totalpossible-itemcount) + '\n'
 	#Call the PEP8 police on me, I don't care
