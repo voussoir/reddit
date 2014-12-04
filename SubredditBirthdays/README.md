@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 684,980 of 684,980 subreddits (100.000%) (0 remain)
+#####Collected 686,714 of 686,714 subreddits (100.000%) (0 remain)
 
-#####[Today's jumble](http://reddit.com/r/NewGirl+tacobell+mlpoc+civmildlyinteresting+Dick+CivPolitics+penguins+Morrowind+PlayStationPlus+medicalporn+WiggleButts+excel+JapaneseGameShows+glassheads+TheLastAirbender+undelete+outrun+chiliadmystery+TomorrowWorld+TheStrain)
+#####[Today's jumble](http://reddit.com/r/confusing_perspective+RATS+rescuedogs+gonewildnegev+AppHookup+ungulateteams+nosgoth+chelseafc+coys+DataHoarder+fantasybaseball+Rabbits+Charleston+streetart+debateAMR+policeporn+kayakfishing+belgium+CompanyOfHeroes+ModelsGoneMild)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

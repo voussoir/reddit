@@ -723,9 +723,9 @@ def search(query="", casesense=False, filterout=[], nsfwmode=2, idd="", doreturn
 	Search for a subreddit by name
 	*str query= The search query
 	    "query"    = results where "query" is in the name
-	    ":query"   = results where "query" is at the end of the name
-	    "query:"   = results where "query" is at the beginning of the name
-	    ":querry:" = results where "query" is in the middle of the name
+	    "*query"   = results where "query" is at the end of the name
+	    "query*"   = results where "query" is at the beginning of the name
+	    "*querry*" = results where "query" is in the middle of the name
 	bool casesense = is the search case sensitive
 	list filterout = [list, of, words] to omit from search. Follows casesense
 	int nsfwmode=
@@ -751,19 +751,19 @@ def search(query="", casesense=False, filterout=[], nsfwmode=2, idd="", doreturn
 			if nsfwmode==2 or (subreddit[3] == "1" and nsfwmode == 1) or (subreddit[3] == "0" and nsfwmode == 0):
 				if not casesense:
 					item = item.lower()
-				querl = query.replace(':', '')
+				querl = query.replace('*', '')
 				if querl in item:
 					#print(item)
 					if all(filters not in item for filters in filterout):
 						itemsplit = item.split(querl)
 						if ':' in query:
-							if (query[-1] == ':' and query[0] != ':') and itemsplit[0] == '':
+							if (query[-1] == '*' and query[0] != '*') and itemsplit[0] == '':
 								results.append(subreddit)
 				
-							if (query[0] == ':' and query[-1] != ':') and itemsplit[-1] == '':
+							if (query[0] == '*' and query[-1] != '*') and itemsplit[-1] == '':
 								results.append(subreddit)
 				
-							if (query[-1] == ':' and query[0] == ':') and (itemsplit[0] != '' and itemsplit[-1] != ''):
+							if (query[-1] == '*' and query[0] == '*') and (itemsplit[0] != '' and itemsplit[-1] != ''):
 								results.append(subreddit)
 			
 						else:
