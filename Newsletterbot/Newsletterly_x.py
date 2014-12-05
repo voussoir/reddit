@@ -145,7 +145,7 @@ def manage():
 		if interpretation:
 			print('\tReplying...')
 			pm.reply(interpretation)
-			pm.mark_as_read()
+		pm.mark_as_read()
 	sql.commit()
 
 	print('Finding posts')
