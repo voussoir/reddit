@@ -3,7 +3,7 @@ Subreddit Birthdays
 
 #####Collected 693,411 of 693,411 subreddits (100.000%) (0 remain)
 
-#####[Today's jumble](http://reddit.com/r/chinchilla+secretsanta+tulsa+ProGolf+blender+chemicalreactiongifs+LGG3+greenville+deutschland+judo+veganrecipes+synthesizers+Unity3D+excgarated+AskMenOver30+streetart+dune+DidYouKnowGaming+BeautifulFemales+heat)
+#####[Today's jumble](http://reddit.com/r/indie_rock+SaintsFC+Destiny+blackcoin+SquaredCircle+NotFoolingAnybody+GODUS+lastimages+Megturney+urbanexploration+upvotegifs+saplings+EmoScreamo+kreiswichs+Doom+ArtefactPorn+spotify+wtfdidijustread+mindcrack+cinematography)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

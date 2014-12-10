@@ -66,4 +66,5 @@ Here is a small glimpse at the less fortunate
 
 _____
 
-Tools used: Python + PRAW. Images rendered from postscript, exported by the python module "tkinter". Further information can be found [here](https://github.com/voussoir/reddit/tree/master/SubredditBirthdays)
+Tools used: Python + PRAW. Images rendered from postscript, exported by the python module "tkinter".
+Further information can be found [here](https://github.com/voussoir/reddit/tree/master/SubredditBirthdays)

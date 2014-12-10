@@ -1705,7 +1705,6 @@ These are the subreddits that can be found from /r/random
 2skf0, 1308241032, Jun 16 2011 16:17:12 UTC, 0, clonehigh....................1,624
 2rnx6, 1271013528, Apr 11 2010 19:18:48 UTC, 0, greenville...................1,620
 2s5vq, 1288324297, Oct 29 2010 03:51:37 UTC, 0, OrlandoMagic.................1,611
-2tdvz, 1326792615, Jan 17 2012 09:30:15 UTC, 0, girlsday.....................1,607
 2zxio, 1390647860, Jan 25 2014 11:04:20 UTC, 0, ManyATrueNerd................1,594
 2rp61, 1271963048, Apr 22 2010 19:04:08 UTC, 0, ElPaso.......................1,591
 2vc1z, 1350601937, Oct 18 2012 23:12:17 UTC, 0, CircleMusic..................1,589
