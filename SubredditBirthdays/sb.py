@@ -180,7 +180,7 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, delaysa
 			process(subname)
 
 
-def processrand(count, doublecheck=False, sleepy=0, delaysaving=False, doupdates=False):
+def processrand(count, doublecheck=False, sleepy=0, delaysaving=False, doupdates=True):
 	"""
 	Gets random IDs between a known lower bound and the newest collection
 	*int count= How many you want
@@ -365,19 +365,13 @@ def show():
 	nsfwyes = cur.fetchall()
 	nsfwyes = len(nsfwyes)
 	statisticoutput = []
-	dowdict = {}
-	moydict = {}
-	hoddict = {}
-	yerdict = {}
-	myrdict = {}
-	for item in fetch:
-		itemdate = datetime.datetime.utcfromtimestamp(item[1])
-		dowdict = dictadding(dowdict, datetime.datetime.strftime(itemdate, "%A"))
-		moydict = dictadding(moydict, datetime.datetime.strftime(itemdate, "%B"))
-		hoddict = dictadding(hoddict, datetime.datetime.strftime(itemdate, "%H"))
-		yerdict = dictadding(yerdict, datetime.datetime.strftime(itemdate, "%Y"))
-		myrdict = dictadding(myrdict, datetime.datetime.strftime(itemdate, "%b%Y"))
-	#print(yerdict)
+
+	timedicts = generatetdicts(fetch)
+	dowdict = timedicts[0]
+	moydict = timedicts[1]
+	hoddict = timedicts[2]
+	yerdict = timedicts[3]
+	myrdict = timedicts[4]
 
 	for d in [dowdict, moydict, hoddict, yerdict, myrdict]:
 		#d = dict(zip(d.keys(), d.values()))
@@ -423,12 +417,13 @@ def show():
 	for d in [dowdict, moydict, hoddict, yerdict, myrdict]:
 		dkeys = list(d.keys())
 		dkeys = specialsort(dkeys)
-		data = []
-		data.append(dkeys)
-		data.append([d[x] for x in dkeys])
+		dvals = [d[x] for x in dkeys]
 		#e0e6c3
-		plotdict(str(tempvar), data, colorbg="#272822", colorfg="#000", colormid="#43443a")
+		plotbars(str(tempvar), [dkeys, dvals], colorbg="#272822", colorfg="#000", colormid="#43443a")
 		tempvar += 1
+		if d is myrdict:
+			plotbars(str(tempvar), [dkeys[-15:], dvals[-15:]], colorbg="#272822", colorfg="#000", colormid="#43443a")
+			tempvar += 1
 	subprocess.Popen('PNGCREATOR.bat', shell=True, cwd='spooky')
 
 	if random.randint(0, 20) == 5:
@@ -521,6 +516,22 @@ def show():
 			print(memberformat(member), file=fileu)
 	filer.close()
 	fileu.close()
+
+def generatetdicts(fetch):
+	dowdict = {}
+	moydict = {}
+	hoddict = {}
+	yerdict = {}
+	myrdict = {}
+
+	for item in fetch:
+		itemdate = datetime.datetime.utcfromtimestamp(item[1])
+		dowdict = dictadding(dowdict, datetime.datetime.strftime(itemdate, "%A"))
+		moydict = dictadding(moydict, datetime.datetime.strftime(itemdate, "%B"))
+		hoddict = dictadding(hoddict, datetime.datetime.strftime(itemdate, "%H"))
+		yerdict = dictadding(yerdict, datetime.datetime.strftime(itemdate, "%Y"))
+		myrdict = dictadding(myrdict, datetime.datetime.strftime(itemdate, "%b%Y"))
+	return [dowdict, moydict, hoddict, yerdict, myrdict]
 
 def memberformat(member, spacer='.'):
 	subscribers = '{0:,}'.format(member[5])
@@ -952,7 +963,14 @@ def modernize():
 def rounded(x, rounding=100):
 	return int(round(x/rounding)) * rounding
 
-def plotdict(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888"):
+def plotbars(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888"):
+	"""Create postscript vectors of data
+
+	title = Name of the file without extension
+
+	inputdata = A list of two lists. First list has the x axis labels, second list
+	has the y axis data. x label 14 coresponds to y datum 14, etc.
+	"""
 	print('Printing', title)
 	t=tkinter.Tk()
 
@@ -988,7 +1006,7 @@ def plotdict(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888"):
 	labely = 255
 	#canvas.create_text(labelx, labely, text=str(top), font=("Consolas", 72), anchor="e")
 	labelspan = 130#(1735-255)/10
-	canvas.create_text(labelx, 100, text="Subreddits", font=("Consolas", 72), anchor="e", fill=colorfg)
+	canvas.create_text(175, 100, text="Subreddits created", font=("Consolas", 72), anchor="w", fill=colorfg)
 	for x in range(12):
 		value = int(top -((labely - 245) * perpixel))
 		value = rounded(value, 10)

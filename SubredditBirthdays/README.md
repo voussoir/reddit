@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 686,714 of 686,714 subreddits (100.000%) (0 remain)
+#####Collected 693,411 of 693,411 subreddits (100.000%) (0 remain)
 
-#####[Today's jumble](http://reddit.com/r/confusing_perspective+RATS+rescuedogs+gonewildnegev+AppHookup+ungulateteams+nosgoth+chelseafc+coys+DataHoarder+fantasybaseball+Rabbits+Charleston+streetart+debateAMR+policeporn+kayakfishing+belgium+CompanyOfHeroes+ModelsGoneMild)
+#####[Today's jumble](http://reddit.com/r/chinchilla+secretsanta+tulsa+ProGolf+blender+chemicalreactiongifs+LGG3+greenville+deutschland+judo+veganrecipes+synthesizers+Unity3D+excgarated+AskMenOver30+streetart+dune+DidYouKnowGaming+BeautifulFemales+heat)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -54,6 +54,22 @@ ______
     At 24 characters, this is the longest subreddit name on the site.
     It is the only subreddit which breaks the upper bound of 21 chars
     
+
+.
+#####The subreddit spammer of 2014
+    #spam begins
+    34nab, 1416340781, Nov 18 2014 19:59:41 UTC, 0, aDTALMel.........................0
+    
+    #spam ends
+    351ic, 1416613575, Nov 21 2014 23:46:15 UTC, 0, SerVic24.........................0
+
+    #subreddits created: 18433 (Not all spam, obviously)
+
+    Most of the offending subreddits have been banned, but not all.
+    Each of the subreddits were created by accounts of the same name as them
+    [/r/lopidider](http://reddit.com/r/lopidider) by /u/lopidider, etc.
+
+
 .
 #####Did I stutter?
     (2qjft, 1214562943, Jun 27 2008 10:35:43 UTC, NSFW:0, Seekers)
@@ -116,7 +132,6 @@ ______
     2s0g4, 1281335500, Aug 09 2010 06:31:40 UTC, 0, handbagsspace....................0
     
     Yes, those are newline characters.
-
 
 .
 #####There is a nsfw subreddit in Reddit's /r/random list
