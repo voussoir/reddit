@@ -27,10 +27,10 @@ subreddits created: 18433 (Not all spam, obviously!)
 
 Here are some surviving subreddits. Notice that the creators names are the same as the subreddit, so there was an equal amount of account spam.  
 /r/crezalamom - [image](https://raw.githubusercontent.com/voussoir/reddit/master/SubredditBirthdays/Novemberspam/crezalamom.png)  
-/r/netciowhitec - [image](https://raw.githubusercontent.com/voussoir/reddit/master/SubredditBirthdays/Novemberspam/netciowhitec.png)  
-/r/ythlebonro - [image](https://raw.githubusercontent.com/voussoir/reddit/master/SubredditBirthdays/Novemberspam/ythlebonro.png)  
-/r/lopidider - [image](https://raw.githubusercontent.com/voussoir/reddit/master/SubredditBirthdays/Novemberspam/lopidider.png)  
-/r/retcentsira - [image](https://raw.githubusercontent.com/voussoir/reddit/master/SubredditBirthdays/Novemberspam/retcentsira.png)  
+/r/netciowhitec - [image](https://raw.githubusercontent.com/voussoir/reddit/master/SubredditBirthdays/Novemberspam/Netciowhitec.png)  
+/r/ythlebonro - [image](https://raw.githubusercontent.com/voussoir/reddit/master/SubredditBirthdays/Novemberspam/Ythlebonro.png)  
+/r/lopidider - [image](https://raw.githubusercontent.com/voussoir/reddit/master/SubredditBirthdays/Novemberspam/Lopidider.png)  
+/r/retcentsira - [image](https://raw.githubusercontent.com/voussoir/reddit/master/SubredditBirthdays/Novemberspam/Retcentsira.png)  
 
 Here is a small glimpse at the less fortunate  
 /r/rephemouti  

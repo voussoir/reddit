@@ -69,6 +69,8 @@ ______
     Each of the subreddits were created by accounts of the same name as them
     [/r/lopidider](http://reddit.com/r/lopidider) by /u/lopidider, etc.
 
+[Deimorz comments on the event](http://www.reddit.com/r/dataisbeautiful/comments/2ovpmb/reddit_was_hit_with_massive_accountsubreddit/cmr50dx)
+
 
 .
 #####Did I stutter?
