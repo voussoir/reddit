@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 693,411 of 693,411 subreddits (100.000%) (0 remain)
+#####Collected 694,783 of 694,783 subreddits (100.000%) (0 remain)
 
-#####[Today's jumble](http://reddit.com/r/indie_rock+SaintsFC+Destiny+blackcoin+SquaredCircle+NotFoolingAnybody+GODUS+lastimages+Megturney+urbanexploration+upvotegifs+saplings+EmoScreamo+kreiswichs+Doom+ArtefactPorn+spotify+wtfdidijustread+mindcrack+cinematography)
+#####[Today's jumble](http://reddit.com/r/Cheap_Meals+SakuraGakuin+stopsmoking+animegifs+bettafish+Warmachine+flyfishing+bookporn+thesims+letsplay+Python+aggies+AlbumArtPorn+cosplaygirls+gamedesign+PropagandaPosters+pokememes+RandomActsOfPolish+wedding+curlyhair)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
