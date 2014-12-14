@@ -92,6 +92,7 @@ ERRORTOOEARLY = '!! DateTime: The time you have entered is before present time. 
 ERRORTITLEFORM = '!! Title: Title expected 3 attributes separated by `' + TITLESEPARATOR + '`'
 ERRORLONGTITLE = "!! Title: Your title is too long. Max 300 characters, you have %d"
 ERRORSUBREDDIT = '!! Reddit: Subbreddit /r/%s could not be found'
+ERRORNOTALLOWED = "!! Reddit: Bot is not allowed to submit to /r/%s."
 ERRORUNKNOWNCOMMAND = "Did not understand the command: `%s`"
 ERRORCRITICAL = '\n\nBecause of a critical post error, your chosen timestamp has been forfeited. You will need to edit it along with the other keys.\n\n'
 
@@ -216,7 +217,7 @@ def updatepost(comment):
 	print('Updating schedule for ' + source.id + ' via comment ' + comment.id)
 	pauthor = source.author.name
 	cauthor = comment.author.name
-	if ALLOWOTHEREDITS or (pauthor == cauthor):
+	if ALLOWOTHEREDITS or (pauthor == cauthor) or any(pauthor.lower() == admin.lower() for admin in ADMINS):
 		cur.execute('SELECT * FROM schedules WHERE ID=?', [source.id])
 		data=cur.fetchone()
 		if data:
@@ -420,7 +421,18 @@ def manage_schedule():
 				newpost = r.submit(psub, ptitle, text=pbody)
 			else:
 				purl = post.url
-				newpost = r.submit(psub, ptitle, url=purl, resubmit=True)
+				try:
+					newpost = r.submit(psub, ptitle, url=purl, resubmit=True)
+				except praw.errors.APIException as error:
+					if a.error_type == "SUBREDDIT_NOTALLOWED":
+						print("\tNOT ALLOWED IN SUBREDDIT!")
+						cur.execute('UPDATE schedules SET TIME=? WHERE ID=?', [IMPOSSIBLETIME, postid])
+						sql.commit()
+						scheduledata = list(schedule)
+						scheduledata[1] = IMPOSSIBLETIME
+						comment=buildcomment(scheduledata, [ERRORNOTALLOWED], critical=True)
+						post.add_comment(comment)
+						
 			errors = []
 			if schedule[4] == 1:
 				try:
