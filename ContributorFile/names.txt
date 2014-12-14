@@ -1,0 +1,4 @@
+# Lines with hashmarks at the front will not be considered
+GoldenSights
+Unidan
+Deimorz
