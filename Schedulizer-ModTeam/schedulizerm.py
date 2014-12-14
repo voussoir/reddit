@@ -24,7 +24,12 @@ TITLESEPARATOR = "||"
 #This should not be a naturally occuring part of any title
 #Example: "15 December 2014 ||| GoldTesting ||| Welcome to the subreddit"
 #          ^Time to post        ^Sub to post    ^Title of post
-POSTEDFLAIR = "Post made!"
+SCHEDULEDFLAIR_TEXT = "Scheduled!"
+SCHEDULEDFLAIR_CSS = "scheduled"
+#This flair will be assigned to the source when the source is scheduled
+
+POSTEDFLAIR_TEXT = "Post made!"
+POSTEDFLAIR_CSS = "posted"
 #This flair will be assigned to the source when the post is made
 MAXPOSTS = 3
 #The number of items you want to get from /new. Recommended 100
@@ -204,6 +209,7 @@ def processpost(inputpost):
 		schedulecomment = buildcomment(datalist, errors, critical)
 		print('Writing comment')
 		inputpost.add_comment(schedulecomment)
+		inputpost.set_flair(flair_text=SCHEDULEDFLAIR_TEXT, flair_css_class=SCHEDULEDFLAIR_CSS)
 
 def updatepost(comment):
 	source = comment.submission
@@ -445,7 +451,7 @@ def manage_schedule():
 			sql.commit()
 			print('Flairing source.')
 			post.add_comment(newcomment)
-			post.set_flair(flair_text=POSTEDFLAIR)
+			post.set_flair(flair_text=POSTEDFLAIR_TEXT, flair_css_class=POSTEDFLAIR_CSS)
 
 		else:
 			print(" : T-" + str(round(posttime - nowstamp)))
