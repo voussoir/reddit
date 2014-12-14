@@ -33,6 +33,10 @@ ALLOWOTHEREDITS = False
 WAIT = 30
 #How many seconds in between loop cycles. Completely inactive during this time.
 
+ADMINS = ["ApexRedditr", "GoldenSights"]
+#These are the people who will get tracebacks when the bot has problems.
+TRACEBACK_SUBJECT = "SchedulizerM Error traceback"
+
 POSTEDCOMMENT = "Your post to /r/%s has been created. %s"
 #Made in the source when the post is made
 
@@ -355,7 +359,7 @@ def manage_unread():
 	inbox = list(r.get_unread(limit=100))
 	for message in inbox:
 		if isinstance(message, praw.objects.Message):
-			if message.subject.lower() == "ping":
+			if "ping" in message.subject.lower():
 				message.reply("Pong")
 				print('Responding to ping')
 		elif isinstance(message, praw.objects.Comment):
@@ -454,6 +458,18 @@ while True:
 		manage_unread()
 		manage_schedule()
 	except Exception as e:
-		traceback.print_exc()
+		error_message = traceback.format_exc()
+		print(error_message)
+		now = getTime(False)
+		now = datetime.datetime.strftime(now, "%B %d %H:%M:%S UTC")
+		error_message = '    ' + error_message
+		error_message = error_message.replace('\n', '\n    ')
+		error_message += '\n' + str(now)
+		for admin in ADMINS:
+			print('Messaging ' + admin)
+			try:
+				r.send_message(admin, TRACEBACK_SUBJECT, error_message)
+			except:
+				print('COULD NOT MESSAGE ADMIN')
 	print("Sleeping\n")
 	time.sleep(WAIT)
