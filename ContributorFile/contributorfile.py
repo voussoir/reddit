@@ -21,7 +21,6 @@ FILENAME = input('File: ')
 # You can replace these with strings if you want it hardcoded.
 
 """ That's all! """
-print(USERAGENT)
 
 try:
     import bot
