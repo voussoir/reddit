@@ -368,7 +368,7 @@ def manage_new():
 				data = [post.id, 1, "", "", 0, 0, "", "", "meta"]
 				cur.execute('INSERT INTO schedules VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
 				sql.commit()
-				
+
 def manage_unread():
 	print('Managing inbox')
 	inbox = list(r.get_unread(limit=100))
@@ -424,55 +424,55 @@ def manage_schedule():
 			ptitle = schedule[3]
 			psub = schedule[2]
 			print('\tSubmitting post')
-			if post.is_self:
-				pbody = post.selftext
-				newpost = r.submit(psub, ptitle, text=pbody)
-			else:
-				purl = post.url
-				try:
-					newpost = r.submit(psub, ptitle, url=purl, resubmit=True)
-				except praw.errors.APIException as error:
-					if a.error_type == "SUBREDDIT_NOTALLOWED":
-						print("\tNOT ALLOWED IN SUBREDDIT!")
-						cur.execute('UPDATE schedules SET TIME=? WHERE ID=?', [IMPOSSIBLETIME, postid])
-						sql.commit()
-						scheduledata = list(schedule)
-						scheduledata[1] = IMPOSSIBLETIME
-						comment=buildcomment(scheduledata, [ERRORNOTALLOWED], critical=True)
-						post.add_comment(comment)
-						
-			errors = []
-			if schedule[4] == 1:
-				try:
-					print('\tDistinguishing')
-					newpost.distinguish()
-				except:
-					print('\tDistinguish failed')
-					errors.append(ERRORDISTINGUISH)
-			if schedule[5] == 1:
-				try:
-					print('\tStickying')
-					newpost.sticky()
-				except:
-					print('\tSticky failed')
-					errors.append(ERRORSTICKYFAIL)
-			if schedule[6] != "" or schedule[7] != "":
-				try:
-					print('\tFlairing')
-					newpost.set_flair(flair_text=schedule[6], flair_css_class=schedule[7])
-				except:
-					print('\tFlair failed')
-			newsub = newpost.subreddit.display_name
-			newlink = newpost.short_link
-			newid = newpost.id
-			newcomment = POSTEDCOMMENT % (newsub, newlink)
-			newcomment += '\n\n'.join(errors)
-			cur.execute('UPDATE schedules SET POST=? WHERE ID=?', [newid, postid])
-			sql.commit()
-			print('Flairing source.')
-			post.add_comment(newcomment)
-			post.set_flair(flair_text=POSTEDFLAIR_TEXT, flair_css_class=POSTEDFLAIR_CSS)
+			try:
+				if post.is_self:
+					pbody = post.selftext
+					newpost = r.submit(psub, ptitle, text=pbody)
+				else:
+					purl = post.url
+						newpost = r.submit(psub, ptitle, url=purl, resubmit=True)
+				errors = []
+				if schedule[4] == 1:
+					try:
+						print('\tDistinguishing')
+						newpost.distinguish()
+					except:
+						print('\tDistinguish failed')
+						errors.append(ERRORDISTINGUISH)
+				if schedule[5] == 1:
+					try:
+						print('\tStickying')
+						newpost.sticky()
+					except:
+						print('\tSticky failed')
+						errors.append(ERRORSTICKYFAIL)
+				if schedule[6] != "" or schedule[7] != "":
+					try:
+						print('\tFlairing')
+						newpost.set_flair(flair_text=schedule[6], flair_css_class=schedule[7])
+					except:
+						print('\tFlair failed')
+				newsub = newpost.subreddit.display_name
+				newlink = newpost.short_link
+				newid = newpost.id
+				newcomment = POSTEDCOMMENT % (newsub, newlink)
+				newcomment += '\n\n'.join(errors)
+				cur.execute('UPDATE schedules SET POST=? WHERE ID=?', [newid, postid])
+				sql.commit()
+				print('Flairing source.')
+				post.add_comment(newcomment)
+				post.set_flair(flair_text=POSTEDFLAIR_TEXT, flair_css_class=POSTEDFLAIR_CSS)
 
+			except praw.errors.APIException as error:
+				if a.error_type == "SUBREDDIT_NOTALLOWED":
+					print("\tNOT ALLOWED IN SUBREDDIT!")
+					cur.execute('UPDATE schedules SET TIME=? WHERE ID=?', [IMPOSSIBLETIME, postid])
+					sql.commit()
+					scheduledata = list(schedule)
+					scheduledata[1] = IMPOSSIBLETIME
+					comment=buildcomment(scheduledata, [ERRORNOTALLOWED], critical=True)
+					post.add_comment(comment)
+						
 		else:
 			print(" : T-" + str(round(posttime - nowstamp)))
 
