@@ -430,7 +430,7 @@ def manage_schedule():
 					newpost = r.submit(psub, ptitle, text=pbody)
 				else:
 					purl = post.url
-						newpost = r.submit(psub, ptitle, url=purl, resubmit=True)
+					newpost = r.submit(psub, ptitle, url=purl, resubmit=True)
 				errors = []
 				if schedule[4] == 1:
 					try:
