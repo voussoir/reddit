@@ -329,6 +329,8 @@ def buildcomment(datalist, errors, critical=False):
 #ID TEXT, TIME INT, REDDIT TEXT, TITLE TEXT, DIST INT, STICKY INT, FLAIR TEXT, FLCSS TEXT, POST TEXT
 #  0         1          2            3          4         5           6           7           8
 def buildtable(inputdata):
+	print(inputdata[1], type(inputdata[1])) #Troubleshooting with Apex
+	
 	timeobj = datetime.datetime.utcfromtimestamp(inputdata[1])
 	inputdata[1] = datetime.datetime.strftime(timeobj, "%B %d %Y %H:%M UTC")
 	inputdata[2] = '/r/' + inputdata[2]
@@ -464,7 +466,7 @@ def manage_schedule():
 				post.set_flair(flair_text=POSTEDFLAIR_TEXT, flair_css_class=POSTEDFLAIR_CSS)
 
 			except praw.errors.APIException as error:
-				if a.error_type == "SUBREDDIT_NOTALLOWED":
+				if error.error_type == "SUBREDDIT_NOTALLOWED":
 					print("\tNOT ALLOWED IN SUBREDDIT!")
 					cur.execute('UPDATE schedules SET TIME=? WHERE ID=?', [IMPOSSIBLETIME, postid])
 					sql.commit()
