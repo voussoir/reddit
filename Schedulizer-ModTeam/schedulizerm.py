@@ -24,10 +24,13 @@ TITLESEPARATOR = "||"
 #This should not be a naturally occuring part of any title
 #Example: "15 December 2014 ||| GoldTesting ||| Welcome to the subreddit"
 #          ^Time to post        ^Sub to post    ^Title of post
+IGNORE_FLAG = "#"
+#If this character is THE FIRST CHARACTER IN THE TITLE,
+#The bot will ignore that post. Used for meta / discussion.
+
 SCHEDULEDFLAIR_TEXT = "Scheduled!"
 SCHEDULEDFLAIR_CSS = "scheduled"
 #This flair will be assigned to the source when the source is scheduled
-
 POSTEDFLAIR_TEXT = "Post made!"
 POSTEDFLAIR_CSS = "posted"
 #This flair will be assigned to the source when the post is made
@@ -359,8 +362,13 @@ def manage_new():
 		pid = post.id
 		cur.execute('SELECT * FROM schedules WHERE ID=?', [pid])
 		if not cur.fetchone():
-			processpost(post)
-
+			if post.title[0] != IGNORE_FLAG:
+					processpost(post)
+			else:
+				data = [post.id, 1, "", "", 0, 0, "", "", "meta"]
+				cur.execute('INSERT INTO schedules VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
+				sql.commit()
+				
 def manage_unread():
 	print('Managing inbox')
 	inbox = list(r.get_unread(limit=100))
