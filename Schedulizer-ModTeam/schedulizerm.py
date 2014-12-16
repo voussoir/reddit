@@ -99,7 +99,7 @@ ERRORNOTALLOWED = "!! Reddit: Bot is not allowed to submit to /r/%s."
 ERRORUNKNOWNCOMMAND = "Did not understand the command: `%s`"
 ERRORCRITICAL = '\n\nBecause of a critical post error, your chosen timestamp has been forfeited. You will need to edit it along with the other keys.\n\n'
 
-IMPOSSIBLETIME = 16756704000
+IMPOSSIBLETIME = 2147483646
 """ All done! """
 
 try:
