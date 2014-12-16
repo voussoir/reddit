@@ -472,7 +472,7 @@ def manage_schedule():
 					sql.commit()
 					scheduledata = list(schedule)
 					scheduledata[1] = IMPOSSIBLETIME
-					comment=buildcomment(scheduledata, [ERRORNOTALLOWED], critical=True)
+					comment=buildcomment(scheduledata, [ERRORNOTALLOWED%psub], critical=True)
 					post.add_comment(comment)
 						
 		else:
