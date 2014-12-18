@@ -59,7 +59,7 @@ def human(timestamp):
 	human = datetime.datetime.strftime(day, "%b %d %Y %H:%M:%S UTC")
 	return human
 
-def processi(sr, doupdates=False, enablekilling=False):
+def processi(sr, doupdates=True, enablekilling=False):
 	global olds
 	if 't5_' not in sr:
 		sr = 't5_' + sr
@@ -113,15 +113,19 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 				isnsfw = '1' if sub.over18 else '0'
 				subscribers = sub.subscribers if sub.subscribers else 0
 				isjumbled = '1' if isjumbled else '0'
-				print('New: ' + sub.id + ' : ' + h + ' : ' + isnsfw + ' : '+ sub.display_name + ' : ' + str(subscribers))
+				print('New: %s : %s : %s : %s : %d' % (sub.id, h, isnsfw, sub.display_name, subscribers))
 				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?)', [sub.id, sub.created_utc, h, isnsfw, sub.display_name, subscribers,isjumbled])
 			elif doupdates:
 				if sub.subscribers != None:
 					subscribers = sub.subscribers
 				else:
 					subscribers = 0
+				h = human(sub.created_utc)
+				isnsfw = '1' if sub.over18 else '0'
 				isjumbled = '1' if isjumbled else '0'
-				print('Upd: ' + sub.id + ' : ' + ' '*31 + sub.display_name + ' : ' + str(subscribers))
+				oldsubs = f[5]
+				subscriberdiff = subscribers - oldsubs
+				print('Upd: %s : %s : %s : %s : %d (%d)' % (sub.id, h, isnsfw, sub.display_name, subscribers, subscriberdiff))
 				cur.execute('UPDATE subreddits SET SUBSCRIBERS=?, JUMBLE=? WHERE ID=?', [subscribers, isjumbled, sub.id])
 				olds += 1
 			else:
