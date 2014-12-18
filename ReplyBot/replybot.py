@@ -26,10 +26,6 @@ WAIT = 20
 
 '''All done!'''
 
-
-
-
-WAITS = str(WAIT)
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
     USERNAME = bot.getu()
@@ -47,6 +43,7 @@ print('Loaded Completed table')
 
 sql.commit()
 
+print('Logging in...')
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
@@ -60,7 +57,6 @@ def scanSub():
             pauthor = post.author.name
             cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
             if not cur.fetchone():
-                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
                 pbody = post.body.lower()
                 if any(key.lower() in pbody for key in PARENTSTRING):
                     if pauthor.lower() != USERNAME.lower():
@@ -68,8 +64,10 @@ def scanSub():
                         post.reply(REPLYSTRING)
                     else:
                         print('Will not reply to self')
+                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
         except AttributeError:
-            pauthor = '[DELETED]'
+            #Author is deleted. We don't care about this
+            pass
     sql.commit()
 
 
@@ -78,7 +76,7 @@ while True:
         scanSub()
     except Exception as e:
         traceback.print_exc()
-    print('Running again in ' + WAITS + ' seconds \n')
+    print('Running again in %d seconds \n' % WAIT)
     sql.commit()
     time.sleep(WAIT)
 

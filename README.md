@@ -27,14 +27,15 @@ If you replace
     PASSWORD = ""
 
 with
+    
+    import getpass
+    PASSWORD = getpass.getpass("Password: ")
 
-    PASSWORD = input("Password: ")
-
-Then you will be asked to type in your bot's password when it starts. For additional security, you can put
+Then you will be asked to type in your bot's password when it starts using the [getpass module](https://docs.python.org/2/library/getpass.html#getpass.getpass). For additional security, you can put
 
     del PASSWORD
 
-immediately after `r.login()` so that the password variable is nowhere in the namespace. If you want your password to be hidden while typing, use [the getpass module](https://docs.python.org/2/library/getpass.html#getpass.getpass) instead of the standard input. 
+immediately after `r.login()` so that the password variable is nowhere in the namespace.
 
 Alternatively, for automated and semi-secure password storage, see Bot.py
 
