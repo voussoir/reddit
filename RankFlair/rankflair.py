@@ -60,7 +60,11 @@ post ["_posttitle_"](_postlink_)
 ''' All done! '''
 
 # Automatic preparation
-RANKINGS_REVERSE = dict(zip(RANKINGS.values(), RANKINGS.keys()))
+RANKINGS_REVERSE = {}
+for key in RANKINGS:
+	val = RANKINGS[key].lower()
+	RANKINGS_REVERSE[val] = key
+
 RANKKEYS = sorted(list(RANKINGS.keys()))
 MAXRANK = RANKKEYS[-1]
 
@@ -106,6 +110,7 @@ def manageranks():
 				post.set_flair(suggested_flair)
 				if SEND_MODMAIL:
 					compose_modmail(post, suggested_flair, suggested_rank)
+					pass
 
 def get_rank_from_pos(position):
 	''' Given a position in a listing, return the appropriate rank '''
@@ -119,9 +124,9 @@ def flair_is_better(new, old):
 		#Post has no flair yet. Anything is better
 		return True
 
-	newrank = RANKINGS_REVERSE[new]
+	newrank = RANKINGS_REVERSE[new.lower()]
 	try:
-		oldrank = RANKINGS_REVERSE[old]
+		oldrank = RANKINGS_REVERSE[old.lower()]
 	except KeyError:
 		if IGNORE_UNKNOWN:
 			print('\t"%s" is not a recognized rank. Ignoring' % old)
