@@ -3,7 +3,7 @@ Subreddit Birthdays
 
 #####Collected 699,427 of 699,427 subreddits (100.000%) (0 remain)
 
-#####[Today's jumble](http://reddit.com/r/Groot+nyc+washingtondc+electricvehicles+teslore+RedneckGifs+HI_Res+Ducati+BoardwalkEmpire+AskSF+CHIBears+playstation+heat+AskDocs+AutoDetailing+asheville+WTF+InsaneCringePosse+exmuslim+dogs)
+#####[Today's jumble](http://reddit.com/r/MRW+ArcherFX+occupywallstreet+BostonTerrier+RedHotChiliPeppers+Marijuana+AngieVaronaLegal+ledootgeneration+Ohio+trapmuzik+SaintsFC+bestofworldstar+spheremasterrace+ofcoursethatsathing+goingtohellforthis+rollerderby+dragoncon+linux4noobs+ronpaul+VolleyballGirls)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

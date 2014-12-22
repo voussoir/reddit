@@ -423,10 +423,10 @@ def show():
 		dkeys = specialsort(dkeys)
 		dvals = [d[x] for x in dkeys]
 		#e0e6c3
-		plotbars(str(tempvar), [dkeys, dvals], colorbg="#272822", colorfg="#000", colormid="#43443a")
+		plotbars(str(tempvar), [dkeys, dvals], colorbg="#272822", colorfg="#000", colormid="#43443a", forcezero=True)
 		tempvar += 1
 		if d is myrdict:
-			plotbars(str(tempvar), [dkeys[-15:], dvals[-15:]], colorbg="#272822", colorfg="#000", colormid="#43443a")
+			plotbars(str(tempvar), [dkeys[-15:], dvals[-15:]], colorbg="#272822", colorfg="#000", colormid="#43443a", forcezero=True)
 			tempvar += 1
 	subprocess.Popen('PNGCREATOR.bat', shell=True, cwd='spooky')
 
@@ -967,7 +967,7 @@ def modernize():
 def rounded(x, rounding=100):
 	return int(round(x/rounding)) * rounding
 
-def plotbars(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888"):
+def plotbars(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888", forcezero=False):
 	"""Create postscript vectors of data
 
 	title = Name of the file without extension
@@ -996,6 +996,8 @@ def plotbars(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888"):
 	smallest = min(dvals)
 	bottom = int(smallest*0.75) - 5
 	bottom = 0 if bottom < 8 else rounded(bottom, 10)
+	if forcezero:
+		bottom = 0
 	largest = max(dvals)
 	top = int(largest + (largest/5))
 	top = rounded(top, 10)
