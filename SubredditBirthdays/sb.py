@@ -106,7 +106,8 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 
 	for sub in subs:
 		try:
-			cur.execute('SELECT * FROM subreddits WHERE ID=?', [sub.id])
+			idint = b36(sub.id)
+			cur.execute('SELECT * FROM subreddits WHERE IDINT=?', [idint])
 			f = cur.fetchone()
 			if not f:
 				h = human(sub.created_utc)
@@ -114,7 +115,7 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 				subscribers = sub.subscribers if sub.subscribers else 0
 				isjumbled = '1' if isjumbled else '0'
 				print('New: %s : %s : %s : %s : %d' % (sub.id, h, isnsfw, sub.display_name, subscribers))
-				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?)', [sub.id, sub.created_utc, h, isnsfw, sub.display_name, subscribers,isjumbled])
+				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [sub.id, sub.created_utc, h, isnsfw, sub.display_name, subscribers, isjumbled, idint])
 			elif doupdates:
 				if sub.subscribers != None:
 					subscribers = sub.subscribers
@@ -126,7 +127,7 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 				oldsubs = f[5]
 				subscriberdiff = subscribers - oldsubs
 				print('Upd: %s : %s : %s : %s : %d (%d)' % (sub.id, h, isnsfw, sub.display_name, subscribers, subscriberdiff))
-				cur.execute('UPDATE subreddits SET SUBSCRIBERS=?, JUMBLE=? WHERE ID=?', [subscribers, isjumbled, sub.id])
+				cur.execute('UPDATE subreddits SET SUBSCRIBERS=?, JUMBLE=? WHERE IDINT=?', [subscribers, isjumbled, idint])
 				olds += 1
 			else:
 				olds += 1
@@ -197,10 +198,8 @@ def processrand(count, doublecheck=False, sleepy=0, delaysaving=False, doupdates
 	lower = cur.fetchone()
 	lower = int(lower[2])
 
-	cur.execute('SELECT * FROM subreddits')
-	fetched = cur.fetchall()
-	fetched.sort(key=lambda x:x[1])
-	upper = fetched[-1][0]
+	cur.execute('SELECT * FROM subreddits ORDER BY IDINT DESC LIMIT 1')
+	upper = cur.fetchone()[0]
 	print('<' + b36(lower).lower() + ',',  upper + '>', end=', ')
 	upper = b36(upper)
 	totalpossible = upper-lower
@@ -269,7 +268,7 @@ def processir(startingpoint, ranger, chunksize=100, slowmode=False, enablekillin
 		print("Rejected", olds)
 
 def kill(sr):
-	cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?)', [sr, 0, '', '', '?', 0, '0'])
+	cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [sr, 0, '', '', '?', 0, '0', b36(sr)])
 	sql.commit()
 
 

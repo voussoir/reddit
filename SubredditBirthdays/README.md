@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 702,597 of 702,597 subreddits (100.000%) (0 remain)
+#####Collected 703,464 of 703,316 subreddits (100.021%) (-148 remain)
 
-#####[Today's jumble](http://reddit.com/r/howardstern+mildyinteresting+barista+NewSkaters+SubredditDrama+allthingszerg+tuckedinkitties+Military+boulder+HomeImprovement+jakeandamir+FCInterMilan+OpiatesRecovery+AskAnthropology+deathgrips+AnythingGoesNews+Rottweiler+Trove+dresdenfiles+whatisthisthing)
+#####[Today's jumble](http://reddit.com/r/iOSthemes+Shaneisms+facebookwins+MLPLounge+copypasta+BSG+pornfree+Toyota+TheBluePill+LinuxActionShow+Kayaking+MovieSuggestions+indianews+kol+NotTimAndEricPics+MushroomPorn+startups+badpeoplestories+indonesia+AFOL)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -11,14 +11,15 @@ The earliest subreddit after which IDs are consistently incrementing is [/r/234]
 
 Some subreddits are not properly marked as NSFW. This is either the fault of the moderators or, in some cases, the data was collected while the subreddit was brand new.
 
-2 November 2014: Finally decided to start measuring subscribers. Numbers will be wrong for quite some time.
+02 November 2014: Finally decided to start measuring subscribers. Numbers will be wrong for quite some time.
 
-7 November 2014: 2009, 2010, and 2011 complete!
+07 November 2014: 2009, 2010, and 2011 complete!
 
-8 November 2014: 2012 and 2013 complete!
+08 November 2014: 2012 and 2013 complete!
 
-9 November 2014: 2014 up-to-date!!!!
+09 November 2014: 2014 up-to-date!!!!
 
+24 December 2014: **Massive speed boost** - I just learned about sql INDEX; and I've also added a column to the table where subreddit IDs are stored in integers instead of b36 strings. Together, these changes make updates go like 20x faster. Why have I waited so long?
 ______
 
 
