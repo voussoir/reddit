@@ -63,7 +63,7 @@ def processi(sr, doupdates=True, enablekilling=False):
 	global olds
 	if 't5_' not in sr:
 		sr = 't5_' + sr
-	cur.execute('SELECT * FROM subreddits WHERE ID=?', [sr[3:]])
+	cur.execute('SELECT * FROM subreddits WHERE IDINT=?', [b36(sr[3:])])
 	if not cur.fetchone() or doupdates==True:
 		sro = r.get_info(thing_id=sr)
 		try:

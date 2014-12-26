@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 704,323 of 704,296 subreddits (100.004%) (-27 remain)
+#####Collected 704,460 of 704,458 subreddits (100.000%) (-2 remain)
 
-#####[Today's jumble](http://reddit.com/r/Astros+HunterXHunter+moto360+stopdrinking+elsamasterrace+SanctionedSuicide+orangeisthenewblack+Defcon+chinchilla+ChicagoSuburbs+rugbyunion+candiceswanepoel+Republican+hayleywilliams+USCR+LOLDyrus+TrueSTL+nononono+PKA+madisonwi)
+#####[Today's jumble](http://reddit.com/r/keto+Conservatives_R_Us+TEFL+MTGLegacy+propaganda+radiocontrol+StarcraftCirclejerk+Okidoge+funnycharts+catbellies+Badfaketexts+realasians+raspberry_pi+ForeverAlone+kpop+intrusivethoughts+InvisibleBicycles+billiards+ecig_vendors+CraftBeer)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
