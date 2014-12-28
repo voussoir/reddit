@@ -96,7 +96,7 @@ def human(timestamp):
 	human = datetime.datetime.strftime(day, "%b %d %Y %H:%M:%S UTC")
 	return human
 
-def process(itemid, log=True):
+def process(itemid, log=True, kill=True):
 	if isinstance(itemid, str):
 		itemid = [itemid]
 	if isinstance(itemid, list):
@@ -112,8 +112,9 @@ def process(itemid, log=True):
 		len(itemid)
 	except:
 		print(temp, "DEAD")
-		logdead(temp[0])
-		process(temp)
+		if kill:
+			logdead(temp[0])
+			process(temp, kill=kill)
 		return
 	for index in range(len(itemid)):
 		item = itemid[index]
@@ -195,7 +196,7 @@ def remove_existing(items):
 		raise Exception("Nothing new")
 	return items
 
-def processrange(lower, upper):
+def processrange(lower, upper, kill=True):
 	if isinstance(lower, str):
 		lower = b36(lower)
 		if isinstance(upper, int):
@@ -210,7 +211,7 @@ def processrange(lower, upper):
 		p = ids[:100]
 		print("%s >>> %s (%d)" % (p[0], p[-1], len(ids)))
 		ids = ids[100:]
-		process(p)
+		process(p, kill=kill)
 
 def lastitem():
 	cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')

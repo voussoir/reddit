@@ -38,6 +38,15 @@ RANKINGS = {1: "#1 Top poster!",
 			25: "Top 25 poster",
 			50: "Top 50 poster",
 			100: "Top 100 poster"}
+#Flair text
+
+RANKINGCSS = {1: "toprank",
+			  5: "fiverank",
+			  10: "tenrank",
+			  25: "twfiverank",
+			  50: "fiftyrank",
+			  100: "hundredrank"}
+#Flair CSS class. Use empty quotes if you don't have any.
 
 SEND_MODMAIL = True
 #Send subreddit modmail when a post achieves a rank
@@ -104,10 +113,12 @@ def manageranks():
 			suggested = get_rank_from_pos(position)
 			suggested_rank = suggested[0]
 			suggested_flair = suggested[1]
+			suggested_css = RANKINGCSS[suggested_rank]
 
 			if flair_is_better(new=suggested_flair, old=actual_flair):
 				print('\tSetting flair: %s' % suggested_flair)
-				post.set_flair(suggested_flair)
+				post.set_flair(flair_text=suggested_flair,
+							   flair_css_class=suggested_css)
 				if SEND_MODMAIL:
 					compose_modmail(post, suggested_flair, suggested_rank)
 					pass
