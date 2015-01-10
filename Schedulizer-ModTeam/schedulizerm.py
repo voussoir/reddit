@@ -440,7 +440,7 @@ def manage_schedule():
 						newpost.distinguish()
 					except:
 						print('\tDistinguish failed')
-						errors.append(ERRORDISTINGUISH)
+						errors.append(ERRORDISTINGUISHFAIL)
 				if schedule[5] == 1:
 					try:
 						print('\tStickying')

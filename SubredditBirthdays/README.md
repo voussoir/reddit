@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 705,947 of 705,945 subreddits (100.000%) (-2 remain)
+#####Collected 715,230 of 715,228 subreddits (100.000%) (-2 remain)
 
-#####[Today's jumble](http://reddit.com/r/TrainPorn+paintball+Cheap_Meals+baconreader+cordcutters+ecology+RandomTrueFacts+logophilia+Pictures+ENFP+FLCL+glassheads+pocketsand+thewalkingdead+mfacirclejerk+Throwers+AnimalsBeingDerps+RedDwarf+arielwinter+ScotchSwap)
+#####[Today's jumble](http://reddit.com/r/workaholics+StartledCats+brisbane+skylineporn+raisedbynarcissists+ledzeppelin+Rift+thatHappened+EmoScreamo+eo+newzealand+lookatmydog+OrlandoMagic+eCards+iOS8+mindcrack+bigboobproblems+birdpics+brokengifs+Stoicism)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
