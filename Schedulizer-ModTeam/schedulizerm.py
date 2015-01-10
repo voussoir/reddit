@@ -379,6 +379,14 @@ def manage_unread():
 			if "ping" in message.subject.lower():
 				message.reply("Pong")
 				print('Responding to ping')
+			try:
+				mauthor = message.author.name
+				if any(mauthor.lower() == admin.lower() for admin in ADMINS):
+					if "kill" in message.subject.lower():
+						alertadmins("Hard shutdown", "The bot is being killed by " + mauthor)
+						quit()
+			except AttributeError:
+				pass
 		elif isinstance(message, praw.objects.Comment):
 			commentsub = message.subreddit.display_name
 			if commentsub.lower() == SUBREDDIT.lower():
@@ -401,7 +409,7 @@ def manage_schedule():
 		submissionlist += r.get_info(thing_id=idlist[:100])
 		idlist = idlist[100:]
 	for item in submissionlist:
-		if not item.author:
+		if (not item.author) or (item.banned_by):
 			print('\t' + item.id + ' has been deleted')
 			cur.execute('DELETE FROM schedules WHERE ID=?', [item.id])
 			sql.commit()
@@ -478,6 +486,13 @@ def manage_schedule():
 		else:
 			print(" : T-" + str(round(posttime - nowstamp)))
 
+def alertadmins(messagesubject, messagetext):
+	for admin in ADMINS:
+		print('Messaging ' + admin)
+		try:
+			r.send_message(admin, messagesubject, messagetext)
+		except:
+			print('COULD NOT MESSAGE ADMIN')
 
 
 while True:
@@ -493,11 +508,6 @@ while True:
 		error_message = '    ' + error_message
 		error_message = error_message.replace('\n', '\n    ')
 		error_message += '\n' + str(now)
-		for admin in ADMINS:
-			print('Messaging ' + admin)
-			try:
-				r.send_message(admin, TRACEBACK_SUBJECT, error_message)
-			except:
-				print('COULD NOT MESSAGE ADMIN')
+		alertadmins(TRACEBACK_SUBJECT, error_message)
 	print("Sleeping\n")
 	time.sleep(WAIT)
