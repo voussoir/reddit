@@ -154,7 +154,6 @@ def manageranks():
 				if SEND_MODMAIL:
 					compose_modmail(post, suggested_flair, suggested_rank)
 					pass
-			time.sleep(2)
 			print()
 
 def get_rank_from_pos(position):
