@@ -147,7 +147,6 @@ def manageranks():
 				subreddit.set_flair(pauthor, flair_css_class=newflair, flair_text=userflairtext)
 				print('\told: css: %s, text: %s' % (userflaircss, userflairtext))
 				print('\tnew: css: %s, text: %s' % (newflair, userflairtext))
-				print("\t%s +%d Point%s!" % (suggested_flair, rankjump, "s!" if rankjump > 1 else "!"))
 				commenttext = "%s +%d Point%s" % (suggested_flair, rankjump, "s!" if rankjump > 1 else "!")
 				post.add_comment(commenttext)
 				print("\tWriting comment:", commenttext)
