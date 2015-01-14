@@ -732,7 +732,7 @@ def processnewest():
 	processi(brandnewest.id)
 	return brandnewest.id
 
-def search(query="", casesense=False, filterout=[], nsfwmode=2, idd="", doreturn=False):
+def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, idd="", doreturn=False):
 	"""
 	Search for a subreddit by name
 	*str query= The search query
@@ -742,6 +742,7 @@ def search(query="", casesense=False, filterout=[], nsfwmode=2, idd="", doreturn
 	    "*querry*" = results where "query" is in the middle of the name
 	bool casesense = is the search case sensitive
 	list filterout = [list, of, words] to omit from search. Follows casesense
+	int subscribers = minimum number of subscribers
 	int nsfwmode=
 	  0 - Clean only
 	  1 - Dirty only

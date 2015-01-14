@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 715,230 of 715,228 subreddits (100.000%) (-2 remain)
+#####Collected 718,749 of 718,747 subreddits (100.000%) (-2 remain)
 
-#####[Today's jumble](http://reddit.com/r/workaholics+StartledCats+brisbane+skylineporn+raisedbynarcissists+ledzeppelin+Rift+thatHappened+EmoScreamo+eo+newzealand+lookatmydog+OrlandoMagic+eCards+iOS8+mindcrack+bigboobproblems+birdpics+brokengifs+Stoicism)
+#####[Today's jumble](http://reddit.com/r/TaylorSwift+evangelion+wowthissubexists+creepy_gif+Minecraft360+eatsandwiches+RedditArmie+WebGames+AnimeSketch+AndroidUsers+PlantedTank+Emma_Roberts+exmuslim+CrappyDesign+CryptoCurrency+rangers+Shortfilms+EA_NHL+eu+redditpolish)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

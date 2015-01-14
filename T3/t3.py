@@ -63,6 +63,7 @@ class Post:
 		self.score = data[9]
 		self.subreddit = data[10]
 		self.distinguished = DISTINGUISHMAP[data[11]]
+		self.distinguished_int = data[11]
 		self.textlen = data[12]
 
 
@@ -221,60 +222,90 @@ def show():
 	filea = open('show/missing.txt', 'w')
 	fileb = open('show/stats.txt', 'w')
 
-	cur.execute('SELECT Count(*) FROM posts')
-	count = cur.fetchone()
-	count = count[0]
-	counts = '{0:,}'.format(count)
-	mainstats = '%s posts collected; ' % counts
-	print('Current total:', counts)
+	totalcount = 0
+	totaltitle = 0
+	totalselftext = 0
+	totalscore = 0
+	deadcount = 0
+	selfcount = 0
+	nsfwcount = 0
+	distinguishcount_m = 0
+	distinguishcount_a = 0
+	subredditcounts = {}
+	dead = []
+	
+	cur.execute('SELECT * FROM posts')
+	post = cur.fetchone()
+	while post:
+		post = Post(post)
+		totalcount += 1
+		if post.created_utc == 0:
+			deadcount += 1
+			dead.append(post.idstr)
+			post = cur.fetchone()
+			continue
+		if post.is_self:
+			selfcount += 1
+			totalselftext += post.textlen
+		if post.over_18:
+			nsfwcount += 1
+		if post.distinguished_int == 1:
+			distinguishcount_m += 1
+		elif post.distinguished_int == 2:
+			distinguishcount_a += 1
+		totalscore += post.score
+		totaltitle += len(post.title)
 
-	print('Counting dead posts')
-	cur.execute('SELECT * FROM posts WHERE created=0')
-	dead = cur.fetchall()
-	dead = [x[1] for x in dead]
-	deadcount = len(dead)
-	deadcount = '{0:,}'.format(deadcount)
-	mainstats += '%s dead.\n' % deadcount
+		try:
+			subredditcounts[post.subreddit] += 1
+		except KeyError:
+			subredditcounts[post.subreddit] = 1
+
+		post = cur.fetchone()
 
 	for deaditem in dead:
 		print(deaditem, file=filea)
 	filea.close()
 
-	print('Counting selfposts')
-	cur.execute('SELECT * FROM posts WHERE self=1')
-	self = cur.fetchall()
-	self = len(self)
-	link = count-self
-	selfs = '{0:,}'.format(self)
-	links = '{0:,}'.format(link)
+
+	currenttime = datetime.datetime.now()
+	currenttime = datetime.datetime.strftime(currenttime, "%B %d %Y %H:%M:%S")
+	currenttimes = "Updated %s\n" % currenttime
+
+	counts = '{0:,}'.format(totalcount)
+	mainstats = '%s posts collected; ' % counts
+	mainstats += '%s dead.\n' % '{0:,}'.format(deadcount)
+
+	linkcount = (totalcount - deadcount) - selfcount
+	selfs = '{0:,}'.format(selfcount)
+	links = '{0:,}'.format(linkcount)
 	selfstats = '%s linkposts; %s selfposts\n' % (links, selfs)
 
 	readmefile = open('README.md', 'r')
 	readmelines = readmefile.readlines()
 	readmefile.close()
-	readmelines[3] = mainstats
-	readmelines[4] = selfstats
+	readmelines[3] = currenttimes
+	readmelines[4] = mainstats
+	readmelines[5] = selfstats
 
 	readmefile = open('README.md', 'w')
 	readmefile.write(''.join(readmelines))
 	readmefile.close()
 
-	#STATS TIME
-	print('Writing subreddit stats')
-	cur.execute('SELECT * FROM posts')
-	subredditcounts = {}
-	while True:
-		fetch = cur.fetchone()
-		if fetch:
-			fetch = Post(fetch)
-			try:
-				subredditcounts[fetch.subreddit] += 1
-			except KeyError:
-				subredditcounts[fetch.subreddit] = 1
-		else:
-			break
+
 	subkeys = list(subredditcounts.keys())
 	subkeys.sort(key=subredditcounts.get, reverse=True)
+	print('Total: %s' % '{0:,}'.format(totalcount), file=fileb)
+	print('Dead: %s' % '{0:,}'.format(deadcount), file=fileb)
+	print('Self: %s' % '{0:,}'.format(selfcount), file=fileb)
+	print('Link: %s' % '{0:,}'.format(linkcount), file=fileb)
+	print('NSFW: %s' % '{0:,}'.format(nsfwcount), file=fileb)
+	print('Distinguished by mods: %s' % '{0:,}'.format(distinguishcount_m), file=fileb)
+	print('Distinguished by admins: %s' % '{0:,}'.format(distinguishcount_a), file=fileb)
+	print('Total upvotes: %s' % '{0:,}'.format(totalscore), file=fileb)
+	print('Total characters in titles: %s' % '{0:,}'.format(totaltitle), file=fileb)
+	print('Total characters in selftext: %s' % '{0:,}'.format(totalselftext), file=fileb)
+	print('\n\n', file=fileb)
 	for key in subkeys:
 		out = key
 		out += '.'*(25-len(key))
