@@ -148,7 +148,8 @@ def manageranks():
 				print('\told: css: %s, text: %s' % (userflaircss, userflairtext))
 				print('\tnew: css: %s, text: %s' % (newflair, userflairtext))
 				commenttext = "%s +%d Point%s" % (suggested_flair, rankjump, "s!" if rankjump > 1 else "!")
-				post.add_comment(commenttext)
+				starcomment = post.add_comment(commenttext)
+				starcomment.distinguish()
 				print("\tWriting comment:", commenttext)
 
 				if SEND_MODMAIL:
