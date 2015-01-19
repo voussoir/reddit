@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 720,005 of 720,003 subreddits (100.000%) (-2 remain)
+#####Collected 722,973 of 722,971 subreddits (100.000%) (-2 remain)
 
-#####[Today's jumble](http://reddit.com/r/futurebeatproducers+CastleClash+wedding+PastAndPresentPics+bipolar+Quebec+CHIBears+Rottweiler+Baking+firstworldproblems+adrenaline+Djent+FreeCompliments+propaganda+Otakon+AmateurRoomPorn+myfriendwantstoknow+ronpaul+exmuslim+CrohnsDisease)
+#####[Today's jumble](http://reddit.com/r/Shortfilms+FreeCompliments+highdeas+linuxmasterrace+wrestlingisreddit+SF4+gamedesign+DebateReligion+palletfurniture+FixedGearBicycle+DrawForMe+SourceFed+TheLastAirbender+homestuck+it+iRacing+firewater+ravens+mindcrackcirclejerk+AnimalPorn)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

@@ -47,7 +47,7 @@ print('Logging in...')
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
-def scanSub():
+def replybot():
     print('Searching '+ SUBREDDIT + '.')
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_comments(limit=MAXPOSTS)
@@ -73,7 +73,7 @@ def scanSub():
 
 while True:
     try:
-        scanSub()
+        replybot()
     except Exception as e:
         traceback.print_exc()
     print('Running again in %d seconds \n' % WAIT)
