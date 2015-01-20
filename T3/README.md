@@ -1,8 +1,8 @@
 T3
 ========
 
-Updated January 15 2015 11:19:24
-583,365 posts collected; 528 dead.
-577,659 linkposts; 5,178 selfposts
+Updated January 19 2015 13:18:05
+656,354 posts collected; 790 dead.
+648,653 linkposts; 6,911 selfposts
 
 This is like the Submission version of the SubredditBirthdays project. The database, if ever completed, will weigh several gigabytes, so I will not be uploading it here.

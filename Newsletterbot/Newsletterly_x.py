@@ -16,6 +16,10 @@ MAXPOSTS = 100
 WAIT = 30
 ADMIN = "GoldenSights"
 
+MAX_PER_MESSAGE = 20
+# Only this many posts may be compiled into a newsletter
+# to avoid massive walls of text
+
 MESSAGE_SUBJECT = "Newsletterly"
 MESSAGE_SUBSCRIBE = "You have subscribed to /r/%s"
 MESSAGE_SUBSCRIBE_ALREADY = "You are already subscribed to /r/%s"
@@ -44,6 +48,10 @@ making new lines.
 MESSAGE_MESSAGE_LONG = "This message ended up being too long!"
 
 '''ALL DONE'''
+
+NOSEND = "nosend" in sys.argv
+if NOSEND:
+	print("NOSEND active!")
 
 try:
 	import bot
@@ -89,7 +97,7 @@ def add_subscription(user, subreddit):
 	user = user.lower()
 	subreddit = subreddit.lower()
 	try:
-		r.get_subreddit(subreddit, fetch=True)
+		subreddit = r.get_subreddit(subreddit, fetch=True).display_name
 		cur.execute('SELECT * FROM subscribers WHERE LOWER(name)=? AND LOWER(reddit)=?', 
 					[user, subreddit])
 		fetch = cur.fetchall()
@@ -138,7 +146,7 @@ def format_post(submission):
 	return template
 
 def manage():
-	print('Scanning Inbox')
+	print('Checking Inbox')
 	pms = r.get_unread(unset_has_mail=True, update_user=True)
 	for pm in pms:
 		interpretation = interpret_message(pm)
@@ -158,7 +166,7 @@ def manage():
 	oldposts = cur.fetchall()
 	oldposts = [f[0] for f in oldposts]
 
-	postlist = []
+	postlist = set()
 
 	for user in userfetch:
 		print('Finding posts for %s' % user)
@@ -171,18 +179,20 @@ def manage():
 			if post.id not in oldposts:
 				print('\t' + post.id)
 				results.append(post)
-				postlist.append(post.id)
+				postlist.add(post.id)
 		results = [format_post(f) for f in results]
 
 		if len(results) > 0:
 			final = MESSAGE_HEADER + '\n\n'
 			final += '\n\n'.join(results)
 			final += '\n\n' + MESSAGE_FOOTER
-			r.send_message(user, MESSAGE_SUBJECT, final, captcha=None)
+			if NOSEND:
+				print('NO SEND')
+			else:
+				r.send_message(user, MESSAGE_SUBJECT, final, captcha=None)
 		else:
 			print('\tNone')
 
-	postlist = list(set(postlist))
 	for postid in postlist:
 		cur.execute('INSERT INTO oldposts VALUES(?)', [postid])
 	sql.commit()
@@ -204,7 +214,7 @@ def interpret_message(pm):
 		except IndexError:
 			continue
 		args = linesplit[1:]
-		if command == 'report' or command == 'reportall':
+		if command in ['report', 'reportall', 'kill']:
 			args = [""]
 
 		for argument in args:
@@ -250,6 +260,11 @@ def interpret_message(pm):
 				status = (MESSAGE_UNSUBSCRIBE_FORCE % (user, subreddit)) + '\n\n'
 				status += drop_subscription(user, subreddit)
 				results.append(status)
+
+			if command == 'kill' and author == ADMIN:
+				pm.mark_as_read()
+				r.send_message(ADMIN, "force kill", "bot is being turned off")
+				quit()
 
 	if len(results) > 0:
 		results = '\n\n_____\n\n'.join(results)
