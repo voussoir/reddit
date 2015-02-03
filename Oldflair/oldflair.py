@@ -35,7 +35,7 @@ Line 3, etc etc.
 # This comment will be left on the post when it is oldflaired
 # Make the quotes empty "" if you don't want to leave a comment
 
-BLACKLIST = ["[Thank You]", "Fulfilled"]
+BLACKLIST = ["[Thank You]", "Fulfilled", "thanks"]
 # This is a list of phrases that, if they are found in the flair
 # OR THE TITLE will cause the post to be skipped from the process
 # Letter casing does not matter
@@ -74,29 +74,31 @@ def oldflair():
 	for submission in submissions:
 		sid = submission.id
 		timedif = nowstamp - submission.created_utc
-		print('Checking %s' % sid, end="")
+		print('Checking %s: ' % sid, end="")
 		if timedif > MINIMUM_AGE:
-			print()
 			sflair_text = submission.link_flair_text
 			sflair_text = sflair_text.lower() if sflair_text else ''
 			sflair_css = submission.link_flair_css_class
 			sflair_css = sflair_css.lower() if sflair_css else ''
 			stitle = submission.title.lower()
 			checks = [sflair_text, sflair_css, stitle]
-			if not any(blacklist.lower() in checks for blacklist in BLACKLIST):
-				if sflair_text != OLDFLAIR_TEXT.lower() and sflair_css != OLDFLAIR_CSS_CLASS.lower():
+			if sflair_text != OLDFLAIR_TEXT.lower() and sflair_css != OLDFLAIR_CSS_CLASS.lower():
+				if not any(blacklist.lower() in checks for blacklist in BLACKLIST):
+					print()
 					print('\tAssigning oldflair')
-					submission.set_flair(flair_text=OLDFLAIR_TEXT, flair_css_class=OLDFLAIR_CSS_CLASS)
+					#submission.set_flair(flair_text=OLDFLAIR_TEXT, flair_css_class=OLDFLAIR_CSS_CLASS)
 					if OLDFLAIR_COMMENT:
 						print('\tWriting comment')
-						oldcomment = submission.add_comment(OLDFLAIR_COMMENT)
+						#oldcomment = submission.add_comment(OLDFLAIR_COMMENT)
 						print('\tDistinguishing comment')
-						oldcomment.distinguish()
+						#oldcomment.distinguish()
+				else:
+					print('Contains blacklisted phrase')
 			else:
-				print('\tContains blacklisted phrase')
+				print('All good')
 		else:
 			remaining = MINIMUM_AGE - timedif
-			print('\t too young. %s remain' % format_seconds_to_hhmmss(remaining))
+			print('Too young. %s remain' % format_seconds_to_hhmmss(remaining))
 
 def format_seconds_to_hhmmss(seconds):
 	'''
