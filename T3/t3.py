@@ -19,7 +19,7 @@ cur.execute('CREATE TABLE IF NOT EXISTS meta(label TEXT, data TEXT)')
 cur.execute(('CREATE TABLE IF NOT EXISTS posts(idint INT, idstr TEXT, '
 	'created INT, self INT, nsfw INT, author TEXT, title TEXT, '
 	'url TEXT, selftext TEXT, score INT, subreddit TEXT, distinguish INT, '
-	'textlen INT)'))
+	'textlen INT, num_comments INT)'))
 
 DISTINGUISHMAP   = {0:"user", 1:"moderator", 2:"admin"}
 DISTINGUISHMAP_R = {"user":0, "moderator":1, "admin":2}
@@ -48,6 +48,7 @@ UPPERBOUND = 164790958
 # 10 - subreddit
 # 11 - distinguished
 # 12 - textlen
+# 13 - num_comments
 class Post:
 	''' Used to map the indices of DB entries to names '''
 	def __init__(self, data):
@@ -65,6 +66,7 @@ class Post:
 		self.distinguished = DISTINGUISHMAP[data[11]]
 		self.distinguished_int = data[11]
 		self.textlen = data[12]
+		self.num_comments = data[13]
 
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
@@ -97,14 +99,15 @@ def human(timestamp):
 	human = datetime.datetime.strftime(day, "%b %d %Y %H:%M:%S UTC")
 	return human
 
-def process(itemid, log=True, kill=True):
+def process(itemid, log=True, kill=True, updates=False):
 	if isinstance(itemid, str):
 		itemid = [itemid]
 	if isinstance(itemid, list):
 		if isinstance(itemid[0], str):
 			itemid = verify_t3(itemid)
 			try:
-				itemid = remove_existing(itemid)
+				if not updates:
+					itemid = remove_existing(itemid)
 				temp = itemid[:]
 			except Exception:
 				return
@@ -114,8 +117,8 @@ def process(itemid, log=True, kill=True):
 	except:
 		print(temp, "DEAD")
 		if kill:
-			logdead(temp[0])
-			process(temp, kill=kill)
+			for item in temp:
+				logdead(item)
 		return
 	for index in range(len(itemid)):
 		item = itemid[index]
@@ -140,7 +143,7 @@ def process(itemid, log=True, kill=True):
 		item = [item.idint, item.idstr, item.created_utc,
 		item.is_self, item.over_18, item.auth, item.title,
 		item.url, item.selftext, item.score, item.sub,
-		item.distinguished, item.textlen]
+		item.distinguished, item.textlen, item.num_comments]
 
 		itemid[index] = item
 
@@ -163,15 +166,19 @@ def process(itemid, log=True, kill=True):
 # 10 - subreddit
 # 11 - distinguished
 # 12 - textlen
+# 13 - num_comments
 def logdb(items):
 	for item in items:
-		cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', item)
+		cur.execute('SELECT * FROM posts WHERE idint=?', [item[0]])
+		if cur.fetchone():
+			cur.execute('DELETE FROM posts WHERE idint=?', [item[0]])
+		cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', item)
 	sql.commit()
 
 def logdead(i):
 	#If an ID is dead, let's at least add it to the db.
 	i = i.replace('t3_', '')
-	data = [b36(i), i, 0, 0, 0, '?', '?', '?', '?', 0, '?', 0, 0]
+	data = [b36(i), i, 0, 0, 0, '?', '?', '?', '?', 0, '?', 0, 0, -1]
 	logdb([data])
 
 def verify_t3(items):
@@ -197,7 +204,7 @@ def remove_existing(items):
 		raise Exception("Nothing new")
 	return items
 
-def processrange(lower, upper, kill=True):
+def processrange(lower, upper, kill=True, updates=False):
 	if isinstance(lower, str):
 		lower = b36(lower)
 		if isinstance(upper, int):
@@ -208,11 +215,14 @@ def processrange(lower, upper, kill=True):
 		print("Upper must be higher than lower")
 		return
 	ids = [b36(x) for x in range(lower, upper)]
+	processchunks(ids, kill, updates)
+
+def processchunks(ids, kill=True, updates=False):
 	while len(ids) > 0:
 		p = ids[:100]
 		print("%s >>> %s (%d)" % (p[0], p[-1], len(ids)))
 		ids = ids[100:]
-		process(p, kill=kill)
+		process(p, kill=kill, updates=updates)
 
 def lastitem():
 	cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
@@ -231,6 +241,7 @@ def show():
 	nsfwcount = 0
 	distinguishcount_m = 0
 	distinguishcount_a = 0
+	commentcount = 0
 	subredditcounts = {}
 	dead = []
 	
@@ -255,6 +266,8 @@ def show():
 			distinguishcount_a += 1
 		totalscore += post.score
 		totaltitle += len(post.title)
+		if post.num_comments > 0:
+			commentcount += 1
 
 		try:
 			subredditcounts[post.subreddit] += 1
@@ -305,6 +318,7 @@ def show():
 	print('Total upvotes: %s' % '{0:,}'.format(totalscore), file=fileb)
 	print('Total characters in titles: %s' % '{0:,}'.format(totaltitle), file=fileb)
 	print('Total characters in selftext: %s' % '{0:,}'.format(totalselftext), file=fileb)
+	print('Total (supposed) comments on posts: %s' % '{0:,}'.format(commentcount), file=fileb)
 	print('\n\n', file=fileb)
 	for key in subkeys:
 		out = key
