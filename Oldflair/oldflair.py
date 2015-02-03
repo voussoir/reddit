@@ -86,12 +86,12 @@ def oldflair():
 				if not any(blacklist.lower() in checks for blacklist in BLACKLIST):
 					print()
 					print('\tAssigning oldflair')
-					#submission.set_flair(flair_text=OLDFLAIR_TEXT, flair_css_class=OLDFLAIR_CSS_CLASS)
+					submission.set_flair(flair_text=OLDFLAIR_TEXT, flair_css_class=OLDFLAIR_CSS_CLASS)
 					if OLDFLAIR_COMMENT:
 						print('\tWriting comment')
-						#oldcomment = submission.add_comment(OLDFLAIR_COMMENT)
+						oldcomment = submission.add_comment(OLDFLAIR_COMMENT)
 						print('\tDistinguishing comment')
-						#oldcomment.distinguish()
+						oldcomment.distinguish()
 				else:
 					print('Contains blacklisted phrase')
 			else:
