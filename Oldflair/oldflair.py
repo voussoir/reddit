@@ -101,10 +101,7 @@ def oldflair():
 			print('Too young. %s remain' % format_seconds_to_hhmmss(remaining))
 
 def format_seconds_to_hhmmss(seconds):
-	'''
-	Thank you Glenn Maynard of Stack Overflow 
-	http://stackoverflow.com/a/1384506
-	'''
+	#Copied from Stack Overflow http://stackoverflow.com/a/1384506
 	hours = seconds // (60*60)
 	seconds %= (60*60)
 	minutes = seconds // 60
