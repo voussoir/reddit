@@ -375,8 +375,9 @@ def show():
 	hoddict = timedicts[2]
 	yerdict = timedicts[3]
 	myrdict = timedicts[4]
+	domdict = timedicts[5]
 
-	for d in [dowdict, moydict, hoddict, yerdict, myrdict]:
+	for d in [dowdict, moydict, hoddict, yerdict, myrdict, domdict]:
 		#d = dict(zip(d.keys(), d.values()))
 		dkeys = list(d.keys())
 		dkeys.sort(key=d.get)
@@ -387,7 +388,7 @@ def show():
 
 	#print(statisticoutput)
 	pos = 0
-	for d in [dowdict, moydict, hoddict, yerdict, myrdict]:
+	for d in [dowdict, moydict, hoddict, yerdict, myrdict, domdict]:
 		d = dict(zip(d.keys(), d.values()))
 		dkeys = list(d.keys())
 		dkeys = specialsort(dkeys)
@@ -416,17 +417,17 @@ def show():
 
 	print(statisticoutput, file=filem)
 	filem.close()
-	tempvar = 0
-	for d in [dowdict, moydict, hoddict, yerdict, myrdict]:
+	plotnum = 0
+	for d in [dowdict, moydict, hoddict, yerdict, myrdict, domdict]:
 		dkeys = list(d.keys())
 		dkeys = specialsort(dkeys)
 		dvals = [d[x] for x in dkeys]
 		#e0e6c3
-		plotbars(str(tempvar), [dkeys, dvals], colorbg="#272822", colorfg="#000", colormid="#43443a", forcezero=True)
-		tempvar += 1
+		plotbars(str(plotnum), [dkeys, dvals], colorbg="#272822", colorfg="#000", colormid="#43443a", forcezero=True)
+		plotnum += 1
 		if d is myrdict:
-			plotbars(str(tempvar), [dkeys[-15:], dvals[-15:]], colorbg="#272822", colorfg="#000", colormid="#43443a", forcezero=True)
-			tempvar += 1
+			plotbars(str(plotnum), [dkeys[-15:], dvals[-15:]], colorbg="#272822", colorfg="#000", colormid="#43443a", forcezero=True)
+			plotnum += 1
 	subprocess.Popen('PNGCREATOR.bat', shell=True, cwd='spooky')
 
 	if random.randint(0, 20) == 5:
@@ -526,6 +527,7 @@ def generatetdicts(fetch):
 	hoddict = {}
 	yerdict = {}
 	myrdict = {}
+	domdict = {}
 
 	for item in fetch:
 		itemdate = datetime.datetime.utcfromtimestamp(item[1])
@@ -534,7 +536,8 @@ def generatetdicts(fetch):
 		hoddict = dictadding(hoddict, datetime.datetime.strftime(itemdate, "%H"))
 		yerdict = dictadding(yerdict, datetime.datetime.strftime(itemdate, "%Y"))
 		myrdict = dictadding(myrdict, datetime.datetime.strftime(itemdate, "%b%Y"))
-	return [dowdict, moydict, hoddict, yerdict, myrdict]
+		domdict = dictadding(domdict, datetime.datetime.strftime(itemdate, "%d"))
+	return [dowdict, moydict, hoddict, yerdict, myrdict, domdict]
 
 def memberformat(member, spacer='.'):
 	subscribers = '{0:,}'.format(member[5])

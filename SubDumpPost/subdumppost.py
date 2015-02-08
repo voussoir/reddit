@@ -1,4 +1,5 @@
 #/u/GoldenSights
+import traceback
 import praw # simple interface to the reddit API, also handles rate limiting of requests
 import time
 import sqlite3
@@ -77,7 +78,7 @@ sql.commit()
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
-def scanSub():
+def scansub():
     print('Searching '+ SUBREDDIT + '.')
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_new(limit=MAXPOSTS)
@@ -112,6 +113,8 @@ def scanSub():
                         newtitle = newtitle.replace('_subreddit_', post.subreddit.display_name)
                         newtitle = newtitle.replace('_score_', str(post.score) + ' points')
                         newtitle = newtitle.replace('_title_', post.title)
+                        if len(newtitle) > 300:
+                            newtitle = newtitle[:297]
                         create = r.submit(DSUB, newtitle, url=plink, captcha = None)
                         print('\tDumped to ' + DSUB + '.')
                 except AttributeError:
@@ -119,7 +122,7 @@ def scanSub():
             cur.execute('INSERT INTO oldposts VALUES(?)', [pid])    
     if len(result) > 0 and MAILME == True:
         for m in range(len(result)):
-            result[m] = '- [' + authors[m] + '](' + result[m] + ')'
+            result[m] = '- [%s](%s)' % (authors[m], result[m])
         r.send_message(RECIPIENT, MTITLE, MHEADER + '\n\n' + '\n\n'.join(result), captcha=None)
         print('Mailed ' + RECIPIENT)
         
@@ -127,9 +130,9 @@ def scanSub():
 
 while True:
     try:
-        scanSub()
+        scansub()
     except Exception as e:
-        print('An error has occured:', str(e))
+        traceback.print_exc()
     print('Running again in ' + WAITS + ' seconds \n')
     sql.commit()
     time.sleep(WAIT)
