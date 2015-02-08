@@ -1,3 +1,4 @@
+import traceback
 import praw
 import time
 import datetime
@@ -30,10 +31,17 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
     try:
         while lower < maxupper:
             print('\nCurrent interval:', interval, 'seconds')
-            print('Lower', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(lower), "%b %d %Y %H:%M:%S"))
-            print('Upper', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(upper), "%b %d %Y %H:%M:%S"))
+            print('Lower', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(lower), "%b %d %Y %H:%M:%S"), lower)
+            print('Upper', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(upper), "%b %d %Y %H:%M:%S"), upper)
             timestamps = [lower, upper]
-            searchresults = list(r.search('', subreddit=subreddit, sort='new', timestamps=timestamps))
+            while True:
+                try:
+                    searchresults = list(r.search('', subreddit=subreddit, sort='new', timestamps=timestamps))
+                    break
+                except:
+                    traceback.print_exc()
+                    print('resuming in 5...')
+                    time.sleep(5)
             print([i.id for i in searchresults])
             allresults += searchresults
     
@@ -53,7 +61,8 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
                 upper = lower + interval
             print()
     
-        print('Finished with', len(allresults), 'items')
+        print('Collected', len(allresults), 'items')
+        print('Please wait...')
     except Exception as e:
         print("ERROR:", e)
         print('File will be printed and list returned')
