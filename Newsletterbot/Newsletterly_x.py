@@ -116,6 +116,9 @@ def add_subscription(user, subreddit):
 def drop_subscription(user, subreddit):
 	user = user.lower()
 	subreddit = subreddit.lower()
+	if subreddit == 'all':
+		cur.execute('DELETE FROM subscribers WHERE LOWER(name)=?', [user])
+		return (MESSAGE_USUBSCRIBE % subreddit)
 	cur.execute('SELECT * FROM subscribers WHERE LOWER(name)=? AND LOWER(reddit)=?', 
 				[user, subreddit])
 	if cur.fetchone():
@@ -189,7 +192,13 @@ def manage():
 			if NOSEND:
 				print('NO SEND')
 			else:
-				r.send_message(user, MESSAGE_SUBJECT, final, captcha=None)
+				try:
+					r.send_message(user, MESSAGE_SUBJECT, final, captcha=None)
+				except praw.errors.InvalidUser:
+					drop_subscription(user, 'all')
+					r.send_message(ADMIN, 'invalid user', user, captcha=None)
+				except requests.exceptions.HTTPError:
+					pass
 		else:
 			print('\tNone')
 
