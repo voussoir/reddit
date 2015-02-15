@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 746,651 of 746,649 subreddits (100.000%) (-2 remain)
+#####Collected 761,416 of 761,414 subreddits (100.000%) (-2 remain)
 
-#####[Today's jumble](http://reddit.com/r/memeanimals+parrots+kaleycuoco+Washington+Disneyland+roosterteeth+pittsburgh+Trophies+HighHeels+linuxmasterrace+ontario+DiWHY+lost+GoForGold+sunsetshimmer+ChiefKeef+ExplainMyDownvotes+SRSGaming+NewSkaters+occupywallstreet)
+#####[Today's jumble](http://reddit.com/r/BMW+NotYourMothersReddit+Planetside+outofcontextcomics+craigferguson+ChoosingBeggars+blues+terriblefacebookmemes+ImageStabilization+HailCorporate+bestofbronze+dresdenfiles+GuildWarsDyeJob+Kirby+Robocraft+aliens+projectzomboid+UnsentLetters+HaltAndCatchFire+Coffee)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
