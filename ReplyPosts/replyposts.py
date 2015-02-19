@@ -14,8 +14,17 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-TITLESTRING = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
-#These are the words you are looking for in the titles.
+SEARCHTITLE = True
+SEARCHTEXT = False
+#Should the bot check within the title?
+#Should the bot check within the selftext?
+KEYWORDS = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
+#These are the words you are looking for.
+#Make empty to reply to ANY post that also matches keyauthor
+KEYAUTHORS = ["GoldenSights"]
+#These are the names of the authors you are looking for
+#Any authors not on this list will not be replied to.
+#Make empty to allow anybody
 REPLYSTRING = "Hi hungry, I'm dad"
 #This is the word you want to put in reply
 MAXPOSTS = 100
@@ -50,30 +59,35 @@ sql.commit()
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
-def scanSub():
+
+def scansub():
     print('Searching '+ SUBREDDIT + '.')
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_new(limit=MAXPOSTS)
     for post in posts:
         pid = post.id
         try:
-            pauthor = post.author.name
+            pauthor = post.author.name.lower()
         except AttributeError:
             pauthor = '[DELETED]'
-        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
-        if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
-            pbody = post.selftext.lower()
-            pbody += ' ' + post.title.lower()
-            if any(key.lower() in pbody for key in TITLESTRING):
-                print('Replying to ' + pid + ' by ' + pauthor)
-                post.add_comment(REPLYSTRING)
+        if KEYAUTHORS == [] or any(auth.lower() == pauthor for auth in KEYAUTHORS):
+            cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
+            if not cur.fetchone():
+                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+                pbody = ''
+                if SEARCHTITLE:
+                    pbody += post.title + ' '
+                if SEARCHTEXT:
+                    pbody += post.selftext
+                if KEYWORDS == [] any(key.lower() in pbody for key in KEYWORDS):
+                    print('Replying to ' + pid + ' by ' + pauthor)
+                    post.add_comment(REPLYSTRING)
     sql.commit()
 
 
 while True:
     try:
-        scanSub()
+        scansub()
     except Exception as e:
         traceback.print_exc()
     print('Running again in ' + WAITS + ' seconds \n')
