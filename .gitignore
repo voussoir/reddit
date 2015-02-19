@@ -3,6 +3,8 @@
 ## Eclipse
 #################
 
+SubredditBirthdays/sql.db
+
 *.pydevproject
 .project
 .metadata
