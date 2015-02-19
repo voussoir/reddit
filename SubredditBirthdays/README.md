@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 761,416 of 761,414 subreddits (100.000%) (-2 remain)
+#####Collected 768,391 of 768,389 subreddits (100.000%) (-2 remain)
 
-#####[Today's jumble](http://reddit.com/r/BMW+NotYourMothersReddit+Planetside+outofcontextcomics+craigferguson+ChoosingBeggars+blues+terriblefacebookmemes+ImageStabilization+HailCorporate+bestofbronze+dresdenfiles+GuildWarsDyeJob+Kirby+Robocraft+aliens+projectzomboid+UnsentLetters+HaltAndCatchFire+Coffee)
+#####[Today's jumble](http://reddit.com/r/)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -20,6 +20,8 @@ Some subreddits are not properly marked as NSFW. This is either the fault of the
 09 November 2014: 2014 up-to-date!!!!
 
 24 December 2014: **Massive speed boost** - I just learned about sql INDEX; and I've also added a column to the table where subreddit IDs are stored in integers instead of b36 strings. Together, these changes make updates go like 20x faster. Why have I waited so long?
+
+18 February 2015: Database is now TOO BIG for github! ZIP is provided in its place. The db is now tracking subreddit_type and submission_type to help detect spam. This has put the file over the allowed 100 megabyte limit. I'll probably forget to re-zip it on every commit but I'll do my best.
 ______
 
 

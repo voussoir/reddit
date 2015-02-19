@@ -43,6 +43,8 @@ TSFORMAT = ">_timestamp_\n"
 #_subreddit_
 #_nplink_
 #_author_
+#_numcomments_
+#_score_
 
 PRINTFILE = "nsa"
 #Name of the file that will be produced. Do not type the file extension
@@ -50,7 +52,7 @@ PRINTFILE = "nsa"
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once.
 
-READ_FROM_FILE_IDS = "nsaleaks_8feb2015_id.txt"
+READ_FROM_FILE = "botwatch.db"
 # A text file where a post ID is on each line
 # These will be collected before anything from /new
 
@@ -99,7 +101,7 @@ def scansub():
 	return lista
 
 def scanfile():
-	idfile = open(READ_FROM_FILE_IDS)
+	idfile = open(READ_FROM_FILE)
 	lines = [line.strip() for line in idfile.readlines()]
 	idfile.close()
 	for lineindex in range(len(lines)):
@@ -152,6 +154,8 @@ def work(lista, listfile):
 		slink = slink.replace('http://', 'http://np.')
 		final = final.replace('_nplink_', slink)
 		final = final.replace('_flairtext_', flair_text)
+		final = final.replace('_score_', str(post.score))
+		final = final.replace('_numcomments_', str(post.num_comments))
 		print(final, file=listfile)
 		previous_timestamp = timestamp
 
@@ -228,9 +232,10 @@ def removeduplicates(lista):
 def main():
 	lista = []
 	if READ_FROM_FILE_IDS:
-		lista = scanfile()
-	lista += scansub()
-	lista = removeduplicates(lista)
+		scanfile()
+	else:
+		lista = scansub()
+		lista = removeduplicates(lista)
 
 	writefiles(lista)
 

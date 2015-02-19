@@ -27,7 +27,7 @@ WAITS = str(WAIT)
 
 sql = sqlite3.connect('sql.db')
 cur = sql.cursor()
-cur.execute('CREATE TABLE IF NOT EXISTS subreddits(ID TEXT, CREATED INT, HUMAN TEXT, NSFW TEXT, NAME TEXT, SUBSCRIBERS INT)')
+cur.execute('CREATE TABLE IF NOT EXISTS subreddits(ID TEXT, CREATED INT, HUMAN TEXT, NSFW TEXT, NAME TEXT, SUBSCRIBERS INT, JUMBLE INT, IDINT INT, SUBREDDIT_TYPE INT, SUBMISSION_TYPE INT, IS_SPAM INT)')
 cur.execute('CREATE TABLE IF NOT EXISTS jumble(ID TEXT, CREATED INT, HUMAN TEXT, NSFW TEXT, NAME TEXT, SUBSCRIBERS INT)')
 cur.execute('CREATE TABLE IF NOT EXISTS etc(LABEL TEXT, DATA TEXT, DATB TEXT, DATC TEXT)')
 print('Loaded SQL Database')
@@ -52,6 +52,23 @@ monthnumbers = {
 	"Oct":"10",
 	"Nov":"11",
 	"Dec":"12"
+}
+
+SUBREDDIT_TYPE = {
+	'public':0,
+	'restricted':1,
+	'private':2,
+	'archived':3,
+	None:4,
+	'employees_only':5,
+	'gold_restricted':6,
+	'gold_only':6
+}
+SUBMISSION_TYPE = {
+	'any':0,
+	'link':1,
+	'self':2,
+	None:3
 }
 
 def human(timestamp):
@@ -115,7 +132,10 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 				subscribers = sub.subscribers if sub.subscribers else 0
 				isjumbled = '1' if isjumbled else '0'
 				print('New: %s : %s : %s : %s : %d' % (sub.id, h, isnsfw, sub.display_name, subscribers))
-				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [sub.id, sub.created_utc, h, isnsfw, sub.display_name, subscribers, isjumbled, idint])
+				subreddit_type = SUBREDDIT_TYPE[sub.subreddit_type]
+				submission_type = SUBMISSION_TYPE[sub.submission_type]
+				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+					[sub.id, sub.created_utc, h, isnsfw, sub.display_name, subscribers, isjumbled, idint, subreddit_type, submission_type, -1])
 			elif doupdates:
 				if sub.subscribers != None:
 					subscribers = sub.subscribers
@@ -124,10 +144,13 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 				h = human(sub.created_utc)
 				isnsfw = '1' if sub.over18 else '0'
 				isjumbled = '1' if isjumbled else '0'
+				subreddit_type = SUBREDDIT_TYPE[sub.subreddit_type]
+				submission_type = SUBMISSION_TYPE[sub.submission_type]
 				oldsubs = f[5]
 				subscriberdiff = subscribers - oldsubs
 				print('Upd: %s : %s : %s : %s : %d (%d)' % (sub.id, h, isnsfw, sub.display_name, subscribers, subscriberdiff))
-				cur.execute('UPDATE subreddits SET SUBSCRIBERS=?, JUMBLE=? WHERE IDINT=?', [subscribers, isjumbled, idint])
+				cur.execute('UPDATE subreddits SET SUBSCRIBERS=?, JUMBLE=?, SUBREDDIT_TYPE=?, SUBMISSION_TYPE=? WHERE IDINT=?',
+					[subscribers, isjumbled, subreddit_type, submission_type, idint])
 				olds += 1
 			else:
 				olds += 1
@@ -268,7 +291,7 @@ def processir(startingpoint, ranger, chunksize=100, slowmode=False, enablekillin
 		print("Rejected", olds)
 
 def kill(sr):
-	cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?)', [sr, 0, '', '', '?', 0, '0', b36(sr)])
+	cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [sr, 0, '', '', '?', 0, '0', b36(sr), 0, 0, -1])
 	sql.commit()
 
 
