@@ -79,7 +79,7 @@ def scansub():
                     pbody += post.title + ' '
                 if SEARCHTEXT:
                     pbody += post.selftext
-                if KEYWORDS == [] any(key.lower() in pbody for key in KEYWORDS):
+                if KEYWORDS == [] or any(key.lower() in pbody for key in KEYWORDS):
                     print('Replying to ' + pid + ' by ' + pauthor)
                     post.add_comment(REPLYSTRING)
     sql.commit()
