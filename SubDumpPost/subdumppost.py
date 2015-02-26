@@ -115,7 +115,7 @@ def scansub():
                         newtitle = newtitle.replace('_title_', post.title)
                         if len(newtitle) > 300:
                             newtitle = newtitle[:297]
-                        create = r.submit(DSUB, newtitle, url=plink, captcha = None)
+                        create = r.submit(DSUB, newtitle, url=plink, resubmit=True, captcha = None)
                         print('\tDumped to ' + DSUB + '.')
                 except AttributeError:
                     print(pid + ': Author deleted. Ignoring comment')

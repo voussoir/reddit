@@ -21,7 +21,7 @@ class SpamGUI:
 		self.label_submissiontype = tkinter.Label(self.t, text="Submission type: ", font=("Consolas", 10))
 		self.spinbox_subreddittype = tkinter.Spinbox(self.t, from_=-1, to=6, width=2, font=("Consolas", 10))
 		self.spinbox_subreddittype.delete(0, "end")
-		self.spinbox_subreddittype.insert(0, 1)
+		self.spinbox_subreddittype.insert(0, -1)
 		self.spinbox_submissiontype = tkinter.Spinbox(self.t, from_=-1, to=3, width=2, font=("Consolas", 10))
 		self.spinbox_submissiontype.delete(0, "end")
 		self.spinbox_submissiontype.insert(0, -1)
@@ -43,6 +43,7 @@ class SpamGUI:
 		self.button_pass.pack(fill="both", expand=1)
 		self.button_browser.pack(fill="both", expand=1)
 		self.button_refresh = tkinter.Button(self.t, text="refresh", font=("Consolas", 10), relief="flat", bg="#6fd5f6", activebackground="#6fd5f6", command=self.refresh)
+		self.button_printspam = tkinter.Button(self.t, text="print", font=("Consolas", 10), relief="flat", bg="#6fd5f6", activebackground="#6fd5f6", command=self.printspam)
 
 		self.label_subredditname.place(x=(self.w/2), y=40, anchor="center")
 		self.button_yes_frame.place(x=(self.w/8), y=150, anchor="w")
@@ -54,6 +55,7 @@ class SpamGUI:
 		self.label_submissiontype.place(x=(self.w/2)-5, y=275, anchor="e")
 		self.spinbox_submissiontype.place(x=(self.w/2)+5, y=275, anchor="w")
 		self.button_refresh.place(x=(self.w/2), y=310, anchor="c")
+		self.button_printspam.place(x=(self.w - 50), y=310, anchor="c")
 
 		self.screenwidth = self.t.winfo_screenwidth()
 		self.screenheight = self.t.winfo_screenheight()
@@ -69,7 +71,9 @@ class SpamGUI:
 	def refresh(self):
 		subreddit_type = int(self.spinbox_subreddittype.get())
 		submission_type = int(self.spinbox_submissiontype.get())
-		if submission_type == -1:
+		if subreddit_type == -1 & submission_type == -1:
+			self.cur.execute('SELECT * FROM subreddits WHERE IS_SPAM=? AND SUBMISSION_TYPE != ?', [-1, 3])
+		elif submission_type == -1:
 			self.cur.execute('SELECT * FROM subreddits WHERE IS_SPAM = ? AND SUBREDDIT_TYPE=? AND SUBMISSION_TYPE != ?', [-1, subreddit_type, 3])
 		else:
 			self.cur.execute('SELECT * FROM subreddits WHERE IS_SPAM = ? AND SUBREDDIT_TYPE=? AND SUBMISSION_TYPE = ?', [-1, subreddit_type, submission_type])
@@ -99,5 +103,16 @@ class SpamGUI:
 		if redditname:
 			url = self.URL % redditname
 			webbrowser.open(url)
+
+	def printspam(self):
+		self.cur.execute('SELECT * FROM subreddits WHERE IS_SPAM = 1 AND SUBMISSION_TYPE != 3')
+		fetch = self.cur.fetchall()
+		fetch.sort(key=lambda x: x[1])
+		f = open('spams.html', 'w')
+		print('<body style=font-family:"Consolas">', file=f)
+		for x in fetch:
+			print('<a href=http://reddit.com/r/%s>%s, %s, %s</a><br>' % (x[4], x[0], x[2], x[4]), file=f)
+		print('</body>', file=f)
+		f.close()
 
 spamgui = SpamGUI()

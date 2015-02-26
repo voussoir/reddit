@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 768,391 of 768,389 subreddits (100.000%) (-2 remain)
+#####Collected 777,985 of 777,983 subreddits (100.000%) (-2 remain)
 
-#####[Today's jumble](http://reddit.com/r/)
+#####[Today's jumble](http://reddit.com/r/wec+bioniclelego+DailyShow+DetroitPistons+Diablo3Wizards+offmychest+shittyideas+WeirdWheels+Louisiana+ConspiracyGrumps+ArtisanVideos+crafts+FossilPorn+creepygaming+n64+thuglife+AdiposeAmigos+kickstarter+sugarfreemua+falloutlore)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
