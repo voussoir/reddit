@@ -70,12 +70,12 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
         smartinsert(sql, cur, searchresults)
         itemcount += len(searchresults)
         print('Found', len(searchresults), ' items')
-        if len(searchresults) < 5:
-            print('Too few results, doubling interval', end='')
-            interval *= 2
+        if len(searchresults) < 75:
+            print('Too few results, increasing interval', end='')
+            interval = int(interval *= 1.05)
         if len(searchresults) > 95:
-            print('Too many results, halving interval', end='')
-            interval /= 2
+            print('Too many results, reducing interval', end='')
+            interval = int(interval *= 0.9)
             upper = lower + interval
         else:
             lower = upper
