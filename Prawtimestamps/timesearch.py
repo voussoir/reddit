@@ -32,17 +32,25 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
     # 14 - flair_text
     # 15 - flair_css_class
 
+    if lower == 'update':
+        cur.execute('SELECT * FROM posts')
+        f = cur.fetchall()
+        if len(f) > 0:
+            f.sort(key=lambda x: x[2])
+            lower = f[-1][2]
+
     offset = -time.timezone
     subname = subreddit if type(subreddit)==str else subreddit.display_name
-    if lower==None or maxupper==None:
+    if lower is None:
         if isinstance(subreddit, praw.objects.Subreddit):
             creation = subreddit.created_utc
         else:
             subreddit = r.get_subreddit(subreddit)
             creation = subreddit.created_utc
-    
-        nowstamp = datetime.datetime.now(datetime.timezone.utc).timestamp()
         lower = creation
+
+    if maxupper is None:
+        nowstamp = datetime.datetime.now(datetime.timezone.utc).timestamp()
         maxupper = nowstamp
         
     #outfile = open('%s-%d-%d.txt'%(subname, lower, maxupper), 'w', encoding='utf-8')
@@ -66,24 +74,32 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
                 traceback.print_exc()
                 print('resuming in 5...')
                 time.sleep(5)
+
+        searchresults.reverse()
         print([i.id for i in searchresults])
         smartinsert(sql, cur, searchresults)
-        itemcount += len(searchresults)
-        print('Found', len(searchresults), ' items')
-        if len(searchresults) < 75:
+
+        itemsfound = len(searchresults)
+        itemcount += itemsfound
+        print('Found', itemsfound, 'items')
+        if itemsfound < 75:
             print('Too few results, increasing interval', end='')
-            interval = int(interval *= 1.05)
-        if len(searchresults) > 95:
+            diff = (1 - (itemsfound / 75)) + 1
+            interval = int(interval * diff)
+        if itemsfound > 95:
             print('Too many results, reducing interval', end='')
-            interval = int(interval *= 0.9)
+            interval = int(interval * 0.8)
             upper = lower + interval
         else:
+            #Intentionally not elif
             lower = upper
             upper = lower + interval
         print()
 
+    cur.execute('SELECT * FROM posts')
+    f = cur.fetchall()
+    itemcount = len(f)
     print('Ended with %d items in %s' % (itemcount, databasename))
-
 
 def smartinsert(sql, cur, results):
     for o in results:
@@ -100,7 +116,6 @@ def smartinsert(sql, cur, results):
             o.num_comments, o.link_flair_text, o.link_flair_css_class]
             cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', postdata)
             sql.commit()
-
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     """Converts an integer to a base36 string."""
@@ -127,27 +142,34 @@ def b36(i):
     if type(i) == str:
         return base36decode(i)
 
-print("Get posts from subreddit: /r/", end='')
-sub = input()
-print('Lower bound (Leave blank to get ALL POSTS)\n]: ', end='')
-lower  = input()
-if lower == '':
-    x = get_all_posts(sub)
-else:
-    print('Maximum upper bound\n]: ', end='')
-    maxupper = input()
-    print('Starting interval (Leave blank for standard)\n]: ', end='')
-    interval = input()
-    if interval == '':
-        interval = 84600
-    try:
-        maxupper = int(maxupper)
-        lower = int(lower)
-        interval = int(interval)
-        x = get_all_posts(sub, lower, maxupper, interval)
-    except ValueError:
-        print("lower and upper bounds must be unix timestamps")
-        input()
-print("Done. Press Enter to close window")
-input()
-quit()
+def main():
+    print("Get posts from subreddit: /r/", end='')
+    sub = input()
+    print('\nLower bound (Leave blank to get ALL POSTS)\nEnter "update" to use last entry\n]: ', end='')
+    lower  = input().lower()
+    if lower == '':
+        lower = None
+    if lower is None or lower == 'update':
+        x = get_all_posts(sub, lower)
+    else:
+        print('Maximum upper bound\n]: ', end='')
+        maxupper = input()
+        print('Starting interval (Leave blank for standard)\n]: ', end='')
+        interval = input()
+        if interval == '':
+            interval = 84600
+        try:
+            maxupper = int(maxupper)
+            lower = int(lower)
+            interval = int(interval)
+            x = get_all_posts(sub, lower, maxupper, interval)
+        except ValueError:
+            print("lower and upper bounds must be unix timestamps")
+            input()
+    print("Done. Press Enter to close window")
+    input()
+    quit()
+
+
+if __name__ == '__main__':
+    main()
