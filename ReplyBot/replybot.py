@@ -16,7 +16,7 @@ SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 PARENTSTRING = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
 #These are the words you are looking for
-REPLYSTRING = "Hi hungry, I'm dad"
+REPLYSTRING = "t"
 #This is the word you want to put in reply
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
@@ -28,9 +28,9 @@ WAIT = 20
 
 try:
     import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getu()
-    PASSWORD = bot.getp()
-    USERAGENT = bot.geta()
+    USERNAME = bot.uG
+    PASSWORD = bot.pG
+    USERAGENT = bot.aG
 except ImportError:
     pass
 
@@ -57,6 +57,8 @@ def replybot():
             pauthor = post.author.name
             cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
             if not cur.fetchone():
+                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+                sql.commit()
                 pbody = post.body.lower()
                 if any(key.lower() in pbody for key in PARENTSTRING):
                     if pauthor.lower() != USERNAME.lower():
@@ -64,11 +66,9 @@ def replybot():
                         post.reply(REPLYSTRING)
                     else:
                         print('Will not reply to self')
-                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
         except AttributeError:
             #Author is deleted. We don't care about this
             pass
-    sql.commit()
 
 
 while True:
@@ -77,7 +77,6 @@ while True:
     except Exception as e:
         traceback.print_exc()
     print('Running again in %d seconds \n' % WAIT)
-    sql.commit()
     time.sleep(WAIT)
 
     

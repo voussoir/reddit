@@ -68,21 +68,21 @@ def scansub():
         pid = post.id
         try:
             pauthor = post.author.name.lower()
+            if KEYAUTHORS == [] or any(auth.lower() == pauthor for auth in KEYAUTHORS):
+                cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
+                if not cur.fetchone():
+                    cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+                    sql.commit()
+                    pbody = ''
+                    if SEARCHTITLE:
+                        pbody += post.title + ' '
+                    if SEARCHTEXT:
+                        pbody += post.selftext
+                    if KEYWORDS == [] or any(key.lower() in pbody.lower() for key in KEYWORDS):
+                        print('Replying to ' + pid + ' by ' + pauthor)
+                        post.add_comment(REPLYSTRING)
         except AttributeError:
             pauthor = '[DELETED]'
-        if KEYAUTHORS == [] or any(auth.lower() == pauthor for auth in KEYAUTHORS):
-            cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
-            if not cur.fetchone():
-                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
-                pbody = ''
-                if SEARCHTITLE:
-                    pbody += post.title + ' '
-                if SEARCHTEXT:
-                    pbody += post.selftext
-                if KEYWORDS == [] or any(key.lower() in pbody.lower() for key in KEYWORDS):
-                    print('Replying to ' + pid + ' by ' + pauthor)
-                    post.add_comment(REPLYSTRING)
-    sql.commit()
 
 
 while True:

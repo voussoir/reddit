@@ -86,10 +86,7 @@ def scansub():
     authors = []
     for post in posts:
         pid = post.id
-        try:
-            pbody = post.title.lower() + '\n' + post.selftext.lower()
-        except:
-            pbody = post.title.lower()
+        pbody = post.title.lower() + '\n' + post.selftext.lower()
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
             if KEYWORDS == [] or any(key.lower() in pbody for key in KEYWORDS):
