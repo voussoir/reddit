@@ -147,6 +147,8 @@ def scanSub():
             pauthor = '[DELETED]'
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+            sql.commit()
             if pauthor.lower() != USERNAME.lower():
                 pbody = post.body.lower()
             
@@ -163,8 +165,6 @@ def scanSub():
                         post.reply(newcomment)
             else:
                 print('Will not reply to self')
-            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
-    sql.commit()
 
 
 while True:
