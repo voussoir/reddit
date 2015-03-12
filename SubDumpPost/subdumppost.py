@@ -89,6 +89,10 @@ def scansub():
         pbody = post.title.lower() + '\n' + post.selftext.lower()
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
+            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])    
+            sql.commit()
+            if post.subreddit.display_name.lower() == DSUB.lower():
+                continue
             if KEYWORDS == [] or any(key.lower() in pbody for key in KEYWORDS):
                 try:
                     pauthor = post.author.name
@@ -116,14 +120,12 @@ def scansub():
                         print('\tDumped to ' + DSUB + '.')
                 except AttributeError:
                     print(pid + ': Author deleted. Ignoring comment')
-            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])    
     if len(result) > 0 and MAILME == True:
         for m in range(len(result)):
             result[m] = '- [%s](%s)' % (authors[m], result[m])
         r.send_message(RECIPIENT, MTITLE, MHEADER + '\n\n' + '\n\n'.join(result), captcha=None)
         print('Mailed ' + RECIPIENT)
         
-    sql.commit()
 
 while True:
     try:
