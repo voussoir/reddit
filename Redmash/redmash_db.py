@@ -7,7 +7,8 @@ import sqlite3
 
 '''USER CONFIGURATION'''
 
-TIMESTAMP = '%A %d %B %Y'
+#TIMESTAMP = '%A %d %B %Y'
+TIMESTAMP = '%a %d %b %Y'
 #The time format.
 #  "%A %d %B %Y" = "Wendesday 04 June 2014"
 #http://docs.python.org/2/library/time.html#time.strftime
@@ -18,6 +19,7 @@ HEADER = ""
 
 FORMAT = "_timestamp_: [_title_](_slink_) - /u/_author_ (_score_↑)"
 FORMAT_HTML = "_timestamp_: <a href=\"_slink_\">_title_</a> - <a href=\"_authorlink_\">_author_</a> (+_score_)<br>"
+HTMLHEADER = '<html style="font-family:Consolas;font-size:10pt;">'
 TSFORMAT = ""
 #USE THESE INJECTORS TO CREATE CUSTOM OUTPUT
 #_timestamp_ which follows the TIMESTAMP format
@@ -32,6 +34,7 @@ TSFORMAT = ""
 
 READ_FROM_FILE = input('] Input database = ')
 PRINTFILE = input('] Output filename = ')
+SCORETHRESH = int(input('] Score threshold = '))
 
 HTMLMODE = '.html' in PRINTFILE
 if HTMLMODE:
@@ -96,6 +99,8 @@ def work(lista, listfile):
 		print(HEADER, file=listfile)
 	previous_timestamp = ""
 	for post in lista:
+		if post.score < SCORETHRESH:
+			continue
 		timestamp = post.created_utc
 		timestamp = datetime.datetime.fromtimestamp(int(timestamp)).strftime(TIMESTAMP)
 		if HTMLMODE:
@@ -134,7 +139,11 @@ def writeindividual(printstatement, lista, sortmode, reverse, filesuffix):
 	filesuffix += EXTENSION
 	lista.sort(key=sortmode, reverse=reverse)
 	listfile = open(PRINTFILE + filesuffix, 'w', encoding='utf-8')
+	if HTMLMODE is True:
+		print(HTMLHEADER, file=listfile)
 	work(lista, listfile)
+	if HTMLMODE is True:
+		print('</html>', file=listfile)
 	listfile.close()
 
 
