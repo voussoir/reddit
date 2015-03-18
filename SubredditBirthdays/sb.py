@@ -134,8 +134,8 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 				print('New: %s : %s : %s : %s : %d' % (sub.id, h, isnsfw, sub.display_name, subscribers))
 				subreddit_type = SUBREDDIT_TYPE[sub.subreddit_type]
 				submission_type = SUBMISSION_TYPE[sub.submission_type]
-				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-					[sub.id, sub.created_utc, h, isnsfw, sub.display_name, subscribers, isjumbled, idint, subreddit_type, submission_type, -1])
+				cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+					[sub.id, sub.created_utc, h, isnsfw, sub.display_name, subscribers, isjumbled, idint, subreddit_type, submission_type])
 			elif doupdates:
 				if sub.subscribers != None:
 					subscribers = sub.subscribers
@@ -291,7 +291,7 @@ def processir(startingpoint, ranger, chunksize=100, slowmode=False, enablekillin
 		print("Rejected", olds)
 
 def kill(sr):
-	cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [sr, 0, '', '', '?', 0, '0', b36(sr), 0, 0, -1])
+	cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', [sr, 0, '', '', '?', 0, '0', b36(sr), 0, 0])
 	sql.commit()
 
 
@@ -325,7 +325,7 @@ def show():
 	filel = open('show\\dirty-dom.txt', 'w')
 	filem = open('show\\statistics.txt', 'w')
 	filen = open('show\\missing.txt', 'w')
-	fileo = open('show\\all-marked.txt', 'w')
+	#fileo = open('show\\all-marked.txt', 'w')
 	filep = open('README.md', 'r')
 	fileq = open('show\\duplicates.txt', 'w')
 	filer = open('show\\jumble.txt', 'w')
@@ -357,27 +357,27 @@ def show():
 	last20k = allfetch[-20000:]
 
 	previd = allfetch[0][0]
-	print('Writing marked file')
-	print('Sorted by ID number gaps marked', file=fileo)
-	print('#= Unknown subreddit.   $= Verified missing', file=fileo)
-	c=0
-	totalc = 0
-	for member in allfetch:
-		curid = member[0]
-		iddiff = b36(curid) - b36(previd)
-		if iddiff > 1:
-			print('#' + str(iddiff-1), file=fileo)
-		if member[1] != 0:
-			if c > 0:
-				print('$' + str(c), file=fileo)
-			print(memberformat(member), file=fileo)
-			c=0
-		else:
-			if b36(member[0]) > 4594300:
-				c+=1
-				totalc += 1
-		previd = curid
-	fileo.close()
+	#print('Writing marked file')
+	#print('Sorted by ID number gaps marked', file=fileo)
+	#print('#= Unknown subreddit.   $= Verified missing', file=fileo)
+	#c=0
+	#totalc = 0
+	#for member in allfetch:
+	#	curid = member[0]
+	#	iddiff = b36(curid) - b36(previd)
+	#	if iddiff > 1:
+	#		print('#' + str(iddiff-1), file=fileo)
+	#	if member[1] != 0:
+	#		if c > 0:
+	#			print('$' + str(c), file=fileo)
+	#		print(memberformat(member), file=fileo)
+	#		c=0
+	#	else:
+	#		if b36(member[0]) > 4594300:
+	#			c+=1
+	#			totalc += 1
+	#	previd = curid
+	#fileo.close()
 	del allfetch
 	itemcount += totalc
 

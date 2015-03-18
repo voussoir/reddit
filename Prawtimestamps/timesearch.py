@@ -33,11 +33,8 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
     # 15 - flair_css_class
 
     if lower == 'update':
-        cur.execute('SELECT * FROM posts')
-        f = cur.fetchall()
-        if len(f) > 0:
-            f.sort(key=lambda x: x[2])
-            lower = f[-1][2]
+        cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
+        lower = cur.fetchone()[2]
 
     offset = -time.timezone
     subname = subreddit if type(subreddit)==str else subreddit.display_name
@@ -65,10 +62,11 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
         print('\nCurrent interval:', interval, 'seconds')
         print('Lower', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(lower), "%b %d %Y %H:%M:%S"), lower)
         print('Upper', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(upper), "%b %d %Y %H:%M:%S"), upper)
-        timestamps = [lower, upper]
+        #timestamps = [lower, upper]
         while True:
             try:
-                searchresults = list(r.search('', subreddit=subreddit, sort='new', timestamps=timestamps, limit=100))
+                query = 'timestamp:%d..%d' % (lower, upper)
+                searchresults = list(r.search(query, subreddit=subreddit, sort='new', limit=100, syntax='cloudsearch'))
                 break
             except:
                 traceback.print_exc()
@@ -86,7 +84,7 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
             print('Too few results, increasing interval', end='')
             diff = (1 - (itemsfound / 75)) + 1
             interval = int(interval * diff)
-        if itemsfound > 95:
+        if itemsfound > 99:
             print('Too many results, reducing interval', end='')
             interval = int(interval * 0.8)
             upper = lower + interval
@@ -96,9 +94,8 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
             upper = lower + interval
         print()
 
-    cur.execute('SELECT * FROM posts')
-    f = cur.fetchall()
-    itemcount = len(f)
+    cur.execute('SELECT COUNT(idint) FROM posts')
+    itemcount = cur.fetchone()[0]
     print('Ended with %d items in %s' % (itemcount, databasename))
 
 def smartinsert(sql, cur, results):
