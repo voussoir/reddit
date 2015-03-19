@@ -17,8 +17,8 @@ HEADER = ""
 #Put this at the top of the .txt file
 
 
-FORMAT = "_timestamp_: [_title_](_slink_) - /u/_author_ (_score_↑)"
-FORMAT_HTML = "_timestamp_: <a href=\"_slink_\">_title_</a> - <a href=\"_authorlink_\">_author_</a> (+_score_)<br>"
+FORMAT = "_timestamp_: [_title_](_slink_) - /u/_author_ (+_score_)"
+FORMAT_HTML = "_timestamp_: <a href=\"_shortlink_\">[_flairtext_] _title_</a> - <a href=\"_authorlink_\">_author_</a> (+_score_)<br>"
 HTMLHEADER = '<html style="font-family:Consolas;font-size:10pt;">'
 TSFORMAT = ""
 #USE THESE INJECTORS TO CREATE CUSTOM OUTPUT
@@ -26,13 +26,17 @@ TSFORMAT = ""
 #_title_
 #_url_
 #_subreddit_
-#_slink_
+#_shortlink_
 #_author_
 #_authorlink_
 #_numcomments_
 #_score_
+#_flairtext_
+#_flaircss_
 
 READ_FROM_FILE = input('] Input database = ')
+if READ_FROM_FILE[-3:] != '.db':
+	READ_FROM_FILE += '.db'
 PRINTFILE = input('] Output filename = ')
 SCORETHRESH = int(input('] Score threshold = '))
 
@@ -63,42 +67,40 @@ cur = sql.cursor()
     # 13 - num_comments
     # 14 - flair_text
     # 15 - flair_css_class
-def scanfile():
-	cur.execute('SELECT * FROM posts')
-	fetchall = cur.fetchall()
+def createpost(post):
+	p = Post()
+	p.id = post[1]
+	p.created_utc = post[2]
+	p.is_self = post[3]
+	p.over_18 = post[4]
+	p.author = post[5]
+	p.title = post[6]
+	p.title = p.title.replace('\n', '')
+	p.url = post[7]
+	p.selftext = post[8]
+	p.score = post[9]
+	p.subreddit = post[10]
+	p.distinguished = post[11]
+	p.textlen = post[12]
+	p.num_comments = post[13]
+	p.link_flair_text = post[14]
+	p.link_flair_css_class = post[15]
 
-	output = []
-	for post in fetchall:
-		p = Post()
-		p.id = post[1]
-		p.created_utc = post[2]
-		p.is_self = post[3]
-		p.over_18 = post[4]
-		p.author = post[5]
-		p.title = post[6]
-		p.title = p.title.replace('\n', '')
-		p.url = post[7]
-		p.selftext = post[8]
-		p.score = post[9]
-		p.subreddit = post[10]
-		p.distinguished = post[11]
-		p.textlen = post[12]
-		p.num_comments = post[13]
-		p.link_flair_text = post[14]
-		p.link_flair_css_class = post[15]
-
-		p.short_link = 'http://redd.it/' + p.id
-
-		output.append(p)
+	p.short_link = 'http://redd.it/' + p.id
 	
-	return output
+	return p
 
 
-def work(lista, listfile):
+def work(listfile):
 	if HEADER != "":
 		print(HEADER, file=listfile)
 	previous_timestamp = ""
-	for post in lista:
+	while True:
+		post = cur.fetchone()
+		if post is None:
+			break
+
+		post = createpost(post)
 		if post.score < SCORETHRESH:
 			continue
 		timestamp = post.created_utc
@@ -124,9 +126,9 @@ def work(lista, listfile):
 		url = post.url
 		url = url.replace('http://www.reddit.com', 'http://np.reddit.com')
 		final = final.replace('_url_', url)
-		slink = post.short_link
+		shortlink = post.short_link
 		#slink = slink.replace('http://', 'http://np.')
-		final = final.replace('_slink_', slink)
+		final = final.replace('_slink_', shortlink)
 		final = final.replace('_flairtext_', flair_text)
 		final = final.replace('_score_', str(post.score))
 		final = final.replace('_numcomments_', str(post.num_comments))
@@ -134,45 +136,53 @@ def work(lista, listfile):
 		previous_timestamp = timestamp
 
 
-def writeindividual(printstatement, lista, sortmode, reverse, filesuffix):
-	print(printstatement)
+def preparefile(filesuffix):
 	filesuffix += EXTENSION
-	lista.sort(key=sortmode, reverse=reverse)
 	listfile = open(PRINTFILE + filesuffix, 'w', encoding='utf-8')
 	if HTMLMODE is True:
 		print(HTMLHEADER, file=listfile)
-	work(lista, listfile)
+	return listfile
+
+def closefile(listfile):
 	if HTMLMODE is True:
 		print('</html>', file=listfile)
 	listfile.close()
 
 
-def writefiles(lista):
-	writeindividual('Writing time file', lista,
-		lambda x:x.created_utc, True, '_date')
-	
-	#writeindividual('Writing subreddit file', lista,
-	#	lambda x:x.subreddit.lower(), False, '_subreddit')
-	
-	writeindividual('Writing title file', lista,
-		lambda x:x.title.lower(), False, '_title')
+def writefiles():
 
-	writeindividual('Writing score file', lista,
-		lambda x:x.score, True, '_score')
+	print('Writing time files')
+	listfile = preparefile('_date')
+	cur.execute('SELECT * FROM posts WHERE score > ? ORDER BY created DESC', [SCORETHRESH])
+	work(listfile)
+	closefile(listfile)
 	
-	writeindividual('Writing author file', lista,
-		lambda x:x.author.lower(), False, '_author')
+	print('Writing title files')
+	listfile = preparefile('_title')
+	cur.execute('SELECT * FROM posts WHERE score > ? ORDER BY title ASC', [SCORETHRESH])
+	work(listfile)
+	closefile(listfile)
+
+	print('Writing score files')
+	listfile = preparefile('_score')
+	cur.execute('SELECT * FROM posts WHERE score > ? ORDER BY score DESC', [SCORETHRESH])
+	work(listfile)
+	closefile(listfile)
+	
+	print('Writing author files')
+	listfile = preparefile('_author')
+	cur.execute('SELECT * FROM posts WHERE score > ? ORDER BY author ASC', [SCORETHRESH])
+	work(listfile)
+	closefile(listfile)
 	
 	print('Writing flair file')
-	now = datetime.datetime.now(datetime.timezone.utc).timestamp()
-	lista.sort(key=lambda x: (x.link_flair_text, now-x.created_utc))
-	for index in range(len(lista)):
-		if lista[index].link_flair_text != "":
-			lista = lista[index:] + lista[:index]
-			break
-	listfile = open(PRINTFILE + '_flair' + EXTENSION, 'w', encoding='utf-8')
-	work(lista, listfile)
-	listfile.close()
+	listfile = preparefile('_flair')
+	cur.execute('SELECT * FROM posts WHERE score > ? AND flair_text IS NOT NULL ORDER BY flair_text, created ASC', [SCORETHRESH])
+	work(listfile)
+	cur.execute('SELECT * FROM posts WHERE score > ? AND flair_text IS NULL ORDER BY flair_text, created ASC', [SCORETHRESH])
+	work(listfile)
+	closefile(listfile)
+
 	print('Done.')
 
 def removeduplicates(lista):
@@ -185,8 +195,7 @@ def removeduplicates(lista):
 
 
 def main():
-	lista = scanfile()
-	writefiles(lista)
+	writefiles()
 
 
 class Post:
