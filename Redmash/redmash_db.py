@@ -150,7 +150,6 @@ def closefile(listfile):
 
 
 def writefiles():
-
 	print('Writing time files')
 	listfile = preparefile('_date')
 	cur.execute('SELECT * FROM posts WHERE score > ? ORDER BY created DESC', [SCORETHRESH])
