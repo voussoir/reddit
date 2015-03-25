@@ -1,5 +1,6 @@
 #/u/GoldenSights
 import traceback
+import sys
 import time
 import datetime
 import string
@@ -34,23 +35,23 @@ TSFORMAT = ""
 #_flairtext_
 #_flaircss_
 
-READ_FROM_FILE = input('] Input database = ')
-if READ_FROM_FILE[-3:] != '.db':
-	READ_FROM_FILE += '.db'
-PRINTFILE = input('] Output filename = ')
-SCORETHRESH = int(input('] Score threshold = '))
-
-HTMLMODE = '.html' in PRINTFILE
-if HTMLMODE:
-	EXTENSION = '.html'
-	PRINTFILE = PRINTFILE.replace('.html', '')
-else:
-	EXTENSION = '.txt'
-
+READ_FROM_FILE = ""
+PRINTFILE = ""
+SCORETHRESH = 0
+HTMLMODE = False
+USERMODE = False
+BREAKDOWNMODE = False
+EXTENSION = '.txt'
+# Variables are input by user during the
+# inputvars() method
 '''All done!'''
 
-sql = sqlite3.connect(READ_FROM_FILE)
-cur = sql.cursor()
+
+class Post:
+	#Generic class to convert SQL columns into an object
+	pass
+sql = None
+cur = None
     #  0 - idint
     #  1 - idstr
     #  2 - created
@@ -67,39 +68,51 @@ cur = sql.cursor()
     # 13 - num_comments
     # 14 - flair_text
     # 15 - flair_css_class
-def createpost(post):
-	p = Post()
-	p.id = post[1]
-	if 't3_' in p.id or 't1_' in p.id:
-		p.fullname = p.id
-		p.id = p.id.split('_')[1]
+def createpost(postdata):
+	post = Post()
+	post.id = postdata[1]
+	if 't3_' in post.id or 't1_' in post.id:
+		post.fullname = post.id
+		post.id = post.id.split('_')[1]
 	else:
-		p.fullname = 't3_' + p.id
-	p.created_utc = post[2]
-	p.is_self = post[3]
-	p.over_18 = post[4]
-	p.author = post[5]
-	p.title = post[6]
-	p.title = p.title.replace('\n', '')
-	p.url = post[7]
-	p.selftext = post[8]
-	p.score = post[9]
-	p.subreddit = post[10]
-	p.distinguished = post[11]
-	p.textlen = post[12]
-	p.num_comments = post[13]
-	p.link_flair_text = post[14]
-	p.link_flair_css_class = post[15]
+		post.fullname = 't3_' + post.id
+	post.type = int(post.fullname.split('_')[0][-1])
+	post.created_utc = postdata[2]
+	post.is_self = postdata[3]
+	post.over_18 = postdata[4]
+	post.author = postdata[5]
+	post.title = postdata[6]
+	post.title = post.title.replace('\n', '')
+	post.url = postdata[7]
+	post.selftext = postdata[8]
+	post.score = postdata[9]
+	post.subreddit = postdata[10]
+	post.distinguished = postdata[11]
+	post.textlen = postdata[12]
+	post.num_comments = postdata[13]
+	post.link_flair_text = postdata[14]
+	post.link_flair_css_class = postdata[15]
 
-	p.short_link = 'http://redd.it/' + p.id
+	post.short_link = 'http://redd.it/' + post.id
 	
-	return p
+	return post
 
+def preparefile(filesuffix):
+	filesuffix += EXTENSION
+	listfile = open(PRINTFILE + filesuffix, 'w', encoding='utf-8')
+	if HTMLMODE is True:
+		print(HTMLHEADER, file=listfile)
+	return listfile
+
+def closefile(listfile):
+	if HTMLMODE is True:
+		print('</html>', file=listfile)
+	listfile.close()
 
 def work(listfile):
-	if HEADER != "":
+	if HEADER != '':
 		print(HEADER, file=listfile)
-	previous_timestamp = ""
+	previous_timestamp = ''
 	while True:
 		post = cur.fetchone()
 		if post is None:
@@ -140,62 +153,143 @@ def work(listfile):
 		print(final, file=listfile)
 		previous_timestamp = timestamp
 
-
-def preparefile(filesuffix):
-	filesuffix += EXTENSION
-	listfile = open(PRINTFILE + filesuffix, 'w', encoding='utf-8')
-	if HTMLMODE is True:
-		print(HTMLHEADER, file=listfile)
-	return listfile
-
-def closefile(listfile):
-	if HTMLMODE is True:
-		print('</html>', file=listfile)
-	listfile.close()
-
-
 def writefiles():
 	print('Writing time files')
 	listfile = preparefile('_date')
-	cur.execute('SELECT * FROM posts WHERE score > ? ORDER BY created DESC', [SCORETHRESH])
+	cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY created DESC', [SCORETHRESH])
 	work(listfile)
 	closefile(listfile)
 	
 	print('Writing title files')
 	listfile = preparefile('_title')
-	cur.execute('SELECT * FROM posts WHERE score > ? ORDER BY title ASC', [SCORETHRESH])
+	cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY title ASC', [SCORETHRESH])
 	work(listfile)
 	closefile(listfile)
 
 	print('Writing score files')
 	listfile = preparefile('_score')
-	cur.execute('SELECT * FROM posts WHERE score > ? ORDER BY score DESC', [SCORETHRESH])
+	cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY score DESC', [SCORETHRESH])
 	work(listfile)
 	closefile(listfile)
 	
-	print('Writing author files')
-	listfile = preparefile('_author')
-	cur.execute('SELECT * FROM posts WHERE score > ? ORDER BY author ASC', [SCORETHRESH])
-	work(listfile)
-	closefile(listfile)
+	if USERMODE is False:
+		print('Writing author files')
+		listfile = preparefile('_author')
+		cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY author ASC', [SCORETHRESH])
+		work(listfile)
+		closefile(listfile)
+
+	if USERMODE is True:
+		print('Writing subreddit files')
+		listfile = preparefile('_subreddit')
+		cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY subreddit ASC', [SCORETHRESH])
+		work(listfile)
+		closefile(listfile)
 	
 	print('Writing flair file')
 	listfile = preparefile('_flair')
-	cur.execute('SELECT * FROM posts WHERE score > ? AND flair_text IS NOT NULL ORDER BY flair_text, created ASC', [SCORETHRESH])
+	cur.execute('SELECT * FROM posts WHERE score >= ? AND flair_text IS NOT NULL ORDER BY flair_text, created ASC', [SCORETHRESH])
 	work(listfile)
-	cur.execute('SELECT * FROM posts WHERE score > ? AND flair_text IS NULL ORDER BY flair_text, created ASC', [SCORETHRESH])
+	cur.execute('SELECT * FROM posts WHERE score >= ? AND flair_text IS NULL ORDER BY flair_text, created ASC', [SCORETHRESH])
 	work(listfile)
 	closefile(listfile)
 
 	print('Done.')
 
+def breakdown():
+	print('\nBreaking it down...')
+	listfile = preparefile('')
+	cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY subreddit ASC', [SCORETHRESH])
+	count_submissions = 0
+	count_comments = 0
+	previous_subreddit = ''
+	breakdowndict = {}
+	while True:
+		post = cur.fetchone()
+		if post is None:
+			break
+		post = createpost(post)
+		if post.subreddit != previous_subreddit:
+			breakdowndict[previous_subreddit] = {'submissions':count_submissions, 'comments':count_comments}
+			previous_subreddit = post.subreddit
+			count_submissions = 0
+			count_comments = 0
+
+		if post.type == 1:
+			count_comments += 1
+		if post.type == 3:
+			count_submissions += 1
+
+	del breakdowndict['']
+	keys = list(breakdowndict.keys())
+	keys.sort(key=lambda x: (breakdowndict[x]['submissions'], breakdowndict[x]['comments'], x), reverse=True)
+	out = []
+	for k in keys:
+		subreddit = '"%s"' % k
+		submissions = breakdowndict[k]['submissions']
+		comments = breakdowndict[k]['comments']
+		o = '%s:\n\t{%s:%d, %s:%d}' % (subreddit, '"submissions"', submissions, '"comments"', comments)
+		out.append(o)
+	out = ',\n'.join(out)
+	out = '{\n' + out + '}'
+	print(out, file=listfile)
+	#json.dump(breakdowndict, listfile, sort_keys=True, indent=4)
+
+
+def inputvars():
+	global READ_FROM_FILE
+	global PRINTFILE
+	global SCORETHRESH
+	global HTMLMODE
+	global USERMODE
+	global BREAKDOWNMODE
+	global EXTENSION
+	global sql
+	global cur
+
+	try:
+		READ_FROM_FILE = sys.argv[1]
+	except IndexError:
+		READ_FROM_FILE = input('] Input database = ')
+
+	if READ_FROM_FILE[-3:] != '.db':
+		READ_FROM_FILE += '.db'
+	filename = READ_FROM_FILE.replace('\\', '/')
+	filename = filename.split('/')[-1]
+	if filename[0] == '@':
+		USERMODE = True
+
+	try:
+		PRINTFILE = sys.argv[2]
+	except IndexError:
+		PRINTFILE = input('] Output filename = ')
+
+	try:
+		SCORETHRESH = int(sys.argv[3])
+	except IndexError:
+		SCORETHRESH = int(input('] Score threshold = '))
+	
+	HTMLMODE = '.html' in PRINTFILE
+	BREAKDOWNMODE = '.json' in PRINTFILE
+	if HTMLMODE:
+		EXTENSION = '.html'
+		PRINTFILE = PRINTFILE.replace('.html', '')
+	elif BREAKDOWNMODE:
+		EXTENSION = '.json'
+		PRINTFILE = PRINTFILE.replace('.json', '')
+	else:
+		EXTENSION = '.txt'
+
+	sql = sqlite3.connect(READ_FROM_FILE)
+	cur = sql.cursor()
+
 def main():
-	writefiles()
+	inputvars()
+	if BREAKDOWNMODE is False:
+		writefiles()
+	else:
+		breakdown()
 
-
-class Post:
-	#Generic class to convert SQL columns into an object
-	pass
 
 if __name__ == '__main__':
 	main()
