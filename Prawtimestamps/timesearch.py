@@ -6,6 +6,10 @@ import sqlite3
 
 USERAGENT = ''
 # Enter a useragent
+MAXIMUM_EXPANSION_MULTIPLIER = 2
+# The maximum amount by which it can multiply the interval
+# when not enough posts are found.
+
 try:
     import bot
     USERAGENT = bot.aPT
@@ -101,6 +105,7 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
         if itemsfound < 75:
             print('Too few results, increasing interval', end='')
             diff = (1 - (itemsfound / 75)) + 1
+            diff = min(MAXIMUM_EXPANSION_MULTIPLIER, diff)
             interval = int(interval * diff)
         if itemsfound > 99:
             print('Too many results, reducing interval', end='')
@@ -187,6 +192,7 @@ def main():
         except ValueError:
             print("lower and upper bounds must be unix timestamps")
             input()
+            quit()
     get_all_posts(sub, lower, maxupper, interval, usermode)
     print("Done. Press Enter to close window")
     input()
