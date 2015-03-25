@@ -70,6 +70,11 @@ cur = sql.cursor()
 def createpost(post):
 	p = Post()
 	p.id = post[1]
+	if 't3_' in p.id or 't1_' in p.id:
+		p.fullname = p.id
+		p.id = p.id.split('_')[1]
+	else:
+		p.fullname = 't3_' + p.id
 	p.created_utc = post[2]
 	p.is_self = post[3]
 	p.over_18 = post[4]
@@ -184,15 +189,6 @@ def writefiles():
 
 	print('Done.')
 
-def removeduplicates(lista):
-	print('Removing duplicate posts in list')
-	nodupes = []
-	for post in lista:
-		if not any(p.id == post.id for p in nodupes):
-			nodupes.append(post)
-	return nodupes
-
-
 def main():
 	writefiles()
 
@@ -201,5 +197,5 @@ class Post:
 	#Generic class to convert SQL columns into an object
 	pass
 
-main()
-quit()
+if __name__ == '__main__':
+	main()
