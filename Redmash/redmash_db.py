@@ -196,22 +196,30 @@ def writefiles():
 
 	print('Done.')
 
-def breakdown():
+def breakdown(doreturn=False, mode='user'):
 	print('\nBreaking it down...')
 	listfile = preparefile('')
-	cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY subreddit ASC', [SCORETHRESH])
+	if mode == 'subreddit':
+		cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY author ASC', [SCORETHRESH])
+	if mode == 'user':
+		cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY subreddit ASC', [SCORETHRESH])
 	count_submissions = 0
 	count_comments = 0
-	previous_subreddit = ''
+	previous = ''
 	breakdowndict = {}
 	while True:
 		post = cur.fetchone()
 		if post is None:
+			breakdowndict[previous] = {'submissions':count_submissions, 'comments':count_comments}
 			break
 		post = createpost(post)
-		if post.subreddit != previous_subreddit:
-			breakdowndict[previous_subreddit] = {'submissions':count_submissions, 'comments':count_comments}
-			previous_subreddit = post.subreddit
+		if mode == 'subreddit':
+			relevant = post.author
+		elif mode == 'user':
+			relevant = post.subreddit
+		if relevant != previous:
+			breakdowndict[previous] = {'submissions':count_submissions, 'comments':count_comments}
+			previous = relevant
 			count_submissions = 0
 			count_comments = 0
 
@@ -221,17 +229,22 @@ def breakdown():
 			count_submissions += 1
 
 	del breakdowndict['']
+
+	if doreturn is True:
+		return breakdowndict
+
 	keys = list(breakdowndict.keys())
-	keys.sort(key=lambda x: (breakdowndict[x]['submissions'], breakdowndict[x]['comments'], x), reverse=True)
+	longestkey = max([len(k) for k in keys])
+	keys.sort(key=lambda x: (breakdowndict[x]['submissions'] + breakdowndict[x]['comments'], x), reverse=True)
 	out = []
 	for k in keys:
-		subreddit = '"%s"' % k
+		relevant = (' '*(longestkey-len(k))) + ('"%s"' % k)
 		submissions = breakdowndict[k]['submissions']
 		comments = breakdowndict[k]['comments']
-		o = '%s:\n\t{%s:%d, %s:%d}' % (subreddit, '"submissions"', submissions, '"comments"', comments)
+		o = '%s:{%s:%d, %s:%d}' % (relevant, '"submissions"', submissions, '"comments"', comments)
 		out.append(o)
 	out = ',\n'.join(out)
-	out = '{\n' + out + '}'
+	out = '{\n' + out + '\n}'
 	print(out, file=listfile)
 	#json.dump(breakdowndict, listfile, sort_keys=True, indent=4)
 
@@ -288,7 +301,10 @@ def main():
 	if BREAKDOWNMODE is False:
 		writefiles()
 	else:
-		breakdown()
+		if USERMODE is True:
+			breakdown(mode='user')
+		else:
+			breakdown(mode='subreddit')
 
 
 if __name__ == '__main__':
