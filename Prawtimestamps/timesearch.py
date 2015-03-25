@@ -4,11 +4,23 @@ import time
 import datetime
 import sqlite3
 
-print('Connecting to reddit')
-r = praw.Reddit('/u/GoldenSights automatic timestamp search program')
+USERAGENT = ''
+# Enter a useragent
+try:
+    import bot
+    USERAGENT = bot.aPT
+except ImportError:
+    pass
 
-def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
-    databasename = subreddit + '.db'
+print('Connecting to reddit')
+r = praw.Reddit(USERAGENT)
+
+def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode=False):
+    if usermode is False:
+        databasename = '%s.db' % subreddit
+    else:
+        databasename = '@%s.db' % usermode
+
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
     cur.execute(('CREATE TABLE IF NOT EXISTS posts(idint INT, idstr TEXT, '
@@ -39,11 +51,14 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
     offset = -time.timezone
     subname = subreddit if type(subreddit)==str else subreddit.display_name
     if lower is None:
-        if isinstance(subreddit, praw.objects.Subreddit):
+        if usermode is False:
+            if not isinstance(subreddit, praw.objects.Subreddit):
+                subreddit = r.get_subreddit(subreddit)
             creation = subreddit.created_utc
         else:
-            subreddit = r.get_subreddit(subreddit)
-            creation = subreddit.created_utc
+            if not isinstance(usermode, praw.objects.Redditor):
+                user = r.get_redditor(usermode)
+            creation = user.created_utc
         lower = creation
 
     if maxupper is None:
@@ -65,7 +80,10 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400):
         #timestamps = [lower, upper]
         while True:
             try:
-                query = 'timestamp:%d..%d' % (lower, upper)
+                if usermode is not False:
+                    query = '(and author:"%s" (and timestamp:%d..%d))' % (usermode, lower, upper)
+                else:
+                    query = 'timestamp:%d..%d' % (lower, upper)
                 searchresults = list(r.search(query, subreddit=subreddit, sort='new', limit=100, syntax='cloudsearch'))
                 break
             except:
@@ -107,7 +125,7 @@ def smartinsert(sql, cur, results):
             except AttributeError:
                 o.authorx = '[DELETED]'
 
-            postdata = [b36(o.id), o.id, o.created_utc, o.is_self, o.over_18,
+            postdata = [b36(o.id), o.fullname, o.created_utc, o.is_self, o.over_18,
             o.authorx, o.title, o.url, o.selftext, o.score,
             o.subreddit.display_name, o.distinguished, len(o.selftext),
             o.num_comments, o.link_flair_text, o.link_flair_css_class]
@@ -140,17 +158,24 @@ def b36(i):
         return base36decode(i)
 
 def main():
-    print("Get posts from subreddit: /r/", end='')
+    usermode = False
+    maxupper = None
+    interval = 86400
+    print('\nGet posts from subreddit\n/r/', end='')
     sub = input()
+    if sub == '':
+        print('Get posts from user\n/u/', end='')
+        usermode = input()
+        sub = 'all'
     print('\nLower bound (Leave blank to get ALL POSTS)\nEnter "update" to use last entry\n]: ', end='')
     lower  = input().lower()
     if lower == '':
         lower = None
-    if lower is None or lower == 'update':
-        x = get_all_posts(sub, lower)
-    else:
+    if lower not in [None, 'update']:
         print('Maximum upper bound\n]: ', end='')
         maxupper = input()
+        if maxupper == '':
+            maxupper = datetime.datetime.now(datetime.timezone.utc).timestamp()
         print('Starting interval (Leave blank for standard)\n]: ', end='')
         interval = input()
         if interval == '':
@@ -159,10 +184,10 @@ def main():
             maxupper = int(maxupper)
             lower = int(lower)
             interval = int(interval)
-            x = get_all_posts(sub, lower, maxupper, interval)
         except ValueError:
             print("lower and upper bounds must be unix timestamps")
             input()
+    get_all_posts(sub, lower, maxupper, interval, usermode)
     print("Done. Press Enter to close window")
     input()
     quit()

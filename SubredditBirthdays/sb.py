@@ -1,5 +1,6 @@
 #/u/GoldenSights
 import praw # simple interface to the reddit API, also handles rate limiting of requests
+import bot
 import time
 import sqlite3
 import datetime
@@ -34,6 +35,7 @@ print('Loaded SQL Database')
 sql.commit()
 
 r = praw.Reddit(USERAGENT)
+r.login(bot.uG, bot.pG)
 print('Connected to reddit.')
 
 olds = 0
@@ -332,7 +334,7 @@ def show():
 	files = open('show\\all-subscribers.txt', 'w')
 	filet = open('show\\dirty-subscribers.txt', 'w')
 	fileu = open('show\\jumble-nsfw.txt', 'w')
-	cur.execute('SELECT * FROM subreddits WHERE CREATED !=?', [0])
+	cur.execute('SELECT * FROM subreddits WHERE CREATED !=0')
 	fetch = cur.fetchall()
 	itemcount = len(fetch)
 	print(str(itemcount) + ' items.')
@@ -357,26 +359,29 @@ def show():
 	last20k = allfetch[-20000:]
 
 	previd = allfetch[0][0]
-	#print('Writing marked file')
+	print('Writing marked file')
 	#print('Sorted by ID number gaps marked', file=fileo)
 	#print('#= Unknown subreddit.   $= Verified missing', file=fileo)
-	#c=0
-	#totalc = 0
-	#for member in allfetch:
-	#	curid = member[0]
-	#	iddiff = b36(curid) - b36(previd)
-	#	if iddiff > 1:
-	#		print('#' + str(iddiff-1), file=fileo)
-	#	if member[1] != 0:
-	#		if c > 0:
-	#			print('$' + str(c), file=fileo)
-	#		print(memberformat(member), file=fileo)
-	#		c=0
-	#	else:
-	#		if b36(member[0]) > 4594300:
-	#			c+=1
-	#			totalc += 1
-	#	previd = curid
+	c=0
+	totalc = 0
+	for member in allfetch:
+		curid = member[0]
+		iddiff = b36(curid) - b36(previd)
+		if iddiff > 1:
+			#print('#' + str(iddiff-1), file=fileo)
+			pass
+		if member[1] != 0:
+			if c > 0:
+				#print('$' + str(c), file=fileo)
+				pass
+			#print(memberformat(member), file=fileo)
+			pass
+			c=0
+		else:
+			if b36(member[0]) > 4594300:
+				c+=1
+				totalc += 1
+		previd = curid
 	#fileo.close()
 	del allfetch
 	itemcount += totalc
@@ -1084,3 +1089,22 @@ def plotbars(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888", 
 	t.geometry("1x1+1+1")
 	t.update()
 	t.destroy()
+
+def completesweep(shuffle=False, sleepy=0):
+	cur.execute('SELECT * from subreddits WHERE created > 0')
+	c = []
+	f=cur.fetchone()
+	while f is not None:
+		c.append(f[0])
+		f=cur.fetchone()
+		if len(c) % 3000 == 0:
+			print('\r',len(c), end='')
+	print()
+
+	if shuff:
+		random.shuffle(c)
+
+	while len(c) > 0:
+		processmega(c[:100])
+		c=c[100:]
+		time.sleep(sleepy)
