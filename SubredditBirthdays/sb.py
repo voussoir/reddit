@@ -1101,7 +1101,7 @@ def completesweep(shuffle=False, sleepy=0):
 			print('\r',len(c), end='')
 	print()
 
-	if shuff:
+	if shuffle:
 		random.shuffle(c)
 
 	while len(c) > 0:
