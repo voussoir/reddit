@@ -123,6 +123,8 @@ def b36(i):
 def main():
 	print('\nDatabase file')
 	databasename = input(']: ')
+	if databasename[-3:] != '.db':
+		databasename += '.db'
 	print('\nLimit - number of MoreComments objects to replace')
 	print('Enter 0 to have no limit and get all')
 	limit = input(']: ')

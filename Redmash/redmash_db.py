@@ -121,6 +121,8 @@ def work(listfile):
 		post = createpost(post)
 		if post.score < SCORETHRESH:
 			continue
+		if post.type != 3:
+			continue
 		timestamp = post.created_utc
 		timestamp = datetime.datetime.fromtimestamp(int(timestamp)).strftime(TIMESTAMP)
 		if HTMLMODE:
@@ -292,6 +294,7 @@ def inputvars():
 		PRINTFILE = PRINTFILE.replace('.json', '')
 	else:
 		EXTENSION = '.txt'
+		PRINTFILE = PRINTFILE.replace('.txt', '')
 
 	sql = sqlite3.connect(READ_FROM_FILE)
 	cur = sql.cursor()
