@@ -21,6 +21,7 @@ r = praw.Reddit(USERAGENT)
 def commentaugment(databasename, limit, threshold):
 	sql = sqlite3.connect(databasename)
 	cur = sql.cursor()
+	cur2 = sql.cursor()
 	#  0 - idint
 	#  1 - idstr
 	#  2 - created
@@ -41,6 +42,8 @@ def commentaugment(databasename, limit, threshold):
 	while True:
 		hundred = [cur.fetchone() for x in range(100)]
 		hundred = remove_none(hundred)
+		if len(hundred) == 0:
+			return
 		hundred = [h[1] for h in hundred]
 		hundred = verify_t3(hundred)
 		submissions = r.get_info(thing_id=hundred)
@@ -52,7 +55,7 @@ def commentaugment(databasename, limit, threshold):
 			submission.replace_more_comments(limit, threshold)
 			comments = praw.helpers.flatten_tree(submission.comments)
 			print(len(comments))
-			smartinsert(sql, cur, comments)
+			smartinsert(sql, cur2, comments)
 
 def remove_none(itemlist):
 	done = False
