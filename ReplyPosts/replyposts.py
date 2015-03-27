@@ -1,6 +1,6 @@
 #/u/GoldenSights
 import traceback
-import praw # simple interface to the reddit API, also handles rate limiting of requests
+import praw
 import time
 import sqlite3
 
@@ -32,22 +32,15 @@ MAXPOSTS = 100
 WAIT = 20
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
-
-'''All done!'''
-
-
-
-
-WAITS = str(WAIT)
 try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
-    USERAGENT = bot.getaG()
+	import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
+	USERNAME = bot.getuG()
+	PASSWORD = bot.getpG()
+	USERAGENT = bot.getaG()
 except ImportError:
-    pass
+	pass
 
-sql = sqlite3.connect('sql.db')
+sql = sqlite3.connect('replyposts.db')
 print('Loaded SQL Database')
 cur = sql.cursor()
 
@@ -61,35 +54,45 @@ r.login(USERNAME, PASSWORD)
 
 
 def scansub():
-    print('Searching '+ SUBREDDIT + '.')
-    subreddit = r.get_subreddit(SUBREDDIT)
-    posts = subreddit.get_new(limit=MAXPOSTS)
-    for post in posts:
-        pid = post.id
-        try:
-            pauthor = post.author.name.lower()
-            if KEYAUTHORS == [] or any(auth.lower() == pauthor for auth in KEYAUTHORS):
-                cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
-                if not cur.fetchone():
-                    cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
-                    sql.commit()
-                    pbody = ''
-                    if SEARCHTITLE:
-                        pbody += post.title + ' '
-                    if SEARCHTEXT:
-                        pbody += post.selftext
-                    if KEYWORDS == [] or any(key.lower() in pbody.lower() for key in KEYWORDS):
-                        print('Replying to ' + pid + ' by ' + pauthor)
-                        post.add_comment(REPLYSTRING)
-        except AttributeError:
-            pauthor = '[DELETED]'
+	print('Searching '+ SUBREDDIT + '.')
+	subreddit = r.get_subreddit(SUBREDDIT)
+	posts = subreddit.get_new(limit=MAXPOSTS)
+	for post in posts:
+		# Anything that needs to happen every loop goes here.
+		pid = post.id
+
+		try:
+			pauthor = post.author.name.lower()
+		except AttributeError:
+			# Author is deleted and we don't care about this post
+			continue
+
+		if KEYAUTHORS != [] and all(auth.lower() != pauthor for auth in KEYAUTHORS):
+			# This post was not made by a keyauthor
+			continue
+
+		cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
+		if cur.fetchone():
+			# This post is already marked in the database
+			continue
+
+		cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+		sql.commit()
+		pbody = ''
+		if SEARCHTITLE:
+			pbody += post.title + '\n'
+		if SEARCHTEXT:
+			pbody += post.selftext
+		if KEYWORDS == [] or any(key.lower() in pbody.lower() for key in KEYWORDS):
+			print('Replying to ' + pid + ' by ' + pauthor)
+			post.add_comment(REPLYSTRING)
 
 
 while True:
-    try:
-        scansub()
-    except Exception as e:
-        traceback.print_exc()
-    print('Running again in ' + WAITS + ' seconds \n')
-    sql.commit()
-    time.sleep(WAIT)
+	try:
+		scansub()
+	except Exception as e:
+		traceback.print_exc()
+	print('Running again in %d seconds \n' % WAIT)
+	sql.commit()
+	time.sleep(WAIT)
