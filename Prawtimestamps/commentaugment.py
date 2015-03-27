@@ -18,7 +18,7 @@ except ImportError:
 print('Connecting to reddit')
 r = praw.Reddit(USERAGENT)
 
-def commentaugment(databasename, limit, threshold):
+def commentaugment(databasename, limit, threshold, numthresh):
 	sql = sqlite3.connect(databasename)
 	cur = sql.cursor()
 	cur2 = sql.cursor()
@@ -38,7 +38,7 @@ def commentaugment(databasename, limit, threshold):
 	# 13 - num_comments
 	# 14 - flair_text
 	# 15 - flair_css_class
-	cur.execute('SELECT * FROM posts WHERE url IS NOT NULL and num_comments > 0 ORDER BY num_comments DESC')
+	cur.execute('SELECT * FROM posts WHERE url IS NOT NULL and num_comments > ? ORDER BY num_comments DESC', [numthresh])
 	while True:
 		hundred = [cur.fetchone() for x in range(100)]
 		hundred = remove_none(hundred)
@@ -148,7 +148,16 @@ def main():
 		if threshold < 0:
 			threshold = 0
 
-	commentaugment(databasename, limit, threshold)
+	print('\nMinimum num_comments a thread must have to be scanned')
+	numthresh = input(']: ')
+	if numthresh == '':
+		numthresh = 0
+	else:
+		numthresh = int(numthresh)
+		if numthresh < 0:
+			numthresh = 0
+
+	commentaugment(databasename, limit, threshold, numthresh)
 	print('Done')
 	input()
 	quit()
