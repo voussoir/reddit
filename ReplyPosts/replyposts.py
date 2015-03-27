@@ -67,17 +67,17 @@ def scansub():
 			# Author is deleted and we don't care about this post
 			continue
 
-		if KEYAUTHORS != [] and all(auth.lower() != pauthor for auth in KEYAUTHORS):
-			# This post was not made by a keyauthor
-			continue
-
 		cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
 		if cur.fetchone():
 			# This post is already marked in the database
 			continue
-
 		cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 		sql.commit()
+		
+		if KEYAUTHORS != [] and all(auth.lower() != pauthor for auth in KEYAUTHORS):
+			# This post was not made by a keyauthor
+			continue
+
 		pbody = ''
 		if SEARCHTITLE:
 			pbody += post.title + '\n'
