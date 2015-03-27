@@ -14,9 +14,13 @@ USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-PARENTSTRING = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
+KEYWORDS = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
 #These are the words you are looking for
-REPLYSTRING = "t"
+KEYAUTHORS = ["GoldenSights"]
+# These are the names of the authors you are looking for
+# Any authors not on this list will not be replied to.
+# Make empty to allow anybody
+REPLYSTRING = "Hi hungry, I'm dad."
 #This is the word you want to put in reply
 MAXPOSTS = 100
 #This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
@@ -48,27 +52,37 @@ r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
 
 def replybot():
-    print('Searching '+ SUBREDDIT + '.')
+    print('Searching %s.' % SUBREDDIT)
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_comments(limit=MAXPOSTS)
     for post in posts:
+        # Anything that needs to happen every loop goes here.
         pid = post.id
+
         try:
             pauthor = post.author.name
-            cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
-            if not cur.fetchone():
-                cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
-                sql.commit()
-                pbody = post.body.lower()
-                if any(key.lower() in pbody for key in PARENTSTRING):
-                    if pauthor.lower() != USERNAME.lower():
-                        print('Replying to ' + pid + ' by ' + pauthor)
-                        post.reply(REPLYSTRING)
-                    else:
-                        print('Will not reply to self')
         except AttributeError:
-            #Author is deleted. We don't care about this
-            pass
+            #Author is deleted. We don't care about this post.
+            continue
+
+        if KEYAUTHORS != [] and all(auth.lower() != pauthor for auth in KEYAUTHORS):
+            # This post was not made by a keyauthor
+            continue
+
+        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
+        if cur.fetchone():
+            # Post is already in the database
+            continue
+
+        cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+        sql.commit()
+        pbody = post.body.lower()
+        if any(key.lower() in pbody for key in KEYWORDS):
+            if pauthor.lower() != USERNAME.lower():
+                print('Replying to ' + pid + ' by ' + pauthor)
+                post.reply(REPLYSTRING)
+            else:
+                print('Will not reply to myself')
 
 
 while True:
