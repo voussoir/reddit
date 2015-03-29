@@ -1090,8 +1090,11 @@ def plotbars(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888", 
 	t.update()
 	t.destroy()
 
-def completesweep(shuffle=False, sleepy=0):
-	cur.execute('SELECT * from subreddits WHERE created > 0')
+def completesweep(shuffle=False, sleepy=0, query=None):
+	if query is None:
+		cur.execute('SELECT * from subreddits WHERE created > 0')
+	else:
+		cur.execute(query)
 	c = []
 	f=cur.fetchone()
 	while f is not None:
