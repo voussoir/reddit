@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 795,779 of 795,952 subreddits (99.978%) (173 remain)
+#####Collected 798,821 of 798,821 subreddits (100.000%) (0 remain)
 
-#####[Today's jumble](http://reddit.com/r/snakes+unixporn+accidjental+MensRights+adhdmeme+snowden+beadsprites+DetroitPistons+forza+PokemonPlaza+bestofTLDR+Unexpected+todayilearned+GermanGoneWild+rutgers+alexandradaddario+BakaNewsJP+CherokeeXJ+starcraft+AustralianCattleDog)
+#####[Today's jumble](http://reddit.com/r/GirlsCuddling+TrollXGirlGamers+LastManonEarthTV+FantasyLCS+shittyTESlore+ongakur+BakaNewsJP+LadiesofScience+AnimalTextGifs+askportland+bigbangcomics+DailyShow+VaporwaveAesthetics+scala+talesfromsecurity+beetlejuicing+lovelive_ja+OopsDidntMeanTo+hamburg+Toriko)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
