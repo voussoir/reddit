@@ -28,6 +28,7 @@ WAITS = str(WAIT)
 
 sql = sqlite3.connect('sql.db')
 cur = sql.cursor()
+cur2 = sql.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS subreddits(ID TEXT, CREATED INT, HUMAN TEXT, NSFW TEXT, NAME TEXT, SUBSCRIBERS INT, JUMBLE INT, IDINT INT, SUBREDDIT_TYPE INT, SUBMISSION_TYPE INT, IS_SPAM INT)')
 cur.execute('CREATE TABLE IF NOT EXISTS jumble(ID TEXT, CREATED INT, HUMAN TEXT, NSFW TEXT, NAME TEXT, SUBSCRIBERS INT)')
 cur.execute('CREATE TABLE IF NOT EXISTS etc(LABEL TEXT, DATA TEXT, DATB TEXT, DATC TEXT)')
@@ -387,7 +388,7 @@ def show():
 	itemcount += totalc
 
 	print('Writing statistics')
-	totalpossible = b36(fetch[-1][0]) - 4594260
+	totalpossible = b36(fetch[-1][0]) - 4594433
 	headliner = 'Collected '+'{0:,}'.format(itemcount)+' of '+'{0:,}'.format(totalpossible)+' subreddits ('+"%0.03f"%(100*itemcount/totalpossible)+'%)'
 	headliner+= ' ({0:,} remain)'.format(totalpossible-itemcount) + '\n'
 	#Call the PEP8 police on me, I don't care
@@ -1092,22 +1093,18 @@ def plotbars(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888", 
 
 def completesweep(shuffle=False, sleepy=0, query=None):
 	if query is None:
-		cur.execute('SELECT * from subreddits WHERE created > 0')
+		cur2.execute('SELECT * FROM subreddits WHERE created > 0')
+	if query is None and shuffle is True:
+		cur2.execute('SELECT * FROM subreddits WHERE created > 0 ORDER BY RANDOM()')
 	else:
-		cur.execute(query)
-	c = []
-	f=cur.fetchone()
-	while f is not None:
-		c.append(f[0])
-		f=cur.fetchone()
-		if len(c) % 3000 == 0:
-			print('\r',len(c), end='')
-	print()
+		cur2.execute(query)
 
-	if shuffle:
-		random.shuffle(c)
-
-	while len(c) > 0:
-		processmega(c[:100])
-		c=c[100:]
+	while True:
+		hundred = [cur2.fetchone() for x in range(100)]
+		while None in hundred:
+			hundred.remove(None)
+		if len(hundred) == 0:
+			break
+		hundred = [h[0] for h in hundred]
+		processmega(hundred)
 		time.sleep(sleepy)
