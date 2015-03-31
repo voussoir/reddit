@@ -1094,7 +1094,7 @@ def plotbars(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888", 
 def completesweep(shuffle=False, sleepy=0, query=None):
 	if query is None:
 		cur2.execute('SELECT * FROM subreddits WHERE created > 0')
-	if query is None and shuffle is True:
+	elif query is None and shuffle is True:
 		cur2.execute('SELECT * FROM subreddits WHERE created > 0 ORDER BY RANDOM()')
 	else:
 		cur2.execute(query)
