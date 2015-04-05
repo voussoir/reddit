@@ -49,17 +49,27 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
     # 14 - flair_text
     # 15 - flair_css_class
 
-    if lower == 'update':
-        cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
-        lower = cur.fetchone()[2]
-
     offset = -time.timezone
     subname = subreddit if type(subreddit)==str else subreddit.display_name
+
+
+    if lower == 'update':
+        cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
+        f = cur.fetchone()
+        if f:
+            lower = f[2]
+            print(lower)
+        else:
+            lower = None
+
     if lower is None:
         if usermode is False:
             if not isinstance(subreddit, praw.objects.Subreddit):
-                subreddit = r.get_subreddit(subreddit)
-            creation = subreddit.created_utc
+                subreddits = subreddit.split('+')
+                subreddits = [r.get_subreddit(sr) for sr in subreddits]
+                creation = min([sr.created_utc for sr in subreddits])
+            else:
+                creation = subreddit.created_utc
         else:
             if not isinstance(usermode, praw.objects.Redditor):
                 user = r.get_redditor(usermode)
@@ -71,17 +81,18 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
         maxupper = nowstamp
         
     #outfile = open('%s-%d-%d.txt'%(subname, lower, maxupper), 'w', encoding='utf-8')
-    #lower -= offset
+    lower -= offset
     maxupper -= offset
     cutlower = lower
     cutupper = maxupper
     upper = lower + interval
     itemcount = 0
 
+    toomany_inarow = 0
     while lower < maxupper:
         print('\nCurrent interval:', interval, 'seconds')
-        print('Lower', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(lower), "%b %d %Y %H:%M:%S"), lower)
-        print('Upper', datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(upper), "%b %d %Y %H:%M:%S"), upper)
+        print('Lower', datetime.datetime.strftime(datetime.datetime.fromtimestamp(lower), "%b %d %Y %H:%M:%S"), lower)
+        print('Upper', datetime.datetime.strftime(datetime.datetime.fromtimestamp(upper), "%b %d %Y %H:%M:%S"), upper)
         #timestamps = [lower, upper]
         while True:
             try:
@@ -95,10 +106,10 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
                 traceback.print_exc()
                 print('resuming in 5...')
                 time.sleep(5)
+                continue
 
         searchresults.reverse()
         print([i.id for i in searchresults])
-        smartinsert(sql, cur, searchresults)
 
         itemsfound = len(searchresults)
         itemcount += itemsfound
@@ -110,12 +121,15 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
             interval = int(interval * diff)
         if itemsfound > 99:
             print('Too many results, reducing interval', end='')
-            interval = int(interval * 0.8)
+            interval = int(interval * (0.8 - (0.05*toomany_inarow)))
             upper = lower + interval
+            toomany_inarow += 1
         else:
             #Intentionally not elif
             lower = upper
             upper = lower + interval
+            toomany_inarow = max(0, toomany_inarow-1)
+            smartinsert(sql, cur, searchresults)
         print()
 
     cur.execute('SELECT COUNT(idint) FROM posts')
