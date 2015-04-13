@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 803,161 of 803,161 subreddits (100.000%) (0 remain)
+#####Collected 808,826 subreddits
 
-#####[Today's jumble](http://reddit.com/r/)
+#####[Today's jumble](http://reddit.com/r/GermanGoneWild+Walker+TwoandaHalfMen+cis_ja+shitpostemblem+VictorianWorldPowers+lovelive_ja+specialisttools+ToA+funnyniggers+fatpeoplelove)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
