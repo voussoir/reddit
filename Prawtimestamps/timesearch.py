@@ -32,6 +32,7 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
     'created INT, self INT, nsfw INT, author TEXT, title TEXT, '
     'url TEXT, selftext TEXT, score INT, subreddit TEXT, distinguish INT, '
     'textlen INT, num_comments INT, flair_text TEXT, flair_css_class TEXT)'))
+    cur.execute('CREATE INDEX IF NOT EXISTS postindex ON posts(idint)')
     #  0 - idint
     #  1 - idstr
     #  2 - created
@@ -145,12 +146,16 @@ def smartinsert(sql, cur, results):
             except AttributeError:
                 o.authorx = '[DELETED]'
 
+            if o.is_self:
+                o.url = None
             postdata = [b36(o.id), o.fullname, o.created_utc, o.is_self, o.over_18,
             o.authorx, o.title, o.url, o.selftext, o.score,
             o.subreddit.display_name, o.distinguished, len(o.selftext),
             o.num_comments, o.link_flair_text, o.link_flair_css_class]
             cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', postdata)
-            sql.commit()
+        else:
+            cur.execute('UPDATE posts SET score=? WHERE idint=?', [o.score, b36(o.id)])
+        sql.commit()
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     """Converts an integer to a base36 string."""

@@ -144,7 +144,10 @@ def work(listfile):
 		final = final.replace('_authorlink_', authorlink)
 		final = final.replace('_subreddit_', post.subreddit)
 		url = post.url
-		url = url.replace('http://www.reddit.com', 'http://np.reddit.com')
+		if url is None:
+			url = post.short_link
+		else:
+			url = url.replace('http://www.reddit.com', 'http://np.reddit.com')
 		final = final.replace('_url_', url)
 		shortlink = post.short_link
 		#slink = slink.replace('http://', 'http://np.')
