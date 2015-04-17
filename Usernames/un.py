@@ -164,8 +164,8 @@ def process(users, quiet=False):
 			data[SQL_AVAILABLE] = 0
 			preverify = user.preverify
 
-		x = smartinsert(data, '%04d' % current, preverified=preverify)
 		# preverification happens within userify_list
+		x = smartinsert(data, '%04d' % current, preverified=preverify)
 
 		if x is False:
 			olds += 1
@@ -201,13 +201,17 @@ def smartinsert(data, printprefix='', preverified=False):
 		check = check is not None
 	if preverified or check:
 		data = [
+			data[SQL_IDINT],
+			data[SQL_IDSTR],
+			data[SQL_CREATED],
+			data[SQL_HUMAN],
 			data[SQL_LINK_KARMA],
 			data[SQL_COMMENT_KARMA],
 			data[SQL_TOTAL_KARMA],
 			data[SQL_AVAILABLE],
 			data[SQL_LASTSCAN],
 			data[SQL_NAME]]
-		cur.execute('UPDATE users SET link_karma=?, comment_karma=?, total_karma=?, available=?, lastscan=? WHERE name=?', data)
+		cur.execute('UPDATE users SET idint=?, idstr=?, created=?, human=?, link_karma=?, comment_karma=?, total_karma=?, available=?, lastscan=? WHERE name=?', data)
 	else:
 		isnew = True
 		cur.execute('INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
@@ -315,19 +319,19 @@ def show():
 	
 	print('Writing karma total file.')
 	print(HEADER_FULL, file=file_karma_total)
-	cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY total_karma DESC')
+	cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY total_karma DESC, LOWER(name) ASC')
 	fetchwriter(file_karma_total)
 	file_karma_total.close()
 
 	print('Writing karma link file.')
 	print(HEADER_FULL, file=file_karma_link)
-	cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY link_karma DESC')
+	cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY link_karma DESC, LOWER(name) ASC')
 	fetchwriter(file_karma_link)
 	file_karma_link.close()
 
 	print('Writing karma comment file.')
 	print(HEADER_FULL, file=file_karma_comment)
-	cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY comment_karma DESC')
+	cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY comment_karma DESC, LOWER(name) ASC')
 	fetchwriter(file_karma_comment)
 	file_karma_comment.close()
 
