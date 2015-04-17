@@ -30,11 +30,7 @@ with
     import getpass
     PASSWORD = getpass.getpass("Password: ")
 
-Then you will be asked to type in your bot's password when it starts using the [getpass module](https://docs.python.org/2/library/getpass.html#getpass.getpass). For additional security, you can put
-
-    del PASSWORD
-
-immediately after `r.login()` so that the password variable is nowhere in the namespace.
+Then you will be asked to type in your bot's password when it starts, using the [getpass module](https://docs.python.org/2/library/getpass.html#getpass.getpass).
 
 Alternatively, for automated and semi-secure password storage, see Bot.py
 
@@ -50,12 +46,12 @@ In a lot of my bots, you'll see
 
 `USERNAME = bot.uG`
 
-etc. This is a file in my python library which contains my username and my password. I use this system so that I can push this code to git without worrying about my password being seen.
+etc. This is a file in my python library which contains my bot's username and my password. I use this system so that I can push this code to git without worrying about my password being seen.
 
 To create your own bot.py is very simple. It's just a regular .py file which you save in C:\Python34\Lib\. Then you just enter some variables
 
-`username = "GoldenSights"`
+`username = "robot"`
 
 `password = "12345"`
 
-Then, when you `import bot`, you can type `bot.username` and get "GoldenSights". You can create as many variables as you want, including useragents and multiple account credentials.
+Now, when you `import bot`, you can type `bot.username` and get "GoldenSights". You can create as many variables as you want, including useragents and multiple account credentials.
