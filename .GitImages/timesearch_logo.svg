@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 744.09448819 1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="timesearch_logo.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="453.73388"
+     inkscape:cy="292.40595"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1366"
+     inkscape:window-height="706"
+     inkscape:window-x="1432"
+     inkscape:window-y="204"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g4950"
+       transform="matrix(1.2856707,0,0,1.2856707,-143.72129,-360.55251)">
+      <circle
+         r="101.84515"
+         cy="689.70508"
+         cx="401.1669"
+         id="path4138"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:13.67800045;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         style="opacity:1;fill:#eaeaea;fill-opacity:1;stroke:#000000;stroke-width:13.67800045;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 234.73832,671.49083 332.85714,0 0,36.42857 -332.85714,0 z"
+         id="path4901"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         style="opacity:1;fill:#eaeaea;fill-opacity:1;stroke:#000000;stroke-width:13.67800045;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 234.73834,629.67537 332.85714,0 0,36.42857 -332.85714,0 z"
+         id="path4905"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         style="opacity:1;fill:#eaeaea;fill-opacity:1;stroke:#000000;stroke-width:13.67800045;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 234.73832,713.30626 332.85714,0 0,36.42857 -332.85714,0 z"
+         id="path4907"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccc" />
+      <circle
+         style="opacity:1;fill:#eaeaea;fill-opacity:1;stroke:none;stroke-width:13.67800045;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="circle4890"
+         cx="401.1669"
+         cy="689.70508"
+         r="95.013931" />
+      <circle
+         r="72.156792"
+         cy="689.70508"
+         cx="401.1669"
+         id="circle4920"
+         style="opacity:1;fill:#c8c8c8;fill-opacity:1;stroke:none;stroke-width:13.67800045;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         d="m -617.54829,-401.1669 a 72.156792,72.156792 0 0 1 -54.48179,69.95854 72.156792,72.156792 0 0 1 -81.17271,-35.68547 72.156792,72.156792 0 0 1 14.71483,-87.44105 72.156792,72.156792 0 0 1 88.3816,-7.15237 l -39.59872,60.32035 z"
+         sodipodi:end="5.2933016"
+         sodipodi:start="0"
+         sodipodi:ry="72.156792"
+         sodipodi:rx="72.156792"
+         sodipodi:cy="-401.1669"
+         sodipodi:cx="-689.70508"
+         sodipodi:type="arc"
+         transform="matrix(0,-1,-1,0,0,0)"
+         style="opacity:1;fill:#4a4a4a;fill-opacity:1;stroke:none;stroke-width:13.67800045;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="circle4922" />
+    </g>
+  </g>
+</svg>

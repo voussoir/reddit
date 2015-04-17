@@ -183,7 +183,10 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 					subscribers = 0
 				h = human(sub.created_utc)
 				isnsfw = 1 if sub.over18 else 0
-				isjumbled = 1 if isjumbled else 0
+				if isjumbled is True or int(f[SQL_JUMBLE]) == 1:
+					isjumbled = 1
+				else:
+					isjumbled = 0
 				subreddit_type = SUBREDDIT_TYPE[sub.subreddit_type]
 				submission_type = SUBMISSION_TYPE[sub.submission_type]
 				oldsubs = f[SQL_SUBSCRIBERS]
@@ -447,7 +450,7 @@ def show():
 			key = dkeys_primary[keyindex]
 			val = d[key]
 			val = '{0:,}'.format(val)
-			spacer = 24 - (len(val) + len(val))
+			spacer = 34 - (len(key) + len(val))
 			spacer = '.' * spacer
 			statisticoutput += key + spacer + val
 			statisticoutput += ' ' * 8
@@ -455,7 +458,7 @@ def show():
 			key = dkeys_secondary[keyindex]
 			val = d[key]
 			val = '{0:,}'.format(val)
-			spacer = 24 - (len(val) + len(val))
+			spacer = 34 - (len(key) + len(val))
 			spacer = '.' * spacer
 			statisticoutput += key + spacer + val
 			statisticoutput +=  '\n'
@@ -843,9 +846,11 @@ def plotbars(title, inputdata, colorbg="#fff", colorfg="#000", colormid="#888", 
 
 def completesweep(shuffle=False, sleepy=0, query=None):
 	if shuffle is True:
-		cur2.execute('SELECT * FROM subreddits WHERE created > 0 ORDER BY RANDOM()')
+		cur2.execute('SELECT idstr FROM subreddits WHERE created > 0 ORDER BY RANDOM()')
 	elif query is None:
-		cur2.execute('SELECT * FROM subreddits WHERE created > 0')
+		cur2.execute('SELECT idstr FROM subreddits WHERE created > 0')
+	elif query == 'subscribers':
+		cur2.execute('SELECT idstr FROM subreddits WHERE created > 0 ORDER BY subscribers DESC')
 	else:
 		cur2.execute(query)
 
@@ -855,7 +860,7 @@ def completesweep(shuffle=False, sleepy=0, query=None):
 			hundred.remove(None)
 		if len(hundred) == 0:
 			break
-		hundred = [h[SQL_IDSTR] for h in hundred]
+		hundred = [h[0] for h in hundred]
 		processmega(hundred)
 		time.sleep(sleepy)
 

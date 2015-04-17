@@ -20,6 +20,24 @@ except ImportError:
 print('Connecting to reddit')
 r = praw.Reddit(USERAGENT)
 
+SQL_COLUMNCOUNT = 16
+SQL_IDINT = 0
+SQL_IDSTR = 1
+SQL_CREATED = 2
+SQL_SELF = 3
+SQL_NSFW = 4
+SQL_AUTHOR = 5
+SQL_TITLE = 6
+SQL_URL = 7
+SQL_SELFTEXT = 8
+SQL_SCORE = 9
+SQL_SUBREDDIT = 10
+SQL_DISTINGUISHED = 11
+SQL_TEXTLEN = 12
+SQL_NUM_COMMENTS = 13
+SQL_FLAIR_TEXT = 14
+SQL_FLAIR_CSS_CLASS = 15
+
 def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode=False):
     if usermode is False:
         databasename = '%s.db' % subreddit
@@ -137,7 +155,7 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
     itemcount = cur.fetchone()[0]
     print('Ended with %d items in %s' % (itemcount, databasename))
 
-def smartinsert(sql, cur, results):
+def smartinsert(sql, cur, results, delaysave=False):
     for o in results:
         cur.execute('SELECT * FROM posts WHERE idint=?', [b36(o.id)])
         if not cur.fetchone():
@@ -148,14 +166,53 @@ def smartinsert(sql, cur, results):
 
             if o.is_self:
                 o.url = None
-            postdata = [b36(o.id), o.fullname, o.created_utc, o.is_self, o.over_18,
-            o.authorx, o.title, o.url, o.selftext, o.score,
-            o.subreddit.display_name, o.distinguished, len(o.selftext),
-            o.num_comments, o.link_flair_text, o.link_flair_css_class]
+            postdata = [None] * SQL_COLUMNCOUNT
+            postdata[SQL_IDINT] = b36(o.id)
+            postdata[SQL_IDSTR] = o.fullname
+            postdata[SQL_CREATED] = o.created_utc
+            postdata[SQL_SELF] = o.is_self
+            postdata[SQL_NSFW] = o.over_18
+            postdata[SQL_AUTHOR] = o.authorx
+            postdata[SQL_TITLE] = o.title
+            postdata[SQL_URL] = o.url
+            postdata[SQL_SELFTEXT] = o.selftext
+            postdata[SQL_SCORE] = o.score
+            postdata[SQL_SUBREDDIT] = o.subreddit.display_name
+            postdata[SQL_DISTINGUISHED] = o.distinguished
+            postdata[SQL_TEXTLEN] = len(o.selftext)
+            postdata[SQL_NUM_COMMENTS] = o.num_comments
+            postdata[SQL_FLAIR_TEXT] = o.link_flair_text
+            postdata[SQL_FLAIR_CSS_CLASS] = o.link_flair_css_class
             cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', postdata)
         else:
             cur.execute('UPDATE posts SET score=? WHERE idint=?', [o.score, b36(o.id)])
+    if not delaysave:
         sql.commit()
+
+def updatescores(databasename):
+    if '.db' not in databasename:
+        databasename += '.db'
+    sql = sqlite3.connect(databasename)
+    cur = sql.cursor()
+    cur2 = sql.cursor()
+    cur.execute('SELECT COUNT(*) FROM posts')
+    totalitems = cur.fetchone()[0]
+    cur.execute('SELECT * FROM posts')
+    itemcount = 0
+    while True:
+        f = []
+        for x in range(100):
+            x = cur.fetchone()
+            if x is not None and 't3_' in x[SQL_IDSTR]:
+                f.append(x[SQL_IDSTR])
+        if len(f) == 0:
+            break
+        posts = r.get_info(thing_id=f)
+        itemcount += len(f)
+        print('%d / %d updated' % (itemcount, totalitems))
+        smartinsert(sql, cur2, posts, delaysave=True)
+    sql.commit()
+    sql.close()
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     """Converts an integer to a base36 string."""
@@ -214,10 +271,12 @@ def main():
             input()
             quit()
     get_all_posts(sub, lower, maxupper, interval, usermode)
-    print("Done. Press Enter to close window")
-    input()
+    print('\nDone. Press Enter to close window or type "restart"')
+    return input().lower() == 'restart'
     quit()
 
 
 if __name__ == '__main__':
-    main()
+    go= True
+    while go:
+        go = main()
