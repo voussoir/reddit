@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 808,826 subreddits
+#####Collected 811,364 subreddits
 
-#####[Today's jumble](http://reddit.com/r/GermanGoneWild+Walker+TwoandaHalfMen+cis_ja+shitpostemblem+VictorianWorldPowers+lovelive_ja+specialisttools+ToA+funnyniggers+fatpeoplelove)
+#####[Today's jumble](http://reddit.com/r/blop+amateurfights+BollywoodRealism+civbattleroyale+brokengifs+analogygifs+mturk+LazyCats+ZettaiRyouiki+monsterhunterclan+ussoccer+fastfood+watchingcongress+AnimalsBeingFunny+makeyourchoice+Berserk+SpecArt+mtgaltered+OutsideLands+DetroitPistons)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -105,7 +105,7 @@ ______
 
 
 .
-#####How?
+#####Newlines in names
     2quw7, 1237025633, Mar 14 2009 10:13:53 UTC, 1, Inbedwithmedia...................0
     2quw8, 1237027829, Mar 14 2009 10:50:29 UTC, 0, MySingaporeTailor................0
     2quw9, 1237028834, Mar 14 2009 11:07:14 UTC, 0, she4he\n.........................0
@@ -136,7 +136,13 @@ ______
     2s0g3, 1281335431, Aug 09 2010 06:30:31 UTC, 0, cfmonkey.........................0
     2s0g4, 1281335500, Aug 09 2010 06:31:40 UTC, 0, handbagsspace....................0
     
-    Yes, those are newline characters.
+
+.
+#####The only subreddit with a hyphen
+
+    2r3oh, Aug 01 2009 07:16:14 UTC, 0, banned..........................335
+    2quox, Mar 10 2009 20:57:13 UTC, 0, banned-irene......................1
+    32k0q, Jul 14 2014 04:37:47 UTC, 0, banned_accounts...................0
 
 .
 #####There is a nsfw subreddit in Reddit's /r/random list

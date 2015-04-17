@@ -4,6 +4,8 @@
 #################
 
 SubredditBirthdays/sql.db
+Usernames/un.zip
+Usernames/show/available.txt
 
 *.pydevproject
 .project
