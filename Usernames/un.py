@@ -106,7 +106,8 @@ def reducetonames(users):
 	outlist = set()
 	for name in users:
 		if isinstance(name, str):
-			outlist.add(name.lower())
+			if 2 < len(name) < 21:
+				outlist.add(name.lower())
 		elif isinstance(name, praw.objects.Redditor):
 			outlist.add(name.name.lower())
 	return outlist

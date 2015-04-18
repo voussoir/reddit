@@ -12,3 +12,7 @@ Don't forget to change the Useragent before starting.
 ============
 
 I want to live in a future where everyone uses UTC and agrees on daylight savings.
+
+<p align="center">
+  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/timesearch_logo_256.png?raw=true" alt="Timesearch"/>
+</p>
