@@ -3,6 +3,7 @@ import threading
 import tkinter
 import time
 import string
+import os
 
 goodchars = string.ascii_lowercase + string.digits + '_-'
 todo = set()
@@ -23,7 +24,8 @@ def a():
 		t.after(250, update)
 	
 	t=tkinter.Tk()
-	display = tkinter.Label(t, text='Heyo')
+	t.configure(bg='#333')
+	display = tkinter.Label(t, text='Heyo', bg='#333', fg='#eee')
 	display.pack(expand=True, fill='both')
 	t.title('windowtitle')
 	w = 450
@@ -37,17 +39,23 @@ def a():
 	geometrystring = '%dx%d+%d+%d' % (windowwidth, windowheight, windowx, windowy)
 	t.geometry(geometrystring)
 	
-	enter = tkinter.Entry(t)
+	enter = tkinter.Entry(t, bg='#111', relief='flat', fg='#fff', insertbackground='#fff')
+	enter.configure(font=('Consolas', 10))
 	enter.focus_set()
 	enter.pack()
 	enter.bind('<Return>', submit)
 	t.mainloop()
 
+	# Brutal shutdown because otherwise closing the tkinter window
+	# causes a TCL Async "deleted by wrong thread" error which causes
+	# Python to hang and open a Windows crash screen.
+	os._exit(0)
+
 
 thread = threading.Thread(target=a)
-thread.daemon=True
+thread.daemon=False
 thread.start()
-while True:
+while thread.is_alive():
 	for x in todo:
 		un.process(x, quiet=True)
 		todo.remove(x)

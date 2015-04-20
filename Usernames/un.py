@@ -36,6 +36,7 @@ SQL_TOTAL_KARMA = 7
 SQL_AVAILABLE = 8
 SQL_LASTSCAN = 9
 
+print('Logging in.')
 USERAGENT = "/u/GoldenSights Usernames data collection: Gathering the creation dates of user accounts in the interest of information.\
  More at https://github.com/voussoir/reddit/tree/master/Usernames"
 r = praw.Reddit(USERAGENT)
