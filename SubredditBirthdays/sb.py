@@ -55,9 +55,9 @@ SQL_JUMBLE = 7
 SQL_SUBREDDIT_TYPE = 8
 SQL_SUBMISSION_TYPE = 9
 
+print('Logging in.')
 r = praw.Reddit(USERAGENT)
 r.login(bot.uG, bot.pG)
-print('Connected to reddit.')
 
 olds = 0
 noinfolist = []

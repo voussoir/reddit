@@ -76,7 +76,7 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
         cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
         f = cur.fetchone()
         if f:
-            lower = f[2]
+            lower = f[SQL_CREATED]
             print(lower)
         else:
             lower = None
@@ -152,7 +152,7 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
         print()
 
     cur.execute('SELECT COUNT(idint) FROM posts')
-    itemcount = cur.fetchone()[0]
+    itemcount = cur.fetchone()[SQL_IDINT]
     print('Ended with %d items in %s' % (itemcount, databasename))
 
 def smartinsert(sql, cur, results, delaysave=False):

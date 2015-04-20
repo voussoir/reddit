@@ -11,6 +11,15 @@ Don't forget to change the Useragent before starting.
 
 ============
 
+commentaugment
+==============
+
+The commentaugment script will take the submissions in one of your timesearch databases, and get their comments. These comments will be packed back into the same database, so be mindful of the item's fullname when you are later doing analysis (t1=comment, t3=submission)
+
+Commentaugment can be very slow, so you may wish to have verbosity=1 to see what's happening.
+
+===============
+
 I want to live in a future where everyone uses UTC and agrees on daylight savings.
 
 <p align="center">
