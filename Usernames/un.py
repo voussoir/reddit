@@ -50,8 +50,8 @@ HEADER_BRIEF = '      LAST SCANNED       |   NAME'
 MEMBERFORMAT_FULL = '%s  %s  %s  %s  %s (%s) | %s'
 MEMBERFORMAT_BRIEF = '%s | %s'
 
-MIN_LASTSCAN_DIFF = 172800
-# Don't rescan a name if we scanned it < 2 days ago
+MIN_LASTSCAN_DIFF = 86400 * 3
+# Don't rescan a name if we scanned it this many days ago
 
 def human(timestamp):
 	day = datetime.datetime.utcfromtimestamp(timestamp)

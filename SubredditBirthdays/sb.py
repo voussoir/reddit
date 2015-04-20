@@ -364,12 +364,24 @@ def show():
 	file_dirty_name.close()
 
 	print('Writing subscriber files.')
+	rank_all = 1
+	rank_nsfw = 1
 	cur.execute('SELECT * FROM subreddits WHERE created != 0 ORDER BY subscribers DESC')
 	for item in fetchgenerator():
+		if rank_all <= 20000:
+			rankstr = commapadding(rank_all, ' ', 9)
+			rank_all += 1
+		else:
+			rankstr = ''
 		itemf = memberformat(item)
-		print(itemf, file=file_all_subscribers)
+		print(itemf+rankstr, file=file_all_subscribers)
 		if int(item[SQL_NSFW]) == 1:
-			print(itemf, file=file_dirty_subscribers)
+			if rank_nsfw <= 20000:
+				rankstr = commapadding(rank_nsfw, ' ', 9)
+				rank_nsfw += 1
+			else:
+				rankstr = ''
+			print(itemf+rankstr, file=file_dirty_subscribers)
 	file_all_subscribers.close()
 	file_dirty_subscribers.close()
 
@@ -489,7 +501,7 @@ def show():
 	print()
 
 def memberformat(member, spacerchar='.'):
-	idstr = member[SQL_IDSTR]
+	idstr = commapadding(member[SQL_IDSTR], ' ', 5, forcestring=True)
 	human = member[SQL_HUMAN]
 	nsfw = member[SQL_NSFW]
 	name = member[SQL_NAME]
@@ -505,6 +517,26 @@ def memberformat(member, spacerchar='.'):
 		subscribers=subscribers)
 	return member
 
+def commapadding(s, spacer, spaced, left=True, forcestring=False):
+	'''
+	Given a number 's', make it comma-delimted and then
+	pad it on the left or right using character 'spacer'
+	so the whole string is of length 'spaced'
+
+	Providing a non-numerical string will skip straight
+	to padding
+	'''
+	if not forcestring:
+		try:
+			s = int(s)
+			s = '{0:,}'.format(s)
+		except:
+			pass
+
+	spacer = spacer * (spaced - len(s))
+	if left:
+		return spacer + s
+	return s + spacer
 
 def dictadding(targetdict, item):
 	if item not in targetdict:

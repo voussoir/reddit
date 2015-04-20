@@ -58,19 +58,27 @@ def commentaugment(databasename, limit, threshold, numthresh, verbose):
 			sys.stdout.flush()
 			if verbose:
 				print()
-			comments = praw.helpers.flatten_tree(submission.comments)
-			comments = manually_replace_comments(comments, limit, threshold, verbose)
+			comments = get_comments_for_thread(submission, limit, threshold, verbose)
 			smartinsert(sql, cur2, comments)
 			scannedthreads += 1
 			print('Found %d | %d / %d threads complete' % (len(comments), scannedthreads, totalthreads))
+
+def get_comments_for_thread(submission, limit, threshold, verbose):
+	comments = praw.helpers.flatten_tree(submission.comments)
+	comments = manually_replace_comments(comments, limit, threshold, verbose)
+	return comments
 
 def nofailrequest(function):
 	''' Create a function that will retry until it succeeds '''
 	def a(*args, **kwargs):
 		while True:
 			try:
-				result = function(*args, **kwargs)
-				return result
+				try:
+					result = function(*args, **kwargs)
+					return result
+				except AssertionError:
+					# Remove this when possible
+					return []
 			except:
 				traceback.print_exc()
 				print('Retrying in 2...')
@@ -98,29 +106,34 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
 			comments.append(item)
 		incomments = incomments[1:]
 
-	while True:
-		if limit is not None and limit <= 0:
-			break
-		if len(morecomments) == 0:
-			break
-
-		morecomments.sort(key=lambda x: x.count, reverse=True)
-		mc = morecomments[0]
-		morecomments = morecomments[1:]
-		additional = nofailrequest(mc.comments)()
-		additionals = 0
-		limit -= 1
-		for item in additional:
-			if isinstance(item, praw.objects.MoreComments) and item.count >= threshold:
-				morecomments.append(item)
-			elif isinstance(item, praw.objects.Comment):
-				comments.append(item)
-				additionals += 1
-		if verbose:
-			s = 'Got %d more' % additionals
+	try:
+		while True:
+			if limit is not None and limit <= 0:
+				break
+			if len(morecomments) == 0:
+				break
+			morecomments.sort(key=lambda x: x.count, reverse=True)
+			mc = morecomments[0]
+			morecomments = morecomments[1:]
+			additional = nofailrequest(mc.comments)()
+			additionals = 0
 			if limit is not None:
-				s += ', can perform %d more replacements' % limit
-			print(s)
+				limit -= 1
+			for item in additional:
+				if isinstance(item, praw.objects.MoreComments) and item.count >= threshold:
+					morecomments.append(item)
+				elif isinstance(item, praw.objects.Comment):
+					comments.append(item)
+					additionals += 1
+			if verbose:
+				s = 'Got %d more, %d so far.' % (additionals, len(comments))
+				if limit is not None:
+					s += ' Can perform %d more replacements' % limit
+				print(s)
+	except KeyboardInterrupt:
+		pass
+	except:
+		traceback.print_exc()
 
 	return comments
 
