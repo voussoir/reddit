@@ -18,37 +18,43 @@ except ImportError:
 print('Connecting to reddit')
 r = praw.Reddit(USERAGENT)
 
-def commentaugment(databasename, limit, threshold, numthresh, verbose):
+SQL_COLUMNCOUNT = 16
+SQL_IDINT = 0
+SQL_IDSTR = 1
+SQL_CREATED = 2
+SQL_SELF = 3
+SQL_NSFW = 4
+SQL_AUTHOR = 5
+SQL_TITLE = 6
+SQL_URL = 7
+SQL_SELFTEXT = 8
+SQL_SCORE = 9
+SQL_SUBREDDIT = 10
+SQL_DISTINGUISHED = 11
+SQL_TEXTLEN = 12
+SQL_NUM_COMMENTS = 13
+SQL_FLAIR_TEXT = 14
+SQL_FLAIR_CSS_CLASS = 15
+
+def commentaugment(databasename, limit, threshold, numthresh, skips, verbose):
 	sql = sqlite3.connect(databasename)
 	cur = sql.cursor()
 	cur2 = sql.cursor()
-	#  0 - idint
-	#  1 - idstr
-	#  2 - created
-	#  3 - self
-	#  4 - nsfw
-	#  5 - author
-	#  6 - title
-	#  7 - url
-	#  8 - selftext
-	#  9 - score
-	# 10 - subreddit
-	# 11 - distinguished
-	# 12 - textlen
-	# 13 - num_comments
-	# 14 - flair_text
-	# 15 - flair_css_class
 	cur.execute('SELECT COUNT(idint) FROM posts WHERE url IS NOT NULL and num_comments > ?', [numthresh])
 	totalthreads = cur.fetchone()[0]
 
 	cur.execute('SELECT * FROM posts WHERE url IS NOT NULL and num_comments > ? ORDER BY num_comments DESC', [numthresh])
-	scannedthreads = 0
+	scannedthreads = skips
+	for x in range(skips):
+		trash = cur.fetchone()
+		print('Skipping %s, %d / %d' % (trash[SQL_IDSTR], x+1, totalthreads))
+
 	while True:
 		hundred = [cur.fetchone() for x in range(100)]
 		hundred = remove_none(hundred)
 		if len(hundred) == 0:
 			return
-		hundred = [h[1] for h in hundred]
+		hundred = [h[SQL_IDSTR] for h in hundred]
 		hundred = verify_t3(hundred)
 		submissions = nofailrequest(r.get_info)(thing_id=hundred)
 		print('Retrieved %d submissions' % len(submissions))
@@ -179,10 +185,24 @@ def smartinsert(sql, cur, results):
 			except AttributeError:
 				o.authorx = '[DELETED]'
 
-			postdata = [b36(o.id), o.fullname, o.created_utc, None, None,
-			o.authorx, o.parent_id, None, o.body, o.score,
-			o.subreddit.display_name, o.distinguished, len(o.body),
-			None, None, None]
+            postdata = [None] * SQL_COLUMNCOUNT
+            postdata[SQL_IDINT] = b36(o.id)
+            postdata[SQL_IDSTR] = o.fullname
+            postdata[SQL_CREATED] = o.created_utc
+            postdata[SQL_SELF] = None
+            postdata[SQL_NSFW] = None
+            postdata[SQL_AUTHOR] = o.authorx
+            postdata[SQL_TITLE] = o.parent_id
+            postdata[SQL_URL] = None
+            postdata[SQL_SELFTEXT] = o.body
+            postdata[SQL_SCORE] = o.score
+            postdata[SQL_SUBREDDIT] = o.subreddit.display_name
+            postdata[SQL_DISTINGUISHED] = o.distinguished
+            postdata[SQL_TEXTLEN] = len(o.body)
+            postdata[SQL_NUM_COMMENTS] = None
+            postdata[SQL_FLAIR_TEXT] = None
+            postdata[SQL_FLAIR_CSS_CLASS] = None
+
 			cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', postdata)
 			sql.commit()
 
@@ -211,6 +231,14 @@ def b36(i):
 	if type(i) == str:
 		return base36decode(i)
 
+def fixint(i):
+	if i == '':
+		return 0
+	i = int(i)
+	if i < 0:
+		return 0
+	return i
+
 def main():
 	print('\nDatabase file')
 	databasename = input(']: ')
@@ -229,31 +257,22 @@ def main():
 	print('\nThreshold - minimum number of children comments a MoreComments')
 	print('object must have to warrant a replacement')
 	threshold = input(']: ')
-	if threshold == '':
-		threshold = 0
-	else:
-		threshold = int(threshold)
-		if threshold < 0:
-			threshold = 0
+	threshold = fixint(threshold)
 
 	print('\nMinimum num_comments a thread must have to be scanned')
 	numthresh = input(']: ')
-	if numthresh == '':
-		numthresh = 0
-	else:
-		numthresh = int(numthresh)
-		if numthresh < 0:
-			numthresh = 0
+	numthresh = fixint(numthresh)
+
+	print('\nSkips - Skip ahead by this many threads, to pick up where you left off.')
+	skips = input(']: ')
+	skips = fixint(skips)
 
 	print('\nVerbosity. 0 = quieter, 1 = louder')
 	verbose = input(']: ')
-	if verbose == '':
-		verbose = False
-	else:
-		verbose = int(verbose)
-		verbose = (verbose is 1)
+	verbose = fixint(verbose)
+	verbose = (verbose is 1)
 
-	commentaugment(databasename, limit, threshold, numthresh, verbose)
+	commentaugment(databasename, limit, threshold, numthresh, skips, verbose)
 	print('Done')
 	input()
 	quit()
