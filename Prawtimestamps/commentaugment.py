@@ -185,23 +185,23 @@ def smartinsert(sql, cur, results):
 			except AttributeError:
 				o.authorx = '[DELETED]'
 
-            postdata = [None] * SQL_COLUMNCOUNT
-            postdata[SQL_IDINT] = b36(o.id)
-            postdata[SQL_IDSTR] = o.fullname
-            postdata[SQL_CREATED] = o.created_utc
-            postdata[SQL_SELF] = None
-            postdata[SQL_NSFW] = None
-            postdata[SQL_AUTHOR] = o.authorx
-            postdata[SQL_TITLE] = o.parent_id
-            postdata[SQL_URL] = None
-            postdata[SQL_SELFTEXT] = o.body
-            postdata[SQL_SCORE] = o.score
-            postdata[SQL_SUBREDDIT] = o.subreddit.display_name
-            postdata[SQL_DISTINGUISHED] = o.distinguished
-            postdata[SQL_TEXTLEN] = len(o.body)
-            postdata[SQL_NUM_COMMENTS] = None
-            postdata[SQL_FLAIR_TEXT] = None
-            postdata[SQL_FLAIR_CSS_CLASS] = None
+			postdata = [None] * SQL_COLUMNCOUNT
+			postdata[SQL_IDINT] = b36(o.id)
+			postdata[SQL_IDSTR] = o.fullname
+			postdata[SQL_CREATED] = o.created_utc
+			postdata[SQL_SELF] = None
+			postdata[SQL_NSFW] = None
+			postdata[SQL_AUTHOR] = o.authorx
+			postdata[SQL_TITLE] = o.parent_id
+			postdata[SQL_URL] = None
+			postdata[SQL_SELFTEXT] = o.body
+			postdata[SQL_SCORE] = o.score
+			postdata[SQL_SUBREDDIT] = o.subreddit.display_name
+			postdata[SQL_DISTINGUISHED] = o.distinguished
+			postdata[SQL_TEXTLEN] = len(o.body)
+			postdata[SQL_NUM_COMMENTS] = None
+			postdata[SQL_FLAIR_TEXT] = None
+			postdata[SQL_FLAIR_CSS_CLASS] = None
 
 			cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', postdata)
 			sql.commit()
