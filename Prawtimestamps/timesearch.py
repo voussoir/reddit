@@ -51,22 +51,6 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
     'url TEXT, selftext TEXT, score INT, subreddit TEXT, distinguish INT, '
     'textlen INT, num_comments INT, flair_text TEXT, flair_css_class TEXT)'))
     cur.execute('CREATE INDEX IF NOT EXISTS postindex ON posts(idint)')
-    #  0 - idint
-    #  1 - idstr
-    #  2 - created
-    #  3 - self
-    #  4 - nsfw
-    #  5 - author
-    #  6 - title
-    #  7 - url
-    #  8 - selftext
-    #  9 - score
-    # 10 - subreddit
-    # 11 - distinguished
-    # 12 - textlen
-    # 13 - num_comments
-    # 14 - flair_text
-    # 15 - flair_css_class
 
     offset = -time.timezone
     subname = subreddit if type(subreddit)==str else subreddit.display_name
