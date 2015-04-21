@@ -64,12 +64,18 @@ def commentaugment(databasename, limit, threshold, numthresh, verbose):
 			print('Found %d | %d / %d threads complete' % (len(comments), scannedthreads, totalthreads))
 
 def get_comments_for_thread(submission, limit, threshold, verbose):
-	comments = praw.helpers.flatten_tree(submission.comments)
+	comments = nofailrequest(lambda x: x.comments)(submission)
+	comments = praw.helpers.flatten_tree(comments)
 	comments = manually_replace_comments(comments, limit, threshold, verbose)
 	return comments
 
 def nofailrequest(function):
-	''' Create a function that will retry until it succeeds '''
+	'''
+	Creates a function that will retry until it succeeds.
+	This function accepts 1 parameter, a function, and returns a modified
+	version of that function that will try-catch, sleep, and loop until it
+	finally returns.
+	'''
 	def a(*args, **kwargs):
 		while True:
 			try:
@@ -77,7 +83,9 @@ def nofailrequest(function):
 					result = function(*args, **kwargs)
 					return result
 				except AssertionError:
-					# Remove this when possible
+					# Strange PRAW bug causes certain MoreComments
+					# To throw assertion error, so just ignore it
+					# And get onto the next one.
 					return []
 			except:
 				traceback.print_exc()
@@ -89,11 +97,11 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
 	'''
 	PRAW's replace_more_comments method cannot continue
 	where it left off in the case of an Ow! screen.
-	So I'm writing my own function to do it
+	So I'm writing my own function to get each MoreComments item individually
 
 	Furthermore, this function will maximize the number of retrieved comments by
-	separating MoreComments objects from Comments, and sorting the MoreComments
-	by their count, then working down.
+	sorting the MoreComments objects and getting the big chunks before worrying
+	about the tail ends.
 	'''
 
 	comments = []
