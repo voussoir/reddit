@@ -7,11 +7,14 @@ import sqlite3
 
 
 USERNAME  = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
+# This is the bot's Username.
+# Accounts will lower karma will run into rate limits at first.
 PASSWORD  = ""
-#This is the bot's Password. 
+# This is the bot's Password.
+# See my main github repo for alternatives
 USERAGENT = ""
-#This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
+# This is a short description of what the bot does.
+# For example "Python automatic replybot v2.0 (by /u/GoldenSights)"
 try:
 	import bot 
 	# This is a file in my python library which contains my
@@ -43,15 +46,17 @@ class ReplyBot():
 		#This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
 		self.WAIT = 20
 		#This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
+		self.CLEANCYCLES = 10
+		# After this many cycles, the bot will clean its database
+		# Keeping only the latest (2*MAXPOSTS) items
 
 		self.sql = sqlite3.connect(databasename)
 		print('Loaded SQL Database: %s' % databasename)
 		self.cur = self.sql.cursor()
-		
-		self.cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT)')
-		self.cur.execute('CREATE INDEX IF NOT EXISTS index_oldposts on oldposts(id)')
-		
+		self.cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT)')		
 		self.sql.commit()
+
+		self.cycles = 0
 
 	def replybot(self):
 		print('Searching %s.' % self.SUBREDDIT)
@@ -90,8 +95,14 @@ class ReplyBot():
 	def looponce(self):
 		try:
 			self.replybot()
+			self.cycles += 1
 		except Exception as e:
 			traceback.print_exc()
+		if self.cycles >= self.CLEANCYCLES:
+			print('Cleaning database')
+			cur.execute('DELETE FROM oldposts WHERE id NOT IN (SELECT id FROM oldposts ORDER BY id DESC LIMIT ?)', [self.MAXPOSTS * 2])
+			sql.commit()
+			self.cycles = 0
 		print('Running again in %d seconds \n' % self.WAIT)
 		time.sleep(self.WAIT)
 

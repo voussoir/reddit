@@ -7,31 +7,40 @@ import sqlite3
 '''USER CONFIGURATION'''
 
 USERNAME  = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
+# This is the bot's Username.
+# Accounts will lower karma will run into rate limits at first.
 PASSWORD  = ""
-#This is the bot's Password. 
+# This is the bot's Password.
+# See my main github repo for alternatives
 USERAGENT = ""
-#This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "GoldTesting"
-#This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-KEYWORDS = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
-#These are the words you are looking for
-KEYAUTHORS = ["GoldenSights"]
+# This is a short description of what the bot does.
+# For example "Python automatic replybot v2.0 (by /u/GoldenSights)"
+SUBREDDIT = "pics"
+# This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
+KEYWORDS = ["phrase 1", "phrase 2", "phrase 3", "phrase 4", ""]
+# These are the words you are looking for
+KEYAUTHORS = []
 # These are the names of the authors you are looking for
 # Any authors not on this list will not be replied to.
 # Make empty to allow anybody
 REPLYSTRING = "Hi hungry, I'm dad."
-#This is the word you want to put in reply
+# This is the word you want to put in reply
 MAXPOSTS = 100
-#This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 20
-#This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
+# This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
+WAIT = 30
+# This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
+CLEANCYCLES = 10
+# After this many cycles, the bot will clean its database
+# Keeping only the latest (2*MAXPOSTS) items
 
 '''All done!'''
 
 try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
+    import bot 
+    # This is a file in my python library which contains my
+    # Bot's username and password.
+    # I can push code to Git without showing credentials
     USERNAME = bot.uG
     PASSWORD = bot.pG
     USERAGENT = bot.aG
@@ -42,8 +51,7 @@ sql = sqlite3.connect('sql.db')
 print('Loaded SQL Database')
 cur = sql.cursor()
 
-cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
-print('Loaded Completed table')
+cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT)')
 
 sql.commit()
 
@@ -54,7 +62,8 @@ r.login(USERNAME, PASSWORD)
 def replybot():
     print('Searching %s.' % SUBREDDIT)
     subreddit = r.get_subreddit(SUBREDDIT)
-    posts = subreddit.get_comments(limit=MAXPOSTS)
+    posts = list(subreddit.get_comments(limit=MAXPOSTS))
+    posts.reverse()
     for post in posts:
         # Anything that needs to happen every loop goes here.
         pid = post.id
@@ -84,12 +93,18 @@ def replybot():
             else:
                 print('Will not reply to myself')
 
-
+cycles = 0
 while True:
     try:
         replybot()
+        cycles += 1
     except Exception as e:
         traceback.print_exc()
+    if cycles >= CLEANCYCLES:
+        print('Cleaning database')
+        cur.execute('DELETE FROM oldposts WHERE id NOT IN (SELECT id FROM oldposts ORDER BY id DESC LIMIT ?)', [MAXPOSTS * 2])
+        sql.commit()
+        cycles = 0
     print('Running again in %d seconds \n' % WAIT)
     time.sleep(WAIT)
 
