@@ -1,0 +1,2 @@
+# Procfile
+worker: python herokubot.py

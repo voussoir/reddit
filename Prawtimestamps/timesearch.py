@@ -39,6 +39,10 @@ SQL_FLAIR_TEXT = 14
 SQL_FLAIR_CSS_CLASS = 15
 
 def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode=False):
+    '''
+    Get submissions from a subreddit or user between two points in time
+    If lower and upper are None, get ALL posts from the subreddit or user.
+    '''
     if usermode is False:
         databasename = '%s.db' % subreddit
     else:
@@ -61,7 +65,7 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
         f = cur.fetchone()
         if f:
             lower = f[SQL_CREATED]
-            print(lower)
+            print(f[SQL_IDSTR], human(lower), lower)
         else:
             lower = None
 
@@ -94,8 +98,8 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
     toomany_inarow = 0
     while lower < maxupper:
         print('\nCurrent interval:', interval, 'seconds')
-        print('Lower', datetime.datetime.strftime(datetime.datetime.fromtimestamp(lower), "%b %d %Y %H:%M:%S"), lower)
-        print('Upper', datetime.datetime.strftime(datetime.datetime.fromtimestamp(upper), "%b %d %Y %H:%M:%S"), upper)
+        print('Lower', human(lower), lower)
+        print('Upper', human(upper), upper)
         #timestamps = [lower, upper]
         while True:
             try:
@@ -138,11 +142,34 @@ def get_all_posts(subreddit, lower=None, maxupper=None, interval=86400, usermode
     cur.execute('SELECT COUNT(idint) FROM posts')
     itemcount = cur.fetchone()[SQL_IDINT]
     print('Ended with %d items in %s' % (itemcount, databasename))
+    sql.close()
+    del cur
+    del sql
 
-def smartinsert(sql, cur, results, delaysave=False):
+def human(timestamp):
+    x = datetime.datetime.strftime(datetime.datetime.utcfromtimestamp(timestamp), "%b %d %Y %H:%M:%S")
+    return x
+
+def humannow():
+    x = datetime.datetime.now(datetime.timezone.utc).timestamp()
+    x = human(x)
+    return x
+
+def smartinsert(sql, cur, results, delaysave=False, nosave=False):
+    '''
+    Insert the data into the database
+    Or update the listing if it already exists
+    `results` is a list of submissions
+    `delaysave` commits after all inserts
+    `nosave` does not commit
+
+    returns the number of posts that were new.
+    '''
+    newposts = 0
     for o in results:
         cur.execute('SELECT * FROM posts WHERE idint=?', [b36(o.id)])
         if not cur.fetchone():
+            newposts += 1
             try:
                 o.authorx = o.author.name
             except AttributeError:
@@ -170,10 +197,18 @@ def smartinsert(sql, cur, results, delaysave=False):
             cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', postdata)
         else:
             cur.execute('UPDATE posts SET score=? WHERE idint=?', [o.score, b36(o.id)])
-    if not delaysave:
+        if not delaysave:
+            sql.commit()
+    if delaysave and not nosave:
         sql.commit()
+    return newposts
 
 def updatescores(databasename):
+    '''
+    Get all submissions from the database, and update
+    them with the current scores of those submissions
+    '''
+
     if '.db' not in databasename:
         databasename += '.db'
     sql = sqlite3.connect(databasename)
@@ -194,9 +229,51 @@ def updatescores(databasename):
         posts = r.get_info(thing_id=f)
         itemcount += len(f)
         print('%d / %d updated' % (itemcount, totalitems))
-        smartinsert(sql, cur2, posts, delaysave=True)
+        smartinsert(sql, cur2, posts, nosave=True)
     sql.commit()
     sql.close()
+    del cur
+    del sql
+
+def livestream(subreddit=None, username=None, sleepy=30):
+    '''
+    Continuously get posts from this source
+    and insert them into the database
+    '''
+
+    if subreddit is None and username is None:
+        print('Enter username or subreddit parameter')
+        return
+    if subreddit is not None and username is not None:
+        print('Enter subreddit OR username, not both')
+
+    if subreddit:
+        print('Getting subreddit %s' % subreddit)
+        sql = sqlite3.connect('%s.db' % subreddit)
+        item = r.get_subreddit(subreddit)
+        itemf = item.get_new
+    else:
+        print('Getting redditor %s' % username)
+        sql = sqlite3.connect('@%s.db' % username)
+        item = r.get_redditor(username)
+        itemf = item.get_submitted
+    cur = sql.cursor()
+    try:
+        while True:
+            items = list(itemf(limit=100))
+            newitems = smartinsert(sql, cur, items)
+            print('%s +%d' % (humannow(), newitems), end='')
+            if newitems == 0:
+                print('\r', end='')
+            else:
+                print()
+            time.sleep(sleepy)
+    except KeyboardInterrupt:
+        print()
+        sql.commit()
+        sql.close()
+        del cur
+        del sql
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     """Converts an integer to a base36 string."""
@@ -224,43 +301,42 @@ def b36(i):
         return base36decode(i)
 
 def main():
-    usermode = False
-    maxupper = None
-    interval = 86400
-    print('\nGet posts from subreddit\n/r/', end='')
-    sub = input()
-    if sub == '':
-        print('Get posts from user\n/u/', end='')
-        usermode = input()
-        sub = 'all'
-    print('\nLower bound (Leave blank to get ALL POSTS)\nEnter "update" to use last entry\n]: ', end='')
-    lower  = input().lower()
-    if lower == '':
-        lower = None
-    if lower not in [None, 'update']:
-        print('Maximum upper bound\n]: ', end='')
-        maxupper = input()
-        if maxupper == '':
-            maxupper = datetime.datetime.now(datetime.timezone.utc).timestamp()
-        print('Starting interval (Leave blank for standard)\n]: ', end='')
-        interval = input()
-        if interval == '':
-            interval = 84600
-        try:
-            maxupper = int(maxupper)
-            lower = int(lower)
-            interval = int(interval)
-        except ValueError:
-            print("lower and upper bounds must be unix timestamps")
-            input()
-            quit()
-    get_all_posts(sub, lower, maxupper, interval, usermode)
-    print('\nDone. Press Enter to close window or type "restart"')
-    return input().lower() == 'restart'
-    quit()
+    while True:
+        usermode = False
+        maxupper = None
+        interval = 86400
+        print('\n- Subreddit\n  Leave blank to get username instead\n/r/', end='')
+        sub = input()
+        if sub == '':
+            print('Get posts from user\n/u/', end='')
+            usermode = input()
+            sub = 'all'
+        print('\n- Lower bound\n  Leave blank to get ALL POSTS\n  Enter "update" to use last entry\n]: ', end='')
+        lower  = input().lower()
+        if lower == '':
+            lower = None
+        if lower not in [None, 'update']:
+            print('- Maximum upper bound\n]: ', end='')
+            maxupper = input()
+            if maxupper == '':
+                maxupper = datetime.datetime.now(datetime.timezone.utc).timestamp()
+            print('- Starting interval\n  Leave blank for standard\n]: ', end='')
+            interval = input()
+            if interval == '':
+                interval = 84600
+            try:
+                maxupper = int(maxupper)
+                lower = int(lower)
+                interval = int(interval)
+            except ValueError:
+                print("lower and upper bounds must be unix timestamps")
+                input()
+                quit()
+        get_all_posts(sub, lower, maxupper, interval, usermode)
+        print('\nDone. Press Enter to close window or type "restart"')
+        if input().lower() != 'restart':
+            break
 
 
 if __name__ == '__main__':
-    go= True
-    while go:
-        go = main()
+    main()

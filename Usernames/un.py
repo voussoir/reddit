@@ -50,7 +50,7 @@ HEADER_BRIEF = '      LAST SCANNED       |   NAME'
 MEMBERFORMAT_FULL = '%s  %s  %s  %s  %s (%s) | %s'
 MEMBERFORMAT_BRIEF = '%s | %s'
 
-MIN_LASTSCAN_DIFF = 86400 * 3
+MIN_LASTSCAN_DIFF = 86400 * 7
 # Don't rescan a name if we scanned it this many days ago
 
 def human(timestamp):

@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 813,026 subreddits
+#####Collected 820,075 subreddits
 
-#####[Today's jumble](http://reddit.com/r/amateurradio+Louisville+mitsubishi+sewing+WhiteRights+Favors+borrow+nugs+educationalgifs+Virginia+AppleWatch+suspiciousquotes+pokemonconspiracies+nextdoorasians+greenday+forsen+Earwolf+GWABackstage+FocusST+noisygifs)
+#####[Today's jumble](http://reddit.com/r/lectures+OnceUponATime+KoreanAdvice+thomasthedankengine+seinfeld+FFSocks+newsokuvip+cocktails+DoctorWhumour+themoddingofisaac+Canadian_ecigarette+fappeningdiscussion+herpetology+TheGreatWarChannel+FitToFat+RallyPorn+funnyniggers+upvotegifs+teenagers+AfterEffects)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
