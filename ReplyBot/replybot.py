@@ -89,7 +89,10 @@ def replybot():
         if any(key.lower() in pbody for key in KEYWORDS):
             if pauthor.lower() != USERNAME.lower():
                 print('Replying to ' + pid + ' by ' + pauthor)
-                post.reply(REPLYSTRING)
+                try:
+                    post.reply(REPLYSTRING)
+                except praw.requests.exceptions.HTTPError:
+                    print('403 FORBIDDEN - is the bot banned from %s?' % post.subreddit.display_name)
             else:
                 print('Will not reply to myself')
 

@@ -15,14 +15,41 @@ print('Connected to reddit.')
 
 sql = sqlite3.connect('D:/T3/t3.db')
 cur = sql.cursor()
-cur.execute('CREATE TABLE IF NOT EXISTS meta(label TEXT, data TEXT)')
-cur.execute(('CREATE TABLE IF NOT EXISTS posts(idint INT, idstr TEXT, '
-	'created INT, self INT, nsfw INT, author TEXT, title TEXT, '
-	'url TEXT, selftext TEXT, score INT, subreddit TEXT, distinguish INT, '
-	'textlen INT, num_comments INT)'))
+cur.execute((''
+	'CREATE TABLE IF NOT EXISTS posts('
+	'idint INT, '
+	'idstr TEXT, '
+	'created INT, '
+	'author TEXT, '
+	'subreddit TEXT, '
+	'self INT, '
+	'nsfw INT, '
+	'title TEXT, '
+	'url TEXT, '
+	'selftext TEXT, '
+	'score INT, '
+	'distinguished INT, '
+	'textlen INT, '
+	'num_comments INT)'))
+cur.execute('CREATE INDEX IF NOT EXISTS idintindex on posts(idint)')
+SQL_COLUMNCOUNT = 14
+SQL_IDINT = 0
+SQL_IDSTR = 1
+SQL_CREATED = 2
+SQL_AUTHOR = 3
+SQL_SUBREDDIT = 4
+SQL_SELF = 5
+SQL_NSFW = 6
+SQL_TITLE = 7
+SQL_URL = 8
+SQL_SELFTEXT = 9
+SQL_SCORE = 10
+SQL_DISTINGUISHED = 11
+SQL_TEXTLEN = 12
+SQL_NUM_COMMENTS = 13
 
-DISTINGUISHMAP   = {0:"user", 1:"moderator", 2:"admin"}
-DISTINGUISHMAP_R = {"user":0, "moderator":1, "admin":2}
+DISTINGUISHMAP   = {0:'user', 1:'moderator', 2:'admin'}
+DISTINGUISHMAP_R = {'user':0, 'moderator':1, 'admin':2, None:0}
 
 LOWERBOUND = 9999000
 #            5yba0
@@ -35,39 +62,135 @@ UPPERBOUND = 164790958
 #  120,932,352 = 200000
 #  164,790,958 = 2q41im
 
-#  0 - idint
-#  1 - idstr
-#  2 - created
-#  3 - self
-#  4 - nsfw
-#  5 - author
-#  6 - title
-#  7 - url
-#  8 - selftext
-#  9 - score
-# 10 - subreddit
-# 11 - distinguished
-# 12 - textlen
-# 13 - num_comments
-class Post:
-	''' Used to map the indices of DB entries to names '''
-	def __init__(self, data):
-		self.idint = data[0]
-		self.idstr = data[1]
-		self.created_utc = data[2]
-		self.is_self = True if data[3] == 1 else False
-		self.over_18 = True if data[4] == 1 else False
-		self.author = data[5]
-		self.title = data[6]
-		self.url = data[7]
-		self.selftext = data[8]
-		self.score = data[9]
-		self.subreddit = data[10]
-		self.distinguished = DISTINGUISHMAP[data[11]]
-		self.distinguished_int = data[11]
-		self.textlen = data[12]
-		self.num_comments = data[13]
 
+class Post:
+	''' Generic class to map the indices of DB entries to names '''
+	def __init__(self, data):
+		self.idint = data[SQL_IDINT]
+		self.idstr = data[SQL_IDSTR]
+		self.created_utc = data[SQL_CREATED]
+		self.is_self = True if data[SQL_SELF] == 1 else False
+		self.over_18 = True if data[SQL_NSFW] == 1 else False
+		self.author = data[SQL_AUTHOR]
+		self.title = data[SQL_TITLE]
+		self.url = data[SQL_URL]
+		self.selftext = data[SQL_SELFTEXT]
+		self.score = data[SQL_SCORE]
+		self.subreddit = data[SQL_SUBREDDIT]
+		self.distinguished = DISTINGUISHMAP[data[SQL_DISTINGUISHED]]
+		self.distinguished_int = data[SQL_DISTINGUISHED]
+		self.textlen = data[SQL_TEXTLEN]
+		self.num_comments = data[SQL_NUM_COMMENTS]
+
+def process(idstr, ranger=0):
+	'''
+	Given a string or a set of strings that represent thread IDs,
+	get those Submissions and put them into the database
+	'''
+
+	if isinstance(idstr, str):
+		idstr = [idstr]
+	last = b36(idstr[-1])
+	for x in range(ranger):
+		# Take the last item in the list and get its ID in decimal
+		# Then add the next `ranger` IDs into the list
+		idstr.append(b36(last+x))
+	idstr = remove_existing(idstr)
+	idstr = verify_t3(idstr)
+	while len(idstr) > 0:
+		hundred = idstr[:100]
+		print('(%d) %s > %s' % (len(idstr), hundred[0], hundred[-1]))
+		try:
+			items = list(r.get_submissions(hundred))
+		except praw.requests.exceptions.HTTPError as e:
+			# 404 error means no posts exist for that ID.
+			# So we know there's no posts here, and continue on
+			# Anything other than 404, we need to hear about please
+			if e.response.status_code != 404:
+				raise e
+			items = []
+			pass
+		idstr = idstr[100:]
+		for item in items:
+			print(' %s, %s' % (item.fullname, item.subreddit.display_name))
+			item = dataformat(item)
+			# Preverification happens via remove_existing
+			smartinsert(item, preverified=True)
+		sql.commit()
+p = process
+
+def remove_existing(idstr):
+	'''
+	Given a list of IDs, remove any which are already
+	in the database
+
+	This serves as preverification for process() so we don't
+	do a SELECT for the same item twice.
+	'''
+	outset = []
+	for i in idstr:
+		if i in outset:
+			continue
+		check = i.replace('t3_', '')
+		check = b36(check)
+		cur.execute('SELECT * FROM posts WHERE idint==?', [check])
+		if not cur.fetchone():
+			outset.append(i)
+		else:
+			print(' %s preverify' % i)
+	return outset
+
+def dataformat(item):
+	'''
+	Given a Subission, return a list
+	where the indices contain the data that corresponds
+	to the the SQL column with the same indice
+	'''
+
+	data = [None] * SQL_COLUMNCOUNT
+	data[SQL_IDINT] = b36(item.id)
+	data[SQL_IDSTR] = item.id
+	data[SQL_CREATED] = item.created_utc
+
+	author = item.author
+	if author is not None:
+		author = author.name
+	data[SQL_AUTHOR] = author
+	data[SQL_SUBREDDIT] = item.subreddit.display_name
+	data[SQL_SELF] = 1 if item.is_self else 0
+	data[SQL_NSFW] = 1 if item.over_18 else 0
+	data[SQL_TITLE] = item.title
+
+	url = item.url
+	if ('/comments/%s/' % item.id) in url:
+		# Don't waste your bytes saving the URL for selfposts
+		url = None
+	data[SQL_URL] = url
+	selftext = item.selftext
+
+	if selftext == '':
+		selftext = None
+	data[SQL_SELFTEXT] = selftext
+	data[SQL_SCORE] = item.score
+
+	distinguished = item.distinguished
+
+	data[SQL_DISTINGUISHED] = DISTINGUISHMAP_R[item.distinguished]
+	data[SQL_TEXTLEN] = len(item.selftext)
+	data[SQL_NUM_COMMENTS] = item.num_comments
+	return data
+
+def smartinsert(data, preverified=False):
+	'''
+	Given a list, into the database if the item does not already exist
+	Preverification means that it will not perform a SELECT to see
+	if the item exists, because you have already guaranteed this.
+	'''
+
+	if not preverified:
+		cur.execute('SELECT * FROM posts WHERE idint==?', [data[SQL_IDINT]])
+	if (preverified) or (cur.fetchone() is None):
+		cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     """Converts an integer to a base36 string."""
@@ -94,11 +217,23 @@ def b36(i):
 	if type(i) == str:
 		return base36decode(i)
 
+def verify_t3(items):
+	for index in range(len(items)):
+		i = items[index]
+		if 't3_' not in i:
+			items[index] = 't3_' + i
+	return items
+
 def human(timestamp):
 	day = datetime.datetime.utcfromtimestamp(timestamp)
 	human = datetime.datetime.strftime(day, "%b %d %Y %H:%M:%S UTC")
 	return human
 
+def lastitem():
+	cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
+	return cur.fetchone()[SQL_IDSTR]
+
+'''
 def process(itemid, log=True, kill=True, updates=False):
 	if isinstance(itemid, str):
 		itemid = [itemid]
@@ -173,6 +308,7 @@ def logdb(items):
 		if cur.fetchone():
 			cur.execute('DELETE FROM posts WHERE idint=?', [item[0]])
 		cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', item)
+		print(item[1], item[10])
 	sql.commit()
 
 def logdead(i):
@@ -194,7 +330,7 @@ def remove_existing(items):
 	while not done:
 		done = True
 		for item in items:
-			cur.execute('SELECT * FROM posts WHERE idint=?', [b36(item[3:])])
+			cur.execute('SELECT * FROM posts WHERE idint=? AND created != 0', [b36(item[3:])])
 			f = cur.fetchone()
 			if f:
 				items.remove(item)
@@ -223,10 +359,6 @@ def processchunks(ids, kill=True, updates=False):
 		print("%s >>> %s (%d)" % (p[0], p[-1], len(ids)))
 		ids = ids[100:]
 		process(p, kill=kill, updates=updates)
-
-def lastitem():
-	cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
-	return cur.fetchone()[1]
 
 def show():
 	filea = open('show/missing.txt', 'w')
@@ -328,3 +460,4 @@ def show():
 		out += num
 		print(out, file=fileb)
 	fileb.close()
+'''
