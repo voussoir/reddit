@@ -5,19 +5,24 @@ Using Heroku to run a bot
 
 Inside git.zip is the .git repo that I created for this. I had to zip it so that I can push it here.
 
-1. Create a [Heroku account](http://heroku.com)
-2. Install [Heroku toolbelt](https://toolbelt.heroku.com/)
-3. Install [Git](http://git-scm.com/)
-4. Create a folder to keep your repo
-5. cd into this folder
-5. Write your bot
-6. Create requirements.txt, and require a version of praw
-7. Create runtime.txt, and require a version of Python
-8. Create Procfile, and create a worker that will launch your bot.
+1. Create a [Heroku account](http://heroku.com).
+3. Install [Git](http://git-scm.com/).
+2. Install [Heroku toolbelt](https://toolbelt.heroku.com/).
+4. Create a folder to keep your repo in.
+5. Open a terminal and `cd` into that folder.
+5. Write your bot.
+6. Create requirements.txt, and require a version of praw.
+7. Create runtime.txt, and require a version of Python.
+8. Create Procfile, and create a worker that will launch your bot. Notice that this file does not have an extension.
 9. `> heroku login`
+
+    	Enter your Heroku credentials.
+		Email: email@email.com
+		Password (typing will be hidden):
+		Authentication successful.
 10. `> git init`
 11. `> git add .`
-12. `> git commit -m "1"`
+12. `> git commit -m "Commit Message"`
 13. `> heroku create`
 
         Creating aqueous-plains-9797... done, stack is cedar-14
@@ -74,3 +79,5 @@ Inside git.zip is the .git repo that I created for this. I had to zip it so that
 	    2015-05-01T00:32:45.316900+00:00 app[worker.1]: All done!
 
 17. Celebrate
+
+18. To turn your bot off at any time, simply `> heroku ps:scale worker=0`
