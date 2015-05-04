@@ -63,6 +63,21 @@ def findduplicates(datalist, attribute):
 	datadict = {x:datadict[x] for x in datadict if len(datadict[x]) > 2}
 	return datadict
 
+def listblock(x, blocklength=10, joins=', '):
+    out = ''
+    x = [str(i) for i in x]
+    l = len(x)
+    ra = (l // blocklength)
+    if l % blocklength is not 0:
+        ra += 1
+    for i in range(ra):
+        a = i*blocklength
+        b = a + blocklength
+        out += joins.join(x[a:b])
+        out += '\n'
+    return out
+
+
 def main():
 	out('/u/GallowBoob\n')
 	out('Deletions can only be detected if the post is found while new')
@@ -138,10 +153,10 @@ def main():
 	out(dictformat(freq_total))
 	out('')
 	out('Living posts')
-	out('\t', [x.id for x in living])
+	out(listblock([x.id for x in living]))
 	out('')
 	out('Deleted posts')
-	out('\t', [x.id for x in nonliving])
+	out(listblock([x.id for x in nonliving]))
 
 main()
 outfile.close()
