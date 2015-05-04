@@ -197,7 +197,7 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
             cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', postdata)
         else:
             cur.execute('UPDATE posts SET score=? WHERE idint=?', [o.score, b36(o.id)])
-        if not delaysave:
+        if not delaysave and not nosave:
             sql.commit()
     if delaysave and not nosave:
         sql.commit()

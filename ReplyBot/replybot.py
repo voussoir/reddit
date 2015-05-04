@@ -17,7 +17,7 @@ USERAGENT = ""
 # For example "Python automatic replybot v2.0 (by /u/GoldenSights)"
 SUBREDDIT = "pics"
 # This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-KEYWORDS = ["phrase 1", "phrase 2", "phrase 3", "phrase 4", ""]
+KEYWORDS = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
 # These are the words you are looking for
 KEYAUTHORS = []
 # These are the names of the authors you are looking for
@@ -71,7 +71,12 @@ def replybot():
         try:
             pauthor = post.author.name
         except AttributeError:
-            #Author is deleted. We don't care about this post.
+            # Author is deleted. We don't care about this post.
+            continue
+
+        if pauthor.lower() == USERNAME.lower():
+            # Don't reply to yourself, robot!
+            print('Will not reply to myself.')
             continue
 
         if KEYAUTHORS != [] and all(auth.lower() != pauthor for auth in KEYAUTHORS):
@@ -87,14 +92,12 @@ def replybot():
         sql.commit()
         pbody = post.body.lower()
         if any(key.lower() in pbody for key in KEYWORDS):
-            if pauthor.lower() != USERNAME.lower():
-                print('Replying to ' + pid + ' by ' + pauthor)
-                try:
-                    post.reply(REPLYSTRING)
-                except praw.requests.exceptions.HTTPError:
+            print('Replying to %s by %s' % (pid, pauthor))
+            try:
+                post.reply(REPLYSTRING)
+            except praw.requests.exceptions.HTTPError as e:
+                if e.response.status_code == 403:
                     print('403 FORBIDDEN - is the bot banned from %s?' % post.subreddit.display_name)
-            else:
-                print('Will not reply to myself')
 
 cycles = 0
 while True:
