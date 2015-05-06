@@ -339,7 +339,7 @@ def show():
 
 	print('Writing available')
 	print(HEADER_BRIEF, file=file_available)
-	cur.execute('SELECT * FROM users WHERE available == 1 ORDER BY LOWER(name) ASC')
+	cur.execute('SELECT * FROM users WHERE available == 1 AND LENGTH(name) > 3 ORDER BY LOWER(name) ASC')
 	fetchwriter(file_available, spacer1=' ', brief=True)
 	file_available.close()
 
