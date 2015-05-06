@@ -240,6 +240,7 @@ def manage_posts():
 					print('\t' + post.id)
 					results.append(post)
 		results = [format_post(f) for f in results]
+		print('\t%d' % len(results))
 		usersubs[user] = results
 
 	for postid in postlist:
@@ -250,6 +251,7 @@ def manage_posts():
 		# In this second block, use the subscription results to construct a PM
 		# and insert the PM to the spool to be sent later. By spooling the messages,
 		# we make sure that no api errors cause us to lose any results.
+		results = usersubs[user]
 		if len(results) > 0:
 			final = MESSAGE_HEADER + '\n\n'
 			final += '\n\n'.join(results)
@@ -259,8 +261,6 @@ def manage_posts():
 			else:
 				add_to_spool(user, final, nosave=True)
 				sql.commit()
-		else:
-			print('%s None' % user)
 
 def interpret_message(pm):
 	results = []
