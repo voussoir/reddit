@@ -14,7 +14,12 @@ USERAGENT = ""
 
 MAXPOSTS = 100
 WAIT = 30
-ADMIN = "GoldenSights"
+ADMINS = ["GoldenSights"]
+# The Admins have the ability to see other peoples' subscriptions
+# as well as forcibly subscribe people to subreddits.
+# They can also send the "kill" message to the bot and have it 
+# turn off.
+# The first name on the list will receive the error messages.
 
 MAX_PER_MESSAGE = 20
 # Only this many posts may be compiled into a newsletter
@@ -52,6 +57,7 @@ MESSAGE_MESSAGE_LONG = "This message ended up being too long!"
 NOSEND = "nosend" in sys.argv
 if NOSEND:
 	print("NOSEND active!")
+ADMINS = [admin.lower() for admin in ADMINS]
 
 try:
 	import bot
@@ -192,7 +198,8 @@ def manage_spool():
 			r.send_message(user, MESSAGE_SUBJECT, final, captcha=None)
 		except praw.errors.InvalidUser:
 			drop_subscription(user, 'all')
-			r.send_message(ADMIN, 'invalid user', user, captcha=None)
+			if ADMINS:
+				r.send_message(ADMINS[0], 'invalid user', user, captcha=None)
 		drop_from_spool(spoolmessage)
 		sql.commit()
 
@@ -203,10 +210,13 @@ def manage_inbox():
 	r.evict(r.config['unread'] + '.json')
 	for pm in pms:
 		pm.mark_as_read()
+		try:
+			author = pm.author.name
+		except AttributeError:
+			continue
 		interpretation = interpret_message(pm)
 		if interpretation:
-			print('\tReplying...')
-			pm.reply(interpretation)
+			add_to_spool(author, interpretation, nosave=False)
 
 def manage_posts():
 	print('Finding posts')
@@ -260,7 +270,7 @@ def manage_posts():
 				print('%s NO SEND' % user)
 			else:
 				add_to_spool(user, final, nosave=True)
-				sql.commit()
+	sql.commit()
 
 def interpret_message(pm):
 	results = []
@@ -294,14 +304,14 @@ def interpret_message(pm):
 				status += build_report(author)
 				results.append(status)
 
-			elif command == 'reportall' and author == ADMIN:
+			elif command == 'reportall' and author.lower() in ADMINS:
 				status = MESSAGE_REPORT_ALL + '\n\n'
 				status += build_report(None, supermode=True)
 				results.append(status)
 
-			elif command == 'kill' and author == ADMIN:
+			elif command == 'kill' and author.lower() in ADMINS:
 				pm.mark_as_read()
-				r.send_message(ADMIN, "force kill", "bot is being turned off")
+				r.send_message(ADMINS[0], "force kill", "bot is being turned off")
 				quit()
 
 			if not argument:
@@ -317,12 +327,12 @@ def interpret_message(pm):
 				status = drop_subscription(author, argument)
 				results.append(status)
 
-			elif command == 'reportuser' and author == ADMIN:
+			elif command == 'reportuser' and author.lower() in ADMINS:
 				status = (MESSAGE_REPORT_USER % argument) + '\n\n'
 				status += build_report(argument)
 				results.append(status)
 
-			elif command == 'forcesubscribe' and author == ADMIN:
+			elif command == 'forcesubscribe' and author.lower() in ADMINS:
 				argument = argument.split('.')
 				user = argument[0]
 				subreddit = argument[1]
@@ -330,7 +340,7 @@ def interpret_message(pm):
 				status = (MESSAGE_SUBSCRIBE_FORCE % (user, subreddit)) + '\n\n'
 				results.append(status)
 
-			elif command == 'forceunsubscribe' and author == ADMIN:
+			elif command == 'forceunsubscribe' and author.lower() in ADMINS:
 				argument = argument.split('.')
 				user = argument[0]
 				subreddit = argument[1]
