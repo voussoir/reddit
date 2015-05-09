@@ -1,12 +1,26 @@
-import un
 import threading
 import tkinter
 import time
 import string
 import os
+import sys
 
 goodchars = string.ascii_lowercase + string.digits + '_-'
 todo = set()
+
+class SysLabel:
+	def __init__(self, module, maxsize):
+		self.lines = []
+		self.module = module
+		self.maxsize = maxsize
+	def write(self, data):
+		data = data.strip()
+		if len(data) > 0:
+			self.lines.append(data)
+		self.lines = self.lines[-self.maxsize:]
+		self.flush()
+	def flush(self):
+		self.module.configure(text='\n'.join(self.lines))
 
 def a():
 	def submit(*b):
@@ -25,10 +39,17 @@ def a():
 	
 	t=tkinter.Tk()
 	t.configure(bg='#333')
+	syslabel = tkinter.Label(t, bg='#000', fg='#eee', justify='left', anchor='nw', height=3)
+	syslabel.configure(font=('Consolas', 10))
+	syslabel.pack(expand=True, fill='x', anchor='nw')
+	sysout = SysLabel(syslabel, 3)
+	sys.stdout = sysout
+	sys.stderr = sysout
 	display = tkinter.Label(t, text='Heyo', bg='#333', fg='#eee')
+	display.configure(font=('Consolas', 10))
 	display.pack(expand=True, fill='both')
 	t.title('windowtitle')
-	w = 450
+	w = 550
 	h = 350
 	screenwidth = t.winfo_screenwidth()
 	screenheight = t.winfo_screenheight()
@@ -55,6 +76,9 @@ def a():
 thread = threading.Thread(target=a)
 thread.daemon=False
 thread.start()
+import un
+un.MIN_LASTSCAN_DIFF *= 100
+print('Ready.')
 while thread.is_alive():
 	for x in todo:
 		un.process(x, quiet=True)

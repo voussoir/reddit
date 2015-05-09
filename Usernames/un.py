@@ -182,19 +182,9 @@ def smartinsert(data, printprefix='', preverified=False):
 	sql-update without knowing the ID.
 	'''
 	isnew = False
-	### Print message
-	if data[SQL_IDINT] is not None:
-		print('%s %s : %s : %s : %d : %d' % (
-				printprefix,
-				data[SQL_IDSTR],
-				data[SQL_HUMAN],
-				data[SQL_NAME],
-				data[SQL_LINK_KARMA],
-				data[SQL_COMMENT_KARMA]))
-	else:
-		statement = 'available' if data[SQL_AVAILABLE] is 1 else 'unavailable'
-		print('%s : %s' % (data[SQL_NAME], statement))
-	###
+	
+	print_message(data, printprefix)
+	
 
 	check = False
 	if not preverified:
@@ -219,6 +209,19 @@ def smartinsert(data, printprefix='', preverified=False):
 		cur.execute('INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
 	sql.commit()
 	return isnew
+
+def print_message(data, printprefix=''):
+	if data[SQL_IDINT] is not None:
+		print('%s %s : %s : %s : %d : %d' % (
+				printprefix,
+				data[SQL_IDSTR],
+				data[SQL_HUMAN],
+				data[SQL_NAME],
+				data[SQL_LINK_KARMA],
+				data[SQL_COMMENT_KARMA]))
+	else:
+		statement = 'available' if data[SQL_AVAILABLE] is 1 else 'unavailable'
+		print('%s : %s' % (data[SQL_NAME], statement))
 
 def get_from_listing(sr, limit, listfunction, submissions=True, comments=True, returnnames=False):
 	subreddit = r.get_subreddit(sr)
@@ -403,3 +406,11 @@ def memberformat_brief(data, spacer='.'):
 
 	out = MEMBERFORMAT_BRIEF % (lastscan, name)
 	return out
+
+def find(name):
+	cur.execute('SELECT * FROM users WHERE LOWER(name)=?', [name])
+	f = cur.fetchone()
+	if f:
+		print_message(f)
+	else:
+		print(f)
