@@ -50,7 +50,7 @@ HEADER_BRIEF = '      LAST SCANNED       |   NAME'
 MEMBERFORMAT_FULL = '%s  %s  %s  %s  %s (%s) | %s'
 MEMBERFORMAT_BRIEF = '%s | %s'
 
-MIN_LASTSCAN_DIFF = 86400 * 7
+MIN_LASTSCAN_DIFF = 86400 * 70
 # Don't rescan a name if we scanned it this many days ago
 
 def human(timestamp):
@@ -174,6 +174,20 @@ def process(users, quiet=False):
 	if quiet is False:
 		print('%d old' % olds)
 p = process
+
+def processid(idnum, ranger=1):
+	idnum = idnum.split('_')[-1]
+	base = b36(idnum)
+	for x in range(ranger):
+		idnum = x + base
+		idnum = 't2_' + b36(idnum)
+		search = list(r.search('author_fullname:%s' % idnum))
+		if len(search) > 0:
+			item = search[0].author.name
+			process(item)
+		else:
+			print('Ain\'t found shit.')
+pid = processid
 
 def smartinsert(data, printprefix='', preverified=False):
 	'''

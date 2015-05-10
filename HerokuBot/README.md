@@ -1,6 +1,8 @@
 Using Heroku to run a bot
 =============
 
+[**Nevermind.**](https://blog.heroku.com/archives/2015/5/7/heroku-free-dynos) Free accounts are limited to 18 hours of activity per day.
+
 [Thank you /u/cmd-t for helping me to finally understand this](http://www.reddit.com/r/botwatch/comments/34dpku/can_someone_write_a_complete_idiots_guide_to/cqts1tr)
 
 Inside git.zip is the .git repo that I created for this. I had to zip it so that I can push it here.
