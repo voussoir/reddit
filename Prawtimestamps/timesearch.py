@@ -258,8 +258,8 @@ def livestream(subreddit=None, username=None, sleepy=30):
         item = r.get_redditor(username)
         itemf = item.get_submitted
     cur = sql.cursor()
-    try:
-        while True:
+    while True:
+        try:
             items = list(itemf(limit=100))
             newitems = smartinsert(sql, cur, items)
             print('%s +%d' % (humannow(), newitems), end='')
@@ -268,12 +268,16 @@ def livestream(subreddit=None, username=None, sleepy=30):
             else:
                 print()
             time.sleep(sleepy)
-    except KeyboardInterrupt:
-        print()
-        sql.commit()
-        sql.close()
-        del cur
-        del sql
+        except KeyboardInterrupt:
+            print()
+            sql.commit()
+            sql.close()
+            del cur
+            del sql
+            return
+        except Exception as e:
+            traceback.print_exc()
+            time.sleep(5)
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     """Converts an integer to a base36 string."""
