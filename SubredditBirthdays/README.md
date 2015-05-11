@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 824,796 subreddits
+#####Collected 826,044 subreddits
 
-#####[Today's jumble](http://reddit.com/r/EAF+pocketsand+pakistan+PictureChallenge+CinemaSins+LadiesofScience+ProRevenge+Mommit+chromeos+ITcrowd+perl+LandRover+FocusST+CafeRacers+celeb_redheads+streetwear+Ladybonersgonecuddly+thomasthedankengine+whatsthisbird+haskell)
+#####[Today's jumble](http://reddit.com/r/Enhancement+AnimalsFailing+regularshow+team60s+WhatCanIDoForBernie+leopardgeckos+wolves+AndroidMasterRace+rugbyunion+vegan+pakistan+SCP+forza+TaylorSwift+VictorianWorldPowers+Astronomy+SelfshotAsians+pittsburgh+sadcomics+DevinTownsend)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
