@@ -184,7 +184,7 @@ def processid(idnum, ranger=1):
 		search = list(r.search('author_fullname:%s' % idnum))
 		if len(search) > 0:
 			item = search[0].author.name
-			process(item)
+			process(item, quiet=True)
 		else:
 			print('Ain\'t found shit.')
 pid = processid
