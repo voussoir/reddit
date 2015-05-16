@@ -4,6 +4,7 @@ import praw
 import time
 import datetime
 import sqlite3
+import sys
 
 USERAGENT = ''
 # Enter a useragent
@@ -343,4 +344,19 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) > 1:
+        subreddit = 'all'
+        lower = None
+        user = False
+        maxupper = None
+        interval = 86400
+        for x in sys.argv[1:]:
+            if x == 'update':
+                lower = 'update'
+            else:
+                x=x.split('=')
+                locals()[x[0]] = x[1]
+        get_all_posts(subreddit, lower, maxupper, interval, user)
+        #get_all_posts(sub, lower, maxupper, interval, user)
+    else:
+        main()
