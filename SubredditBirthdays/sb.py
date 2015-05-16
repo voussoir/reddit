@@ -125,7 +125,7 @@ def processi(sr, doupdates=True, enablekilling=False):
 	else:
 		olds += 1
 
-def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumbled=False):
+def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumbled=False, nosave=False):
 	global olds
 	subs = []
 
@@ -197,11 +197,12 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 				olds += 1
 			else:
 				olds += 1
-			if not delaysaving:
+			if not delaysaving and not nosave:
 				sql.commit()
 		except praw.requests.exceptions.HTTPError:
 			print('HTTPError:', sub)
-	sql.commit()
+	if not nosave:			
+		sql.commit()
 
 
 def chunklist(inputlist, chunksize):
@@ -214,7 +215,7 @@ def chunklist(inputlist, chunksize):
 			inputlist = inputlist[chunksize:]
 		return outputlist
 
-def processmega(srinput, isrealname=False, chunksize=100, docrash=False, delaysaving=False, doupdates=True):
+def processmega(srinput, isrealname=False, chunksize=100, docrash=False, delaysaving=False, doupdates=True, nosave=False):
 	global olds
 	global noinfolist
 	#This is the new standard in sr processing
@@ -236,7 +237,7 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, delaysa
 				subreddits = r.get_info(thing_id=subset)
 				try:
 					for sub in subreddits:
-						process(sub, delaysaving=delaysaving, doupdates=doupdates)
+						process(sub, delaysaving=delaysaving, doupdates=doupdates, nosave=nosave)
 				except TypeError:
 					print('Received no info. See variable `noinfolist`')
 					noinfolist = subset[:]
@@ -886,15 +887,20 @@ def completesweep(shuffle=False, sleepy=0, query=None):
 	else:
 		cur2.execute(query)
 
-	while True:
-		hundred = [cur2.fetchone() for x in range(100)]
-		while None in hundred:
-			hundred.remove(None)
-		if len(hundred) == 0:
-			break
-		hundred = [h[0] for h in hundred]
-		processmega(hundred)
-		time.sleep(sleepy)
+	try:
+		while True:
+			hundred = [cur2.fetchone() for x in range(100)]
+			while None in hundred:
+				hundred.remove(None)
+			if len(hundred) == 0:
+				break
+			hundred = [h[0] for h in hundred]
+			processmega(hundred, nosave=True)
+			time.sleep(sleepy)
+	except KeyboardInterrupt:
+		sql.commit()
+	except Exception:
+		slq.commit()
 
 def get_newest_sub():
 	brandnewest = list(r.get_new_subreddits(limit=1))[0]

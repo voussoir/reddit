@@ -1,4 +1,4 @@
-prawtimesearch
+timesearch.py
 =============
 
 It's all fresh all smooth
@@ -11,7 +11,7 @@ Don't forget to change the Useragent before starting.
 
 ============
 
-commentaugment
+commentaugment.py
 ==============
 
 The commentaugment script will take the submissions in one of your timesearch databases, and get their comments. These comments will be packed back into the same database, so be mindful of the item's fullname when you are later doing analysis (t1=comment, t3=submission)
