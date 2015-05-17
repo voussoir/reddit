@@ -33,8 +33,13 @@ LEVENMODE = True
 #If this is True it will use a function that is slow but can find misspelled keys
 #If this is False it will use a simple function that is very fast but can only find keys which are spelled exactly
 
-MAXPOSTS = 100
-#This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
+MINSEARCH = 100
+MAXSEARCH = 2000
+#This is the max and min number of posts to search in one run. PRAW will automatically handle these within Reddit's guidelines.
+
+MAXTABLE = 10000
+#This is the maximum number of rows for your SQL table. Once the limit is reached, the script will remove any non-hits.
+
 WAIT = 30
 #This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
 
@@ -61,13 +66,14 @@ sql = sqlite3.connect('sql.db')
 print('Loaded SQL Database')
 cur = sql.cursor()
 
-cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
+cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT, STATUS TEXT)')
 print('Loaded Completed table')
 
 sql.commit()
 
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD) 
+REQUESTPOSTS = int(MAXSEARCH*0.75)
 
 
 def levenshtein(s1, s2):
@@ -135,9 +141,13 @@ def findsimple(comment):
     return results
 
 def scanSub():
-    print('Searching '+ SUBREDDIT + '.')
+    global HITCOUNT
+    HITCOUNT = 0
+    global START
+    START = time.time()
+    print('Review of the ' + str(REQUESTPOSTS) + ' most recent comments started at ' + time.strftime("%H:%M:%S))
     subreddit = r.get_subreddit(SUBREDDIT)
-    posts = subreddit.get_comments(limit=MAXPOSTS)
+    posts = subreddit.get_comments(limit=REQUESTPOSTS)
     for post in posts:
         results = []
         pid = post.id
@@ -147,8 +157,9 @@ def scanSub():
             pauthor = '[DELETED]'
         cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
         if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+            cur.execute('INSERT INTO oldposts VALUES(?,"Reviewed")', [pid])
             sql.commit()
+            HITCOUNT = HITCOUNT + 1
             if pauthor.lower() != USERNAME.lower():
                 pbody = post.body.lower()
             
@@ -161,10 +172,13 @@ def scanSub():
                         newcomment = COMMENTHEADER
                         newcomment += '\n\n' + '\n\n'.join(results) + '\n\n'
                         newcomment += COMMENTFOOTER
-                        print('Replying to ' + pid + ' by ' + pauthor + ' with ' + str(len(results)) + ' items')
+                        print('  -Hit found: Attempting reply to ' + pid + ' by ' + pauthor')
                         post.reply(newcomment)
+                        cur.execute('UPDATE oldposts SET STATUS="Hit" WHERE ID=?',[pid])
+                        sql.commit()
+                        print('    +Reply sent.')
             else:
-                print('Will not reply to self')
+                print('  -Hit found: Will not reply to self')
 
 
 while True:
@@ -172,6 +186,26 @@ while True:
         scanSub()
     except Exception as e:
         traceback.print_exc()
-    print('Running again in ' + WAITS + ' seconds \n')
+    ELAPSED = time.time() - START
+    M,S = divmod(int(ELAPSED),60)
+    cur.execute('SELECT Count() FROM oldposts')
+    CURRENTTABLE = cur.fetchone()[0]
+    print(again'Complete! ' + str(HITCOUNT) + ' comments in ' + str(M) + ' min(s) ' + str(S) + ' sec(s). Table includes ' + str(CURRENTTABLE) + ' rows.')
+    if CURRENTTABLE > MAXTABLE:
+        cur.execute(DELETE FROM oldposts WHERESTATUS ="Reviewed"')
+        sql.commit()
+        cur.execute(SELECT Count() FROM oldposts')
+        CURRENTTABLE = cur.fetchone()[0]
+        print('Cleaned table now has' + str(CURRENTTABLE) + 'rows. Restarting in ' + WAITS + ' sec \n')
+    else:
+        print('Table OK, restarting in ' + WAITS + ' sec \n')
+    
+    if HITCOUNT > int(MAXSEARCH * 0.8):
+        REQUESTPOSTS = MAXSEARCH
+    elif HITCOUNT < MINSEARCH:
+        REQUESTPOSTS = MINSEARCH
+    else:
+        REQUESTPOSTS = int(HITCOUNT * 1.2)
+    
     sql.commit()
     time.sleep(WAIT)
