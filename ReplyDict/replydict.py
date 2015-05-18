@@ -7,7 +7,7 @@ import json
 
 '''USER CONFIGURATION'''
 
-USERNAME  = ""
+USERNAME  = ""s
 #This is the bot's Username. In order to send mail, he must have some amount of Karma.
 PASSWORD  = ""
 #This is the bot's Password. 
@@ -145,7 +145,7 @@ def scanSub():
     HITCOUNT = 0
     global START
     START = time.time()
-    print('Review of the ' + str(REQUESTPOSTS) + ' most recent comments started at ' + time.strftime("%H:%M:%S)")
+    print('Review of the ' + str(REQUESTPOSTS) + ' most recent comments started at ' + time.strftime("%H:%M:%S"))
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_comments(limit=REQUESTPOSTS)
     for post in posts:
