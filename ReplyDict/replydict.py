@@ -7,7 +7,7 @@ import json
 
 '''USER CONFIGURATION'''
 
-USERNAME  = ""s
+USERNAME  = ""
 #This is the bot's Username. In order to send mail, he must have some amount of Karma.
 PASSWORD  = ""
 #This is the bot's Password. 
