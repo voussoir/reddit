@@ -196,7 +196,7 @@ while True:
         sql.commit()
         cur.execute('SELECT Count() FROM oldposts')
         CURRENTTABLE = cur.fetchone()[0]
-        print('Cleaned table now has ' + str(CURRENTTABLE) + ' rows. Restarting in ' + WAITS + ' sec \n')
+        print('Cleaned table now has ' + str(CURRENTTABLE) + ' rows. Restarting in ' + WAITS + ' sec. \n')
     else:
         print('Table OK, restarting in ' + WAITS + ' sec \n')
     
