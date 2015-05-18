@@ -145,7 +145,7 @@ def scanSub():
     HITCOUNT = 0
     global START
     START = time.time()
-    print('Review of the ' + str(REQUESTPOSTS) + ' most recent comments started at ' + time.strftime("%H:%M:%S))
+    print('Review of the ' + str(REQUESTPOSTS) + ' most recent comments started at ' + time.strftime("%H:%M:%S)")
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_comments(limit=REQUESTPOSTS)
     for post in posts:
@@ -172,7 +172,7 @@ def scanSub():
                         newcomment = COMMENTHEADER
                         newcomment += '\n\n' + '\n\n'.join(results) + '\n\n'
                         newcomment += COMMENTFOOTER
-                        print('  -Hit found: Attempting reply to ' + pid + ' by ' + pauthor')
+                        print('  -Hit found: Attempting reply to ' + pid + ' by ' + pauthor)
                         post.reply(newcomment)
                         cur.execute('UPDATE oldposts SET STATUS="Hit" WHERE ID=?',[pid])
                         sql.commit()
@@ -190,11 +190,11 @@ while True:
     M,S = divmod(int(ELAPSED),60)
     cur.execute('SELECT Count() FROM oldposts')
     CURRENTTABLE = cur.fetchone()[0]
-    print(again'Complete! ' + str(HITCOUNT) + ' comments in ' + str(M) + ' min(s) ' + str(S) + ' sec(s). Table includes ' + str(CURRENTTABLE) + ' rows.')
+    print('Complete! ' + str(HITCOUNT) + ' comments in ' + str(M) + ' min(s) ' + str(S) + ' sec(s). Table includes ' + str(CURRENTTABLE) + ' rows.')
     if CURRENTTABLE > MAXTABLE:
-        cur.execute(DELETE FROM oldposts WHERESTATUS ="Reviewed"')
+        cur.execute('DELETE FROM oldposts WHERE STATUS = "Reviewed"')
         sql.commit()
-        cur.execute(SELECT Count() FROM oldposts')
+        cur.execute('SELECT Count() FROM oldposts')
         CURRENTTABLE = cur.fetchone()[0]
         print('Cleaned table now has' + str(CURRENTTABLE) + 'rows. Restarting in ' + WAITS + ' sec \n')
     else:
