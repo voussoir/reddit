@@ -357,6 +357,5 @@ if __name__ == '__main__':
                 x=x.split('=')
                 locals()[x[0]] = x[1]
         get_all_posts(subreddit, lower, maxupper, interval, user)
-        #get_all_posts(sub, lower, maxupper, interval, user)
     else:
         main()

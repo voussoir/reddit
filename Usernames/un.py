@@ -115,15 +115,12 @@ def reducetonames(users):
 	return outlist
 
 def userify_list(users):
-	outlist = []
-	if isinstance(users, str):
-		users = [users]
 	users = list(reducetonames(users))
 	for username in users:
 		try:
-			preverify = getentry(name=username)
-			if preverify is not None:
-				preverify = preverify[SQL_LASTSCAN]
+			preexisting = getentry(name=username)
+			if preexisting is not None:
+				preverify = preexisting[SQL_LASTSCAN]
 				preverify = getnow() - preverify
 				preverify = (preverify > MIN_LASTSCAN_DIFF)
 				if not preverify:
@@ -141,8 +138,12 @@ def userify_list(users):
 			availability = AVAILABILITY[availability]
 			yield [username, availability]
 
-def process(users, quiet=False):
+def process(users, quiet=False, knownid=''):
 	olds = 0
+	if isinstance(users, str):
+		users = [users]
+	if len(users) > 1:
+		knownid=''
 	users = userify_list(users)
 	now = int(getnow())
 	current = 0
@@ -152,6 +153,9 @@ def process(users, quiet=False):
 		data[SQL_LASTSCAN] = now
 		preverify=False
 		if isinstance(user, list):
+			if knownid != '':
+				data[SQL_IDINT] = b36(knownid)
+				data[SQL_IDSTR] = knownid
 			data[SQL_NAME] = user[0]
 			data[SQL_AVAILABLE] = AVAILABILITY[user[1]]
 		else:
@@ -182,12 +186,14 @@ def processid(idnum, ranger=1):
 	for x in range(ranger):
 		idnum = x + base
 		idnum = 't2_' + b36(idnum)
+		idnum = idnum.lower()
 		search = list(r.search('author_fullname:%s' % idnum))
+		print('%s - ' % idnum, end='')
 		if len(search) > 0:
 			item = search[0].author.name
-			process(item, quiet=True)
+			process(item, quiet=True, knownid=idnum[3:])
 		else:
-			print('Ain\'t found shit.')
+			print('No idea.')
 pid = processid
 
 def smartinsert(data, printprefix='', preverified=False):
@@ -226,7 +232,7 @@ def smartinsert(data, printprefix='', preverified=False):
 	return isnew
 
 def print_message(data, printprefix=''):
-	if data[SQL_IDINT] is not None:
+	if data[SQL_HUMAN] is not None:
 		print('%s %s : %s : %s : %d : %d' % (
 				printprefix,
 				data[SQL_IDSTR],
@@ -312,7 +318,7 @@ def show():
 
 	cur.execute('SELECT COUNT(*) FROM users')
 	totalitems = cur.fetchone()[0]
-	cur.execute('SELECT COUNT(*) FROM users WHERE idint IS NOT NULL')
+	cur.execute('SELECT COUNT(*) FROM users WHERE idint IS NOT NULL AND available == 0')
 	validitems = cur.fetchone()[0]
 	print(totalitems, validitems)
 
@@ -327,7 +333,7 @@ def show():
 
 	print('Writing time file.')
 	print(HEADER_FULL, file=file_time)
-	cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY created ASC')
+	cur.execute('SELECT * FROM users WHERE idint IS NOT NULL AND created IS NOT NULL ORDER BY created ASC')
 	fetchwriter(file_time)
 	file_time.close()
 
@@ -390,6 +396,9 @@ def memberformat_full(data, spacer='.'):
 	name = data[SQL_NAME]
 	name += spacer*(20 - len(name))
 
+	thuman = data[SQL_HUMAN]
+	if thuman is None:
+		thuman = ' '*24
 	link_karma = data[SQL_LINK_KARMA]
 	comment_karma = data[SQL_COMMENT_KARMA]
 	total_karma = data[SQL_TOTAL_KARMA]
@@ -406,7 +415,7 @@ def memberformat_full(data, spacer='.'):
 	lastscan = human(lastscan)
 	out = MEMBERFORMAT_FULL % (
 		idstr,
-		data[SQL_HUMAN],
+		thuman,
 		name,
 		link_karma,
 		comment_karma,
@@ -429,3 +438,16 @@ def find(name):
 		print_message(f)
 	else:
 		print(f)
+
+def load_textfile(filename):
+	f = open(filename, 'r')
+	lines = [x.strip() for x in f.readlines()]
+	f.close()
+	return lines
+
+def save_textfile(filename, lines):
+	f = open(filename, 'w')
+	for x in lines:
+		print(x, file=f)
+	f.close()
+	

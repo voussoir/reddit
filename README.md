@@ -54,4 +54,4 @@ To create your own bot.py is very simple. It's just a regular .py file which you
 
 `password = "12345"`
 
-Now, when you `import bot`, you can type `bot.username` and get "GoldenSights". You can create as many variables as you want, including useragents and multiple account credentials.
+Now, when you `import bot`, you can type `bot.username` and get "robot". You can create as many variables as you want, including useragents and multiple account credentials.
