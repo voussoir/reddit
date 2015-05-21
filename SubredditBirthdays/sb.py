@@ -894,13 +894,16 @@ def completesweep(shuffle=False, sleepy=0, query=None):
 				hundred.remove(None)
 			if len(hundred) == 0:
 				break
+			# h[0] because the selection query calls for idstr
+			# This is not a mistake
 			hundred = [h[0] for h in hundred]
 			processmega(hundred, nosave=True)
 			time.sleep(sleepy)
 	except KeyboardInterrupt:
 		sql.commit()
 	except Exception:
-		slq.commit()
+		sql.commit()
+	sql.commit()
 
 def get_newest_sub():
 	brandnewest = list(r.get_new_subreddits(limit=1))[0]
