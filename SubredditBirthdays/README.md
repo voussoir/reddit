@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 831,706 subreddits
+#####Collected 836,498 subreddits
 
-#####[Today's jumble](http://reddit.com/r/shittyTESlore+WoahTunes+calvinandhobbes+FocusST+HomemadeNsfw+futureporn+libertarianmeme+PKA+InternetIsBeautiful+ConanTravels+ACON_Support+inquisitionsliders+PowerMetal+haskell+ThatPeelingFeeling+ToA+mildlyamusing+Magicdeckbuilding+PeopleGettingRocked+wwiipics)
+#####[Today's jumble](http://reddit.com/r/animation+BatesMotel+MLS+greatdanes+Scholar+beetlejuicing+FeelsLikeTheFirstTime+celeb_redheads+lovelive_ja+TwoandaHalfMen+kindafunny+zooeydeschanel+oaklandraiders+LadiesofScience+bigbangcomics+Harley+minnesotaunited+EvolveGame+CodeGeass+Cricket)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

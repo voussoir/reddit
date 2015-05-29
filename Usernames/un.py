@@ -7,6 +7,7 @@ import bot
 import datetime
 import time
 import string
+import sys
 
 
 sql = sqlite3.connect('un.db')
@@ -185,10 +186,14 @@ def processid(idnum, ranger=1):
 	base = b36(idnum)
 	for x in range(ranger):
 		idnum = x + base
+		if getentry(idint=idnum) != None:
+			print('Skipping %s' % b36(idnum))
+			continue
 		idnum = 't2_' + b36(idnum)
 		idnum = idnum.lower()
 		search = list(r.search('author_fullname:%s' % idnum))
 		print('%s - ' % idnum, end='')
+		sys.stdout.flush()
 		if len(search) > 0:
 			item = search[0].author.name
 			process(item, quiet=True, knownid=idnum[3:])
@@ -245,6 +250,12 @@ def print_message(data, printprefix=''):
 		print('%s : %s' % (data[SQL_NAME], statement))
 
 def get_from_listing(sr, limit, listfunction, submissions=True, comments=True, returnnames=False):
+	'''
+	Get submission listings using one of PRAW's get methods
+	and process those usernames
+
+	`listfunction` would be praw.objects.Subreddit.get_new for example
+	'''
 	subreddit = r.get_subreddit(sr)
 	if limit is None:
 		limit = 1000
@@ -267,14 +278,23 @@ def get_from_listing(sr, limit, listfunction, submissions=True, comments=True, r
 	process(items)
 
 def get_from_new(sr, limit=None, submissions=True, comments=True, returnnames=False):
+	'''
+	Shortcut for get_from_listing, using /new
+	'''
 	listfunction = praw.objects.Subreddit.get_new
 	return get_from_listing(sr, limit, listfunction, submissions, comments, returnnames)
 
 def get_from_top(sr, limit=None, submissions=True, comments=True, returnnames=False):
+	'''
+	Shortcut for get_from_listing, using /top?t=all
+	'''
 	listfunction = praw.objects.Subreddit.get_top_from_all
 	return get_from_listing(sr, limit, listfunction, submissions, comments, returnnames)
 
 def get_from_hot(sr, limit=None, submissions=True, comments=True, returnnames=False):
+	'''
+	Shortcut for get_from_listing, using /hot
+	'''
 	listfunction = praw.objects.Subreddit.get_hot
 	return get_from_listing(sr, limit, listfunction, submissions, comments, returnnames)
 
@@ -307,19 +327,27 @@ def fetchwriter(outfile, spacer1=' ', spacer2=None, brief=False):
 		if spacer2 is not None:
 			flipflop = not flipflop
 
+def count(validonly=False):
+	if validonly:
+		cur.execute('SELECT COUNT(*) FROM users WHERE idint IS NOT NULL AND available == 0')
+	else:
+		cur.execute('SELECT COUNT(*) FROM users')
+	return cur.fetchone()[0]
+
 def show():
+	'''
+	Create a bunch of text files that nobody will read
+	'''
 	file_time = open('show\\time.txt', 'w')
 	file_name = open('show\\name.txt', 'w')
 	file_karma_total = open('show\\karma_total.txt', 'w')
-	file_karma_link = open('show\\karma_link.txt', 'w')
-	file_karma_comment = open('show\\karma_comment.txt', 'w')
+	#file_karma_link = open('show\\karma_link.txt', 'w')
+	#file_karma_comment = open('show\\karma_comment.txt', 'w')
 	file_available = open('show\\available.txt', 'w')
 	file_readme = open('README.md', 'r')
 
-	cur.execute('SELECT COUNT(*) FROM users')
-	totalitems = cur.fetchone()[0]
-	cur.execute('SELECT COUNT(*) FROM users WHERE idint IS NOT NULL AND available == 0')
-	validitems = cur.fetchone()[0]
+	totalitems = count(validonly=False)
+	validitems = count(validonly=True)
 	print(totalitems, validitems)
 
 	print('Updating readme')
@@ -349,17 +377,17 @@ def show():
 	fetchwriter(file_karma_total)
 	file_karma_total.close()
 
-	print('Writing karma link file.')
-	print(HEADER_FULL, file=file_karma_link)
-	cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY link_karma DESC, LOWER(name) ASC')
-	fetchwriter(file_karma_link)
-	file_karma_link.close()
+	#print('Writing karma link file.')
+	#print(HEADER_FULL, file=file_karma_link)
+	#cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY link_karma DESC, LOWER(name) ASC')
+	#fetchwriter(file_karma_link)
+	#file_karma_link.close()
 
-	print('Writing karma comment file.')
-	print(HEADER_FULL, file=file_karma_comment)
-	cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY comment_karma DESC, LOWER(name) ASC')
-	fetchwriter(file_karma_comment)
-	file_karma_comment.close()
+	#print('Writing karma comment file.')
+	#print(HEADER_FULL, file=file_karma_comment)
+	#cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY comment_karma DESC, LOWER(name) ASC')
+	#fetchwriter(file_karma_comment)
+	#file_karma_comment.close()
 
 	print('Writing available')
 	print(HEADER_BRIEF, file=file_available)
@@ -389,6 +417,10 @@ def commapadding(s, spacer, spaced, left=True, forcestring=False):
 	return s + spacer
 
 def memberformat_full(data, spacer='.'):
+	'''
+	Given a data list, create a string that will
+	become a single row in one of the show() files
+	'''
 	idstr = data[SQL_IDSTR]
 	idstr = commapadding(idstr, spacer, 5, forcestring=True)
 
@@ -424,6 +456,9 @@ def memberformat_full(data, spacer='.'):
 	return out
 
 def memberformat_brief(data, spacer='.'):
+	'''
+	Shorter version of memberformat for avaialbe names
+	'''
 	name = data[SQL_NAME]
 	lastscan = data[SQL_LASTSCAN]
 	lastscan = human(lastscan)
@@ -432,6 +467,9 @@ def memberformat_brief(data, spacer='.'):
 	return out
 
 def find(name):
+	'''
+	Print the details of a username
+	'''
 	cur.execute('SELECT * FROM users WHERE LOWER(name)=?', [name])
 	f = cur.fetchone()
 	if f:
@@ -440,14 +478,29 @@ def find(name):
 		print(f)
 
 def load_textfile(filename):
+	'''
+	Read lines of file into a list
+	'''
 	f = open(filename, 'r')
 	lines = [x.strip() for x in f.readlines()]
 	f.close()
 	return lines
 
 def save_textfile(filename, lines):
+	'''
+	Write items of list as lines in file
+	'''
 	f = open(filename, 'w')
 	for x in lines:
 		print(x, file=f)
 	f.close()
 	
+def idlenew(subreddit='all', sleepy=15):
+	while True:
+		try:
+			get_from_new(subreddit, 100)
+		except KeyboardInterrupt:
+			break
+		except:
+			pass
+		time.sleep(sleepy)

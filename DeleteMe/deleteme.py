@@ -16,7 +16,7 @@ r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD)
 
 def tprint(thing):
-	#Having a whole bunch of text appear at once can be jarring
+	# Slows down the printouts
 	print(thing)
 	time.sleep(0.1)
 
