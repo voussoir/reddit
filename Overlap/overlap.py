@@ -119,4 +119,3 @@ def process_and_write(sr):
 
 if __name__ == '__main__':
 	process_and_write('goldtesting')
-	quit()
