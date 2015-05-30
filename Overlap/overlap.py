@@ -52,6 +52,7 @@ def nfr(function, dropout=None):
 	return a
 
 def process_subreddit(sr):
+	sr = sr.lower()
 	subreddit = nfr(r.get_subreddit)(sr)
 	print('/r/%s/new' % sr)
 	posts = list(nfr(subreddit.get_new)(limit=MAXPOSTS))
@@ -75,7 +76,8 @@ def process_subreddit(sr):
 		#print(totalreddits)
 		i += 1
 
-	del totalreddits[sr]
+	if sr in totalreddits:
+		del totalreddits[sr]
 	# -1 because of %totalposts%
 	totalreddits['%totalsubs%'] = (len(totalreddits) - 1)
 	return totalreddits
@@ -92,7 +94,7 @@ def process_user(username, pre=''):
 	userreddits = {'%totalposts%':len(userposts)}
 	#print(userreddits)
 	for post in userposts:
-		subreddit = post.subreddit.display_name
+		subreddit = post.subreddit.display_name.lower()
 		userreddits[subreddit] = userreddits.get(subreddit, 0) + 1
 
 	return userreddits
@@ -116,5 +118,5 @@ def process_and_write(sr):
 	write_json(sr, totalreddits)
 
 if __name__ == '__main__':
-	process_and_write('redditdev')
+	process_and_write('goldtesting')
 	quit()
