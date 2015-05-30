@@ -36,7 +36,7 @@ def nfr(function, dropout=None):
 						raise e
 					if e.response.status_code == dropout:
 						return None
-					if e.response.status_code in dropout:
+					if isinstance(dropout, list) and e.response.status_code in dropout:
 						return None
 					else:
 						raise e
