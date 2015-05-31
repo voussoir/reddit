@@ -23,6 +23,12 @@ except ImportError:
 r = praw.Reddit(USERAGENT)
 
 def nfr2(function, *fargs, **fkwargs):
+	'''
+	Different version of NFR. 
+	The first was having problems with generators and lazyload
+	objects, because those functions return successfully
+	even though the data isn't checked
+	'''
 	while True:
 		try:
 			results = function(*fargs, **fkwargs)
@@ -82,6 +88,11 @@ def nfr(function, dropout=None):
 	return a
 
 def get_subreddit_authors(sr):
+	'''
+	Given a subreddit name, go to /r/subreddit/new
+	and /r/subreddit/comments, and return the names of post
+	authors.
+	'''
 	sr = sr.lower()
 	subreddit = nfr(r.get_subreddit)(sr)
 	print('/r/%s/new' % sr)
@@ -97,7 +108,16 @@ def get_subreddit_authors(sr):
 	print('Found %d authors' % len(authors))
 	return authors
 
-def process_userlist(authors):
+def process_userlist(authors, fromsubreddit=''):
+	'''
+	Given a list of usernames, put each into process_user()
+	and collect a total dictionary of subreddits
+
+	If this list of names comes from scanning a subreddit, you
+	can provide `fromsubreddit`, which will be removed from the dict
+	at the end, since it's useless data if everyone has it in common.
+	'''
+	fromsubreddit = fromsubreddit.lower()
 	count = len(authors)
 	i = 1
 	userreddits = {}
@@ -111,18 +131,27 @@ def process_userlist(authors):
 		#print(totalreddits)
 		i += 1
 
-	if sr in totalreddits:
-		del totalreddits[sr]
+	if fromsubreddit in totalreddits:
+		del totalreddits[fromsubreddit]
 	# -1 because of %totalposts%
 	totalreddits['%totalsubs%'] = (len(totalreddits) - 1)
 	return totalreddits
 
 def process_subreddit(sr):
+	'''
+	Given a subreddit name, collect authors from submissions
+	and comments, then pass them into process_userlist
+	'''
 	authors = get_subreddit_authors(sr)
-	results = process_userlist(authors)
+	results = process_userlist(authors, fromsubreddit=sr)
 	return results
 
 def process_user(username, pre=''):
+	'''
+	Given a username, go to /u/username/submitted
+	and /u/username/comments, and return the names
+	of subreddits he has posted to, with their frequencies
+	'''
 	user = nfr(r.get_redditor, dropout=404)(username)
 	if user is None:
 		return {}
@@ -141,6 +170,10 @@ def process_user(username, pre=''):
 	return userreddits
 
 def write_json(filename, totalreddits):
+	'''
+	Given a dictionary totalreddits, sort by freq
+	and write it to filename.json
+	'''
 	if filename[-5:] != '.json':
 		filename += '.json'
 	keys = list(totalreddits.keys())
@@ -155,6 +188,9 @@ def write_json(filename, totalreddits):
 	outfile.write('}')
 
 def process_and_write(sr):
+	'''
+	shortcut to process_subreddit and write_json
+	'''
 	totalreddits = process_subreddit(sr)
 	write_json(sr, totalreddits)
 
