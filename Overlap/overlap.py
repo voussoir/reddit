@@ -224,7 +224,7 @@ def process_userfile(filename, jsonfilename):
 	userlines = file_lines(filename)
 
 	for username in userlines:
-		results = process_userlist
+		results = process_userlist(username)
 		write_json(jsonfilename, results)
 
 if __name__ == '__main__':
