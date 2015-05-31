@@ -43,30 +43,39 @@ def commentaugment(databasename, limit, threshold, numthresh, skips, verbose):
 	cur.execute('SELECT COUNT(idint) FROM posts WHERE url IS NOT NULL and num_comments > ?', [numthresh])
 	totalthreads = cur.fetchone()[0]
 
-	cur.execute('SELECT * FROM posts WHERE url IS NOT NULL and num_comments > ? ORDER BY num_comments DESC', [numthresh])
+	cur.execute('SELECT idstr FROM posts WHERE url IS NOT NULL and num_comments > ? ORDER BY num_comments DESC', [numthresh])
+	fetchall = cur.fetchall()
+	fetchall = [f[0] for f in fetchall]
+
 	scannedthreads = skips
-	for x in range(skips):
-		trash = cur.fetchone()
+	for x in fetchall[:skips]:
 		print('Skipping %s, %d / %d' % (trash[SQL_IDSTR], x+1, totalthreads))
+	fetchall = fetchall[skips:]
 
 	while True:
-		hundred = [cur.fetchone() for x in range(100)]
-		hundred = remove_none(hundred)
+		hundred = fetchall[:100]
+		fetchall = fetchall[100:]
+		hundred = list(filter(None, hundred))
 		if len(hundred) == 0:
 			return
-		hundred = [h[SQL_IDSTR] for h in hundred]
 		hundred = verify_t3(hundred)
 		submissions = nofailrequest(r.get_info)(thing_id=hundred)
 		print('Retrieved %d submissions' % len(submissions))
 
 		for submission in submissions:
-			print('Processing %s expecting %d | ' % (submission.fullname, submission.num_comments), end='')
+			if verbose:
+				spacer = '\n\t'
+			else:
+				spacer = ' '
+			print('Processing %s%sexpecting %d | ' % (submission.fullname, spacer, submission.num_comments), end='')
 			sys.stdout.flush()
 			if verbose:
 				print()
 			comments = get_comments_for_thread(submission, limit, threshold, verbose)
 			smartinsert(sql, cur2, comments)
 			scannedthreads += 1
+			if verbose:
+				print('\t', end='')
 			print('Found %d | %d / %d threads complete' % (len(comments), scannedthreads, totalthreads))
 
 def get_comments_for_thread(submission, limit, threshold, verbose):
@@ -140,7 +149,7 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
 					comments.append(item)
 					additionals += 1
 			if verbose:
-				s = 'Got %d more, %d so far.' % (additionals, len(comments))
+				s = '\tGot %d more, %d so far.' % (additionals, len(comments))
 				if limit is not None:
 					s += ' Can perform %d more replacements' % limit
 				print(s)
@@ -150,17 +159,6 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
 		traceback.print_exc()
 
 	return comments
-
-def remove_none(itemlist):
-	done = False
-	while not done:
-		done = True
-		for index in range(len(itemlist)):
-			if itemlist[index] is None:
-				done = False
-				del itemlist[index]
-				break
-	return itemlist
 
 def verify_t3(itemlist):
 	done = False
@@ -176,7 +174,7 @@ def verify_t3(itemlist):
 				itemlist[index] = 't3_' + item
 	return itemlist
 
-def smartinsert(sql, cur, results):
+def smartinsert(sql, cur, results, nosave=False):
 	for o in results:
 		cur.execute('SELECT * FROM posts WHERE idint=?', [b36(o.id)])
 		if not cur.fetchone():
@@ -204,7 +202,8 @@ def smartinsert(sql, cur, results):
 			postdata[SQL_FLAIR_CSS_CLASS] = None
 
 			cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', postdata)
-			sql.commit()
+			if nosave is False:
+				sql.commit()
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
 	"""Converts an integer to a base36 string."""
