@@ -2,6 +2,7 @@ import praw
 import traceback
 import time
 import types
+import os
 
 ''' CONFIG '''
 
@@ -177,7 +178,7 @@ def write_json(filename, totalreddits):
 	if filename[-5:] != '.json':
 		filename += '.json'
 	keys = list(totalreddits.keys())
-	keys.sort(key=totalreddits.get, reverse=True)
+	keys.sort(key=lambda x: (totalreddits.get(x), x.lower()), reverse=True)
 
 	print('Creating %s' % filename)
 	outfile = open(filename, 'w')
@@ -196,3 +197,4 @@ def process_and_write(sr):
 
 if __name__ == '__main__':
 	process_and_write('goldtesting')
+	os._exit(0)
