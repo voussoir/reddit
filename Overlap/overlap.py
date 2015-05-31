@@ -197,6 +197,35 @@ def process_and_write(sr):
 	totalreddits = process_subreddit(sr)
 	write_json(sr, totalreddits)
 
+def file_lines(filename):
+	textfile = open(filename, 'r')
+	textlines = [line.strip() for line in textfile.readlines()]
+	textfile.close()
+
+def process_subfile(filename):
+	'''
+	Shortcut to open a txt file containing subreddit names
+	automatically put each one into process_and_write
+	'''
+	sublines = file_lines(filename)
+
+	for subname in sublines:
+		process_and_write(subname)
+
+def process_userfile(filename, jsonfilename):
+	'''
+	Shortcut to open a txt file containing user names
+	automatically put each one into process_userlist
+
+	jsonfilename is required since we don't have any subreddit
+	to go off of.
+	'''
+	userlines = file_lines(filename)
+
+	for username in userlines:
+		results = process_userlist
+		write_json(jsonfilename, results)
+
 if __name__ == '__main__':
 	process_and_write('goldtesting')
 	os._exit(0)
