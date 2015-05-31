@@ -118,6 +118,7 @@ def process_userlist(authors, fromsubreddit=''):
 	can provide `fromsubreddit`, which will be removed from the dict
 	at the end, since it's useless data if everyone has it in common.
 	'''
+	authors = list(set(authors))
 	fromsubreddit = fromsubreddit.lower()
 	count = len(authors)
 	i = 1
