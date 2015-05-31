@@ -187,6 +187,7 @@ def write_json(filename, totalreddits):
 		val = totalreddits[key]
 		outfile.write('\t"%s" : %d,\n' % (key, val))
 	outfile.write('}')
+	outfile.close()
 
 def process_and_write(sr):
 	'''
