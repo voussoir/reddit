@@ -201,6 +201,7 @@ def file_lines(filename):
 	textfile = open(filename, 'r')
 	textlines = [line.strip() for line in textfile.readlines()]
 	textfile.close()
+	return textlines
 
 def process_subfile(filename):
 	'''
