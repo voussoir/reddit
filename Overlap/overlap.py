@@ -38,7 +38,7 @@ def nfr2(function, *fargs, **fkwargs):
 			print('Retrying in 2...')
 			time.sleep(2)
 		except KeyboardInterrupt:
-			raise Exception("CTRL+C")
+			return None
 		except:
 			traceback.print_exc()
 			print('Retrying in 2...')
