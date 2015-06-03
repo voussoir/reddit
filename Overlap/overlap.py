@@ -13,6 +13,10 @@ DROPOUT = [404]
 # This error code will cause the nofailrequest to exit.
 # There's no reason to repeatedly request a 404.
 
+NFR_TIMEOUT = 10
+# How many times should NoFailRequest attempt the request?
+# If 0, it goes on forever
+
 ''' END CONFIG '''
 
 try:
@@ -30,7 +34,8 @@ def nfr2(function, *fargs, **fkwargs):
 	objects, because those functions return successfully
 	even though the data isn't checked
 	'''
-	while True:
+	loopcount = 0
+	while loopcount == 0 or loopcount < NFR_TIMEOUT:
 		try:
 			results = function(*fargs, **fkwargs)
 			if isinstance(results, types.GeneratorType):
@@ -50,6 +55,8 @@ def nfr2(function, *fargs, **fkwargs):
 			traceback.print_exc()
 			print('Retrying in 2...')
 			time.sleep(2)
+		if NFR_TIMEOUT != 0:
+			loopcount += 1
 
 def nfr(function, dropout=None):
 	'''
@@ -184,10 +191,13 @@ def write_json(filename, totalreddits):
 	print('Creating %s' % filename)
 	outfile = open(filename, 'w')
 	outfile.write('{\n')
+	lines = []
 	for key in keys:
 		val = totalreddits[key]
-		outfile.write('\t"%s" : %d,\n' % (key, val))
-	outfile.write('}')
+		lines.append('\t"%s" : %d' % (key, val))
+	lines = ',\n'.join(lines)
+	outfile.write(lines)
+	outfile.write('\n}')
 	outfile.close()
 
 def process_and_write(sr):
@@ -224,7 +234,9 @@ def process_userfile(filename, jsonfilename):
 	userlines = file_lines(filename)
 
 	for username in userlines:
-		results = process_userlist(username)
+		results = process_user(username)
+		jsonfilename = jsonfilename.split('.')[0]
+		jsonfilename += '-%s' % username
 		write_json(jsonfilename, results)
 
 if __name__ == '__main__':
