@@ -295,6 +295,8 @@ def updatepost(comment):
 def validatesubreddit(sr):
 	#This will intentionall crash if /r/sr does not exist
 	sr = sr.replace('/r/', '')
+	sr = sr.replace('r/', '')
+	sr = sr.replace('/', '')
 	r.get_subreddit(sr, fetch=True)
 
 def ispostvalid(inputdata, errors):
