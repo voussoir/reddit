@@ -69,10 +69,9 @@ WIKI_PERMLEVEL = 1
 # 1 - Use a whitelist of names
 # 2 - Only mods can read and see this page
 
-MAXPOSTS = 100
+MAXPOSTS = 10
 # How many submissions / how many comments to get on each run
 # PRAW can get up to 100 in a single call
-# I recommend leaving it at 100
 
 MAX_MAILTRIES = 15
 # The maximum number of times to attempt sending mail
