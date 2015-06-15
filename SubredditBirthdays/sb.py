@@ -313,6 +313,10 @@ def fetchgenerator():
 			break
 		yield fetch
 
+def datetimedict(outputdict, timestamp, strftime):
+	dtd = datetime.datetime.strftime(timestamp, strftime) # 01
+	outputdict[dtd] = outputdict.get(dtd, 0) + 1
+
 def show():
 	file_all_time = open('show\\all-time.txt', 'w')
 	file_all_name = open('show\\all-name.txt', 'w')
@@ -431,23 +435,13 @@ def show():
 	for item in fetchgenerator():
 		dt = datetime.datetime.utcfromtimestamp(item[SQL_CREATED])
 
-		hod = datetime.datetime.strftime(dt, '%H') # 01
-		hoddict[hod] = hoddict.get(hod, 0) + 1
+		datetimedict(hoddict, dt, '%H') # 01
+		datetimedict(dowdict, dt, '%A') # Monday
+		datetimedict(domdict, dt, '%d') # 01
+		datetimedict(moydict, dt, '%B') # January
+		datetimedict(myrdict, dt, '%b%Y') # Jan2015
+		datetimedict(yerdict, dt, '%Y') # 2015
 
-		dow = datetime.datetime.strftime(dt, '%A') # Monday
-		dowdict[dow] = dowdict.get(dow, 0) + 1
-
-		dom = datetime.datetime.strftime(dt, '%d') # 01
-		domdict[dom] = domdict.get(dom, 0) + 1
-
-		moy = datetime.datetime.strftime(dt, '%B') # January
-		moydict[moy] = moydict.get(moy, 0) + 1
-
-		myr = datetime.datetime.strftime(dt, '%b%Y') # Jan2015
-		myrdict[myr] = myrdict.get(myr, 0) + 1
-
-		yer = datetime.datetime.strftime(dt, '%Y') # 2015
-		yerdict[yer] = yerdict.get(yer, 0) + 1
 	print('    forming columns')
 	plotnum = 0
 	modes = [None, 'day', None, 'month', None, 'monthyear']
@@ -763,10 +757,12 @@ def modsfromid(subid):
 	return mods
 
 def modernize():
-	cur.execute('SELECT * FROM subreddits')
-	f=cur.fetchall()
-	f.sort(key=lambda x: x[SQL_CREATED])
-	finalitem = f[-1]
+	#cur.execute('SELECT * FROM subreddits')
+	#f=cur.fetchall()
+	#f.sort(key=lambda x: x[SQL_CREATED])
+	#finalitem = f[-1]
+	cur.execute('SELECT * FROM subreddits ORDER BY created DESC LIMIT 1')
+	finalitem = cur.fetchone()
 	print('Current final item:')
 	print(finalitem[SQL_IDSTR], finalitem[SQL_HUMAN], finalitem[SQL_NAME])
 	finalid = finalitem[SQL_IDINT]
