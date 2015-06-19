@@ -17,29 +17,29 @@ SUBREDDIT = "GoldTesting"
 # This is the sub or list of subs to scan for new posts. For a single sub, use "sub1".
 # For multiple subs, use "sub1+sub2+sub3+...". For all use "all"
 
-MESSAGE_INITIAL_SUBJECT = 'Welcome to /r/subreddit, _author_!'
+MESSAGE_INITIAL_SUBJECT = 'Welcome to /r/_subreddit_, _author_!'
 MESSAGE_INITIAL_BODY = '''
 Hey _author_,
 
-This is the first time we've seen you post in /r/subreddit, welcome!
+This is the first time we've seen you post in /r/_subreddit_, welcome!
 
 Your [first submission](_permalink_) has been added to your new bio page
-at /r/subreddit/wiki/_author_.
+at /r/_subreddit_/wiki/_author_.
 '''
 
-MESSAGE_UPDATE_SUBJECT = 'Your /r/subreddit bio has been updated'
+MESSAGE_UPDATE_SUBJECT = 'Your /r/_subreddit_ bio has been updated'
 MESSAGE_UPDATE_BODY = '''
 Hey _author_,
 
-Your [submission](_permalink_) to /r/subreddit has been added
-to the bottom of your bio at /r/subreddit/wiki/_author_.
+Your [submission](_permalink_) to /r/_subreddit_ has been added
+to the bottom of your bio at /r/_subreddit_/wiki/_author_.
 '''
 
-MESSAGE_FULL_SUBJECT = 'Youre /r/subreddit bio is full!'
+MESSAGE_FULL_SUBJECT = 'Youre /r/_subreddit_ bio is full!'
 MESSAGE_FULL_BODY = '''
 Hey _author_,
 
-I attempted to update your bio page at /r/subreddit/wiki/_author_,
+I attempted to update your bio page at /r/_subreddit_/wiki/_author_,
 but found that it was too full for me to add more text!
 '''
 # The subject and body of the messages you will to send to users.
@@ -147,7 +147,7 @@ def update_wikipage(author, submission, newuser=False):
 		content = WIKI_PAGE_INITIAL_TEXT.replace('_author_', author)
 	newtext = WIKI_POST_FORMAT
 	newtext = newtext.replace('_title_', submission.title)
-	newtext = newtext.replace('_permalink_', submission.shortlink)
+	newtext = newtext.replace('_permalink_', submission.short_link)
 	if submission.is_self:
 		newtext = newtext.replace('_text_', submission.selftext)
 	else:
@@ -157,7 +157,7 @@ def update_wikipage(author, submission, newuser=False):
 		complete = content + newtext
 		if len(complete) > MAX_WIKI_SIZE:
 			print('!! Page %s contains too many characters: %d / %d' % (
-				   len(complete), MAX_WIKI_SIZE))
+				   author, len(complete), MAX_WIKI_SIZE))
 			return 'full'
 	else:
 		complete = content
@@ -229,8 +229,10 @@ def biowikibot():
 			body = MESSAGE_FULL_BODY
 
 		subject = subject.replace('_author_', author)
+		subject = subject.replace('_subreddit_', SUBREDDIT)
 		body = body.replace('_author_', author)
-		body = body.replace('_permalink_', submission.shortlink)
+		body = body.replace('_permalink_', submission.short_link)
+		body = body.replace('_subreddit_', SUBREDDIT)
 		if result is not None:
 			send_message(author, subject, body)
 
