@@ -129,12 +129,10 @@ def userify_list(users):
 					continue
 			else:
 				preverify = False
-			user = r.get_redditor(username)
+			user = r.get_redditor(username, fetch=True)
 			user.preverify = preverify
 			yield user
-		except requests.exceptions.HTTPError as he:
-			if he.response.status_code != 404:
-				raise he
+		except praw.errors.NotFound as he:
 			availability = r.is_username_available(username)
 			availability = AVAILABILITY[availability]
 			yield [username, availability]

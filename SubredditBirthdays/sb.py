@@ -239,8 +239,13 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, delaysa
 					for sub in subreddits:
 						process(sub, delaysaving=delaysaving, doupdates=doupdates, nosave=nosave)
 				except TypeError:
-					print('Received no info. See variable `noinfolist`')
 					noinfolist = subset[:]
+					if len(noinfolist) == 1:
+						print('Received no info. See variable `noinfolist`')
+					else:
+						for item in noinfolist:
+							processmega([item])
+
 				remaining -= len(subset)
 			except praw.requests.exceptions.HTTPError as e:
 				print(e)

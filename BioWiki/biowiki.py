@@ -34,6 +34,14 @@ Hey _author_,
 Your [submission](_permalink_) to /r/subreddit has been added
 to the bottom of your bio at /r/subreddit/wiki/_author_.
 '''
+
+MESSAGE_FULL_SUBJECT = 'Youre /r/subreddit bio is full!'
+MESSAGE_FULL_BODY = '''
+Hey _author_,
+
+I attempted to update your bio page at /r/subreddit/wiki/_author_,
+but found that it was too full for me to add more text!
+'''
 # The subject and body of the messages you will to send to users.
 # If you put _author_ in either one of these texts, it will be automatically
 # replaced with their usename.
@@ -100,7 +108,7 @@ sql.commit()
 print('Logging in %s' % USERNAME)
 r = praw.Reddit(USERAGENT)
 r.login(USERNAME, PASSWORD, disable_warning=True)
-
+START_TIME = time.time()
 
 def get_page_content(pagename):
 	subreddit = r.get_subreddit(SUBREDDIT)
@@ -139,8 +147,7 @@ def update_wikipage(author, submission, newuser=False):
 		content = WIKI_PAGE_INITIAL_TEXT.replace('_author_', author)
 	newtext = WIKI_POST_FORMAT
 	newtext = newtext.replace('_title_', submission.title)
-	shortlink = 'http://redd.it/%s' % submission.id
-	newtext = newtext.replace('_permalink_', shortlink)
+	newtext = newtext.replace('_permalink_', submission.shortlink)
 	if submission.is_self:
 		newtext = newtext.replace('_text_', submission.selftext)
 	else:
@@ -151,7 +158,7 @@ def update_wikipage(author, submission, newuser=False):
 		if len(complete) > MAX_WIKI_SIZE:
 			print('!! Page %s contains too many characters: %d / %d' % (
 				   len(complete), MAX_WIKI_SIZE))
-			return
+			return 'full'
 	else:
 		complete = content
 
@@ -187,7 +194,9 @@ def biowikibot():
 		if submission.author is None:
 			# Post is deleted. Ignore
 			continue
-
+		if submission.created_utc < START_TIME:
+			# Post made before the bot started. Ignore
+			continue
 		author = submission.author.name
 		cur.execute('SELECT * FROM users WHERE name=?', [author])
 		fetch = cur.fetchone()
@@ -196,7 +205,7 @@ def biowikibot():
 			print('New user: %s' % author)
 			posts = submission.fullname
 			cur.execute('INSERT INTO users VALUES(?, ?)', [author, posts])
-			update_wikipage(author, submission, newuser=True)
+			result = update_wikipage(author, submission, newuser=True)
 
 			subject = MESSAGE_INITIAL_SUBJECT
 			body = MESSAGE_INITIAL_BODY
@@ -210,16 +219,20 @@ def biowikibot():
 			posts = ','.join(posts)
 			cur.execute('UPDATE users SET submissions=? WHERE name=?',
 						[posts, author])
-			update_wikipage(author, submission, newuser=False)
+			result = update_wikipage(author, submission, newuser=False)
 
 			subject = MESSAGE_UPDATE_SUBJECT
 			body = MESSAGE_UPDATE_BODY
 
+		if result == 'full':
+			subject = MESSAGE_FULL_SUBJECT
+			body = MESSAGE_FULL_BODY
+
 		subject = subject.replace('_author_', author)
 		body = body.replace('_author_', author)
-		shortlink = 'http://redd.it/%s' % submission.id
-		body = body.replace('_permalink_', shortlink)
-		send_message(author, subject, body)
+		body = body.replace('_permalink_', submission.shortlink)
+		if result is not None:
+			send_message(author, subject, body)
 
 		sql.commit()
 

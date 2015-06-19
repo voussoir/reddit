@@ -21,8 +21,8 @@ KEYWORDS = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
 # These are the words you are looking for
 KEYAUTHORS = []
 # These are the names of the authors you are looking for
-# Any authors not on this list will not be replied to.
-# Make empty to allow anybody
+# The bot will only reply to authors on this list
+# Keep it empty to allow anybody.
 REPLYSTRING = "Hi hungry, I'm dad."
 # This is the word you want to put in reply
 MAXPOSTS = 100
