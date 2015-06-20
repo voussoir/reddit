@@ -67,10 +67,6 @@ _text_
 # This one puts a horizontal line above each post to separate them
 # Available injectors are _title_, _permalink_, _text_
 
-MAX_WIKI_SIZE = 499 * 1024
-# The apparent character limit for wiki pages
-# Going over 499 kb seems to cause http 500 errors
-
 WIKI_PERMLEVEL = 1
 # Who can edit this page?
 # 0 - Use global wiki settings
@@ -155,16 +151,19 @@ def update_wikipage(author, submission, newuser=False):
 
 	if newtext not in content:
 		complete = content + newtext
-		if len(complete) > MAX_WIKI_SIZE:
-			print('!! Page %s contains too many characters: %d / %d' % (
-				   author, len(complete), MAX_WIKI_SIZE))
-			return 'full'
 	else:
 		complete = content
 
 	print('\tUpdating page text')
 	subreddit = r.get_subreddit(SUBREDDIT)
-	subreddit.edit_wiki_page(author, complete)
+	try:
+		subreddit.edit_wiki_page(author, complete)
+	except praw.errors.PRAWException as e:
+		if e._raw.status_code in [500, 413]:
+			print('\tThe bio page for %s is too full!')
+			return 'full'
+		else:
+			raise e
 	if newuser is True:
 		print('\tAssigning permission')
 		page = subreddit.get_wiki_page(author)
