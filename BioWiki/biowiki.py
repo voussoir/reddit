@@ -35,7 +35,7 @@ Your [submission](_permalink_) to /r/_subreddit_ has been added
 to the bottom of your bio at /r/_subreddit_/wiki/_author_.
 '''
 
-MESSAGE_FULL_SUBJECT = 'Youre /r/_subreddit_ bio is full!'
+MESSAGE_FULL_SUBJECT = 'Your /r/_subreddit_ bio is full!'
 MESSAGE_FULL_BODY = '''
 Hey _author_,
 
@@ -44,7 +44,7 @@ but found that it was too full for me to add more text!
 '''
 # The subject and body of the messages you will to send to users.
 # If you put _author_ in either one of these texts, it will be automatically
-# replaced with their usename.
+# replaced with their username.
 # Feel free to send me a message if you want more injectors
 
 WIKI_PAGE_INITIAL_TEXT = '''

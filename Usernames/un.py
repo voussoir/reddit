@@ -52,7 +52,7 @@ HEADER_BRIEF = '      LAST SCANNED       |   NAME'
 MEMBERFORMAT_FULL = '%s  %s  %s  %s  %s (%s) | %s'
 MEMBERFORMAT_BRIEF = '%s | %s'
 
-MIN_LASTSCAN_DIFF = 86400 * 70
+MIN_LASTSCAN_DIFF = 86400 * 365
 # Don't rescan a name if we scanned it this many days ago
 
 def human(timestamp):
@@ -115,20 +115,20 @@ def reducetonames(users):
 			outlist.add(name.name.lower())
 	return outlist
 
-def userify_list(users):
+def userify_list(users, noskip=False):
 	users = list(reducetonames(users))
 	for username in users:
 		try:
 			preexisting = getentry(name=username)
 			if preexisting is not None:
-				preverify = preexisting[SQL_LASTSCAN]
-				preverify = getnow() - preverify
+				lastscan = preexisting[SQL_LASTSCAN]
+				preverify = getnow() - lastscan
 				preverify = (preverify > MIN_LASTSCAN_DIFF)
-				if not preverify:
+				if not preverify and noskip is False:
 					print('skipping ' + username)
 					continue
 			else:
-				preverify = False
+				preverify = noskip
 			user = r.get_redditor(username, fetch=True)
 			user.preverify = preverify
 			yield user
@@ -137,18 +137,18 @@ def userify_list(users):
 			availability = AVAILABILITY[availability]
 			yield [username, availability]
 
-def process(users, quiet=False, knownid=''):
+def process(users, quiet=False, knownid='', noskip=False):
 	olds = 0
 	if isinstance(users, str):
 		users = [users]
 	if len(users) > 1:
 		knownid=''
-	users = userify_list(users)
-	now = int(getnow())
+	users = userify_list(users, noskip=noskip)
 	current = 0
 	for user in users:
 		current += 1
 		data = [None] * SQL_COLUMNCOUNT
+		now = int(getnow())
 		data[SQL_LASTSCAN] = now
 		preverify=False
 		if isinstance(user, list):
@@ -205,17 +205,14 @@ def smartinsert(data, printprefix='', preverified=False):
 	when accounts were deleted / banned, because it wasn't possible to
 	sql-update without knowing the ID.
 	'''
-	isnew = False
-	
 	print_message(data, printprefix)
-	
-
 	check = False
 	if not preverified:
-		cur.execute('SELECT * FROM users WHERE name=?', [data[SQL_NAME]])
+		cur.execute('SELECT * FROM users WHERE LOWER(name)=?', [data[SQL_NAME].lower()])
 		check = cur.fetchone()
 		check = check is not None
 	if preverified or check:
+		isnew = False
 		data = [
 			data[SQL_IDINT],
 			data[SQL_IDSTR],
@@ -226,8 +223,13 @@ def smartinsert(data, printprefix='', preverified=False):
 			data[SQL_TOTAL_KARMA],
 			data[SQL_AVAILABLE],
 			data[SQL_LASTSCAN],
-			data[SQL_NAME]]
-		cur.execute('UPDATE users SET idint=?, idstr=?, created=?, human=?, link_karma=?, comment_karma=?, total_karma=?, available=?, lastscan=? WHERE name=?', data)
+			data[SQL_NAME],
+			data[SQL_NAME].lower()]
+		cur.execute('UPDATE users SET \
+			idint=?, idstr=?, created=?, \
+			human=?, link_karma=?, comment_karma=?, \
+			total_karma=?, available=?, lastscan=?, \
+			name=? WHERE LOWER(name)=?', data)
 	else:
 		isnew = True
 		cur.execute('INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
@@ -254,16 +256,16 @@ def get_from_listing(sr, limit, listfunction, submissions=True, comments=True, r
 
 	`listfunction` would be praw.objects.Subreddit.get_new for example
 	'''
-	subreddit = r.get_subreddit(sr)
+	subreddit = r.get_subreddit(sr, fetch=sr != 'all')
 	if limit is None:
 		limit = 1000
 	items = []
 	if submissions is True:
-		print('/r/%s, %d submissions' % (sr, limit))
+		print('/r/%s, %d submissions' % (subreddit._fast_name, limit))
 		subreddit.lf = listfunction
 		items += list(subreddit.lf(subreddit, limit=limit))
 	if comments is True:
-		print('/r/%s, %d comments' % (sr, limit))
+		print('/r/%s, %d comments' % (subreddit._fast_name, limit))
 		items += list(subreddit.get_comments(limit=limit))
 
 	items = [x.author for x in items]
@@ -464,13 +466,15 @@ def memberformat_brief(data, spacer='.'):
 	out = MEMBERFORMAT_BRIEF % (lastscan, name)
 	return out
 
-def find(name):
+def find(name, doreturn=False):
 	'''
 	Print the details of a username
 	'''
 	cur.execute('SELECT * FROM users WHERE LOWER(name)=?', [name])
 	f = cur.fetchone()
 	if f:
+		if doreturn:
+			return f
 		print_message(f)
 	else:
 		print(f)

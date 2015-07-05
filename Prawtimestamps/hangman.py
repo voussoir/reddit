@@ -31,10 +31,10 @@ def out(*text):
 	print(*text, file=outfile)
 
 def frequencydict(datalist):
-	dataset = set(datalist)
 	datadict = {}
-	for item in dataset:
-		datadict[item] = datalist.count(item)
+	print('freq')
+	for item in datalist:
+		datadict[item] = datadict.get(item, 0) + 1
 	return datadict
 
 def average(datalist):
@@ -113,6 +113,7 @@ def main():
 	scores_total.sort(key=lambda x: x[0], reverse=True)
 	scores_living.sort(key=lambda x: x[0], reverse=True)
 	scores_nonliving.sort(key=lambda x: x[0], reverse=True)
+	print('Measuring scores')
 	out('Average score: %d' % (average([x[0] for x in scores_total])))
 	out('Average score of living: %d' % (average([x[0] for x in scores_living])))
 	out('Average score of deleted: %d' % (average([x[0] for x in scores_nonliving])))
@@ -128,15 +129,17 @@ def main():
 	duplicates_total = sum([len(freq_total[x]) for x in freq_total])
 	duplicates_living = sum([len(freq_living[x]) for x in freq_living])
 	duplicates_nonliving = sum([len(freq_nonliving[x]) for x in freq_nonliving])
+	print('Measuring reposts')
 	out('Submissions with the same link as another: %d' % duplicates_total)
 	out('Submissions living with the same link as another living: %d' % duplicates_living)
 	out('Submissions deleted with the same link as another deleted: %d' % duplicates_nonliving)
 	out('Submissions deleted with the same link as another living: %d' % (duplicates_total - (duplicates_living+duplicates_nonliving)))
 	out(dictformat(freq_total))
 	out('')
-	freq_total = frequencydict([x.subreddit.display_name for x in living+nonliving])
-	freq_living = frequencydict([x.subreddit.display_name for x in living])
-	freq_nonliving = frequencydict([x.subreddit.display_name for x in nonliving])
+	print('Measuring subreddits')
+	freq_total = frequencydict([x.subreddit._fast_name for x in living+nonliving])
+	freq_living = frequencydict([x.subreddit._fast_name for x in living])
+	freq_nonliving = frequencydict([x.subreddit._fast_name for x in nonliving])
 	out('Subreddits posted to: %d' % len(freq_total))
 	out('Subreddits posted to, living: %d' % len(freq_living))
 	out('Subreddits posted to, deleted: %d' % len(freq_nonliving))
@@ -144,7 +147,7 @@ def main():
 		karma = 0
 		deletions = 0
 		for post in living+nonliving:
-			if post.subreddit.display_name == subreddit:
+			if post.subreddit._fast_name == subreddit:
 				karma += post.score
 				if post.author is None:
 					deletions += 1

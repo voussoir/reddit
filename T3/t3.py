@@ -1,16 +1,13 @@
 #/u/GoldenSights
+import bot
 import praw
 import time
 import sqlite3
 import datetime
 import random
 
-USERAGENT = """
-/u/GoldenSights T3 data collection: Gathering Submission data for
-statistical analysis.
-More info at https://github.com/voussoir/reddit/tree/master/T3
-"""
-r = praw.Reddit(USERAGENT)
+r = praw.Reddit(bot.aG)
+#r.login(bot.uG, bot.pG)
 print('Connected to reddit.')
 
 sql = sqlite3.connect('D:/T3/t3.db')
@@ -94,7 +91,7 @@ def process(idstr, ranger=0):
 	for x in range(ranger):
 		# Take the last item in the list and get its ID in decimal
 		# Then add the next `ranger` IDs into the list
-		idstr.append(b36(last+x))
+		idstr.append(b36(last+x+1))
 	idstr = remove_existing(idstr)
 	idstr = verify_t3(idstr)
 	while len(idstr) > 0:
@@ -102,17 +99,17 @@ def process(idstr, ranger=0):
 		print('(%d) %s > %s' % (len(idstr), hundred[0], hundred[-1]))
 		try:
 			items = list(r.get_submissions(hundred))
-		except praw.requests.exceptions.HTTPError as e:
+		except praw.errors.HTTPException as e:
 			# 404 error means no posts exist for that ID.
 			# So we know there's no posts here, and continue on
 			# Anything other than 404, we need to hear about please
-			if e.response.status_code != 404:
+			if e._raw.status_code != 404:
 				raise e
 			items = []
 			pass
 		idstr = idstr[100:]
 		for item in items:
-			print(' %s, %s' % (item.fullname, item.subreddit.display_name))
+			print(' %s, %s' % (item.fullname, item.subreddit._fast_name))
 			item = dataformat(item)
 			# Preverification happens via remove_existing
 			smartinsert(item, preverified=True)
@@ -156,7 +153,7 @@ def dataformat(item):
 	if author is not None:
 		author = author.name
 	data[SQL_AUTHOR] = author
-	data[SQL_SUBREDDIT] = item.subreddit.display_name
+	data[SQL_SUBREDDIT] = item.subreddit._fast_name
 	data[SQL_SELF] = 1 if item.is_self else 0
 	data[SQL_NSFW] = 1 if item.over_18 else 0
 	data[SQL_TITLE] = item.title
@@ -268,7 +265,7 @@ def process(itemid, log=True, kill=True, updates=False):
 		item.created_utc = int(item.created_utc)
 		item.is_self = 1 if item.is_self else 0
 		item.over_18 = 1 if item.over_18 else 0
-		item.sub = item.subreddit.display_name
+		item.sub = item.subreddit._fast_name
 		item.textlen = len(item.selftext)
 		try:
 			item.auth = item.author.name

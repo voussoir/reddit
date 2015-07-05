@@ -1,16 +1,17 @@
 #/u/GoldenSights
-import praw # simple interface to the reddit API, also handles rate limiting of requests
 import bot
-import time
-import sqlite3
 import datetime
-import urllib
 import json
-import sys
-import random
 import os
-import tkinter
+import praw
+import random
+import string
+import sqlite3
 import subprocess
+import sys
+import time
+import tkinter
+import urllib
 
 '''USER CONFIGURATION'''
 
@@ -25,6 +26,7 @@ WAIT = 20
 
 WAITS = str(WAIT)
 
+GOODCHARS = string.ascii_letters + string.digits + '_'
 
 sql = sqlite3.connect('sql.db')
 cur = sql.cursor()
@@ -98,13 +100,16 @@ SUBMISSION_TYPE = {
 LOWERBOUND_STR = '2qh0j'
 LOWERBOUND_INT = 4594339
 
-MEMBERFORMAT = '{idstr}, {human}, {nsfw}, {name}{spacer}{subscribers}'
+MEMBERFORMAT = '_idstr_, _human_, _nsfw_, _name__spacer__subscribers_'
 
 
 def human(timestamp):
 	day = datetime.datetime.utcfromtimestamp(timestamp)
 	human = datetime.datetime.strftime(day, "%b %d %Y %H:%M:%S UTC")
 	return human
+
+def now():
+	return datetime.datetime.now(datetime.timezone.utc).timestamp()
 
 def processi(sr, doupdates=True, enablekilling=False):
 	global olds
@@ -199,7 +204,7 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True, isjumb
 				olds += 1
 			if not delaysaving and not nosave:
 				sql.commit()
-		except praw.requests.exceptions.HTTPError:
+		except praw.errors.HTTPException:
 			print('HTTPError:', sub)
 	if not nosave:			
 		sql.commit()
@@ -247,7 +252,7 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, delaysa
 							processmega([item])
 
 				remaining -= len(subset)
-			except praw.requests.exceptions.HTTPError as e:
+			except praw.errors.HTTPException as e:
 				print(e)
 				print(vars(e))
 				if docrash:
@@ -508,13 +513,13 @@ def memberformat(member, spacerchar='.'):
 	subscribers = '{0:,}'.format(member[SQL_SUBSCRIBERS])
 	spacer = 35 - (len(name) + len(subscribers))
 	spacer = spacerchar * spacer
-	member = MEMBERFORMAT.format(
-		idstr=idstr,
-		human=human,
-		nsfw=nsfw,
-		name=name,
-		spacer=spacer,
-		subscribers=subscribers)
+	member = MEMBERFORMAT
+	member = member.replace('_idstr_', idstr)
+	member = member.replace('_human_', human)
+	member = member.replace('_nsfw_', str(nsfw))
+	member = member.replace('_name_', name)
+	member = member.replace('_spacer_', spacer)
+	member = member.replace('_subscribers_', subscribers)
 	return member
 
 def commapadding(s, spacer, spaced, left=True, forcestring=False):
@@ -634,74 +639,77 @@ def b36(i):
 	if type(i) == str:
 		return base36decode(i)
 
-def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, idd="", doreturn=False):
+def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, doreturn=False):
 	"""
 	Search for a subreddit by name
-	*str query= The search query
+	*str query = The search query
 	    "query"    = results where "query" is in the name
 	    "*query"   = results where "query" is at the end of the name
 	    "query*"   = results where "query" is at the beginning of the name
-	    "*querry*" = results where "query" is in the middle of the name
+	    "*query*" = results where "query" is in the middle of the name
 	bool casesense = is the search case sensitive
 	list filterout = [list, of, words] to omit from search. Follows casesense
 	int subscribers = minimum number of subscribers
-	int nsfwmode=
+	int nsfwmode =
 	  0 - Clean only
 	  1 - Dirty only
 	  2 - All
 	"""
-
-	if idd == "":
-		cur.execute('SELECT * FROM subreddits WHERE name !=?', ['?'])
-		fetched = cur.fetchall()
-		fetched.sort(key=lambda x: x[SQL_NAME].lower())
-
-		results = []
-		if not casesense:
-			query = query.lower()
-			for x in range(len(filterout)):
-				filterout[x] = filterout[x].lower()
-
-		#print(len(fetched))
-		for subreddit in fetched:
-			item = subreddit[SQL_NAME]
-			if nsfwmode==2 or (subreddit[SQL_NSFW] == "1" and nsfwmode == 1) or (subreddit[SQL_NSFW] == "0" and nsfwmode == 0):
-				if not casesense:
-					item = item.lower()
-				querl = query.replace('*', '')
-				if querl in item:
-					#print(item)
-					if all(filters not in item for filters in filterout):
-						itemsplit = item.split(querl)
-						if ':' in query:
-							if (query[-1] == '*' and query[0] != '*') and itemsplit[0] == '':
-								results.append(subreddit)
-				
-							if (query[0] == '*' and query[-1] != '*') and itemsplit[-1] == '':
-								results.append(subreddit)
-				
-							if (query[-1] == '*' and query[0] == '*') and (itemsplit[0] != '' and itemsplit[-1] != ''):
-								results.append(subreddit)
-			
-						else:
-							results.append(subreddit)
-					else:
-						#print('Filtered', item)
-						pass
-
-		if not doreturn:
-			for item in results:
-				item = str(item)
-				item = item.replace("'", '')
-				print(item)
-			print()
-		else:
-			return results
-
+	querys = ''.join([c for c in query if c in GOODCHARS])
+	queryx = '%%%s%%' % querys
+	if '!' in query:
+		cur.execute('SELECT * FROM subreddits WHERE name LIKE ?', [querys])
+		return cur.fetchone()
+	if nsfwmode in [0,1]:
+		cur.execute('SELECT * FROM subreddits WHERE name LIKE ? AND subscribers > ? AND nsfw=?', [queryx, subscribers, nsfwmode])
 	else:
-		cur.execute('SELECT * FROM subreddits WHERE idint=?', [b36(idd)])
-		f = cur.fetchone()
-		print(f)
+		cur.execute('SELECT * FROM subreddits WHERE name LIKE ? AND subscribers > ?', [queryx, subscribers])
+
+	results = []
+	if casesense is False:
+		querys = querys.lower()
+		filterout = [x.lower() for x in filterout]
+
+	if '*' in query:
+		positional = True
+		front = query[-1] == '*'
+		back = query[0] == '*'
+		if front and back:
+			mid = True
+			front = False
+			back = False
+		else:
+			mid = False
+	else:
+		positional = False
+
+	lenq = len(querys)
+	for item in fetchgenerator():
+		name = item[SQL_NAME]
+		if casesense is False:
+			name = name.lower()
+		if querys not in name:
+			#print('%s not in %s' % (querys, name))
+			continue
+		if (positional and front) and (name[:lenq] != querys):
+			#print('%s not front %s (%s)' % (querys, name, name[:lenq]))
+			continue
+		if (positional and back) and (name[-lenq:] != querys):
+			#print('%s not back %s (%s)' % (querys, name, name[-lenq:]))
+			continue
+		if (positional and mid) and (querys not in name[1:-1]):
+			#print('%s not mid %s (%s)' % (querys, name, name[1:-1]))
+			continue
+		if any(filters in name for filters in filterout):
+			#print('%s not filter %s' % (querys, name))
+			continue
+		results.append(item)
+
+	if doreturn is True:
+		return results
+	else:
+		for item in results:
+			print(item)
 
 def cls():
 	os.system('cls')
@@ -885,6 +893,8 @@ def completesweep(shuffle=False, sleepy=0, query=None):
 		cur2.execute('SELECT idstr FROM subreddits WHERE created > 0')
 	elif query == 'subscribers':
 		cur2.execute('SELECT idstr FROM subreddits WHERE created > 0 ORDER BY subscribers DESC')
+	elif query == 'restricted':
+		cur2.execute('SELECT idstr FROM subreddits WHERE created > 0 AND subreddit_type != 0 ORDER BY subscribers DESC')
 	else:
 		cur2.execute(query)
 
