@@ -6,8 +6,7 @@ import sqlite3
 import datetime
 import random
 
-r = praw.Reddit(bot.aG)
-#r.login(bot.uG, bot.pG)
+r = bot.oG()
 print('Connected to reddit.')
 
 sql = sqlite3.connect('D:/T3/t3.db')
@@ -109,7 +108,7 @@ def process(idstr, ranger=0):
 			pass
 		idstr = idstr[100:]
 		for item in items:
-			print(' %s, %s' % (item.fullname, item.subreddit._fast_name))
+			print(' %s, %s' % (item.fullname, item.subreddit.display_name))
 			item = dataformat(item)
 			# Preverification happens via remove_existing
 			smartinsert(item, preverified=True)
@@ -153,7 +152,7 @@ def dataformat(item):
 	if author is not None:
 		author = author.name
 	data[SQL_AUTHOR] = author
-	data[SQL_SUBREDDIT] = item.subreddit._fast_name
+	data[SQL_SUBREDDIT] = item.subreddit.display_name
 	data[SQL_SELF] = 1 if item.is_self else 0
 	data[SQL_NSFW] = 1 if item.over_18 else 0
 	data[SQL_TITLE] = item.title
@@ -229,232 +228,3 @@ def human(timestamp):
 def lastitem():
 	cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
 	return cur.fetchone()[SQL_IDSTR]
-
-'''
-def process(itemid, log=True, kill=True, updates=False):
-	if isinstance(itemid, str):
-		itemid = [itemid]
-	if isinstance(itemid, list):
-		if isinstance(itemid[0], str):
-			itemid = verify_t3(itemid)
-			try:
-				if not updates:
-					itemid = remove_existing(itemid)
-				temp = itemid[:]
-			except Exception:
-				return
-			itemid = r.get_info(thing_id=itemid)
-	try:
-		len(itemid)
-	except:
-		print(temp, "DEAD")
-		if kill:
-			for item in temp:
-				logdead(item)
-		return
-	for index in range(len(itemid)):
-		item = itemid[index]
-		item.idint = b36(item.id)
-		item.idstr = item.id
-		if item.distinguished is None:
-			item.distinguished = 0
-		else:
-			item.distinguished = DISTINGUISHMAP_R[item.distinguished]
-
-		item.url = "self" if item.is_self else item.url
-		item.created_utc = int(item.created_utc)
-		item.is_self = 1 if item.is_self else 0
-		item.over_18 = 1 if item.over_18 else 0
-		item.sub = item.subreddit._fast_name
-		item.textlen = len(item.selftext)
-		try:
-			item.auth = item.author.name
-		except AttributeError:
-			item.auth = "[deleted]"
-
-		item = [item.idint, item.idstr, item.created_utc,
-		item.is_self, item.over_18, item.auth, item.title,
-		item.url, item.selftext, item.score, item.sub,
-		item.distinguished, item.textlen, item.num_comments]
-
-		itemid[index] = item
-
-	if log:
-		logdb(itemid)
-	else:
-		return itemid
-	if len(itemid) < len(temp):
-		process(temp)
-#  0 - idint
-#  1 - idstr
-#  2 - created
-#  3 - self
-#  4 - nsfw
-#  5 - author
-#  6 - title
-#  7 - url
-#  8 - selftext
-#  9 - score
-# 10 - subreddit
-# 11 - distinguished
-# 12 - textlen
-# 13 - num_comments
-def logdb(items):
-	for item in items:
-		cur.execute('SELECT * FROM posts WHERE idint=?', [item[0]])
-		if cur.fetchone():
-			cur.execute('DELETE FROM posts WHERE idint=?', [item[0]])
-		cur.execute('INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', item)
-		print(item[1], item[10])
-	sql.commit()
-
-def logdead(i):
-	#If an ID is dead, let's at least add it to the db.
-	i = i.replace('t3_', '')
-	data = [b36(i), i, 0, 0, 0, '?', '?', '?', '?', 0, '?', 0, 0, -1]
-	logdb([data])
-
-def verify_t3(items):
-	for index in range(len(items)):
-		i = items[index]
-		if 't3_' not in i:
-			items[index] = 't3_' + i
-	return items
-
-def remove_existing(items):
-	done = False
-	items = verify_t3(items)
-	while not done:
-		done = True
-		for item in items:
-			cur.execute('SELECT * FROM posts WHERE idint=? AND created != 0', [b36(item[3:])])
-			f = cur.fetchone()
-			if f:
-				items.remove(item)
-				done = False
-				break
-	if len(items) == 0:
-		raise Exception("Nothing new")
-	return items
-
-def processrange(lower, upper, kill=True, updates=False):
-	if isinstance(lower, str):
-		lower = b36(lower)
-		if isinstance(upper, int):
-			upper = lower + upper
-	if isinstance(upper, str):
-		upper = b36(upper)
-	if upper <= lower:
-		print("Upper must be higher than lower")
-		return
-	ids = [b36(x) for x in range(lower, upper)]
-	processchunks(ids, kill, updates)
-
-def processchunks(ids, kill=True, updates=False):
-	while len(ids) > 0:
-		p = ids[:100]
-		print("%s >>> %s (%d)" % (p[0], p[-1], len(ids)))
-		ids = ids[100:]
-		process(p, kill=kill, updates=updates)
-
-def show():
-	filea = open('show/missing.txt', 'w')
-	fileb = open('show/stats.txt', 'w')
-
-	totalcount = 0
-	totaltitle = 0
-	totalselftext = 0
-	totalscore = 0
-	deadcount = 0
-	selfcount = 0
-	nsfwcount = 0
-	distinguishcount_m = 0
-	distinguishcount_a = 0
-	commentcount = 0
-	subredditcounts = {}
-	dead = []
-	
-	cur.execute('SELECT * FROM posts')
-	post = cur.fetchone()
-	while post:
-		post = Post(post)
-		totalcount += 1
-		if post.created_utc == 0:
-			deadcount += 1
-			dead.append(post.idstr)
-			post = cur.fetchone()
-			continue
-		if post.is_self:
-			selfcount += 1
-			totalselftext += post.textlen
-		if post.over_18:
-			nsfwcount += 1
-		if post.distinguished_int == 1:
-			distinguishcount_m += 1
-		elif post.distinguished_int == 2:
-			distinguishcount_a += 1
-		totalscore += post.score
-		totaltitle += len(post.title)
-		if post.num_comments > 0:
-			commentcount += 1
-
-		try:
-			subredditcounts[post.subreddit] += 1
-		except KeyError:
-			subredditcounts[post.subreddit] = 1
-
-		post = cur.fetchone()
-
-	for deaditem in dead:
-		print(deaditem, file=filea)
-	filea.close()
-
-
-	currenttime = datetime.datetime.now()
-	currenttime = datetime.datetime.strftime(currenttime, "%B %d %Y %H:%M:%S")
-	currenttimes = "Updated %s\n" % currenttime
-
-	counts = '{0:,}'.format(totalcount)
-	mainstats = '%s posts collected; ' % counts
-	mainstats += '%s dead.\n' % '{0:,}'.format(deadcount)
-
-	linkcount = (totalcount - deadcount) - selfcount
-	selfs = '{0:,}'.format(selfcount)
-	links = '{0:,}'.format(linkcount)
-	selfstats = '%s linkposts; %s selfposts\n' % (links, selfs)
-
-	readmefile = open('README.md', 'r')
-	readmelines = readmefile.readlines()
-	readmefile.close()
-	readmelines[3] = currenttimes
-	readmelines[4] = mainstats
-	readmelines[5] = selfstats
-
-	readmefile = open('README.md', 'w')
-	readmefile.write(''.join(readmelines))
-	readmefile.close()
-
-
-	subkeys = list(subredditcounts.keys())
-	subkeys.sort(key=subredditcounts.get, reverse=True)
-	print('Total: %s' % '{0:,}'.format(totalcount), file=fileb)
-	print('Dead: %s' % '{0:,}'.format(deadcount), file=fileb)
-	print('Self: %s' % '{0:,}'.format(selfcount), file=fileb)
-	print('Link: %s' % '{0:,}'.format(linkcount), file=fileb)
-	print('NSFW: %s' % '{0:,}'.format(nsfwcount), file=fileb)
-	print('Distinguished by mods: %s' % '{0:,}'.format(distinguishcount_m), file=fileb)
-	print('Distinguished by admins: %s' % '{0:,}'.format(distinguishcount_a), file=fileb)
-	print('Total upvotes: %s' % '{0:,}'.format(totalscore), file=fileb)
-	print('Total characters in titles: %s' % '{0:,}'.format(totaltitle), file=fileb)
-	print('Total characters in selftext: %s' % '{0:,}'.format(totalselftext), file=fileb)
-	print('Total (supposed) comments on posts: %s' % '{0:,}'.format(commentcount), file=fileb)
-	print('\n\n', file=fileb)
-	for key in subkeys:
-		out = key
-		out += '.'*(25-len(key))
-		num = '{0:,}'.format(subredditcounts[key])
-		out += '.'*(14-len(num))
-		out += num
-		print(out, file=fileb)
-	fileb.close()
-'''

@@ -4,7 +4,7 @@ import datetime
 import time
 
 
-USERAGENT = '/u/Goldensights ScoreStats. Collecting information from the top posts from multiple subreddits to see how various criteria may affect score'
+USERAGENT = ""
 
 r = praw.Reddit(USERAGENT)
 

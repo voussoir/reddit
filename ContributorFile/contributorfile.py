@@ -4,16 +4,13 @@ import praw
 import getpass
 
 """ USER CONFIGURATION """
-USERNAME = input("Username: ")
-# You must be a moderator of the subreddit with Contributor permission
-PASSWORD = getpass.getpass("Password (hidden): ")
-# The password to your account.
-# For alternatives, 
-# https://github.com/voussoir/reddit#concerned-about-your-password
-USERAGENT = """
-/u/%s using the ContributorFile 1.0 tool by /u/GoldenSights.
-Automatically adds names from a file as contributors to a subreddit
-""" % USERNAME
+
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
+USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter Bot".
 
 SUBREDDIT = input("Subreddit: /r/")
@@ -24,15 +21,14 @@ FILENAME = input('File: ')
 
 try:
     import bot
-    USERNAME = bot.uG
-    PASSWORD = bot.pG
     USERAGENT = bot.aG
 except ImportError:
     pass
 
 print('Logging in...')
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD) 
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def contributorfile():
 	subreddit = r.get_subreddit(SUBREDDIT)
