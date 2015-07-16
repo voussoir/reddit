@@ -22,7 +22,11 @@ STRFTIME = '%d %b %Y %H:%M:%S'
 MODMAIL = True
 ''' All done! '''
 
-sql = sqlite3.connect('messagearchive.db')
+if MODMAIL:
+    dbname = 'messagearchive_mod.db'
+else:
+    dbname = 'messagearchive.db'
+sql = sqlite3.connect(dbname)
 cur = sql.cursor()
 cur.execute(('CREATE TABLE IF NOT EXISTS messages('
              'idstr TEXT,'
@@ -160,7 +164,10 @@ def build_tree():
 
 def render_txt(keys, roots):
     print('Rendering text')
-    outfile = open('render_txt.txt', 'w', encoding='utf-8')
+    if MODMAIL:
+        outfile = open('render_mod_txt.txt', 'w', encoding='utf-8')
+    else:
+        outfile = open('render_txt.txt', 'w', encoding='utf-8')
     threads = []
     for key in keys:
         threadtext = []
