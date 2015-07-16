@@ -41,8 +41,8 @@ SQL_LASTSCAN = 9
 print('Logging in.')
 USERAGENT = "/u/GoldenSights Usernames data collection: Gathering the creation dates of user accounts in the interest of information.\
  More at https://github.com/voussoir/reddit/tree/master/Usernames"
-r = praw.Reddit(USERAGENT)
-r.login(bot.uG, bot.pG)
+# http://redd.it/3cm1p8
+r = bot.oG()
 
 
 AVAILABILITY = {True:'available', False:'unavailable', 'available':1, 'unavailable':0}
@@ -261,11 +261,11 @@ def get_from_listing(sr, limit, listfunction, submissions=True, comments=True, r
 		limit = 1000
 	items = []
 	if submissions is True:
-		print('/r/%s, %d submissions' % (subreddit._fast_name, limit))
+		print('/r/%s, %d submissions' % (subreddit.display_name, limit))
 		subreddit.lf = listfunction
 		items += list(subreddit.lf(subreddit, limit=limit))
 	if comments is True:
-		print('/r/%s, %d comments' % (subreddit._fast_name, limit))
+		print('/r/%s, %d comments' % (subreddit.display_name, limit))
 		items += list(subreddit.get_comments(limit=limit))
 
 	items = [x.author for x in items]

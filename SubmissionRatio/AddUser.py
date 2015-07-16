@@ -18,9 +18,7 @@ comments = 0
 
 
 try:
-	import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-	USERNAME = bot.uG
-	PASSWORD = bot.pG
+	import bot
 	USERAGENT = bot.aG
 except ImportError:
     pass
