@@ -7,10 +7,11 @@ import sys
 
 ''' USER CONFIG '''
 
-USERNAME  = ""
-# This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = ""
-# This is the bot's Password. 
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ""
 # This is a short description of what the bot does. 
 # For example "/u/GoldenSights' Newsletter bot to notify of new posts"
@@ -58,8 +59,6 @@ ERROR_WAIT = 20
 
 try:
 	import bot
-	USERNAME = bot.uG
-	PASSWORD = bot.pG
 	USERAGENT = bot.aG
 except ImportError:
 	pass
@@ -70,10 +69,10 @@ cur.execute('CREATE TABLE IF NOT EXISTS users(name TEXT)')
 cur.execute('CREATE INDEX IF NOT EXISTS userindex on users(name)')
 sql.commit()
 
-print('Logging in %s' % USERNAME)
+print('Logging in')
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD)
-del PASSWORD
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def welcomebot():
 	print('Scanning /r/%s' % SUBREDDIT)

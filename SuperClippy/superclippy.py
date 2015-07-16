@@ -10,12 +10,11 @@ import praw
 '''USER CONFIGURATION'''
 
 """GENERAL"""
-USERNAME  = "Clippy_Office_Asst"
-# This is the bot's Username. In order to send mail, he must have some amount
-# of Karma.
-PASSWORD  = ""
-# This is the bot's Password. 
-# Replace the quotes with `input("Password: ")` to be prompted at startup.
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = "/r/Excel Clippy Office Assistant all-in-one moderator."
 # This is a short description of what the bot does.
 # For example "/u/GoldenSights' Newsletter bot"
@@ -521,7 +520,7 @@ class ClippyReference:
 				cur.execute('SELECT * FROM clippy_reference WHERE ID=?',[cid])
 				if not cur.fetchone():
 					print('\t' + cid)
-					if cauthor.lower() != USERNAME.lower():
+					if cauthor.lower() != r.user.name.lower():
 						cbody = comment.body.lower()
 					
 						if DICT_LEVENSHTEIN == True:
@@ -622,15 +621,13 @@ if __name__ == "__main__":
 	print('Logging in...', end="")
 	try:
 		import bot
-		USERNAME = bot.uG
-		PASSWORD = bot.pG
 		USERAGENT = bot.aG
 	except ImportError:
 		pass
 	sys.stdout.flush()
 	r = praw.Reddit(USERAGENT)
-	r.login(USERNAME, PASSWORD)
-	del PASSWORD
+	r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+	r.refresh_access_information(APP_REFRESH)
 	print('done.')
 	print('Starting Points...', end="")
 	clippypoints = ClippyPoints()

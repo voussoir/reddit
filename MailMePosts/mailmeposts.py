@@ -6,12 +6,13 @@ import sqlite3
 
 '''USER CONFIGURATION'''
 
-USERNAME  = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = ""
-#This is the bot's Password. 
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 RECIPIENT = "GoldenSights"
-#The username that will receive this PM. It can be the same as USERNAME if you want to
+#The username that will receive this PM. It can be your username if you want to
 MTITLE = "MailMePost"
 #This will be the title of the PM that you get
 USERAGENT = ""
@@ -33,9 +34,7 @@ WAIT = 20
 
 WAITS = str(WAIT)
 try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
+    import bot
     USERAGENT = bot.getaG()
 except ImportError:
     pass
@@ -50,7 +49,8 @@ print('Loaded Completed table')
 sql.commit()
 
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD) 
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def scanSub():
     print('Searching '+ SUBREDDIT + '.')

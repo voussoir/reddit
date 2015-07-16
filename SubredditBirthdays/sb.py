@@ -58,8 +58,8 @@ SQL_SUBREDDIT_TYPE = 8
 SQL_SUBMISSION_TYPE = 9
 
 print('Logging in.')
-r = praw.Reddit(USERAGENT)
-r.login(bot.uG, bot.pG)
+# http://redd.it/3cm1p8
+r = bot.oG()
 
 olds = 0
 noinfolist = []
@@ -639,7 +639,7 @@ def b36(i):
 	if type(i) == str:
 		return base36decode(i)
 
-def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, doreturn=False):
+def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, doreturn=False, sort=None):
 	"""
 	Search for a subreddit by name
 	*str query = The search query
@@ -654,6 +654,8 @@ def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, d
 	  0 - Clean only
 	  1 - Dirty only
 	  2 - All
+	int sort = The integer representing the sql column to sort by. Defaults
+	           to no sort.
 	"""
 	querys = ''.join([c for c in query if c in GOODCHARS])
 	queryx = '%%%s%%' % querys
@@ -705,6 +707,8 @@ def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, d
 			continue
 		results.append(item)
 
+	if sort is not None:
+		results.sort(key=lambda x: x[sort], reverse=True)
 	if doreturn is True:
 		return results
 	else:

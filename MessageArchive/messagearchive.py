@@ -1,165 +1,207 @@
-#/u/Goldensights
+# /u/Goldensights
 
-import praw
-import time
-import sqlite3
 import datetime
+import json
+import praw
+import sqlite3
+import sys
+import textwrap
 
 '''USER CONFIG'''
-
-USERNAME  = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = ""
-#This is the bot's Password. 
 USERAGENT = ""
-#This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-MAXPOSTS = 300
-#This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 30
-#This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
-VERBOSE = False
-#IF Verbose is set to true, the console will spit out a lot more information. Use True or False (Use capitals! No quotations!)
-PRINTFILE = 'messages.txt'
-#This is the file, in the same directory as the .py file, where the messages are stored
-ITEMTYPE = 't4'
-#The type of item to gather. t4 is a PM
-'''All done!'''
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
+WIDTH = 120
+DO_TEXTWRAP = True
+# Wrap the text to line width of WIDTH
+SEPARATOR = '\n\n*%s*\n\n' % ('='*(WIDTH-2))
+STRFTIME = '%d %b %Y %H:%M:%S'
+MODMAIL = True
+''' All done! '''
 
+sql = sqlite3.connect('messagearchive.db')
+cur = sql.cursor()
+cur.execute(('CREATE TABLE IF NOT EXISTS messages('
+             'idstr TEXT,'
+             'parent_id TEXT,'
+             'author TEXT,'
+             'dest TEXT,'
+             'subject TEXT,'
+             'body TEXT,'
+             'created INT,'
+             'first_message TEXT,'
+             'link_id TEXT)'))
 
+cur.execute('CREATE INDEX IF NOT EXISTS idindex ON messages(idstr)')
 
-clistfile = open(PRINTFILE, "a+")
-clistfile.close()
-#This is a hackjob way of creating the file if it does not exist
+SQL_COLUMNCOUNT = 9
+SQL_IDSTR = 0
+SQL_PARENT_ID = 1
+SQL_AUTHOR = 2
+SQL_DEST = 3
+SQL_SUBJECT = 4
+SQL_BODY = 5
+SQL_CREATED = 6
+SQL_FIRST_MESSAGE = 7
+SQL_LINK_ID = 8
 
-WAITS = str(WAIT)
+#####
+
 try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.uG
-    PASSWORD = bot.pG
+    import bot
     USERAGENT = bot.aG
+    APP_ID = bot.oG_id
+    APP_SECRET = bot.oG_secret
+    APP_URI = bot.oG_uri
+    APP_REFRESH = bot.oG_scopes['all']
 except ImportError:
     pass
 
-sql = sqlite3.connect('sql.db')
-print('Loaded SQL Database')
-cur = sql.cursor()
 
-cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
-print('Loaded Completed table')
+def fetchgenerator():
+    while True:
+        fetch = cur.fetchone()
+        if fetch is None:
+            break
+        yield fetch
 
-sql.commit()
+def smartinsert(item, nosave=False):
+    '''
+    Given an inboxed item, compile the necessary information into a
+    database row.
 
-r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD)
+    Return the number of new items (only 0 or 1)
+    '''
+    cur.execute('SELECT * FROM messages WHERE idstr=?', [item.fullname])
+    if cur.fetchone():
+        return 0
+        # not doing any sql updates for this bot
+    data = [None] * SQL_COLUMNCOUNT
+    data[SQL_IDSTR] = item.fullname
+    if not bool(item.parent_id):
+        parent = None
+    else:
+        parent = item.parent_id
+    data[SQL_PARENT_ID] = parent
+    data[SQL_AUTHOR] = item.author.name if item.author else None
+    data[SQL_DEST] = item.dest
+    data[SQL_SUBJECT] = item.subject
+    data[SQL_BODY] = item.body
+    data[SQL_CREATED] = int(item.created_utc)
+    if not bool(item.context):
+        link = None
+    elif '/comments/' in item.context:
+        link = item.context.split('/comments/')[1].split('/')[0]
+        link = 't3_' + link
+    data[SQL_FIRST_MESSAGE] = item.first_message_name
+    data[SQL_LINK_ID] = link
+    cur.execute('INSERT INTO messages VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
+    if nosave is False:
+        sql.commit()
+    return 1
 
-def scanInbox():
-	print('Scanning Received')
-	inbox = r.get_inbox(limit=MAXPOSTS)
-	listo = []
-	selfuser = r.user
-	for item in inbox:
-		iid = item.fullname
-		cur.execute('SELECT * FROM oldposts WHERE id=?', [iid])
-		if not cur.fetchone():
-			if ITEMTYPE in iid:
-				print('\tIn ' + iid)
-				listo.append(item)
-				if item.new:
-					item.mark_as_read()
+def fetch_mail():
+    print('Logging in.')
+    r = praw.Reddit(USERAGENT)
+    r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+    r.refresh_access_information(APP_REFRESH)
+    new = 0
+    if MODMAIL:
+        print('Checking modmail...')
+        mail = list(r.get_mod_mail(limit=None))
+        mail = praw.helpers.flatten_tree(mail)
+        for item in mail:
+            new += smartinsert(item)
+    else:
+        print('Checking inbox... be patient')
+        for item in r.get_inbox(limit=None):
+            new += smartinsert(item)
+        print('Checking outbox...')
+        for item in r.get_sent(limit=None):
+            new += smartinsert(item)
+    print('Collected %d new items.' % new)
 
-			cur.execute('INSERT INTO oldposts VALUES(?)', [iid])
-	sql.commit()
-	return listo
+def build_tree():
+    print('Building message tree')
+    cur.execute('SELECT * FROM messages ORDER BY first_message, idstr ASC')
+    roots = {}
+    for item in fetchgenerator():
+        if item[SQL_PARENT_ID] is None:
+            # For root messages
+            roots[item[SQL_IDSTR]] = [item]
+            continue
+        if 't4_' not in item[SQL_PARENT_ID]:
+            # For comment and submission replies
+            if item[SQL_PARENT_ID] in roots:
+                roots[item[SQL_PARENT_ID]].append(item)
+            else:
+                roots[item[SQL_PARENT_ID]] = [item]
+            continue
+        if 't4_' in item[SQL_PARENT_ID]:
+            # For message replies
+            if item[SQL_FIRST_MESSAGE] in roots:
+                roots[item[SQL_FIRST_MESSAGE]].append(item)
+            else:
+                # Message replies where the root is beyond
+                # the api limitation of 1,000 items.
+                roots[item[SQL_FIRST_MESSAGE]] = [item]
+            continue
+    for root in roots:
+        roots[root].sort(key=lambda x: (int(x[SQL_PARENT_ID].split('_')[1],
+                                        36) if x[SQL_PARENT_ID] else 0,
+                                        x[SQL_CREATED]))
+    keys = list(roots.keys())
+    keys.sort(key=lambda x: roots[x][0][SQL_CREATED], reverse=True)
+    print('Found %d threads' % len(keys))
+    return (keys, roots)
 
-def scanSent():
-	print('Scanning Sent')
-	sent = r.get_sent(limit=MAXPOSTS)
-	listo = []
-	for item in sent:
-		iid = item.fullname
-		cur.execute('SELECT * FROM oldposts WHERE id=?', [iid])
-		if not cur.fetchone():
-			if ITEMTYPE in iid:
-				print('\tOut ' + iid)
-				listo.append(item)
-			cur.execute('INSERT INTO oldposts VALUES(?)', [iid])
-	sql.commit()
-	return listo
+def render_txt(keys, roots):
+    print('Rendering text')
+    outfile = open('render_txt.txt', 'w', encoding='utf-8')
+    threads = []
+    for key in keys:
+        threadtext = []
+        depth = 1
+        if 't3_' in key:
+            depth = 1
+            threadtext.append(('Submission %s received the '
+                               'following replies:') % key)
+        if 't1_' in key:
+            depth = 1
+            threadtext.append(('Comment %s received the '
+                               'following replies:') % key)
+        for item in roots[key]:
+            itemtext = ''
+            d = datetime.datetime.utcfromtimestamp(item[SQL_CREATED])
+            d = d.strftime(STRFTIME)
+            itemtext += '%s %s -> %s: %s %s\n' % (item[SQL_IDSTR],
+                item[SQL_AUTHOR], item[SQL_DEST], d, item[SQL_SUBJECT])
+            body = item[SQL_BODY]
+            if DO_TEXTWRAP:
+                # http://stackoverflow.com/a/26538082 ##########################
+                body = '\n'.join(['\n'.join(textwrap.wrap(line, WIDTH-(4*depth),
+                     break_long_words=True, replace_whitespace=False))##########
+                     for line in body.split('\n')])#############################
+                ################################################################
+            body = body.replace('\n', '\n'+'\t'*depth)
+            body = ('\t'*depth) + body
+            itemtext += body
+            threadtext.append(itemtext)
+        threadtext = '\n\n-\n\n'.join(threadtext)
+        threads.append(threadtext)
+    threads = SEPARATOR.join(threads)
+    outfile.write(threads)
+    outfile.close()
 
-
-def work():
-
-	listi = scanInbox()
-	listo = scanSent()
-	lista = listi + listo
-	lista.sort(key=lambda x: x.created_utc, reverse=False)
-	mcur = 0
-	mlen = len(lista)
-	for item in lista:
-		mcur += 1
-		messagefile = open(PRINTFILE, 'r+')
-		messagelist = []
-		for line in messagefile:
-			messagelist.append(line.strip())
-		messagefile.close()
-		messagefile = open(PRINTFILE, 'w')
-		print(("%06d" % mcur) + '/' + ("%06d" % mlen) + ': Writing item ' + item.id, end='')
-		try:
-			try:
-				pauthor = item.author.name
-			except Exception:
-				pauthor = '[DELETED]'
-			if item.parent_id == None:
-				print(' <= Root')
-				messagelist.append('======================================================')
-				messagelist.append(item.id)
-				messagelist.append(datetime.datetime.fromtimestamp(int(item.created_utc)).strftime("%B %d %Y %H:%M UTC"))
-				if pauthor.lower() == USERNAME.lower():
-					messagelist.append('To ' + item.dest)
-				else:
-					messagelist.append('From ' + pauthor)
-				messagelist.append('Subject: ' + item.subject)
-				messagelist.append(item.body.replace('\n', '//'))
-	
-			else:
-				print()
-				for m in range(len(messagelist)):
-					if item.parent_id[3:] in messagelist[m]:
-	
-						count = '| '
-						tline = messagelist[m]
-						while tline[:2] == '| ':
-							count += '| '
-							tline = tline[2:]
-	
-						messagelist[m+4] += '\n\n' + count + item.id + '\n'
-						messagelist[m+4] += count + datetime.datetime.fromtimestamp(int(item.created_utc)).strftime("%B %d %Y %H:%M UTC") + '\n' + count
-						if pauthor.lower() == USERNAME.lower():
-							messagelist[m+4] += 'To ' + item.dest + '\n'
-						else:
-							messagelist[m+4] +='From ' + pauthor + '\n'
-						messagelist[m+4] += count + 'Subject: ' + item.subject + '\n'
-						messagelist[m+4] += count + item.body.replace('\n', '//')
-		except Exception:
-			print("Emergency save!")
-			for m in messagelist:
-				print(m, file=messagefile)
-				messagefile.close()
-				time.sleep(0.1)
-
-
-		for m in messagelist:
-			print(m, file=messagefile)
-		messagefile.close()
-		#time.sleep(0.1)
-
-
-
-while True:
-    try:
-        work()
-    except Exception as e:
-        print('An error has occured:', str(e))
-    print('Running again in ' + WAITS + ' seconds \n')
-    sql.commit()
-    time.sleep(WAIT)
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        print('Use either of:')
+        print('> messagearchive.py fetch')
+        print('> messagearchive.py render')
+    if 'render' in sys.argv:
+        render_txt(*build_tree())
+    elif 'fetch' in sys.argv:
+        fetch_mail()

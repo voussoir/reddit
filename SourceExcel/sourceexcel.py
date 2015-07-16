@@ -6,10 +6,11 @@ import sqlite3
 
 '''USER CONFIGURATION'''
 
-USERNAME = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD = ""
-#This is the bot's Password. 
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter Bot".
 SUBREDDIT = "GoldTesting"
@@ -41,9 +42,7 @@ CSSWAITING = "waiting"
 
 WAITS = str(WAIT)
 try:
-	import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-	USERNAME = bot.getuG()
-	PASSWORD = bot.getpG()
+	import bot
 	USERAGENT = bot.getaG()
 except ImportError:
 	pass
@@ -56,19 +55,8 @@ print('Loaded Oldposts')
 sql.commit()
 
 r = praw.Reddit(USERAGENT)
-
-Trying = True
-while Trying:
-	try:
-		r.login(USERNAME, PASSWORD)
-		print('Successfully logged in\n')
-		Trying = False
-	except praw.errors.InvalidUserPass:
-		print('Wrong Username or Password')
-		quit()
-	except Exception as e:
-		print("%s" % e)
-		time.sleep(5)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)

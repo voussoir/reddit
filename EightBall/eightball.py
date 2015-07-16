@@ -6,21 +6,23 @@ import random
 
 '''USER CONFIGURATION'''
 
-USERNAME  = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = ""
-#This is the bot's Password. 
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "GoldTesting"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 
-TRIGGERSTRINGA = ["I summon you /u/" + USERNAME, "I summon you great /u/" + USERNAME, "I summon you " + USERNAME, "I summon you great " + USERNAME, "Dear great /u/" + USERNAME, "Dear great " + USERNAME, USERNAME + ", roll the 8-ball", USERNAME + " roll the 8-ball"]
+NAME = ""
+TRIGGERSTRINGA = ["I summon you /u/" + NAME, "I summon you great /u/" + NAME, "I summon you " + NAME, "I summon you great " + NAME, "Dear great /u/" + NAME, "Dear great " + NAME, NAME + ", roll the 8-ball", NAME + " roll the 8-ball"]
 #These will trigger a response from replystringa
 REPLYSTRINGA = ["Yes.", "No.", "That's a stupid question.", "Maybe some day.", "Try asking again.", "You should ask the admins."]
 #This is a list of potential replies. Will be randomized.
 
-TRIGGERSTRINGB = [USERNAME + " is dumb"]
+TRIGGERSTRINGB = [NAME + " is dumb"]
 #A second set of triggers
 REPLYSTRINGB = ["No you."]
 #A second set of responses. Will be randomized
@@ -44,9 +46,7 @@ WAIT = 30
 
 WAITS = str(WAIT)
 try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
+    import bot
     USERAGENT = bot.getaG()
 except ImportError:
     pass
@@ -59,9 +59,10 @@ cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
 print('Loaded Completed table')
 
 sql.commit()
-print("Logging in " + USERNAME)
+print("Logging in " + NAME)
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD) 
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def scanSub():
     print('Scanning ' + SUBREDDIT)

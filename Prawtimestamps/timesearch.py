@@ -6,6 +6,11 @@ import datetime
 import sqlite3
 import sys
 
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ''
 # Enter a useragent
 MAXIMUM_EXPANSION_MULTIPLIER = 2
@@ -15,11 +20,17 @@ MAXIMUM_EXPANSION_MULTIPLIER = 2
 try:
 	import bot
 	USERAGENT = bot.aPT
+	APP_ID = bot.oG_id
+	APP_SECRET = bot.oG_secret
+	APP_URI = bot.oG_uri
+	APP_REFRESH = bot.oG_scopes['all']['refresh']
 except ImportError:
 	pass
 
 print('Connecting to reddit')
 r = praw.Reddit(USERAGENT)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 SQL_COLUMNCOUNT = 16
 SQL_IDINT = 0

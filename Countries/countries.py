@@ -5,10 +5,11 @@ import pytz
 from datetime import datetime
 
 '''USER CONFIGURATION'''
-USERNAME  = "CountryChallengeBot"
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = ""
-#This is the bot's Password. 
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = "Written by /u/GoldenSights. Posts a new wikipedia link to /r/countrychallenge every day at 0:00 GMT so that people may study other parts of the world and discuss them"
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "CountryChallenge"
@@ -48,14 +49,10 @@ clistfile.close()
 #This is a hackjob way of creating the file if it does not exist
 
 WAITS = str(WAIT)
-try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-
-except ImportError:
-    pass
 
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 
 def scanSub():

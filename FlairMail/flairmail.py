@@ -5,10 +5,11 @@ import time
 
 '''USER CONFIGURATION'''
 
-USERNAME  = ""
-#This is the bot's Username. In order to send mail, it must have Karma.
-PASSWORD  = ""
-#This is the bot's Password. 
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ""
 #This is a short description of what the bot does.
 #For example "/u/GoldenSights' Newsletter bot"
@@ -46,15 +47,14 @@ enforced by reddit site-wide.
 
 try:
     import bot
-    USERNAME = bot.uG
-    PASSWORD = bot.pG
     USERAGENT = bot.aG
 except ImportError:
     pass
 
 print('Logging in...')
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def flairmail():
 	print('Getting unread messages')

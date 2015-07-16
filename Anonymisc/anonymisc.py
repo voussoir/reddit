@@ -6,10 +6,11 @@ import sys
 import sqlite3
 
 '''USER CONFIGURATION'''
-USERNAME  = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = ""
-#This is the bot's Password. 
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBRESTRICT = ["GoldTesting", "test"]
@@ -66,7 +67,7 @@ WHITEPM = True
 #Do you want to PM the user when the ADMIN bans or whitelists him?
 #Use True or False (With Capitals! No quotation marks!)
 
-WHITEPASSWORD = "addmetothelist"
+WHITEPASS = "addmetothelist"
 #If the user's PM contains this string anywhere in the body, he will be added to the whitelist.
 
 FIELDPERM = ["Permalink:", "Comment Permalink:", "Comment Link:", "Perma:"]
@@ -93,9 +94,7 @@ ADMIN = ["GoldenSights"]
 
 
 try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuT()
-    PASSWORD = bot.getpT()
+    import bot 
     USERAGENT = bot.getaT()
 except ImportError:
     pass
@@ -118,7 +117,8 @@ sql.commit()
 
 
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD) 
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def scanPM():
     banlist = []
@@ -180,7 +180,7 @@ def scanPM():
                     print('\t[   ] ADMIN has requested the banlist')
                     failoverride = True
                     r.send_message(author, PMTITLE, 'Banned Users:\n\n' + '\n\n'.join(banlist) + '\n\n_____\n\nWhitelisted Users:\n\n' + '\n\n'.join(whitelist), captcha=None)
-            if WHITEPASSWORD.lower() in pm.body.lower():
+            if WHITEPASS.lower() in pm.body.lower():
                 print('\t[   ] ' + author + ' has whitelisted himself using the password')
                 cur.execute('INSERT INTO white VALUES(?)', [author])
                 failoverride = True

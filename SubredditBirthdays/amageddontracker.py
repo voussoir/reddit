@@ -1,3 +1,4 @@
+import traceback
 import time
 import sqlite3
 import praw
@@ -9,7 +10,8 @@ cur = sql.cursor()
 cur2 = sql.cursor()
 
 cur.execute('CREATE INDEX IF NOT EXISTS amaindex ON amageddon(idint)')
-r = bot.rG()
+# http://redd.it/3cm1p8
+r = bot.oG()
 
 DEFAULTS = [
 'announcements','Art','AskReddit','askscience','aww',
@@ -64,7 +66,7 @@ def b36(i):
 		return base36decode(i)
 
 def get_hundred():
-	cur.execute('SELECT * FROM subreddits WHERE subscribers > 50 AND subreddit_type != 2 ORDER BY subscribers DESC')
+	cur.execute('SELECT * FROM subreddits WHERE subscribers > 20 AND subreddit_type != 2 ORDER BY subscribers DESC')
 	while True:
 		hundred = [cur.fetchone() for x in range(100)]
 		hundred = list(filter(None, hundred))
@@ -81,6 +83,7 @@ def human(timestamp):
 def manage():
 	hundredg = get_hundred()
 	for hundred in hundredg:
+		bot.refresh(r)
 		print('checking %s - %s %d' % (hundred[0][SQL_NAME], hundred[-1][SQL_NAME], hundred[-1][SQL_SUBSCRIBERS]))
 		subreddits = r.get_info(thing_id=['t5_' + x[SQL_IDSTR] for x in hundred])
 		hundred.sort(key=lambda x: x[SQL_CREATED])
@@ -102,18 +105,18 @@ def manage():
 			if f:
 				if sub.subreddit_type == 'private' and f[-1] is not None:
 					cur2.execute('UPDATE amageddon SET returntime=? WHERE idint=?', [None, idint])
-					print('  [PRIVATE] %s' % sub._fast_name)
+					print('  [PRIVATE] %s' % sub.display_name)
 					continue
 				if sub.subreddit_type == 'private' or f[-1] is not None:
 					continue
 				returntime = int(now())
-				print('     [OPEN] %s' % sub._fast_name)
+				print('     [OPEN] %s' % sub.display_name)
 				cur2.execute('UPDATE amageddon SET returntime=? WHERE idint=?', [returntime, idint])
 			else:
 				if sub.subreddit_type != 'private':
 					continue
-				data = [idint, sub.id, sub._fast_name, sub.psubs, None]
-				print('  [PRIVATE] %s' % sub._fast_name)
+				data = [idint, sub.id, sub.display_name, sub.psubs, None]
+				print('  [PRIVATE] %s' % sub.display_name)
 				cur2.execute('INSERT INTO amageddon VALUES(?, ?, ?, ?, ?)', data)
 		sql.commit()
 
@@ -156,7 +159,7 @@ def show():
 			bonus += itemf
 		total += 1
 	outtotal = outtotal.format(up=up, down=down, total=total)
-	print(len(outtotal))
+	print(len(outtotal), total)
 	outfile = open('amageddon/outfile.txt', 'w')
 	outfile.write(outtotal)
 	outfile.close()
@@ -164,10 +167,11 @@ def show():
 		outtotal = outtotal[:40000]
 	submission = r.get_info(thing_id='t3_3bypzz')
 	submission.edit(outtotal)
+	print('Edited post')
 	outtotal += bonus
 	s = r.get_subreddit('goldtesting')
 	s.edit_wiki_page('amageddon', outtotal)
-	print(total)
+	print('Edited wiki page')
 
 def forever():
 	while True:
@@ -176,7 +180,7 @@ def forever():
 		except KeyboardInterrupt:
 			break
 		except:
-			pass
+			traceback.print_exc()
 		try:
 			show()
 		except:
