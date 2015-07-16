@@ -11,8 +11,11 @@ import datetime
 FORWARD_FROM = ""
 # This is the bot's username
 # This is the account FROM WHICH mail is forwarded
-PASSWORD = ""
-# This is the bot's password
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ""
 # Describe the bot and what it does. Include your username!
 
@@ -49,8 +52,6 @@ MESSAGE_LINK = "http://www.reddit.com/message/compose/?to=%s&subject=%s"
 
 try:
 	import bot
-	USERNAME = bot.u7
-	PASSWORD = bot.p7
 	USERAGENT = bot.a7
 except ImportError:
 	pass
@@ -62,7 +63,8 @@ cur.execute('CREATE TABLE IF NOT EXISTS unsent(id TEXT, subject TEXT, body TEXT)
 
 print('Logging in')
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 
 def prepareforwards():

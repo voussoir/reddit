@@ -6,12 +6,11 @@ import sqlite3
 
 '''USER CONFIGURATION'''
 
-USERNAME  = ""
-# This is the bot's Username.
-# Accounts will lower karma will run into rate limits at first.
-PASSWORD  = ""
-# This is the bot's Password.
-# See my main github repo for alternatives
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ""
 # This is a short description of what the bot does.
 # For example "Python automatic replybot v2.0 (by /u/GoldenSights)"
@@ -44,12 +43,7 @@ CLEANCYCLES = 10
 '''All done!'''
 
 try:
-    import bot 
-    # This is a file in my python library which contains my
-    # Bot's username and password.
-    # I can push code to Git without showing credentials
-    USERNAME = bot.uG
-    PASSWORD = bot.pG
+    import bot
     USERAGENT = bot.aG
 except ImportError:
     pass
@@ -64,7 +58,8 @@ sql.commit()
 
 print('Logging in...')
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD) 
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def replybot():
     print('Searching %s.' % SUBREDDIT)
@@ -81,7 +76,7 @@ def replybot():
             # Author is deleted. We don't care about this post.
             continue
 
-        if pauthor.lower() in [USERNAME.lower(), MAILME_RECIPIENT.lower()]:
+        if pauthor.lower() in [r.user.name.lower(), MAILME_RECIPIENT.lower()]:
             # Don't reply to yourself, robot!
             print('Will not reply to myself.')
             continue

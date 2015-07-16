@@ -5,10 +5,11 @@ import sqlite3
 
 '''USER CONFIGURATION'''
 
-USERNAME  = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD  = ""
-#This is the bot's Password. 
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
 SUBREDDIT = "GoldTesting"
@@ -34,9 +35,7 @@ IGNORESELF = False
 PLEN = len(PARENTSTRING)
 WAITS = str(WAIT)
 try:
-    import bot #This is a file in my python library which contains my Bot's username and password. I can push code to Git without showing credentials
-    USERNAME = bot.getuG()
-    PASSWORD = bot.getpG()
+    import bot
     USERAGENT = bot.getaG()
 except ImportError:
     pass
@@ -51,7 +50,8 @@ print('Loaded Completed table')
 sql.commit()
 
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD) 
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def scanPosts():
     print('Searching '+ SUBREDDIT + ' submissions.')
@@ -67,7 +67,7 @@ def scanPosts():
                 print(pid)
                 try:
                     pauthor = post.author.name
-                    if pauthor != USERNAME or IGNORESELF == False:
+                    if pauthor.lower() != r.user.name.lower() or IGNORESELF == False:
                         for key in PARENTSTRING:
                             if key in purl:
                                 result.append(purl.replace(key, REPLACESTRING)[:-4])
@@ -104,7 +104,7 @@ def scanComs():
                     if any(key.lower() in sent.lower() for key in PARENTSTRING):
                         try:
                             pauthor = post.author.name
-                            if pauthor != USERNAME or IGNORESELF == False:
+                            if pauthor.lower() != r.user.name.lower() or IGNORESELF == False:
                                 for key in PARENTSTRING:
                                     if key in sent:
                                         url = sent.replace(key, REPLACESTRING)

@@ -4,17 +4,17 @@ import time
 import getpass
 import datetime
 
-print('Logging in to reddit')
-print('Your password will be hidden while typing')
-USERNAME = input('U: ')
-PASSWORD = getpass.getpass('P: ')
+USERAGENT = ""
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 
-USERAGENT = 'DeleteMe-Time tool written by /u/Goldensights, being used by /u/' + USERNAME + \
-	'. Will pace through users comments and submissions, and delete those older than a certain Threshold. ' + \
-	'The code for this tool can be found at https://github.com/voussoir/reddit/tree/master/DeleteMeT. ' + \
-	'/u/Goldensights does not have any control over how the tool is being used.'
+print('Logging in to reddit')
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def tprint(thing):
 	#Having a whole bunch of text appear at once can be jarring

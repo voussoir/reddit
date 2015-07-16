@@ -6,11 +6,11 @@ import datetime
 
 ''' USER CONFIGURATION '''
 
-USERNAME = ""
-# This is the bot's username. Must be a moderator of the subreddit
-PASSWORD = ""
-# This is the bot's password. See github.com/voussoir/reddit to see
-# alternative options than putting the pw in this file
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERASGENT = ""
 # This is a description of what your bot is doing. Include your username
 # and be complete
@@ -50,17 +50,14 @@ WAIT = 120
 
 try:
 	import bot
-	# A file in my library with a password so it's not in this file
-	USERNAME = bot.uG
-	PASSWORD = bot.pG
 	USERAGENT = bot.aG
 except ImportError:
 	pass
 
 print('Logging in to reddit')
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD)
-del PASSWORD
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 
 

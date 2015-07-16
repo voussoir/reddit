@@ -12,10 +12,11 @@ import re
 
 USERAGENT = ""
 #Describe the bot and what it does. Include your username
-USERNAME = "GoldenSights"
-#This is the bot's username
-PASSWORD = ""
-#This is the bot's password
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 SUBREDDIT = "Goldtesting"
 #This is the subreddit where the bot finds the schedules
 #It should be private with only the team of moderators
@@ -65,9 +66,9 @@ A foolproof time format is
 Deleting your post will cause it to be removed from the schedule.
 
 If you think the bot is down, send it
-[this message](http://www.reddit.com/message/compose?to=%s&subject=Ping&message=Ping).
+[this message](http://www.reddit.com/message/compose?to=??????&subject=Ping&message=Ping).
 
-"""%USERNAME
+""" # Don't forget to put your username in this message
 
 SCHEDULECOMMENT = """
 
@@ -104,8 +105,6 @@ IMPOSSIBLETIME = 2147483646
 
 try:
 	import bot
-	#USERNAME = bot.uG
-	PASSWORD = bot.pG
 	USERAGENT = bot.aG
 except ImportError:
 	pass
@@ -119,7 +118,8 @@ sql.commit()
 
 print('Logging in')
 r = praw.Reddit(USERAGENT)
-r.login(USERNAME, PASSWORD)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 
 def getTime(bool):

@@ -1,4 +1,4 @@
-#This bot was written by /u/GoldenSights for /u/FourMakesTwoUNLESS on behalf of /r/pkmntcgtrades. Uploaded to Git with permission.
+#This bot was written by /u/GoldenSights for /u/FourMakesTwoUNLESS on behalf of /r/pkmntcgtrades. Uploaded to GitHub with permission.
 import praw
 import time
 import datetime
@@ -6,10 +6,11 @@ import sqlite3
 
 '''USER CONFIGURATION'''
 
-USERNAME = ""
-#This is the bot's Username. In order to send mail, he must have some amount of Karma.
-PASSWORD = ""
-#This is the bot's Password. 
+APP_ID = ""
+APP_SECRET = ""
+APP_URI = ""
+APP_REFRESH = ""
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter Bot"
 SUBREDDIT = ""
@@ -25,9 +26,6 @@ DELAY = 518400
 
 
 
-
-
-
 WAITS = str(WAIT)
 sql = sqlite3.connect('sql.db')
 print('Loaded SQL Database')
@@ -39,19 +37,8 @@ print('Loaded Oldposts')
 sql.commit()
 
 r = praw.Reddit(USERAGENT)
-
-Trying = True
-while Trying:
-	try:
-		r.login(USERNAME, PASSWORD)
-		print('Successfully logged in')
-		Trying = False
-	except praw.errors.InvalidUserPass:
-		print('Wrong Username or Password')
-		quit()
-	except Exception as e:
-		print("%s" % e)
-		time.sleep(5)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
 
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
