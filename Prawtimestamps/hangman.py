@@ -137,9 +137,9 @@ def main():
 	out(dictformat(freq_total))
 	out('')
 	print('Measuring subreddits')
-	freq_total = frequencydict([x.subreddit._fast_name for x in living+nonliving])
-	freq_living = frequencydict([x.subreddit._fast_name for x in living])
-	freq_nonliving = frequencydict([x.subreddit._fast_name for x in nonliving])
+	freq_total = frequencydict([x.subreddit.display_name for x in living+nonliving])
+	freq_living = frequencydict([x.subreddit.display_name for x in living])
+	freq_nonliving = frequencydict([x.subreddit.display_name for x in nonliving])
 	out('Subreddits posted to: %d' % len(freq_total))
 	out('Subreddits posted to, living: %d' % len(freq_living))
 	out('Subreddits posted to, deleted: %d' % len(freq_nonliving))
@@ -147,7 +147,7 @@ def main():
 		karma = 0
 		deletions = 0
 		for post in living+nonliving:
-			if post.subreddit._fast_name == subreddit:
+			if post.subreddit.display_name == subreddit:
 				karma += post.score
 				if post.author is None:
 					deletions += 1

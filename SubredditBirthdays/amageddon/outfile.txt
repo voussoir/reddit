@@ -4,9 +4,9 @@ This is a list of subreddits which became private at some point during the AMAge
 
 The subscriber counts are based on the last time I scanned them, which was, like, 2 days ago maybe.
 
-761 down  
-1431 up  
-2192 total
+745 down  
+1461 up  
+2206 total
 
 ID|NAME|SUBSCRIBERS|REINSTATED (UTC)
 -:|:-|-:|-:
@@ -320,6 +320,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2qlvu|r/BSG|16,968|04Jul 20:51
 2tzv4|r/fo4|16,828|03Jul 19:57
 2qi1r|r/meme|16,687|03Jul 17:50
+351zk|r/CoonTown|16,684|16Jul 08:22
 2ve29|r/AmIFreeToGo|16,637|03Jul 21:06
 2sgvi|r/short|16,567|06Jul 12:46
 2tdf8|r/simpsonsdidit|16,417|03Jul 19:34
@@ -496,7 +497,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2r2x2|r/illustrator|5,838|10Jul 23:00
 2vgrh|r/trapgifs|5,837|04Jul 03:08
 2qhd6|r/spain|5,828|09Jul 19:28
-346d4|r/awfuleverything|5,809|
+346d4|r/awfuleverything|5,809|18Jul 03:05
 2qwwr|r/Metallica|5,768|04Jul 10:59
 2qqq4|r/WedgieGirls|5,738|04Jul 04:12
 2sjei|r/PSO2|5,708|04Jul 02:16
@@ -540,7 +541,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2yl1g|r/SteamOS|4,710|03Jul 19:12
 2tuik|r/dopplebangher|4,707|06Jul 19:44
 2rntx|r/musicals|4,646|03Jul 23:13
-2sggk|r/Overgrowth|4,627|
+2sggk|r/Overgrowth|4,627|18Jul 03:07
 2qjr6|r/Objectivism|4,609|03Jul 19:35
 2xfc5|r/AnomaliesUnleashed|4,590|03Jul 23:59
 35ibf|r/TapTitans|4,581|03Jul 17:32
@@ -651,7 +652,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2ujnz|r/NewTubers|2,908|04Jul 01:09
 2r41e|r/malkovich|2,893|06Jul 14:52
 2t7e3|r/americanproblems|2,889|07Jul 08:33
-30nqa|r/smashcirclejerk|2,883|03Jul 17:32
+30nqa|r/smashcirclejerk|2,883|
 2vkui|r/doctorswithoutborders|2,880|03Jul 23:59
 2safa|r/magicka|2,871|03Jul 17:32
 2y88s|r/Cosplayheels|2,854|06Jul 01:18
@@ -723,6 +724,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2ra6m|r/lightpainting|2,146|
 2qpmb|r/jerky|2,132|05Jul 21:53
 2uewi|r/photoshawwp|2,122|
+32jcm|r/theanthonycumiashow|2,113|
 35498|r/WhatShouldIDoWithIt|2,108|
 2qhky|r/hacks|2,087|05Jul 14:40
 36cr5|r/MorbidRealityRebooted|2,081|04Jul 17:22
@@ -742,7 +744,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2t877|r/AnarchismPDFs|1,978|03Jul 17:33
 2rox4|r/emoticons|1,973|03Jul 19:37
 331fs|r/wwesupercard|1,960|14Jul 02:47
-2rfp0|r/flossdaily|1,955|
+2rfp0|r/flossdaily|1,955|16Jul 05:40
 2t12g|r/grandtheftauto5|1,948|
 315yk|r/DogPeople|1,940|
 38m0i|r/fatpepehate|1,920|
@@ -846,7 +848,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2st4v|r/Libraryporn|1,273|
 2sreq|r/SexyAbortions|1,271|06Jul 12:01
 2ta8v|r/r4rDFW|1,267|11Jul 19:13
-3606e|r/Sexysasha20|1,267|
+3606e|r/Sexysasha20|1,267|18Jul 03:09
 2rb7x|r/Bittorrent|1,256|05Jul 06:20
 30yc3|r/theministryofmagic|1,255|03Jul 21:44
 3521l|r/HaroldPorn|1,249|07Jul 03:33
@@ -862,7 +864,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2u9jn|r/WestHighlandTerriers|1,211|04Jul 04:38
 2r6bj|r/frogs|1,205|03Jul 19:38
 359vj|r/TheLosSantosAliens|1,202|03Jul 23:16
-32dv8|r/justneuerthings|1,201|
+32dv8|r/justneuerthings|1,201|18Jul 20:50
 2w3l7|r/floorgasm|1,201|
 2vdfj|r/armchairphilosophy|1,193|08Jul 02:08
 2sl8a|r/rawpetfood|1,189|03Jul 17:34
@@ -957,7 +959,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2requ|r/jav|856|04Jul 01:57
 3188o|r/AMRsucks|849|03Jul 17:35
 2ru1s|r/Toribash|844|06Jul 18:10
-38sk3|r/karaOhDamn|844|
+38sk3|r/karaOhDamn|844|18Jul 03:11
 32lf7|r/UnbiasedWorldNews|839|11Jul 19:14
 3218c|r/johnyjohnyyespapa|832|03Jul 18:52
 30b8o|r/japaneseunderground|831|06Jul 04:53
@@ -1037,7 +1039,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 38ae8|r/BoycottQatarWorldCup|606|
 33e90|r/TuckedInPuppies|605|06Jul 14:33
 2qxgy|r/Hospitality|604|
-313zc|r/TonightShowFallon|600|
+313zc|r/TonightShowFallon|600|18Jul 03:12
 2s0qz|r/gcc|599|04Jul 02:21
 2s9p2|r/ULL|596|06Jul 17:23
 2u45a|r/MRActivism|594|03Jul 21:23
@@ -1077,8 +1079,3 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2rher|r/totse|521|06Jul 05:18
 2tj6z|r/ChristianBooks|521|12Jul 02:31
 2spnk|r/ragefaces|519|03Jul 19:41
-2qn1y|r/Ryan|519|03Jul 20:03
-2wb0n|r/Guitarsotw|517|
-38m8k|r/takedownrequest|517|
-2vqsb|r/whalewatching|516|04Jul 18:13
-2xvto|r/hiphophead|515|

@@ -23,7 +23,7 @@ try:
 	APP_ID = bot.oG_id
 	APP_SECRET = bot.oG_secret
 	APP_URI = bot.oG_uri
-	APP_REFRESH = bot.oG_scopes['all']['refresh']
+	APP_REFRESH = bot.oG_scopes['all']
 except ImportError:
 	pass
 
@@ -247,7 +247,7 @@ def updatescores(databasename):
 	del cur
 	del sql
 
-def livestream(subreddit=None, username=None, sleepy=30):
+def livestream(subreddit=None, username=None, sleepy=30, limit=100):
 	'''
 	Continuously get posts from this source
 	and insert them into the database
@@ -272,7 +272,7 @@ def livestream(subreddit=None, username=None, sleepy=30):
 	cur = sql.cursor()
 	while True:
 		try:
-			items = list(itemf(limit=100))
+			items = list(itemf(limit=limit))
 			newitems = smartinsert(sql, cur, items)
 			print('%s +%d' % (humannow(), newitems), end='')
 			if newitems == 0:
