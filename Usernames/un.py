@@ -309,6 +309,15 @@ def fetchgenerator():
 			break
 		yield fetch
 
+def popgenerator(x):
+	'''
+	Create a generator which whittles away at the input
+	list until there are no items left.
+	This destroys the input list in-place.
+	'''
+	while len(x) > 0:
+		yield x.pop()
+
 def fetchwriter(outfile, spacer1=' ', spacer2=None, brief=False):
 	'''
 	Write items from the current sql query to the specified file

@@ -271,6 +271,7 @@ def livestream(subreddit=None, username=None, sleepy=30, limit=100):
 		itemf = item.get_submitted
 	cur = sql.cursor()
 	while True:
+		bot.refresh(r)  # personal use
 		try:
 			items = list(itemf(limit=limit))
 			newitems = smartinsert(sql, cur, items)

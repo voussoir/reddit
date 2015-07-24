@@ -1,3 +1,5 @@
+# Consistency? Where?
+
 import praw
 import sqlite3
 import datetime
@@ -7,7 +9,7 @@ r=praw.Reddit(bot.aG)
 
 sql = sqlite3.connect('@gallowboob.db')
 cur = sql.cursor()
-outfile = open('@hangman.txt', 'w')
+outfile = open('@hangman.md', 'w')
 
 SQL_COLUMNCOUNT = 16
 SQL_IDINT = 0
@@ -27,6 +29,17 @@ SQL_NUM_COMMENTS = 13
 SQL_FLAIR_TEXT = 14
 SQL_FLAIR_CSS_CLASS = 15
 
+FOOTER = '''
+submission | archive | note
+--------- | -------- | -----
+[`3e3d5a`](http://redd.it/3e3d5a) | https://archive.is/H1D2V | /r/woahdude 3d printing support
+[`3e3e00`](http://redd.it/3e3e00) | https://archive.is/JcMRf | /r/pics statue
+[`3e3isi`](http://redd.it/3e3isi) | https://archive.is/y6jJU | /r/me_ir jeans
+[`3e3hdx`](http://redd.it/3e3hdx) | https://archive.is/9XI8J | /r/aww jeans
+[`3e3hes`](http://redd.it/3e3hes) | https://archive.is/gwqhf | /r/unexpected jeans
+[`3e3ebs`](http://redd.it/3e3ebs) | https://archive.is/FhkWD | /r/me_irl dogbird
+'''
+
 def out(*text):
 	print(*text, file=outfile)
 
@@ -41,7 +54,7 @@ def average(datalist):
 	denominator = max(1, len(datalist))
 	return sum(datalist) / denominator
 
-def dictformat(datadict):
+def dictformat(datadict, joiner=', '):
 	keys = list(datadict.keys())
 	if isinstance(datadict[keys[0]], list):
 		keys.sort(key=lambda x: (len(datadict.get(x)), datadict.get(x)[0]), reverse=True)
@@ -51,8 +64,9 @@ def dictformat(datadict):
 	out = ''
 	for key in keys:
 		val = datadict[key]
-		key = (' ' * (longestkey - len(key))) + key
-		out += '\t%s : %s\n' % (key, val)
+		if isinstance(val, list):
+			val = joiner.join([str(x) for x in val])
+		out += '%s | %s\n' % (key, val)
 	return out
 
 def findduplicates(datalist, attribute):
@@ -63,9 +77,9 @@ def findduplicates(datalist, attribute):
 	datadict = {x:datadict[x] for x in datadict if len(datadict[x]) > 2}
 	return datadict
 
-def listblock(x, blocklength=10, joins=', '):
+def listblock(x, blocklength=12, joins=', '):
     out = ''
-    x = [str(i) for i in x]
+    x = ['[`{i}`](http://redd.it/{i})'.format(i=i) for i in x]
     l = len(x)
     ra = (l // blocklength)
     if l % blocklength is not 0:
@@ -74,17 +88,19 @@ def listblock(x, blocklength=10, joins=', '):
         a = i*blocklength
         b = a + blocklength
         out += joins.join(x[a:b])
-        out += '\n'
+        out += '  \n'
     return out
 
 
 def main():
-	out('/u/GallowBoob\n')
-	out('Deletions can only be detected if the post is found while new')
-	out('These numbers should be considered lower than is correct.\n')
+	out('/u/GallowBoob\n======\n\n')
+	out('Obviously I can\'t tell if a deleted post was its if I find it too late,')
+	out('so these numbers should be considered lower than is correct.  ')
+	out('[click here](https://github.com/voussoir/reddit/raw/master/Prawtimestamps/%40gallowboob.db) to download the sqlite db.')
+	out('')
 	cur.execute('SELECT COUNT(idint) FROM posts')
 	totalitems = cur.fetchone()[0]
-	out('Submissions on record: %d' % totalitems)
+	out('Submissions on record: %d  ' % totalitems)
 
 	cur.execute('SELECT idstr FROM posts')
 	refreshids = [x[0] for x in cur.fetchall()]
@@ -99,13 +115,13 @@ def main():
 				nonliving.append(item)
 			else:
 				living.append(item)
-	out('Submissions alive: %d' % len(living))
-	out('Submissions deleted: %d' % len(nonliving))
+	out('Submissions alive: %d  ' % len(living))
+	out('Submissions deleted: %d  ' % len(nonliving))
 	out('')
 	cur.execute('SELECT COUNT(idint) FROM posts WHERE self == 1')
 	selfposts = cur.fetchone()[0]
-	out('Selfposts: %d' % selfposts)
-	out('Linkposts: %d' % (totalitems-selfposts))
+	out('Selfposts: %d  ' % selfposts)
+	out('Linkposts: %d  ' % (totalitems-selfposts))
 	out('')
 	scores_total = [[item.score, item.id] for item in living+nonliving]
 	scores_living = [[item.score, item.id] for item in living]
@@ -114,14 +130,17 @@ def main():
 	scores_living.sort(key=lambda x: x[0], reverse=True)
 	scores_nonliving.sort(key=lambda x: x[0], reverse=True)
 	print('Measuring scores')
-	out('Average score: %d' % (average([x[0] for x in scores_total])))
-	out('Average score of living: %d' % (average([x[0] for x in scores_living])))
-	out('Average score of deleted: %d' % (average([x[0] for x in scores_nonliving])))
+	out('Average score: %d  ' % (average([x[0] for x in scores_total])))
+	out('Average score of living: %d  ' % (average([x[0] for x in scores_living])))
+	out('Average score of deleted: %d  ' % (average([x[0] for x in scores_nonliving])))
 	out('')
-	out('Highest score: %s' % scores_total[0])
-	out('Highest score of living: %s' % scores_living[0])
-	out('Lowest score of living: %s' % scores_living[-1])
-	out('Highest score of deleted: %s' % scores_nonliving[0])
+	if scores_total:
+		out('Highest score: [%d](http://redd.it/%s)  ' % (scores_total[0][0], scores_total[0][1]))
+	if scores_living:
+		out('Highest score of living: [%d](http://redd.it/%s)  ' % (scores_living[0][0], scores_living[0][1]))
+		out('Lowest score of living: [%d](http://redd.it/%s)  ' % (scores_living[-1][0], scores_living[-1][1]))
+	if scores_nonliving:
+		out('Highest score of deleted: [%d](http://redd.it/%s)  ' % (scores_nonliving[0][0], scores_nonliving[0][1]))
 	out('')
 	freq_total = findduplicates(living+nonliving, 'url')
 	freq_living = findduplicates(living, 'url')
@@ -130,19 +149,28 @@ def main():
 	duplicates_living = sum([len(freq_living[x]) for x in freq_living])
 	duplicates_nonliving = sum([len(freq_nonliving[x]) for x in freq_nonliving])
 	print('Measuring reposts')
-	out('Submissions with the same link as another: %d' % duplicates_total)
-	out('Submissions living with the same link as another living: %d' % duplicates_living)
-	out('Submissions deleted with the same link as another deleted: %d' % duplicates_nonliving)
-	out('Submissions deleted with the same link as another living: %d' % (duplicates_total - (duplicates_living+duplicates_nonliving)))
+	out('&nbsp;\n\n#reposts\n')
+	out('Submissions with the same link as another: %d  ' % duplicates_total)
+	out('Submissions living with the same link as another living: %d  ' % duplicates_living)
+	out('Submissions deleted with the same link as another deleted: %d  ' % duplicates_nonliving)
+	out('Submissions deleted with the same link as another living: %d  ' % (duplicates_total - (duplicates_living+duplicates_nonliving)))
+	out('')
+	for key in freq_total:
+		val = freq_total[key]
+		freq_total[key] = ['[`{i}`](http://redd.it/{i})'.format(i=i) for i in val]
+	out('url | karma farmas')
+	out('----- | -----')
 	out(dictformat(freq_total))
 	out('')
 	print('Measuring subreddits')
 	freq_total = frequencydict([x.subreddit.display_name for x in living+nonliving])
 	freq_living = frequencydict([x.subreddit.display_name for x in living])
 	freq_nonliving = frequencydict([x.subreddit.display_name for x in nonliving])
-	out('Subreddits posted to: %d' % len(freq_total))
-	out('Subreddits posted to, living: %d' % len(freq_living))
-	out('Subreddits posted to, deleted: %d' % len(freq_nonliving))
+	out('&nbsp;\n\n#subreddits\n')
+	out('Subreddits posted to: %d  ' % len(freq_total))
+	out('Subreddits posted to, living: %d  ' % len(freq_living))
+	out('Subreddits posted to, deleted: %d  ' % len(freq_nonliving))
+	out('')
 	for subreddit in freq_total:
 		karma = 0
 		deletions = 0
@@ -152,14 +180,18 @@ def main():
 				if post.author is None:
 					deletions += 1
 		freq_total[subreddit] = [freq_total[subreddit], deletions, karma]
-	out('\t            subreddit : [posts made, posts deleted, score total]')
-	out(dictformat(freq_total))
+	out('subreddit | posts made | posts deleted | score total')
+	out(':-------- | ---------: | ------------: | ----------:')
+	out(dictformat(freq_total, joiner=' | '))
 	out('')
-	out('Living posts')
+	out('&nbsp;\n\n#living\n')
 	out(listblock([x.id for x in living]))
 	out('')
-	out('Deleted posts')
+	out('&nbsp;\n\n#deleted\n')
 	out(listblock([x.id for x in nonliving]))
+	out('')
+	out('&nbsp;\n\n#archives\n')
+	out(FOOTER)
 
 main()
 outfile.close()
