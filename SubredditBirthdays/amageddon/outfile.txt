@@ -4,9 +4,9 @@ This is a list of subreddits which became private at some point during the AMAge
 
 The subscriber counts are based on the last time I scanned them, which was, like, 2 days ago maybe.
 
-745 down  
-1461 up  
-2206 total
+735 down  
+1508 up  
+2243 total
 
 ID|NAME|SUBSCRIBERS|REINSTATED (UTC)
 -:|:-|-:|-:
@@ -156,7 +156,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2tyoq|r/TrueDetective|55,332|03Jul 17:50
 2rd6n|r/worldbuilding|54,404|03Jul 22:48
 2va87|r/CandidFashionPolice|54,301|03Jul 17:50
-2r5i1|r/catpictures|53,403|
+2r5i1|r/catpictures|53,403|22Jul 21:21
 2tdzg|r/gaybros|53,245|03Jul 22:02
 2tqbt|r/Cynicalbrit|52,981|04Jul 06:32
 2vm6c|r/StraightGirlsPlaying|52,762|04Jul 01:06
@@ -178,7 +178,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2ss1n|r/ThanksObama|46,933|06Jul 17:16
 2snq8|r/fitgirls|46,847|04Jul 02:15
 2qhdi|r/FinalFantasy|46,057|03Jul 17:50
-2wgoc|r/bannedfromclubpenguin|45,934|
+2wgoc|r/bannedfromclubpenguin|45,934|22Jul 21:21
 2r1ee|r/Infographics|44,913|03Jul 19:10
 2qxih|r/swtor|44,807|03Jul 17:50
 2vi60|r/EliteDangerous|44,689|03Jul 18:24
@@ -230,7 +230,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2rai5|r/futanari|31,289|04Jul 03:40
 354cl|r/indianpeoplefacebook|31,260|04Jul 08:46
 2ujn7|r/TreesSuckingAtThings|31,217|04Jul 01:06
-2v4o7|r/bearsdoinghumanthings|31,109|
+2v4o7|r/bearsdoinghumanthings|31,109|22Jul 21:22
 2sf7i|r/femalepov|30,467|05Jul 17:59
 2qh0p|r/robotics|30,291|04Jul 20:50
 2smp6|r/NotSafeForNature|30,252|03Jul 20:43
@@ -437,7 +437,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2rf9x|r/corsets|7,868|05Jul 06:45
 2z1d9|r/BoomBeach|7,833|03Jul 18:48
 2slrm|r/electricians|7,797|03Jul 17:31
-2v33w|r/InternetAMA|7,782|
+2v33w|r/InternetAMA|7,782|21Jul 23:14
 33oia|r/GamerGhazi|7,618|03Jul 17:31
 2wkj8|r/CrowdPulledOnStage|7,557|08Jul 01:38
 2r8t2|r/gatech|7,482|03Jul 19:35
@@ -535,7 +535,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2yb4a|r/ConspiracyGrumps|4,870|04Jul 06:20
 2vvpq|r/PeopleFalling|4,850|03Jul 17:54
 2tqv1|r/wigglegrams|4,763|09Jul 19:29
-2wryy|r/KimJongUnGifs|4,762|
+2wryy|r/KimJongUnGifs|4,762|22Jul 21:23
 2xicy|r/dirtykik|4,723|03Jul 17:54
 2s1zv|r/rollerderby|4,711|08Jul 00:07
 2yl1g|r/SteamOS|4,710|03Jul 19:12
@@ -545,7 +545,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2qjr6|r/Objectivism|4,609|03Jul 19:35
 2xfc5|r/AnomaliesUnleashed|4,590|03Jul 23:59
 35ibf|r/TapTitans|4,581|03Jul 17:32
-2qylb|r/FrontPage|4,577|
+2qylb|r/FrontPage|4,577|21Jul 00:23
 333qt|r/GirlsInTanningBeds|4,552|03Jul 17:32
 2qtkl|r/reddithax|4,424|06Jul 05:13
 2rpsl|r/rainbowbar|4,412|03Jul 17:32
@@ -622,7 +622,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2y180|r/WisDan|3,183|04Jul 01:54
 2vnu3|r/HaltAndCatchFire|3,181|04Jul 02:40
 2slgc|r/chicagotrees|3,181|05Jul 13:26
-2rdvk|r/fishtank|3,173|
+2rdvk|r/fishtank|3,173|22Jul 23:04
 2ypry|r/photoclass2015|3,160|03Jul 21:19
 2y57g|r/EducativeVideos|3,157|03Jul 21:19
 2s97a|r/Throwers|3,139|03Jul 17:32
@@ -640,7 +640,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 31itx|r/MalesMasturbating|3,006|08Jul 06:22
 2zr8m|r/SteamVR|2,986|04Jul 17:21
 2ryf0|r/Nightshift|2,979|03Jul 20:22
-2ry1k|r/Amish|2,977|
+2ry1k|r/Amish|2,977|21Jul 23:16
 366tc|r/FilmsExplained|2,975|11Jul 09:50
 2ti4f|r/unconventionalhomes|2,971|05Jul 09:05
 2rcd1|r/Veterinary|2,950|
@@ -652,7 +652,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2ujnz|r/NewTubers|2,908|04Jul 01:09
 2r41e|r/malkovich|2,893|06Jul 14:52
 2t7e3|r/americanproblems|2,889|07Jul 08:33
-30nqa|r/smashcirclejerk|2,883|
+30nqa|r/smashcirclejerk|2,883|21Jul 00:25
 2vkui|r/doctorswithoutborders|2,880|03Jul 23:59
 2safa|r/magicka|2,871|03Jul 17:32
 2y88s|r/Cosplayheels|2,854|06Jul 01:18
@@ -663,7 +663,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2w5wc|r/dickgirls|2,772|07Jul 22:30
 2toke|r/BenignExistence|2,768|07Jul 00:13
 2qo70|r/Nebraska|2,755|03Jul 19:36
-37qk1|r/unexpectedremix|2,752|
+37qk1|r/unexpectedremix|2,752|22Jul 21:24
 2ql0k|r/serbia|2,746|03Jul 17:55
 2qk1w|r/Blue|2,728|04Jul 07:55
 34528|r/europeanparliament|2,728|04Jul 11:00
@@ -692,6 +692,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2wrt8|r/PSMinecraft|2,417|05Jul 19:28
 2wdjx|r/PolishGauntlet|2,383|03Jul 17:33
 2rba1|r/Urbex|2,377|06Jul 17:19
+2suth|r/RapingWomen|2,369|
 2wipb|r/TeenTitansPorn|2,355|07Jul 19:42
 2rk2c|r/PublicRelations|2,354|03Jul 21:42
 2r4d7|r/facebookquotes|2,333|
@@ -708,7 +709,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 35qsx|r/crowfall|2,240|04Jul 15:22
 2wrle|r/SquirrelsEatingPizza|2,231|03Jul 19:13
 2tp13|r/yishansucks|2,228|03Jul 17:33
-2uo0f|r/BorderlandsGuns|2,220|
+2uo0f|r/BorderlandsGuns|2,220|21Jul 00:26
 2uin6|r/ProjectRunway|2,218|14Jul 23:59
 2wi6p|r/SushiAbomination|2,212|04Jul 18:26
 2sq9z|r/Random_Acts_Of_Sex|2,211|07Jul 02:13
@@ -721,9 +722,9 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2qpu1|r/ForgottenBookmarks|2,176|11Jul 19:12
 318w4|r/cirkeltrek|2,174|03Jul 17:33
 2ud4e|r/cubancigars|2,168|03Jul 20:45
-2ra6m|r/lightpainting|2,146|
+2ra6m|r/lightpainting|2,146|21Jul 01:40
 2qpmb|r/jerky|2,132|05Jul 21:53
-2uewi|r/photoshawwp|2,122|
+2uewi|r/photoshawwp|2,122|22Jul 21:24
 32jcm|r/theanthonycumiashow|2,113|
 35498|r/WhatShouldIDoWithIt|2,108|
 2qhky|r/hacks|2,087|05Jul 14:40
@@ -765,7 +766,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2zi6m|r/kingdomcome|1,787|06Jul 23:07
 2yzub|r/forgottenwebsites|1,774|16Jul 01:02
 331ci|r/TheStage|1,770|04Jul 14:32
-2x28l|r/fringediscussion|1,766|
+2x28l|r/fringediscussion|1,766|21Jul 00:26
 31g74|r/justlegbeardthings|1,765|15Jul 20:41
 32dlz|r/EJuicePorn|1,752|06Jul 03:04
 2s5s7|r/molecularbiology|1,740|
@@ -809,7 +810,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2rzc0|r/VirginiaBeach|1,472|07Jul 14:15
 2utfi|r/Buyingforbaby|1,460|03Jul 23:38
 2yzvt|r/WhoRedditHatesNow|1,456|03Jul 20:23
-332si|r/OneTrueKlein|1,454|
+332si|r/OneTrueKlein|1,454|22Jul 21:25
 2uorh|r/GotMotivated|1,454|05Jul 00:39
 2yr3j|r/Vivillon|1,452|03Jul 19:38
 2slh8|r/HAWP|1,445|08Jul 05:10
@@ -821,7 +822,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2sa44|r/ECEComponentExchange|1,418|12Jul 07:50
 2wqca|r/PandoranRedCross|1,415|05Jul 04:59
 2tebh|r/FRUITUNION|1,412|
-2ro0k|r/TinaFey|1,402|
+2ro0k|r/TinaFey|1,402|21Jul 22:15
 2t996|r/boniver|1,386|03Jul 17:56
 2sqjh|r/Dermatology|1,384|04Jul 16:13
 2t1iv|r/uber|1,382|07Jul 02:14
@@ -835,13 +836,14 @@ vf2|r/nsfw|567,770|03Jul 23:34
 31j3y|r/multipleloads|1,334|12Jul 01:02
 2r2po|r/piratenpartei|1,327|03Jul 19:38
 2szwv|r/ratemyband|1,324|04Jul 00:25
+379ez|r/GetSuave|1,314|
 384bx|r/UnearthedArcana|1,312|03Jul 22:30
 38e57|r/teachmeNSFW|1,308|07Jul 06:39
 2t0p3|r/encyclopediadramatica|1,307|10Jul 21:07
 2r500|r/violentacrez|1,299|
 2sjqd|r/MtGox|1,294|
 2yohc|r/SantasLittleHelpers|1,293|13Jul 02:56
-2tquk|r/pyangyong|1,291|
+2tquk|r/pyangyong|1,291|22Jul 21:26
 2ss4i|r/AerospaceEngineering|1,277|03Jul 17:34
 31o0q|r/kittengifs|1,274|03Jul 19:14
 31fjx|r/DrunkOrRussian|1,273|06Jul 04:29
@@ -862,12 +864,14 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2vgha|r/CambridgeMA|1,215|13Jul 15:22
 2rhkv|r/Mafia|1,211|04Jul 00:48
 2u9jn|r/WestHighlandTerriers|1,211|04Jul 04:38
+2wr00|r/Socialistmusic|1,206|21Jul 04:44
 2r6bj|r/frogs|1,205|03Jul 19:38
 359vj|r/TheLosSantosAliens|1,202|03Jul 23:16
 32dv8|r/justneuerthings|1,201|18Jul 20:50
 2w3l7|r/floorgasm|1,201|
 2vdfj|r/armchairphilosophy|1,193|08Jul 02:08
 2sl8a|r/rawpetfood|1,189|03Jul 17:34
+324c5|r/beatingwomen2|1,183|
 2rq2t|r/Wizards|1,175|07Jul 07:33
 2rov3|r/lastfm|1,172|06Jul 14:31
 37h6s|r/teefies|1,166|04Jul 03:22
@@ -883,8 +887,9 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2ts2g|r/BestOfHuluPlus|1,130|04Jul 02:42
 2qww4|r/electronica|1,124|03Jul 21:44
 2sxj0|r/SodaSwap|1,122|11Jul 05:13
-2qmm8|r/xna|1,117|
+2qmm8|r/xna|1,117|22Jul 21:26
 2uw1d|r/SoloPokes|1,115|04Jul 23:24
+35lhc|r/GasTheKikes|1,113|
 2rw0b|r/FTH|1,112|08Jul 05:11
 31ghc|r/Claire_Abbott|1,110|
 2uskw|r/Birdswithhats|1,107|03Jul 21:44
@@ -970,6 +975,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2wml9|r/OffRoadRacing|821|03Jul 19:16
 306ui|r/Anticlimax|812|03Jul 17:35
 2txcg|r/ultimaker|812|03Jul 17:35
+2qqpb|r/Documentary|812|
 33719|r/corrent|807|03Jul 23:17
 30h5c|r/TEMPUS_FUGIT|806|11Jul 09:20
 2ql9x|r/haiti|798|04Jul 06:24
@@ -1000,7 +1006,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2t2kg|r/fulhamfc|715|03Jul 18:53
 2zqu3|r/VaccineMyths|715|03Jul 19:16
 31gmj|r/GirlsNAnimals|709|04Jul 03:23
-2ufv8|r/entivities|704|
+2ufv8|r/entivities|704|21Jul 00:29
 2xblu|r/Psychrocktapes|695|06Jul 04:54
 2wala|r/im15andimsomaturenow|688|
 2svhy|r/SUBREDDITNAME|687|
@@ -1045,7 +1051,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2u45a|r/MRActivism|594|03Jul 21:23
 2zlyj|r/GIFSoundBattles|593|15Jul 04:44
 2r1gg|r/cherejimonica|587|05Jul 03:13
-34mnv|r/WTFDIJF|582|
+34mnv|r/WTFDIJF|582|21Jul 00:30
 2zjod|r/dogebetting|580|
 2rffu|r/pineapple|579|
 2vb78|r/flightattendants|578|04Jul 19:25
@@ -1067,15 +1073,3 @@ vf2|r/nsfw|567,770|03Jul 23:34
 34fuy|r/eonticket|547|05Jul 15:57
 2ugvy|r/Italianhistory|544|05Jul 01:20
 2ue1q|r/carscirclejerk|543|03Jul 21:24
-2szmj|r/GirlsInJeans|542|06Jul 00:42
-38opp|r/gayfortodd|540|03Jul 20:49
-2s3nh|r/snacks|538|
-2urk7|r/SMITEbug|538|
-2rn0g|r/nsa|536|05Jul 20:19
-2sf6n|r/Destin|532|10Jul 23:05
-32o11|r/editthegame|531|
-2s3cs|r/exeter|529|03Jul 19:17
-2vd7g|r/seasquirrel|524|
-2rher|r/totse|521|06Jul 05:18
-2tj6z|r/ChristianBooks|521|12Jul 02:31
-2spnk|r/ragefaces|519|03Jul 19:41
