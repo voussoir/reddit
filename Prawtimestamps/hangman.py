@@ -38,6 +38,14 @@ submission | archive | note
 [`3e3hdx`](http://redd.it/3e3hdx) | https://archive.is/9XI8J | /r/aww jeans
 [`3e3hes`](http://redd.it/3e3hes) | https://archive.is/gwqhf | /r/unexpected jeans
 [`3e3ebs`](http://redd.it/3e3ebs) | https://archive.is/FhkWD | /r/me_irl dogbird
+[`3f27gh`](http://redd.it/3f27gh) | https://archive.is/CE653 | /r/pics axe spine handle
+[`3f281g`](http://redd.it/3f281g) | https://archive.is/FbDZq | /r/pics axe spine handle again
+[`3f2bk9`](http://redd.it/3f2bk9) | https://archive.is/c3cBW | /r/woahdude axe spine handle again again
+[`3f2838`](http://redd.it/3f2838) | https://archive.is/lOhEe | /r/interestingasfuck axe spine handle again again again
+[`3f2508`](http://redd.it/3f2508) | https://archive.is/5tXtG | /r/aww cat with a job
+[`3f2axj`](http://redd.it/3f2axj) | https://archive.is/V1Mlx | /r/gifs drifting kid
+[`3f29g7`](http://redd.it/3f29g7) | https://archive.is/2OBeP | /r/me_irl guy in water
+[`3f25st`](http://redd.it/3f25st) | https://archive.is/vofui | /r/unexpected sexy video on the beach
 '''
 
 def out(*text):

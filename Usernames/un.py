@@ -141,7 +141,8 @@ def process(users, quiet=False, knownid='', noskip=False):
 	olds = 0
 	if isinstance(users, str):
 		users = [users]
-	if len(users) > 1:
+	# I don't want to import types.GeneratorType just for one isinstance
+	if type(users).__name__ == 'generator' or len(users) > 1:
 		knownid=''
 	users = userify_list(users, noskip=noskip)
 	current = 0

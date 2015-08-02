@@ -11,7 +11,7 @@ import subprocess
 import sys
 import time
 import tkinter
-import urllib
+import traceback
 
 '''USER CONFIGURATION'''
 
@@ -915,9 +915,9 @@ def completesweep(shuffle=False, sleepy=0, query=None):
 			processmega(hundred, nosave=True)
 			time.sleep(sleepy)
 	except KeyboardInterrupt:
-		sql.commit()
+		pass
 	except Exception:
-		sql.commit()
+		traceback.print_exc()
 	sql.commit()
 
 def get_newest_sub():
