@@ -76,7 +76,8 @@ class Primary():
 		if 2 < len(x) < 21:
 			x = [c for c in x if c in goodchars]
 			x = ''.join(x)
-			self.previousinputs.append(x)
+			if len(self.previousinputs) == 0 or self.previousinputs[-1] != x:
+				self.previousinputs.append(x)
 			self.previousinputstep = 0
 			x = T(x, noskip)
 			self.todo.add(x)

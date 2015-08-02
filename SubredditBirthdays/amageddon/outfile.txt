@@ -4,9 +4,9 @@ This is a list of subreddits which became private at some point during the AMAge
 
 The subscriber counts are based on the last time I scanned them, which was, like, 2 days ago maybe.
 
-735 down  
-1508 up  
-2243 total
+691 down  
+1587 up  
+2278 total
 
 ID|NAME|SUBSCRIBERS|REINSTATED (UTC)
 -:|:-|-:|-:
@@ -366,7 +366,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2zoo7|r/tuckedinkitties|11,966|05Jul 13:23
 2u9xs|r/Windows10|11,875|03Jul 22:26
 2qtwp|r/Whatisthis|11,860|04Jul 16:06
-2xyou|r/hipcleavage|11,762|
+2xyou|r/hipcleavage|11,762|26Jul 07:27
 2udux|r/falloutlore|11,564|03Jul 19:57
 2sv87|r/Magicdeckbuilding|11,444|05Jul 10:12
 323ad|r/randomactsofcsgo|11,365|03Jul 19:34
@@ -385,14 +385,14 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2shyc|r/tmobile|10,573|03Jul 17:31
 2y5a6|r/B_Cups|10,517|04Jul 10:58
 2wsnn|r/mallninjashit|10,505|04Jul 00:21
-2ycxx|r/TaydolfSwiftler|10,504|
+2ycxx|r/TaydolfSwiftler|10,504|25Jul 05:49
 2sinj|r/xxxcaptions|10,408|03Jul 23:12
 2t3xs|r/SOPA|10,331|03Jul 17:53
 37550|r/asianandlovingit|10,234|05Jul 22:18
 2qkh0|r/Cleveland|10,225|04Jul 02:38
 38484|r/Simulated|9,820|10Jul 22:58
 2qj2z|r/userexperience|9,816|04Jul 01:30
-2rmu2|r/nsfwgif|9,788|
+2rmu2|r/nsfwgif|9,788|25Jul 05:51
 2qhh9|r/Quebec|9,769|03Jul 21:18
 31zwi|r/startrekstabilized|9,766|04Jul 03:41
 2qnvz|r/Destiny|9,765|03Jul 19:35
@@ -527,6 +527,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2shg9|r/Food_Pantry|5,205|
 2qh7p|r/usa|5,145|03Jul 19:35
 2whtf|r/INeedFeminismBecause|5,131|04Jul 18:07
+2qh8x|r/ideas|5,102|
 3068n|r/PimpYourMomForKarma|5,093|03Jul 18:25
 2ui0h|r/threekings|5,022|06Jul 20:49
 2yax9|r/textventures|4,983|04Jul 16:58
@@ -549,10 +550,10 @@ vf2|r/nsfw|567,770|03Jul 23:34
 333qt|r/GirlsInTanningBeds|4,552|03Jul 17:32
 2qtkl|r/reddithax|4,424|06Jul 05:13
 2rpsl|r/rainbowbar|4,412|03Jul 17:32
-2uetk|r/internationalbusiness|4,400|
+2uetk|r/internationalbusiness|4,400|25Jul 05:51
 2ts2k|r/BestOfAmazonPrime|4,384|04Jul 02:39
 2s4l0|r/UGA|4,383|04Jul 04:58
-37cjr|r/bennythebullgifs|4,376|
+37cjr|r/bennythebullgifs|4,376|25Jul 05:51
 2qqve|r/satanism|4,336|03Jul 17:32
 32oje|r/showerquestions|4,305|
 2y6k6|r/templeofthephil|4,288|03Jul 19:12
@@ -586,13 +587,13 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2siyd|r/globalhealth|3,629|03Jul 21:42
 2vgp9|r/longlostgamers|3,627|05Jul 00:11
 2vufq|r/yee|3,626|04Jul 06:35
-2zriy|r/WinMyArgument|3,622|
+2zriy|r/WinMyArgument|3,622|25Jul 05:52
 2sc65|r/Gamesnews|3,617|04Jul 15:21
 2ti1g|r/catvideos|3,614|04Jul 03:10
 2rz6k|r/AdventureRacing|3,608|03Jul 17:54
 2sh5g|r/metacanada|3,589|03Jul 20:44
 37pn5|r/DickPics4Freedom|3,587|07Jul 18:42
-2zphb|r/wwenetwork|3,575|
+2zphb|r/wwenetwork|3,575|29Jul 21:02
 2zejk|r/MandelaEffect|3,555|04Jul 09:10
 2qsbo|r/NCSU|3,551|06Jul 17:45
 2uafr|r/ketotrees|3,520|04Jul 00:23
@@ -668,6 +669,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2qk1w|r/Blue|2,728|04Jul 07:55
 34528|r/europeanparliament|2,728|04Jul 11:00
 2xo9f|r/FabulousFerds|2,716|05Jul 09:05
+2yshi|r/personallyyours|2,714|
 2r1bz|r/CommercialRealEstate|2,711|06Jul 17:42
 2tn3u|r/Runner5|2,693|04Jul 12:12
 2ugp2|r/pianocovers|2,654|04Jul 17:22
@@ -703,7 +705,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2uyz6|r/Ponytails|2,296|04Jul 13:46
 2qijr|r/cheats|2,270|09Jul 03:58
 2rdjk|r/brum|2,265|03Jul 17:33
-37mxs|r/NoTap|2,260|
+37mxs|r/NoTap|2,260|29Jul 21:05
 2ujsa|r/MichelleJenneke|2,257|08Jul 05:56
 2tnly|r/windowsapps|2,242|04Jul 00:46
 35qsx|r/crowfall|2,240|04Jul 15:22
@@ -747,8 +749,8 @@ vf2|r/nsfw|567,770|03Jul 23:34
 331fs|r/wwesupercard|1,960|14Jul 02:47
 2rfp0|r/flossdaily|1,955|16Jul 05:40
 2t12g|r/grandtheftauto5|1,948|
-315yk|r/DogPeople|1,940|
-38m0i|r/fatpepehate|1,920|
+315yk|r/DogPeople|1,940|29Jul 21:05
+38m0i|r/fatpepehate|1,920|29Jul 21:05
 2zaq3|r/fullanimeonyoutube|1,913|03Jul 17:33
 2sbty|r/dragonquest|1,904|03Jul 17:56
 2r01i|r/mountaingoats|1,873|03Jul 19:14
@@ -777,13 +779,13 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2tcgs|r/redditactivism|1,706|04Jul 05:23
 2s7d8|r/dcss|1,697|03Jul 17:34
 340ix|r/VentGrumps|1,692|
-38jd6|r/Fuckstannis|1,691|
+38jd6|r/Fuckstannis|1,691|29Jul 21:05
 2uvuz|r/imports|1,671|09Jul 04:02
 2sy06|r/mumfordandsons|1,665|04Jul 19:45
 2srg6|r/truevideos|1,663|03Jul 21:43
 2qr2d|r/Newgrounds|1,663|06Jul 14:00
 2tod9|r/WoWComics|1,657|04Jul 01:55
-2rsce|r/Inception|1,653|
+2rsce|r/Inception|1,653|29Jul 21:05
 305oo|r/sciencedocumentaries|1,653|06Jul 22:33
 382q8|r/TheSaltySplatoon|1,647|03Jul 17:34
 2s6lc|r/infiniti|1,631|05Jul 04:20
@@ -796,7 +798,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2s92f|r/WarMovies|1,562|04Jul 17:23
 2ud94|r/NationalSocialism|1,557|07Jul 13:00
 2yxtq|r/MakeItWorse|1,537|03Jul 18:27
-2tvyg|r/MathJokes|1,529|
+2tvyg|r/MathJokes|1,529|25Jul 05:53
 2vvo6|r/80sElectro|1,522|05Jul 14:14
 2yka5|r/ncbeer|1,518|06Jul 13:15
 2rl3k|r/dicks|1,508|10Jul 02:08
@@ -809,6 +811,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2x7ep|r/BiographyFilms|1,473|06Jul 08:47
 2rzc0|r/VirginiaBeach|1,472|07Jul 14:15
 2utfi|r/Buyingforbaby|1,460|03Jul 23:38
+2vz0o|r/xthinspo|1,460|
 2yzvt|r/WhoRedditHatesNow|1,456|03Jul 20:23
 332si|r/OneTrueKlein|1,454|22Jul 21:25
 2uorh|r/GotMotivated|1,454|05Jul 00:39
@@ -817,7 +820,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2tdnb|r/ausents|1,444|03Jul 17:56
 2yxut|r/sharehearthstone|1,436|
 2wa7x|r/franksadventures|1,431|03Jul 17:34
-2tyg3|r/RachelStarr|1,428|
+2tyg3|r/RachelStarr|1,428|29Jul 21:06
 2s6hz|r/backstage|1,420|
 2sa44|r/ECEComponentExchange|1,418|12Jul 07:50
 2wqca|r/PandoranRedCross|1,415|05Jul 04:59
@@ -829,14 +832,14 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2w5pp|r/Dragonstone|1,375|05Jul 14:44
 2tcsn|r/germantrees|1,368|07Jul 15:55
 320ab|r/WritingOnTheWall|1,365|03Jul 21:44
-2xcvi|r/modeveryone|1,360|
+2xcvi|r/modeveryone|1,360|25Jul 05:54
 2uud8|r/RobinHood|1,349|
-2vsqj|r/AbuseInterrupted|1,344|
+2vsqj|r/AbuseInterrupted|1,344|25Jul 05:54
 2vpxu|r/sickbeard|1,339|03Jul 18:05
 31j3y|r/multipleloads|1,334|12Jul 01:02
 2r2po|r/piratenpartei|1,327|03Jul 19:38
 2szwv|r/ratemyband|1,324|04Jul 00:25
-379ez|r/GetSuave|1,314|
+379ez|r/GetSuave|1,314|25Jul 05:54
 384bx|r/UnearthedArcana|1,312|03Jul 22:30
 38e57|r/teachmeNSFW|1,308|07Jul 06:39
 2t0p3|r/encyclopediadramatica|1,307|10Jul 21:07
@@ -870,6 +873,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 32dv8|r/justneuerthings|1,201|18Jul 20:50
 2w3l7|r/floorgasm|1,201|
 2vdfj|r/armchairphilosophy|1,193|08Jul 02:08
+32kfb|r/Dogfighting|1,191|
 2sl8a|r/rawpetfood|1,189|03Jul 17:34
 324c5|r/beatingwomen2|1,183|
 2rq2t|r/Wizards|1,175|07Jul 07:33
@@ -895,6 +899,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2uskw|r/Birdswithhats|1,107|03Jul 21:44
 2vt3u|r/classicskateboarding|1,102|04Jul 14:11
 2x245|r/AgainstAtheismPlus|1,091|04Jul 02:42
+2ze5m|r/TodayNewsTeam|1,090|
 33q6d|r/ello2|1,082|04Jul 10:40
 2u18l|r/fridaynightlights|1,078|03Jul 17:35
 2zdur|r/FedoraFederation|1,077|07Jul 13:31
@@ -905,14 +910,14 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2rda3|r/promote|1,064|03Jul 20:01
 2sbl7|r/BritishRadio|1,058|03Jul 17:35
 2tapu|r/homebuilt|1,054|03Jul 20:01
-2tm1i|r/secretpalace|1,051|
+2tm1i|r/secretpalace|1,051|25Jul 05:54
 2t1mm|r/gameshow|1,048|04Jul 14:37
 30k5e|r/WooWoo|1,047|03Jul 19:15
 2vzc3|r/ejuice|1,043|06Jul 20:52
 2qkq0|r/Innovation|1,043|05Jul 13:52
 2ruyx|r/transformice|1,042|09Jul 19:32
 2w7m8|r/HandsOnComplexity|1,038|03Jul 21:22
-2rny1|r/soundcloud|1,030|
+2rny1|r/soundcloud|1,030|29Jul 21:07
 2sfy6|r/prettygirlproblems|1,027|05Jul 16:19
 2s3xw|r/SixFeetUnder|1,027|06Jul 04:06
 302pi|r/GBA4iOS|1,020|04Jul 15:01
@@ -924,9 +929,9 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2sm7d|r/soflojobs|1,000|06Jul 16:06
 33geg|r/CasualKripp|994|
 2sp0f|r/Butterflies|991|03Jul 17:35
-2u4yv|r/Chasers|989|
+2u4yv|r/Chasers|989|29Jul 21:07
 35vt2|r/pcreich|988|03Jul 20:01
-33nkm|r/faptoberfest|987|
+33nkm|r/faptoberfest|987|25Jul 05:54
 2y86s|r/ShittyBikeMods|984|06Jul 18:25
 2sb38|r/Malifaux|971|04Jul 04:15
 2yapx|r/AskRetail|970|04Jul 19:24
@@ -941,7 +946,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2z6jv|r/fastfoodreview|928|03Jul 19:15
 2vct4|r/SRSWimmin|923|06Jul 00:41
 36rt2|r/anastasia_shcheglova|923|03Jul 21:22
-2w3i7|r/UKBiscuits|917|
+2w3i7|r/UKBiscuits|917|25Jul 05:55
 3314n|r/1stAnal|917|03Jul 20:02
 2ue3k|r/NetworkForSale|912|04Jul 00:02
 2u3gk|r/GCSE|910|04Jul 07:11
@@ -968,9 +973,10 @@ vf2|r/nsfw|567,770|03Jul 23:34
 32lf7|r/UnbiasedWorldNews|839|11Jul 19:14
 3218c|r/johnyjohnyyespapa|832|03Jul 18:52
 30b8o|r/japaneseunderground|831|06Jul 04:53
-2rhj7|r/FMK|830|
+2rhj7|r/FMK|830|25Jul 05:55
 2w9v1|r/jerktalkdiamond|829|03Jul 19:16
 2tehc|r/Twokinds|829|03Jul 20:02
+38d5i|r/GasTheSnoo|826|29Jul 21:07
 2v0rv|r/renderings|823|03Jul 19:16
 2wml9|r/OffRoadRacing|821|03Jul 19:16
 306ui|r/Anticlimax|812|03Jul 17:35
@@ -997,9 +1003,9 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2yngo|r/pcmasterraceporn|739|06Jul 09:11
 2trlu|r/noideadogs|738|03Jul 17:36
 2ujin|r/MetaAnime|732|
-2wpr6|r/picklemilitia|726|
+2wpr6|r/picklemilitia|726|25Jul 05:55
 2s5tl|r/Reddit101|725|
-2so32|r/ChuckPalahniuk|721|
+2so32|r/ChuckPalahniuk|721|25Jul 05:55
 38my3|r/APunchableFace|720|
 31xls|r/ratschlagtiere|719|04Jul 07:58
 2wazb|r/nycgaybros|718|06Jul 22:36
@@ -1032,7 +1038,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 33qzv|r/freegiveaways|633|04Jul 07:12
 2w9un|r/RageGaming|632|03Jul 21:23
 2sfhl|r/skunkworks|631|07Jul 13:07
-2s3cx|r/goodreads|626|
+2s3cx|r/goodreads|626|29Jul 21:08
 2w7qb|r/hhhehehe|625|04Jul 03:24
 31sav|r/WeAreMods|622|09Jul 02:23
 2ubsa|r/99gamers|621|
@@ -1041,7 +1047,7 @@ vf2|r/nsfw|567,770|03Jul 23:34
 31lm6|r/garybuseygifs|616|
 33kno|r/miifighters|616|10Jul 21:43
 315tm|r/googlepokemon|615|
-33l4m|r/androidaudio|608|
+33l4m|r/androidaudio|608|29Jul 21:08
 38ae8|r/BoycottQatarWorldCup|606|
 33e90|r/TuckedInPuppies|605|06Jul 14:33
 2qxgy|r/Hospitality|604|
@@ -1058,18 +1064,3 @@ vf2|r/nsfw|567,770|03Jul 23:34
 2xkn3|r/cloudtobutt|578|
 2sb56|r/umea|577|03Jul 18:07
 2u16r|r/FlorenceAndTheMachine|575|04Jul 17:48
-312jc|r/kahootcrashing|573|10Jul 00:56
-348pj|r/firetvstick|570|03Jul 23:18
-2sdkx|r/posterdesign|567|
-2ys1c|r/HumanDogGifs|566|
-2yz34|r/idleclickinggames|562|
-2t126|r/Sooyoung|562|03Jul 20:49
-2siz0|r/kag|561|
-31khv|r/floridanature|560|
-2r7q5|r/Update|559|03Jul 18:30
-36qa8|r/SorryForYourLoss|559|11Jul 22:03
-2sjr8|r/rokugan|555|04Jul 02:44
-2zbkg|r/strangestateufo|553|04Jul 10:35
-34fuy|r/eonticket|547|05Jul 15:57
-2ugvy|r/Italianhistory|544|05Jul 01:20
-2ue1q|r/carscirclejerk|543|03Jul 21:24
