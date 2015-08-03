@@ -7,7 +7,7 @@ import datetime
 import bot
 r=praw.Reddit(bot.aG)
 
-sql = sqlite3.connect('@gallowboob.db')
+sql = sqlite3.connect('databases/@gallowboob.db')
 cur = sql.cursor()
 outfile = open('@hangman.md', 'w')
 
@@ -31,7 +31,7 @@ SQL_FLAIR_CSS_CLASS = 15
 
 FOOTER = '''
 submission | archive | note
---------- | -------- | -----
+---------- | ------- | -----
 [`3e3d5a`](http://redd.it/3e3d5a) | https://archive.is/H1D2V | /r/woahdude 3d printing support
 [`3e3e00`](http://redd.it/3e3e00) | https://archive.is/JcMRf | /r/pics statue
 [`3e3isi`](http://redd.it/3e3isi) | https://archive.is/y6jJU | /r/me_ir jeans
@@ -46,6 +46,9 @@ submission | archive | note
 [`3f2axj`](http://redd.it/3f2axj) | https://archive.is/V1Mlx | /r/gifs drifting kid
 [`3f29g7`](http://redd.it/3f29g7) | https://archive.is/2OBeP | /r/me_irl guy in water
 [`3f25st`](http://redd.it/3f25st) | https://archive.is/vofui | /r/unexpected sexy video on the beach
+[`3fjwoe`](http://redd.it/3fjwoe) | https://archive.is/WwRpr | /r/nonononoyes extreme biking
+[`3fjws0`](http://redd.it/3fjws0) | https://archive.is/s1B1F | /r/pics RIP Hitchbot
+[`3fjy38`](http://redd.it/3fjy38) | https://archive.is/5Rhzu | /r/peoplebeingjerks RIP Hitchbot again
 '''
 
 def out(*text):
