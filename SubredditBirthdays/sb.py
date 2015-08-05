@@ -792,9 +792,6 @@ def processjumble(count, nsfw=False):
     for x in range(count):
         sub = r.get_random_subreddit(nsfw=nsfw)
         process(sub, isjumbled=True, doupdates=True)
-        #else:
-        #   print('Upd: ' + sub.id + ' '+ sub.display_name + ' : ' + str(sub.subscribers))
-        #cur.execute('UPDATE subreddits SET JUMBLE=? WHERE ID=?', [sub.subscribers, '1', sub.id])
         sql.commit()
 
 
