@@ -1,15 +1,15 @@
 # Consistency? Where?
 
+import datetime
 import praw
 import sqlite3
-import datetime
 
 import bot
 r=praw.Reddit(bot.aG)
 
 sql = sqlite3.connect('databases/@gallowboob.db')
 cur = sql.cursor()
-outfile = open('@hangman.md', 'w')
+outfile = open('@hangman.md', 'w', encoding='utf-8')
 
 SQL_COLUMNCOUNT = 16
 SQL_IDINT = 0
@@ -51,8 +51,9 @@ submission | archive | note
 [`3fjy38`](http://redd.it/3fjy38) | https://archive.is/5Rhzu | /r/peoplebeingjerks RIP Hitchbot again
 '''
 
-def out(*text):
-	print(*text, file=outfile)
+def out(text):
+	outfile.write(text)
+	outfile.write('\n')
 
 def frequencydict(datalist):
 	datadict = {}
@@ -84,7 +85,7 @@ def findduplicates(datalist, attribute):
 	datadict = {}
 	for item in datalist:
 		attr = getattr(item, attribute)
-		datadict[attr] = datadict.get(attr, []) + [item.id]
+		datadict[attr] = datadict.get(attr, []) + [item]
 	datadict = {x:datadict[x] for x in datadict if len(datadict[x]) > 2}
 	return datadict
 
@@ -123,8 +124,10 @@ def main():
 		refreshids = refreshids[100:]
 		for item in items:
 			if item.author is None:
+				item.dot = '•'
 				nonliving.append(item)
 			else:
+				item.dot = '○'
 				living.append(item)
 	out('Submissions alive: %d  ' % len(living))
 	out('Submissions deleted: %d  ' % len(nonliving))
@@ -168,7 +171,7 @@ def main():
 	out('')
 	for key in freq_total:
 		val = freq_total[key]
-		freq_total[key] = ['[`{i}`](http://redd.it/{i})'.format(i=i) for i in val]
+		freq_total[key] = ['[`{d}`](http://redd.it/{i})'.format(d=i.id+i.dot, i=i.id) for i in val]
 	out('url | karma farmas')
 	out('----- | -----')
 	out(dictformat(freq_total))

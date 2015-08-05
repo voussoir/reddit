@@ -499,7 +499,7 @@ def memberformat_full(data, spacer='.'):
 
 def memberformat_brief(data, spacer='.'):
     '''
-    Shorter version of memberformat for avaialbe names
+    Shorter version of memberformat for avaialbe names.
     '''
     name = data[SQL_NAME]
     lastscan = data[SQL_LASTSCAN]
@@ -510,7 +510,7 @@ def memberformat_brief(data, spacer='.'):
 
 def find(name, doreturn=False):
     '''
-    Print the details of a username
+    Print the details of a username.
     '''
     cur.execute('SELECT * FROM users WHERE LOWER(name)=?', [name])
     f = cur.fetchone()
@@ -523,7 +523,7 @@ def find(name, doreturn=False):
 
 def load_textfile(filename):
     '''
-    Read lines of file into a list
+    Returns list of lines.
     '''
     f = open(filename, 'r')
     lines = [x.strip() for x in f.readlines()]
@@ -532,7 +532,7 @@ def load_textfile(filename):
 
 def save_textfile(filename, lines):
     '''
-    Write items of list as lines in file
+    Write items of list as lines in file.
     '''
     f = open(filename, 'w')
     for x in lines:
@@ -540,11 +540,14 @@ def save_textfile(filename, lines):
     f.close()
     
 def idlenew(subreddit='all', sleepy=15):
+    '''
+    For processing while AFK.
+    '''
     while True:
         try:
             get_from_new(subreddit, 100)
         except KeyboardInterrupt:
             break
         except:
-            pass
+            traceback.print_exc()
         time.sleep(sleepy)
