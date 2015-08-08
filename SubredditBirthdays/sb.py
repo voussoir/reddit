@@ -118,7 +118,7 @@ SUBREDDIT_TYPE = {
     None:4,
     'employees_only':5,
     'gold_restricted':6,
-    'gold_only':6
+    'gold_only':7
 }
 SUBMISSION_TYPE = {
     'any':0,
@@ -223,16 +223,23 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True,
                     subscribers = sub.subscribers
                 else:
                     subscribers = 0
+
                 h = human(sub.created_utc)
+
                 isnsfw = 1 if sub.over18 else 0
                 if isjumbled is True or int(f[SQL_JUMBLE]) == 1:
                     isjumbled = 1
                 else:
                     isjumbled = 0
+
                 subreddit_type = SUBREDDIT_TYPE[sub.subreddit_type]
                 submission_type = SUBMISSION_TYPE[sub.submission_type]
+
                 oldsubs = f[SQL_SUBSCRIBERS]
                 subscriberdiff = subscribers - oldsubs
+                if subscribers == 0 and oldsubs > 2 and subreddit_type != SUBREDDIT_TYPE['private']:
+                    print('SUSPICIOUS %s' % sub.display_name)
+                    cur.execute('INSERT INTO suspicious VALUES(?, ?, ?, ?)', [idint, sub.id, sub.display_name, oldsubs])
                 print('Upd: %s : %s : %s : %s : %d (%d)' % (sub.id, h, isnsfw,
                       sub.display_name, subscribers, subscriberdiff))
                 cur.execute('''
