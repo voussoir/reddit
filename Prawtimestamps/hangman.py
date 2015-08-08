@@ -148,14 +148,6 @@ def main():
 	out('Average score of living: %d  ' % (average([x[0] for x in scores_living])))
 	out('Average score of deleted: %d  ' % (average([x[0] for x in scores_nonliving])))
 	out('')
-	if scores_total:
-		out('Highest score: [%d](http://redd.it/%s)  ' % (scores_total[0][0], scores_total[0][1]))
-	if scores_living:
-		out('Highest score of living: [%d](http://redd.it/%s)  ' % (scores_living[0][0], scores_living[0][1]))
-		out('Lowest score of living: [%d](http://redd.it/%s)  ' % (scores_living[-1][0], scores_living[-1][1]))
-	if scores_nonliving:
-		out('Highest score of deleted: [%d](http://redd.it/%s)  ' % (scores_nonliving[0][0], scores_nonliving[0][1]))
-	out('')
 	freq_total = findduplicates(living+nonliving, 'url')
 	freq_living = findduplicates(living, 'url')
 	freq_nonliving = findduplicates(nonliving, 'url')
