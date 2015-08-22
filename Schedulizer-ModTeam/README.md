@@ -3,6 +3,8 @@ SchedulizerM
 
 Written for [/u/ApexRedditr](http://reddit.com/u/apexredditr) - [Req thread](http://www.reddit.com/r/RequestABot/comments/2m5abs/request_schedule_a_post/)
 
+Requires `pip install python-dateutil`
+
 Enormous overhaul of the Schedulizer system. This bot allows a team of moderators to put "Source Posts" in a centralized subreddit, and the content of those posts will immediately be dispersed at the desired time.
 
 ##Creating a Schedule

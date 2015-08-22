@@ -41,13 +41,10 @@ try:
 except ImportError:
     pass
 
+print('Opening SQL Database')
 sql = sqlite3.connect('sql.db')
-print('Loaded SQL Database')
 cur = sql.cursor()
-
 cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT)')
-
-sql.commit()
 
 print('Logging in...')
 r = praw.Reddit(USERAGENT)
