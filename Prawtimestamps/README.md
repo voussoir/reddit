@@ -1,6 +1,15 @@
 timesearch.py
 =============
 
+    19 august 2015
+    - fixed bug in which updatescores stopped iterating early
+      if you had more than 100 comments in a row in the db.
+    - commentaugment has been completely merged into the
+      timesearch.py file. You can use commentaugment_prompt()
+      to input the parameters, or use the commentaugment()
+      function directly.
+
+
 It's all fresh all smooth
 
 This creates an sqlite database file containing the submissions on a subreddit within the requested time span. Best when used in conjunction with an SQL viewer or a tool like Redmash to create text files.

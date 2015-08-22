@@ -124,10 +124,10 @@ def main():
 		refreshids = refreshids[100:]
 		for item in items:
 			if item.author is None:
-				item.dot = '•'
+				item.dot = '-'
 				nonliving.append(item)
 			else:
-				item.dot = '○'
+				item.dot = '+'
 				living.append(item)
 	out('Submissions alive: %d  ' % len(living))
 	out('Submissions deleted: %d  ' % len(nonliving))
@@ -164,6 +164,9 @@ def main():
 	for key in freq_total:
 		val = freq_total[key]
 		freq_total[key] = ['[`{d}`](http://redd.it/{i})'.format(d=i.id+i.dot, i=i.id) for i in val]
+	out('+ : submission is alive  ')
+	out('- : submission is deleted')
+	out('')
 	out('url | karma farmas')
 	out('----- | -----')
 	out(dictformat(freq_total))

@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 882,006 subreddits
+#####Collected 894,537 subreddits
 
-#####[Today's jumble](http://reddit.com/r/duolingo+HaloOnline+Economics+PowerMetal+discgolf+Hawaii+woahdude+TalesFromTheCustomer+TokyoGhoul+DarkNetMarketsNoobs+ios+BreakingShit+Weakpots+MLS+pakistan+snes+team60s+ResentfulAnimals+nin+Emo)
+#####[Today's jumble](http://reddit.com/r/Sense8+LGBTnews+CadenMoranDiary+ThatPeelingFeeling+nongolfers+UselessInfo+NYCbike+DnB+AnimalsBeingFunny+ufc+Indiana+StreetArtPorn+NoFapWar+ProGolf+greatdanes+cute+Brazil+MistressPorn+MosinNagant+CatsInSinks)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

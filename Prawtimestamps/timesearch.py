@@ -16,8 +16,9 @@ APP_REFRESH = ""
 MAXIMUM_EXPANSION_MULTIPLIER = 2
 # The maximum amount by which it can multiply the interval
 # when not enough posts are found.
-DATABASE_SUBREDDIT = 'databases/%s.db'
-DATABASE_USER = 'databases/@%s.db'
+DATABASE_FOLDER = 'databases'
+DATABASE_SUBREDDIT = '%s/%s.db' % (DATABASE_FOLDER, '%s')
+DATABASE_USER = '%s/@%s.db' % (DATABASE_FOLDER, '%s')
 try:
     import bot
     USERAGENT = bot.aPT
@@ -52,6 +53,7 @@ SQL_NUM_COMMENTS = 13
 SQL_FLAIR_TEXT = 14
 SQL_FLAIR_CSS_CLASS = 15
 
+
 def get_all_posts(subreddit, lower=None, maxupper=None,
                   interval=86400, usermode=False):
     '''
@@ -65,13 +67,24 @@ def get_all_posts(subreddit, lower=None, maxupper=None,
 
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS posts(idint INT, idstr TEXT,
-        created INT, self INT, nsfw INT, author TEXT, title TEXT,
-        url TEXT, selftext TEXT, score INT, subreddit TEXT, distinguish INT,
-        textlen INT, num_comments INT, flair_text TEXT, flair_css_class TEXT)
-        ''')
-    cur.execute('CREATE INDEX IF NOT EXISTS postindex ON posts(idint)')
+    cur.execute('''CREATE TABLE IF NOT EXISTS posts(
+        idint INT,
+        idstr TEXT,
+        created INT,
+        self INT,
+        nsfw INT,
+        author TEXT,
+        title TEXT,
+        url TEXT,
+        selftext TEXT,
+        score INT,
+        subreddit TEXT,
+        distinguish INT,
+        textlen INT,
+        num_comments INT,
+        flair_text TEXT,
+        flair_css_class TEXT)''')
+    cur.execute('CREATE INDEX IF NOT EXISTS idstrindex ON posts(idstr)')
 
     offset = -time.timezone
     subname = subreddit if type(subreddit)==str else subreddit.display_name
@@ -164,16 +177,6 @@ def get_all_posts(subreddit, lower=None, maxupper=None,
     del cur
     del sql
 
-def human(timestamp):
-    x = datetime.datetime.utcfromtimestamp(timestamp)
-    x = datetime.datetime.strftime(x, "%b %d %Y %H:%M:%S")
-    return x
-
-def humannow():
-    x = datetime.datetime.now(datetime.timezone.utc).timestamp()
-    x = human(x)
-    return x
-
 def smartinsert(sql, cur, results, delaysave=False, nosave=False):
     '''
     Insert the data into the database
@@ -186,7 +189,7 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
     '''
     newposts = 0
     for o in results:
-        cur.execute('SELECT * FROM posts WHERE idint=?', [b36(o.id)])
+        cur.execute('SELECT * FROM posts WHERE idstr=?', [o.fullname])
         if not cur.fetchone():
             newposts += 1
             try:
@@ -194,58 +197,103 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
             except AttributeError:
                 o.authorx = '[DELETED]'
 
-            if o.is_self:
-                o.url = None
             postdata = [None] * SQL_COLUMNCOUNT
-            postdata[SQL_IDINT] = b36(o.id)
-            postdata[SQL_IDSTR] = o.fullname
-            postdata[SQL_CREATED] = o.created_utc
-            postdata[SQL_SELF] = o.is_self
-            postdata[SQL_NSFW] = o.over_18
-            postdata[SQL_AUTHOR] = o.authorx
-            postdata[SQL_TITLE] = o.title
-            postdata[SQL_URL] = o.url
-            postdata[SQL_SELFTEXT] = o.selftext
-            postdata[SQL_SCORE] = o.score
-            postdata[SQL_SUBREDDIT] = o.subreddit.display_name
-            postdata[SQL_DISTINGUISHED] = o.distinguished
-            postdata[SQL_TEXTLEN] = len(o.selftext)
-            postdata[SQL_NUM_COMMENTS] = o.num_comments
-            postdata[SQL_FLAIR_TEXT] = o.link_flair_text
-            postdata[SQL_FLAIR_CSS_CLASS] = o.link_flair_css_class
-            cur.execute('''
-                INSERT INTO posts VALUES(
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ''', postdata)
+
+            if isinstance(o, praw.objects.Submission):
+                if o.is_self:
+                    o.url = None
+                postdata[SQL_IDINT] = b36(o.id)
+                postdata[SQL_IDSTR] = o.fullname
+                postdata[SQL_CREATED] = o.created_utc
+                postdata[SQL_SELF] = o.is_self
+                postdata[SQL_NSFW] = o.over_18
+                postdata[SQL_AUTHOR] = o.authorx
+                postdata[SQL_TITLE] = o.title
+                postdata[SQL_URL] = o.url
+                postdata[SQL_SELFTEXT] = o.selftext
+                postdata[SQL_SCORE] = o.score
+                postdata[SQL_SUBREDDIT] = o.subreddit.display_name
+                postdata[SQL_DISTINGUISHED] = o.distinguished
+                postdata[SQL_TEXTLEN] = len(o.selftext)
+                postdata[SQL_NUM_COMMENTS] = o.num_comments
+                postdata[SQL_FLAIR_TEXT] = o.link_flair_text
+                postdata[SQL_FLAIR_CSS_CLASS] = o.link_flair_css_class
+
+            if isinstance(o, praw.objects.Comment):
+                postdata[SQL_IDINT] = b36(o.id)
+                postdata[SQL_IDSTR] = o.fullname
+                postdata[SQL_CREATED] = o.created_utc
+                postdata[SQL_SELF] = None
+                postdata[SQL_NSFW] = None
+                postdata[SQL_AUTHOR] = o.authorx
+                postdata[SQL_TITLE] = o.parent_id
+                postdata[SQL_URL] = o.link_id
+                postdata[SQL_SELFTEXT] = o.body
+                postdata[SQL_SCORE] = o.score
+                postdata[SQL_SUBREDDIT] = o.subreddit.display_name
+                postdata[SQL_DISTINGUISHED] = o.distinguished
+                postdata[SQL_TEXTLEN] = len(o.body)
+                postdata[SQL_NUM_COMMENTS] = None
+                postdata[SQL_FLAIR_TEXT] = None
+                postdata[SQL_FLAIR_CSS_CLASS] = None
+
+            cur.execute('''INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', postdata)
         else:
-            cur.execute('UPDATE posts SET score=? WHERE idint=?',
-                        [o.score, b36(o.id)])
+            postdata = [None] * 5
+            
+            if isinstance(o, praw.objects.Submission):
+                postdata[0] = o.score
+                postdata[1] = o.num_comments
+                postdata[2] = o.selftext
+                postdata[3] = o.distinguished
+            
+            if isinstance(o, praw.objects.Comment):
+                postdata[0] = o.score
+                postdata[1] = None
+                postdata[2] = o.body
+                postdata[3] = o.distinguished
+
+            postdata[-1] = o.fullname
+
+            cur.execute('UPDATE posts SET score=?, num_comments=?, selftext=?, distinguish=? WHERE idstr=?', postdata)
+
         if not delaysave and not nosave:
             sql.commit()
     if delaysave and not nosave:
         sql.commit()
     return newposts
 
-def updatescores(databasename):
+def updatescores(databasename, submissions=True, comments=False):
     '''
-    Get all submissions from the database, and update
-    them with the current scores of those submissions
+    Get all submissions or comments from the database, and update
+    them with the current scores.
     '''
 
-    if '.db' not in databasename:
-        databasename += '.db'
+    databasename = databasename.replace('.db', '')
+    databasename = DATABASE_SUBREDDIT % databasename
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
     cur2 = sql.cursor()
-    cur.execute('SELECT COUNT(*) FROM posts')
-    totalitems = cur.fetchone()[0]
-    cur.execute('SELECT * FROM posts')
+    
+    if submissions and comments:
+        cur2.execute('SELECT COUNT(*) FROM posts')
+        cur.execute('SELECT * FROM posts')
+
+    elif submissions:
+        cur2.execute('SELECT COUNT(*) FROM posts WHERE idstr LIKE "t3_%"')
+        cur.execute('SELECT * FROM posts WHERE idstr LIKE "t3_%"')
+
+    elif comments:
+        cur2.execute('SELECT COUNT(*) FROM posts WHERE idstr LIKE "t1_%"')
+        cur.execute('SELECT * FROM posts WHERE idstr LIKE "t1_%"')
+    
+    totalitems = cur2.fetchone()[0]
     itemcount = 0
     while True:
         f = []
         for x in range(100):
             x = cur.fetchone()
-            if x is not None and 't3_' in x[SQL_IDSTR]:
+            if x is not None:
                 f.append(x[SQL_IDSTR])
         if len(f) == 0:
             break
@@ -303,6 +351,8 @@ def livestream(subreddit=None, username=None, sleepy=30, limit=100):
         except Exception as e:
             traceback.print_exc()
             time.sleep(5)
+hangman = lambda: livestream(username='gallowboob', sleepy=60)
+
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     """Converts an integer to a base36 string."""
@@ -328,6 +378,17 @@ def b36(i):
         return base36encode(i)
     if type(i) == str:
         return base36decode(i)
+
+def human(timestamp):
+    x = datetime.datetime.utcfromtimestamp(timestamp)
+    x = datetime.datetime.strftime(x, "%b %d %Y %H:%M:%S")
+    return x
+
+def humannow():
+    x = datetime.datetime.now(datetime.timezone.utc).timestamp()
+    x = human(x)
+    return x
+
 
 prompt_subreddit = '''
 - Subreddit
@@ -383,6 +444,174 @@ def main():
         if input().lower() != 'restart':
             break
 
+def commentaugment(databasename, limit, threshold, numthresh, skips, verbose):
+    databasename = databasename.replace('.db', '')
+    databasename = DATABASE_SUBREDDIT % databasename
+
+    sql = sqlite3.connect(databasename)
+    cur = sql.cursor()
+    cur2 = sql.cursor()
+
+    cur.execute('SELECT idstr FROM posts WHERE idstr LIKE "t3_%" AND num_comments > ? ORDER BY num_comments DESC', [numthresh])
+    fetchall = cur.fetchall()
+    fetchall = [item[0] for item in fetchall]
+    totalthreads = len(fetchall)
+
+    scannedthreads = skips
+    for trashindex, trash in enumerate(fetchall[:skips]):
+        # Use [0] because sql selected only idstr
+        print('Skipping %s, %d / %d' % (trash, trashindex+1, totalthreads))
+    fetchall = fetchall[skips:]
+
+    while True:
+        hundred = fetchall[:100]
+        fetchall = fetchall[100:]
+        hundred = list(filter(None, hundred))
+        if len(hundred) == 0:
+            return
+
+        for submission in hundred:
+            submission = r.get_submission(submission_id=submission.split('_')[-1])
+            if verbose:
+                spacer = '\n\t'
+            else:
+                spacer = ' '
+            print('Processing %s%sexpecting %d | ' % (submission.fullname, spacer, submission.num_comments), end='')
+            sys.stdout.flush()
+            if verbose:
+                print()
+            comments = get_comments_for_thread(submission, limit, threshold, verbose)
+            smartinsert(sql, cur2, comments)
+            scannedthreads += 1
+            if verbose:
+                print('\t', end='')
+            print('Found %d | %d / %d threads complete' % (len(comments), scannedthreads, totalthreads))
+
+def get_comments_for_thread(submission, limit, threshold, verbose):
+    comments = nofailrequest(lambda x: x.comments)(submission)
+    comments = praw.helpers.flatten_tree(comments)
+    comments = manually_replace_comments(comments, limit, threshold, verbose)
+    return comments
+
+def nofailrequest(function):
+    '''
+    Creates a function that will retry until it succeeds.
+    This function accepts 1 parameter, a function, and returns a modified
+    version of that function that will try-catch, sleep, and loop until it
+    finally returns.
+    '''
+    def a(*args, **kwargs):
+        while True:
+            try:
+                try:
+                    result = function(*args, **kwargs)
+                    return result
+                except AssertionError:
+                    # Strange PRAW bug causes certain MoreComments
+                    # To throw assertion error, so just ignore it
+                    # And get onto the next one.
+                    return []
+            except:
+                traceback.print_exc()
+                print('Retrying in 2...')
+                time.sleep(2)
+    return a
+
+def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False):
+    '''
+    PRAW's replace_more_comments method cannot continue
+    where it left off in the case of an Ow! screen.
+    So I'm writing my own function to get each MoreComments item individually
+
+    Furthermore, this function will maximize the number of retrieved comments by
+    sorting the MoreComments objects and getting the big chunks before worrying
+    about the tail ends.
+    '''
+
+    comments = []
+    morecomments = []
+    while len(incomments) > 0:
+        item = incomments[0]
+        if isinstance(item, praw.objects.MoreComments) and item.count >= threshold:
+            morecomments.append(item)
+        elif isinstance(item, praw.objects.Comment):
+            comments.append(item)
+        incomments = incomments[1:]
+
+    try:
+        while True:
+            if limit is not None and limit <= 0:
+                break
+            if len(morecomments) == 0:
+                break
+            morecomments.sort(key=lambda x: x.count, reverse=True)
+            mc = morecomments[0]
+            morecomments = morecomments[1:]
+            additional = nofailrequest(mc.comments)()
+            additionals = 0
+            if limit is not None:
+                limit -= 1
+            for item in additional:
+                if isinstance(item, praw.objects.MoreComments) and item.count >= threshold:
+                    morecomments.append(item)
+                elif isinstance(item, praw.objects.Comment):
+                    comments.append(item)
+                    additionals += 1
+            if verbose:
+                s = '\tGot %d more, %d so far.' % (additionals, len(comments))
+                if limit is not None:
+                    s += ' Can perform %d more replacements' % limit
+                print(s)
+    except KeyboardInterrupt:
+        pass
+    except:
+        traceback.print_exc()
+
+    return comments
+
+def fixint(i):
+    if i == '':
+        return 0
+    i = int(i)
+    if i < 0:
+        return 0
+    return i
+
+def commentaugment_prompt():
+    print('\nDatabase file')
+    databasename = input(']: ')
+    if databasename[-3:] != '.db':
+        databasename += '.db'
+    print('\nLimit - number of MoreComments objects to replace')
+    print('Enter 0 to have no limit and get all')
+    limit = input(']: ')
+    if limit == '':
+        limit = None
+    else:
+        limit = int(limit)
+        if limit < 1:
+            limit = None
+
+    print('\nThreshold - minimum number of children comments a MoreComments')
+    print('object must have to warrant a replacement')
+    threshold = input(']: ')
+    threshold = fixint(threshold)
+
+    print('\nMinimum num_comments a thread must have to be scanned')
+    numthresh = input(']: ')
+    numthresh = fixint(numthresh)
+
+    print('\nSkips - Skip ahead by this many threads, to pick up where you left off.')
+    skips = input(']: ')
+    skips = fixint(skips)
+
+    print('\nVerbosity. 0 = quieter, 1 = louder')
+    verbose = input(']: ')
+    verbose = fixint(verbose)
+    verbose = (verbose is 1)
+
+    commentaugment(databasename, limit, threshold, numthresh, skips, verbose)
+    print('Done')
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
