@@ -306,12 +306,27 @@ def updatescores(databasename, submissions=True, comments=False):
     del cur
     del sql
 
-def livestream(subreddit=None, username=None, sleepy=30, limit=100):
+def livestream_helper(submissions=None, comments=None, debug=False, *a, **k):
+    '''
+    Given a submission-retrieving function and/or a comment-retrieving function,
+    collect submissions and comments in a list together and return that.
+
+    '''
+    if (submissions, comments) == (None, None):
+        raise TypeError('livestream helper got double Nones')
+    results = []
+    for x in (submissions, comments):
+        if x is not None:
+            if debug:
+                print(x.__name__)
+            results += list(x(*a, **k))
+    return results
+
+def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=True, comments=False):
     '''
     Continuously get posts from this source
     and insert them into the database
     '''
-
     if subreddit is None and username is None:
         print('Enter username or subreddit parameter')
         return
@@ -323,17 +338,22 @@ def livestream(subreddit=None, username=None, sleepy=30, limit=100):
         print('Getting subreddit %s' % subreddit)
         sql = sqlite3.connect(DATABASE_SUBREDDIT % subreddit)
         item = r.get_subreddit(subreddit)
-        itemf = item.get_new
+        submissions = item.get_new if submissions else None
+        comments = item.get_comments if comments else None
     else:
         print('Getting redditor %s' % username)
         sql = sqlite3.connect(DATABASE_USER % username)
         item = r.get_redditor(username)
-        itemf = item.get_submitted
+        submissions = item.get_submitted if submissions else None
+        comments = item.get_comments if comments else None
+    
+    livestreamer = lambda *a, **k: livestream_helper(submissions, comments, False, *a, **k)
+
     cur = sql.cursor()
     while True:
         bot.refresh(r)  # personal use
         try:
-            items = list(itemf(limit=limit))
+            items = livestreamer(limit=limit)
             newitems = smartinsert(sql, cur, items)
             print('%s +%d' % (humannow(), newitems), end='')
             if newitems == 0:
@@ -351,7 +371,7 @@ def livestream(subreddit=None, username=None, sleepy=30, limit=100):
         except Exception as e:
             traceback.print_exc()
             time.sleep(5)
-hangman = lambda: livestream(username='gallowboob', sleepy=60)
+hangman = lambda: livestream(username='gallowboob', sleepy=60, submissions=True, comments=True)
 
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
@@ -615,17 +635,7 @@ def commentaugment_prompt():
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        subreddit = 'all'
-        lower = None
-        user = False
-        maxupper = None
-        interval = 86400
-        for x in sys.argv[1:]:
-            if x == 'update':
-                lower = 'update'
-            else:
-                x=x.split('=')
-                locals()[x[0]] = x[1]
-        get_all_posts(subreddit, lower, maxupper, interval, user)
+        c = sys.argv[1]
+        exec(c)
     else:
         main()
