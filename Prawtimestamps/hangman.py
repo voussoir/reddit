@@ -164,8 +164,8 @@ def main():
 	for key in freq_total:
 		val = freq_total[key]
 		freq_total[key] = ['[`{d}`](http://redd.it/{i})'.format(d=i.id+i.dot, i=i.id) for i in val]
-	out('+ : submission is alive  ')
-	out('- : submission is deleted')
+	out('`+` : submission is alive\n')
+	out('`-` : submission is deleted')
 	out('')
 	out('url | karma farmas')
 	out('----- | -----')
