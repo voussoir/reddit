@@ -38,5 +38,3 @@ title | author | time | comments
 [Summing Two Rows of Each Column](http://redd.it/3hw9dh) | /u/strogbad | 21 Aug 2015 21:03:04 | 5
 [Auto generate new tab with pre filled information](http://redd.it/3hzhj9) | /u/iloveexcel69 | 22 Aug 2015 17:01:49 | 4
 [Data validation that requires specific information from specific worksheets](http://redd.it/3hzlfb) | /u/zombienick21 | 22 Aug 2015 17:30:10 | 3
-[Quick Formula Help](http://redd.it/3i5iy8) | /u/ommak | 24 Aug 2015 02:30:39 | 0
-[Running combinations/permutations of a list of names in excel (For PGA fantasy sports)](http://redd.it/3i5nce) | /u/SchiitStack | 24 Aug 2015 03:08:50 | 0

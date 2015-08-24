@@ -12,8 +12,8 @@ MAX_TOTAL_COMMENTS = 24
 IGNORE_DELETED_AUTHORS = True
 SAVE_TO_TXT = 'results_%Y%b%d.txt'
 
-
-WEEK = 7 * 24 * 60 * 60
+MINIMUM_AGE = 60 * 60 * 24
+MAXIMUM_AGE = 7 * 60 * 60 * 24
 
 now = datetime.datetime.now(datetime.timezone.utc)
 nowstamp = now.timestamp()
@@ -25,8 +25,12 @@ new = subreddit.get_new(limit=1000)
 results = []
 old_in_a_row = 0
 for submissionindex, submission in enumerate(new):
-    print('Checked %d submissions\r' % (submissionindex+1), end='')
-    if nowstamp - submission.created_utc > WEEK:
+    print('Checked %d submissions\r' % (submissionindex), end='')
+    age = nowstamp - submission.created_utc
+    if age < MINIMUM_AGE:
+        continue
+
+    if age > MAXIMUM_AGE:
         old_in_a_row += 1
         if old_in_a_row >= 10:
             break
@@ -38,11 +42,17 @@ for submissionindex, submission in enumerate(new):
     if IGNORE_DELETED_AUTHORS and submission.author is None:
         continue
 
-    if submission.num_comments > MAX_TOTAL_COMMENTS:
+    # make sure to perform this part AS LATE AS POSSIBLE to avoid
+    # api calls.
+    submission.replace_more_comments(limit=None, threshold=1)
+    roots = submission.comments[:]
+    total = praw.helpers.flatten_tree(submission.comments)
+
+    if len(total) > MAX_TOTAL_COMMENTS:
         continue
     
     # only counts roots
-    if len(submission.comments) > MAX_ROOT_COMMENTS:
+    if len(roots) > MAX_ROOT_COMMENTS:
         continue
 
     results.append(submission)
