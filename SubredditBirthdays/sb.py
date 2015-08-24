@@ -14,7 +14,20 @@ import traceback
 
 
 '''USER CONFIGURATION'''
-
+'''
+                                                                          ..::::::::.
+   :xzzx?"                    :TeeT/.           .".                /emD#BB&&&&&&&&&&BBDT
+  nBDXXXO8#e. .?zTneXXOmmmOn. ?BOODBBe:       "OBBBn.     T~    .  8mnzx??OX"":::::::.
+  #m:     ."  ~mOOXO&XnTzz?"  ::   .x8Bx     xBm~ x##?   :&x    De .     .Be
+  /DBmz"           ~&/        8e     .X&?   T&n    :mB?  /&~    ?&n      ~&z
+    "TmBDT:        ?&~        #O       88  ?&n      .DB: x&"     XB:     z&~
+       :zDBn.      T&"        #m       m#  D8        /&z ?&~     /&x     eB:
+ ?        ?88"     XB.        #m      ~BX .Be        "&n "&T     "&z     m#
+:BT        .m8.    m8         #m     ?B8:  #m        ?&z  OB"    ?&x     #m
+ n&O~       /&/    Dm         8m   /m&m:   T&n      :8#.  :8#/   OB:     8e
+  /m&8ezx?xe#8:    z?        "nnzX8&D?      TB8n?/?n##~    .XB8XDBT      :.
+    "TOD88DOz.               z#B#mn~         :TD#BBDT.       "zen~         
+'''
 USERAGENT = '''
 /u/GoldenSights SubredditBirthdays data collection:
 Gathering the creation dates of subreddits for visualization.
