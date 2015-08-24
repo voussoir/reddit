@@ -47,7 +47,8 @@ for submissionindex, submission in enumerate(new):
     submission.replace_more_comments(limit=None, threshold=1)
     roots = submission.comments[:]
     total = praw.helpers.flatten_tree(submission.comments)
-
+    submission.croots = roots
+    submission.ctotal = total
     if len(total) > MAX_TOTAL_COMMENTS:
         continue
     
@@ -63,7 +64,7 @@ for (submissionindex, submission) in enumerate(results):
     timeformat = datetime.datetime.utcfromtimestamp(submission.created_utc)
     timeformat = timeformat.strftime('%d %b %Y %H:%M:%S')
 
-    formatted = '[%s](%s) | %s | %s | %d' % (submission.title, submission.short_link, author, timeformat, submission.num_comments)
+    formatted = '[%s](%s) | %s | %s | %d' % (submission.title, submission.short_link, author, timeformat, len(submission.ctotal))
     results[submissionindex] = formatted
 
 table = 'title | author | time | comments\n'
