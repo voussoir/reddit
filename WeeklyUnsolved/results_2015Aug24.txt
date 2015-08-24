@@ -1,0 +1,42 @@
+title | author | time | comments
+:- | :- | -: | -:
+[How do I count the length of strings of the number '1,' in a list of 1's and 0's?](http://redd.it/3hbdze) | /u/friendlyvillain | 17 Aug 2015 13:58:56 | 5
+[Modelling change in data with fixed column sum](http://redd.it/3hbe7y) | /u/EurasianGuy | 17 Aug 2015 14:01:01 | 16
+[How to use an input box and lookup that code in one spreadsheet and paste column 2 in another spreadsheet?](http://redd.it/3hbil4) | /u/j007conks | 17 Aug 2015 14:35:04 | 3
+[I would like to generate "random" numbers that follow a pattern](http://redd.it/3hbmwr) | /u/Ronia_ | 17 Aug 2015 15:08:31 | 1
+[paste values without formulas](http://redd.it/3hbof7) | /u/PaulAcciardi | 17 Aug 2015 15:19:24 | 5
+[How to create a normal distribution curve (I'm confused with the -3, -2.9, -2.8, etc.?](http://redd.it/3hcrwg) | /u/rustitin | 17 Aug 2015 19:56:24 | 6
+[Getting this Macro to work for any set of Data.](http://redd.it/3hct8r) | /u/Moroax | 17 Aug 2015 20:05:24 | 11
+[Add ID To Row And Update Reply Rows With Same ID?](http://redd.it/3hczi8) | /u/neosegauk | 17 Aug 2015 20:47:16 | 1
+[Help with VBA code to search entire sheet (expand range)](http://redd.it/3hd1s7) | /u/missmarykat | 17 Aug 2015 21:03:00 | 3
+[Macro to lookup and copy data from one sheet to another](http://redd.it/3hd7fq) | /u/eddelmon | 17 Aug 2015 21:43:06 | 3
+[Help identifying the max value for a subset of a range and returning misc columns](http://redd.it/3hdfr1) | /u/down_time | 17 Aug 2015 22:42:01 | 4
+[How can I change the default comment box formatting in Excel 2011 on a Mac?](http://redd.it/3hdhdw) | /u/n4lunaluz | 17 Aug 2015 22:53:10 | 5
+[How to maximize value with multiple choices](http://redd.it/3he0fq) | /u/MagicKnights | 18 Aug 2015 01:18:27 | 3
+[Check odd one out](http://redd.it/3hf6x2) | /u/MeconiumMasterpiece | 18 Aug 2015 08:05:43 | 3
+[Finding similar strings, but not exact duplicates](http://redd.it/3hfpib) | /u/Visti | 18 Aug 2015 11:55:08 | 5
+[I have a large population of values and a subtotal. Is there a way to have excel search through combinations of these values until it gets to the subtotal?](http://redd.it/3hgce5) | /u/Farley50 | 18 Aug 2015 15:02:11 | 2
+[Select all variables in pivot table's field list.](http://redd.it/3hgia1) | /u/jamkgrif | 18 Aug 2015 15:42:00 | 3
+['His And Her Weight Tracker' template question](http://redd.it/3hgmsk) | /u/SnenetianVares | 18 Aug 2015 16:13:20 | 5
+[Application.ScreenUpdating is resetting in Excel 2013](http://redd.it/3hhgi4) | /u/tempest_87 | 18 Aug 2015 19:23:33 | 2
+[Separating a title into keywords](http://redd.it/3hhyj7) | /u/BlankM | 18 Aug 2015 21:19:32 | 5
+[Using a pivot table to relate values](http://redd.it/3hjd1a) | /u/likeaminibone | 19 Aug 2015 03:28:15 | 3
+[ways to store and compare data before and after excel calculation](http://redd.it/3hjhlj) | /u/cljsibyl123 | 19 Aug 2015 04:05:08 | 3
+[Pull names with nested index/match?](http://redd.it/3hkt8u) | /u/RedditGaymer | 19 Aug 2015 12:43:44 | 2
+[Formatting data tables on charts](http://redd.it/3hmk8o) | /u/Stompn_Tom | 19 Aug 2015 19:55:48 | 1
+[Trying to determine minimum number in pivot table for like items](http://redd.it/3hok9d) | /u/bigtwenty | 20 Aug 2015 05:02:25 | 8
+[Searching 2 columns, extracting word after second space](http://redd.it/3hox1n) | /u/SenorCeeb | 20 Aug 2015 07:20:50 | 2
+[Looking for a way to restrict access to opening workbooks.](http://redd.it/3hq087) | /u/BravoRAWLima | 20 Aug 2015 14:24:14 | 13
+[Pivot-table Formatting Question](http://redd.it/3hqlyl) | /u/Mick537 | 20 Aug 2015 16:55:18 | 5
+[Trying to lock a column from a table in a SUMIFS formula using the $ sign](http://redd.it/3hr9pv) | /u/MinesJA | 20 Aug 2015 19:35:32 | 4
+[(Mac) add-in to copy tables to wiki?](http://redd.it/3hrir2) | /u/mzinz | 20 Aug 2015 20:37:39 | 0
+[VBA: Open chrome in popout window?](http://redd.it/3htzam) | /u/InsertLinkHere | 21 Aug 2015 10:18:31 | 5
+[Using custom map backgrounds in Powermap: How to assign geography?](http://redd.it/3hu8rl) | /u/PurpleMan | 21 Aug 2015 12:10:41 | 0
+[Some way to create and import Minitab Capability charts into multiple excel sheets?](http://redd.it/3hujp6) | /u/Nonamenewname | 21 Aug 2015 13:46:00 | 0
+[Assistance requested transferring scheduling data to template via macro](http://redd.it/3hv1d3) | /u/eddelmon | 21 Aug 2015 15:55:21 | 8
+[Trying to find sales voids for 31 company accounts](http://redd.it/3hw8di) | /u/_bigAbomb | 21 Aug 2015 20:55:40 | 8
+[Summing Two Rows of Each Column](http://redd.it/3hw9dh) | /u/strogbad | 21 Aug 2015 21:03:04 | 5
+[Auto generate new tab with pre filled information](http://redd.it/3hzhj9) | /u/iloveexcel69 | 22 Aug 2015 17:01:49 | 4
+[Data validation that requires specific information from specific worksheets](http://redd.it/3hzlfb) | /u/zombienick21 | 22 Aug 2015 17:30:10 | 3
+[Quick Formula Help](http://redd.it/3i5iy8) | /u/ommak | 24 Aug 2015 02:30:39 | 0
+[Running combinations/permutations of a list of names in excel (For PGA fantasy sports)](http://redd.it/3i5nce) | /u/SchiitStack | 24 Aug 2015 03:08:50 | 0

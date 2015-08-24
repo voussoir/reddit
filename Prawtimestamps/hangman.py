@@ -110,11 +110,11 @@ def main():
 	out('so these numbers should be considered lower than is correct.  ')
 	out('[click here](https://github.com/voussoir/reddit/raw/master/Prawtimestamps/%40gallowboob.db) to download the sqlite db.')
 	out('')
-	cur.execute('SELECT COUNT(idint) FROM posts')
+	cur.execute('SELECT COUNT(idint) FROM posts WHERE idstr LIKE "t3_%"')
 	totalitems = cur.fetchone()[0]
 	out('Submissions on record: %d  ' % totalitems)
 
-	cur.execute('SELECT idstr FROM posts')
+	cur.execute('SELECT idstr FROM posts WHERE idstr LIKE "t3_%"')
 	refreshids = [x[0] for x in cur.fetchall()]
 	living = []
 	nonliving = []
