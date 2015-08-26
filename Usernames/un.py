@@ -10,7 +10,7 @@ import time
 import traceback
 
 
-sql = sqlite3.connect('un.db')
+sql = sqlite3.connect('C:/git/reddit/usernames/un.db')
 cur = sql.cursor()
 cur.execute('''
     CREATE TABLE IF NOT EXISTS users(
@@ -551,3 +551,6 @@ def idlenew(subreddit='all', sleepy=15):
         except:
             traceback.print_exc()
         time.sleep(sleepy)
+
+def execit(*args, **kwargs):
+    exec(*args, **kwargs)

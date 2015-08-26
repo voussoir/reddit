@@ -239,3 +239,6 @@ def human(timestamp):
 def lastitem():
     cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
     return cur.fetchone()[SQL_IDSTR]
+
+def execit(*args, **kwargs):
+    exec(*args, **kwargs)
