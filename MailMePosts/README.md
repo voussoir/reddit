@@ -1,4 +1,4 @@
 MailMePosts
 =============
 
-This bot works on the same premise as Mailme, but instead of finding comments with your keyword, it will find submissions
+This bot has been merged with [MailMe](https://github.com/voussoir/reddit/tree/master/MailMe). Use the `DO_SUBMISSIONS` variable in that bot's config to do this.

@@ -95,6 +95,11 @@ def levenshtein(s1, s2):
 
 
 def findsuper(comment, tolerance= 3):
+    '''
+    Look in the comment for any matches in the dict.
+    This version uses the levenshtein function to look for keys
+    which are slightly mispelled.
+    '''
     results = []
     used = []
     for itemname in DICT:
@@ -125,6 +130,11 @@ def findsuper(comment, tolerance= 3):
     return results
 
 def findsimple(comment):
+    '''
+    Look in the comment for any matches in the dict.
+    This version just checks whether the text is in the body.
+    It's faster than findsuper.
+    '''
     results = []
     for itemname in DICT:
         if itemname.lower() in comment.lower():

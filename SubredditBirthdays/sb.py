@@ -14,20 +14,6 @@ import traceback
 
 
 '''USER CONFIGURATION'''
-'''
-                                                                          ..::::::::.
-   :xzzx?"                    :TeeT/.           .".                /emD#BB&&&&&&&&&&BBDT
-  nBDXXXO8#e. .?zTneXXOmmmOn. ?BOODBBe:       "OBBBn.     T~    .  8mnzx??OX"":::::::.
-  #m:     ."  ~mOOXO&XnTzz?"  ::   .x8Bx     xBm~ x##?   :&x    De .     .Be
-  /DBmz"           ~&/        8e     .X&?   T&n    :mB?  /&~    ?&n      ~&z
-    "TmBDT:        ?&~        #O       88  ?&n      .DB: x&"     XB:     z&~
-       :zDBn.      T&"        #m       m#  D8        /&z ?&~     /&x     eB:
- ?        ?88"     XB.        #m      ~BX .Be        "&n "&T     "&z     m#
-:BT        .m8.    m8         #m     ?B8:  #m        ?&z  OB"    ?&x     #m
- n&O~       /&/    Dm         8m   /m&m:   T&n      :8#.  :8#/   OB:     8e
-  /m&8ezx?xe#8:    z?        "nnzX8&D?      TB8n?/?n##~    .XB8XDBT      :.
-    "TOD88DOz.               z#B#mn~         :TD#BBDT.       "zen~         
-'''
 USERAGENT = '''
 /u/GoldenSights SubredditBirthdays data collection:
 Gathering the creation dates of subreddits for visualization.
@@ -60,7 +46,7 @@ WAITS = str(WAIT)
 
 GOODCHARS = string.ascii_letters + string.digits + '_'
 
-sql = sqlite3.connect('sql.db')
+sql = sqlite3.connect('C:/git/reddit/subredditbirthdays/sql.db')
 cur = sql.cursor()
 cur2 = sql.cursor()
 cur.execute('''
@@ -990,3 +976,6 @@ def completesweep(shuffle=False, sleepy=0, query=None):
 def get_newest_sub():
     brandnewest = list(r.get_new_subreddits(limit=1))[0]
     return brandnewest.id
+
+def execit(*args, **kwargs):
+    exec(*args, **kwargs)
