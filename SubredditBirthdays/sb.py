@@ -30,6 +30,14 @@ APP_REFRESH = ""
 WAIT = 20
 # This is how many seconds you will wait between cycles.
 # The bot is completely inactive during this time.
+
+LOWERBOUND_STR = '2qh0j'
+LOWERBOUND_INT = 4594339
+
+MEMBERFORMAT = '_idstr_, _human_, _nsfw_, _name__spacer__subscribers_'
+
+'''All done!'''
+
 try:
     import bot
     #USERAGENT = bot.aG
@@ -40,7 +48,6 @@ try:
 except ImportError:
     pass
 
-'''All done!'''
 
 WAITS = str(WAIT)
 
@@ -125,12 +132,6 @@ SUBMISSION_TYPE = {
     'self':2,
     None:3
 }
-
-
-LOWERBOUND_STR = '2qh0j'
-LOWERBOUND_INT = 4594339
-
-MEMBERFORMAT = '_idstr_, _human_, _nsfw_, _name__spacer__subscribers_'
 
 
 def human(timestamp):

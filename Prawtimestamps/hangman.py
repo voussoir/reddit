@@ -49,6 +49,7 @@ submission | archive | note
 [`3fjwoe`](http://redd.it/3fjwoe) | https://archive.is/WwRpr | /r/nonononoyes extreme biking
 [`3fjws0`](http://redd.it/3fjws0) | https://archive.is/s1B1F | /r/pics RIP Hitchbot
 [`3fjy38`](http://redd.it/3fjy38) | https://archive.is/5Rhzu | /r/peoplebeingjerks RIP Hitchbot again
+[`3iivzt`](http://redd.it/3iivzt) | https://archive.is/R87l7 | /r/pics tiny wasp nest
 '''
 
 def out(text):
@@ -164,6 +165,9 @@ def main():
 	for key in freq_total:
 		val = freq_total[key]
 		freq_total[key] = ['[`{d}`](http://redd.it/{i})'.format(d=i.id+i.dot, i=i.id) for i in val]
+	out('&nbps;\n')
+	# The >2 control is done within the findduplicates function
+	out('Only URLs with 3+ reposts are shown here.\n')
 	out('`+` : submission is alive\n')
 	out('`-` : submission is deleted')
 	out('')

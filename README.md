@@ -17,36 +17,15 @@ Do not put multiple programs in the same folder. They use SQL databases to store
 ________
 
 
-###Concerned about your password?
-
-For the bots that require login information, I tell you to put your password in the Config area as `PASSWORD`. Understandably, you may be concerned about having your password stored in plain text on your computer.
-
-If you replace
-
-    PASSWORD = ""
-
-with
-    
-    import getpass
-    PASSWORD = getpass.getpass("Password: ")
-
-Then you will be asked to type in your bot's password when it starts, using the [getpass module](https://docs.python.org/2/library/getpass.html#getpass.getpass).
-
-Alternatively, for automated and semi-secure password storage, see Bot.py
-
-________
-
-
 
 ###Bot.py
 
 In a lot of my bots, you'll see 
 
-`import bot`
+    import bot
+    USERAGENT = bot.aG
 
-`USERNAME = bot.uG`
-
-etc. This is a file in my python library which contains my bot's username and my password. I use this system so that I can push this code to git without worrying about my password being seen.
+etc. This is a file in my python library which contains my bot's oauth credentials I use this system so that I can push this code to git without worrying about my stuff being seen.
 
 To create your own bot.py is very simple. It's just a regular .py file which you save in C:\Python34\Lib\. Then you just enter some variables
 
