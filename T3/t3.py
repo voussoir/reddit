@@ -94,7 +94,7 @@ def process(idstr, ranger=0):
 
     if isinstance(idstr, str):
         idstr = [idstr]
-    last = b36(idstr[-1])
+    last = b36(idstr[-1]) + 1
     for x in range(ranger):
         # Take the last item in the list and get its ID in decimal
         # Then add the next `ranger` IDs into the list

@@ -20,4 +20,8 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
-*.db binary
+*.db binary -delta
+*.zip binary -delta
+*.png binary -delta
+*.jpg binary -delta
+*.ico binary -delta
