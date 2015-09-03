@@ -165,7 +165,7 @@ def main():
 	for key in freq_total:
 		val = freq_total[key]
 		freq_total[key] = ['[`{d}`](http://redd.it/{i})'.format(d=i.id+i.dot, i=i.id) for i in val]
-	out('&nbps;\n')
+	out('&nbsp;\n')
 	# The >2 control is done within the findduplicates function
 	out('Only URLs with 3+ reposts are shown here.\n')
 	out('`+` : submission is alive\n')

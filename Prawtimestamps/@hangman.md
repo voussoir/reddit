@@ -26,7 +26,7 @@ Submissions living with the same link as another living: 269
 Submissions deleted with the same link as another deleted: 582  
 Submissions deleted with the same link as another living: 306  
 
-&nbps;
+&nbsp;
 
 Only URLs with 3+ reposts are shown here.
 
