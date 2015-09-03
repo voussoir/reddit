@@ -25,7 +25,7 @@ In a lot of my bots, you'll see
     import bot
     USERAGENT = bot.aG
 
-etc. This is a file in my python library which contains my bot's oauth credentials I use this system so that I can push this code to git without worrying about my stuff being seen.
+etc. This is a file in my python library which contains my bot's oauth credentials. I use this system so that I can push this code to git without worrying about my stuff being seen.
 
 To create your own bot.py is very simple. It's just a regular .py file which you save in C:\Python34\Lib\. Then you just enter some variables
 
