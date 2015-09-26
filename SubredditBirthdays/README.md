@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 901,642 subreddits
+#####Collected 914,751 subreddits
 
-#####[Today's jumble](http://reddit.com/r/motivation+MiiverseInAction+JUSTNOMIL+deadpool+AnimalsFailing+NoFapChristians+GasTheSnoo+WebGames+Hawken+modeltrains+Brawlhalla+ResentfulAnimals+worldbuilding+snakes+mturk+Games+collegebaseball+Boise+AskCulinary+raidsecrets)
+#####[Today's jumble](http://reddit.com/r/wanttobelieve+AnimalsFailing+TrueFilm+VapePorn+kryptguide+Magicdeckbuilding+bodybuilding+baww+MortalKombat+pokemonshowdown+warlizard+fatpeoplehate51+ukulele+bears+calvinandhobbes+stevenuniverse+worldbuilding+brasil+Aquariums+raidsecrets)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

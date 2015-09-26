@@ -8,7 +8,9 @@ timesearch.py
       timesearch.py file. You can use commentaugment_prompt()
       to input the parameters, or use the commentaugment()
       function directly.
-
+    07 september 2015
+    - fixed bug which allowed `livestream` to crash because
+      `bot.refresh()` was outside of the trycatch.
 
 It's all fresh all smooth
 

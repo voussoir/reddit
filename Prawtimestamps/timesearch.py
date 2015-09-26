@@ -351,8 +351,8 @@ def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=
 
     cur = sql.cursor()
     while True:
-        bot.refresh(r)  # personal use
         try:
+            bot.refresh(r)  # personal use
             items = livestreamer(limit=limit)
             newitems = smartinsert(sql, cur, items)
             print('%s +%d' % (humannow(), newitems), end='')

@@ -164,12 +164,24 @@ def userify_list(users, noskip=False):
             user = r.get_redditor(username, fetch=True)
             user.preverify = preverify
             yield user
-        except praw.errors.NotFound as he:
+        except praw.errors.NotFound:
             availability = r.is_username_available(username)
             availability = AVAILABILITY[availability]
             yield [username, availability]
 
 def process(users, quiet=False, knownid='', noskip=False):
+    '''
+    Fetch the /u/ page for a user or list of users
+
+    users :   A list of strings, each representing a username. Since reddit
+               usernames must be 3 - 20 characters and only contain
+               alphanumeric + "_-", any improper strings will be removed.
+    quiet :   Silences the "x old" report at the end
+    knownid : If you're processing a user which does not exist, but you know
+               what their user ID was supposed to be, this will at least allow
+               you to flesh out the database entry a little better.
+    noskip :  Do not skip usernames which are already in the database.
+    '''
     olds = 0
     if isinstance(users, str):
         users = [users]
@@ -213,6 +225,10 @@ def process(users, quiet=False, knownid='', noskip=False):
 p = process
 
 def processid(idnum, ranger=1):
+    '''
+    Do an author_fullname search in an attempt to find a user by their ID.
+    This is not reliable if the user has no public submissions.
+    '''
     idnum = idnum.split('_')[-1]
     base = b36(idnum)
     for x in range(ranger):
@@ -222,15 +238,22 @@ def processid(idnum, ranger=1):
             continue
         idnum = 't2_' + b36(idnum)
         idnum = idnum.lower()
-        search = list(r.search('author_fullname:%s' % idnum))
         print('%s - ' % idnum, end='')
         sys.stdout.flush()
+        search = list(r.search('author_fullname:%s' % idnum))
         if len(search) > 0:
             item = search[0].author.name
             process(item, quiet=True, knownid=idnum[3:])
         else:
             print('No idea.')
 pid = processid
+
+def check_old_availables():
+    now = getnow()
+    threshold = now - 86400
+    cur.execute('SELECT * FROM users WHERE available = 1 AND lastscan < ?', [threshold])
+    for item in fetchgenerator():
+        process(item, quiet=True, noskip=True)
 
 def smartinsert(data, printprefix='', preverified=False):
     '''
@@ -512,8 +535,8 @@ def find(name, doreturn=False):
     '''
     Print the details of a username.
     '''
-    cur.execute('SELECT * FROM users WHERE LOWER(name)=?', [name])
-    f = cur.fetchone()
+    #cur.execute('SELECT * FROM users WHERE LOWER(name)=?', [name])
+    f = getentry(name=name)
     if f:
         if doreturn:
             return f
