@@ -98,6 +98,33 @@ def getnow(timestamp=True):
         return now.timestamp()
     return now
 
+def allpossiblefromset(characters, length=None, minlength=None, maxlength=None):
+    '''
+    Given an iterable of characters, return a generator that creates every
+    permutation of length `length`.
+
+    If `minlength` and `maxlength` are both provided, all values of intermediate
+    lengths will be generated
+    '''
+
+    if not (minlength is None or maxlength is None):
+        for x in range(minlength, maxlength+1):
+            for item in allpossiblefromset(characters, x):
+                yield item
+    elif length is None:
+        raise ValueError('`length` must be provided if you arent using the mix/max')
+    else:
+        endingpoint = len(characters) ** length
+
+        characters = ''.join(sorted(list(set(characters))))
+
+        for permutation in range(endingpoint):
+            permutation = base36encode(permutation, alphabet=characters)
+            l = len(permutation)
+            if l < length:
+                permutation = (characters[0] * (length-l)) + permutation
+            yield permutation
+
 def base36encode(number, alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
     """Converts an integer to a base36 string."""
     if not isinstance(number, (int)):
@@ -147,8 +174,10 @@ def reducetonames(users):
             outlist.add(name.name.lower())
     return outlist
 
-def userify_list(users, noskip=False):
+def userify_list(users, noskip=False, quiet=False):
     users = list(reducetonames(users))
+    if not quiet:
+        print('Processing %d names' % len(users))
     for username in users:
         try:
             preexisting = getentry(name=username)
@@ -157,7 +186,8 @@ def userify_list(users, noskip=False):
                 preverify = getnow() - lastscan
                 preverify = (preverify > MIN_LASTSCAN_DIFF)
                 if not preverify and noskip is False:
-                    print('skipping ' + username)
+                    appendix = '(available)' if preexisting[SQL_AVAILABLE] else ''
+                    print('skipping %s %s' % (username, appendix))
                     continue
             else:
                 preverify = noskip
@@ -188,7 +218,7 @@ def process(users, quiet=False, knownid='', noskip=False):
     # I don't want to import types.GeneratorType just for one isinstance
     if type(users).__name__ == 'generator' or len(users) > 1:
         knownid=''
-    users = userify_list(users, noskip=noskip)
+    users = userify_list(users, noskip=noskip, quiet=quiet)
     current = 0
     for user in users:
         current += 1
@@ -251,8 +281,9 @@ pid = processid
 def check_old_availables():
     now = getnow()
     threshold = now - 86400
-    cur.execute('SELECT * FROM users WHERE available = 1 AND lastscan < ?', [threshold])
-    for item in fetchgenerator():
+    cur.execute('SELECT name FROM users WHERE available = 1 AND lastscan < ? ORDER BY lastscan ASC', [threshold])
+    availables = cur.fetchall()
+    for item in availables:
         process(item, quiet=True, noskip=True)
 
 def smartinsert(data, printprefix='', preverified=False):
@@ -303,7 +334,7 @@ def print_message(data, printprefix=''):
                 data[SQL_COMMENT_KARMA]))
     else:
         statement = 'available' if data[SQL_AVAILABLE] is 1 else 'unavailable'
-        print('%s : %s' % (data[SQL_NAME], statement))
+        print('%s %s : %s' % (printprefix, data[SQL_NAME], statement))
 
 def get_from_listing(sr, limit, listfunction, submissions=True, comments=True, returnnames=False):
     '''
@@ -331,7 +362,10 @@ def get_from_listing(sr, limit, listfunction, submissions=True, comments=True, r
     if returnnames is True:
         return items
 
-    process(items)
+    try:
+        process(items)
+    except KeyboardInterrupt:
+        sql.commit()
 
 def get_from_new(sr, limit=None, submissions=True, comments=True, returnnames=False):
     '''
@@ -403,12 +437,12 @@ def show():
     '''
     Create a bunch of text files that nobody will read
     '''
-    file_time = open('show\\time.txt', 'w')
-    file_name = open('show\\name.txt', 'w')
-    file_karma_total = open('show\\karma_total.txt', 'w')
-    #file_karma_link = open('show\\karma_link.txt', 'w')
-    #file_karma_comment = open('show\\karma_comment.txt', 'w')
-    file_available = open('show\\available.txt', 'w')
+    file_time = open('show\\time.vdump', 'w')
+    file_name = open('show\\name.vdump', 'w')
+    file_karma_total = open('show\\karma_total.vdump', 'w')
+    #file_karma_link = open('show\\karma_link.vdump', 'w')
+    #file_karma_comment = open('show\\karma_comment.vdump', 'w')
+    file_available = open('show\\available.vdump', 'w')
     file_readme = open('README.md', 'r')
 
     totalitems = count(validonly=False)

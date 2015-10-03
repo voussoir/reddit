@@ -78,10 +78,11 @@ class Primary():
         self.todo = todo
         self.t=tkinter.Tk()
         self.t.configure(bg='#333')
-        self.syslabel = tkinter.Label(self.t, bg='#000', fg='#eee', justify='left', anchor='nw', height=3)
+        self.sysoutsize = 6
+        self.syslabel = tkinter.Label(self.t, bg='#000', fg='#eee', justify='left', anchor='nw', height=self.sysoutsize)
         self.syslabel.configure(font=('Consolas', 10))
         self.syslabel.pack(expand=True, fill='x', anchor='nw')
-        self.sysout = SysLabel(self.syslabel, 3)
+        self.sysout = SysLabel(self.syslabel, self.sysoutsize)
         sys.stdout = self.sysout
         sys.stderr = self.sysout
         self.display = tkinter.Label(self.t, text='Heyo', bg='#333', fg='#eee')
@@ -89,7 +90,7 @@ class Primary():
         self.display.pack(expand=True, fill='both')
         self.t.title('windowtitle')
         w = 550
-        h = 350
+        h = 400
         screenwidth = self.t.winfo_screenwidth()
         screenheight = self.t.winfo_screenheight()
         windowwidth = w

@@ -1,5 +1,6 @@
 #/u/GoldenSights
 import datetime
+import os
 import praw
 import sqlite3
 import sys
@@ -315,14 +316,18 @@ def livestream_helper(submissions=None, comments=None, debug=False, *a, **k):
     if (submissions, comments) == (None, None):
         raise TypeError('livestream helper got double Nones')
     results = []
-    for x in (submissions, comments):
-        if x is not None:
-            if debug:
-                print(x.__name__)
-            results += list(x(*a, **k))
+
+    if submissions:
+        if debug: print('Getting submissions', a, k)
+        results += list(submissions(*a, **k))
+    if comments:
+        if debug: print('Getting comments', a, k)
+        results += list(comments(*a, **k))
+    if debug:
+        print('Collected. Saving...')
     return results
 
-def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=True, comments=False):
+def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=True, comments=False, debug=False):
     '''
     Continuously get posts from this source
     and insert them into the database
@@ -347,7 +352,7 @@ def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=
         submissions = item.get_submitted if submissions else None
         comments = item.get_comments if comments else None
     
-    livestreamer = lambda *a, **k: livestream_helper(submissions, comments, False, *a, **k)
+    livestreamer = lambda *a, **k: livestream_helper(submissions, comments, debug, *a, **k)
 
     cur = sql.cursor()
     while True:
@@ -360,6 +365,8 @@ def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=
                 print('\r', end='')
             else:
                 print()
+            if debug:
+                print('Loop finished.')
             time.sleep(sleepy)
         except KeyboardInterrupt:
             print()
@@ -434,9 +441,15 @@ def main():
         print(prompt_subreddit, end='')
         sub = input()
         if sub == '':
-            print(promp_username, end='')
+            print(prompt_username, end='')
             usermode = input()
             sub = 'all'
+        if usermode:
+            p = DATABASE_USER % usermode
+        else:
+            p = DATABASE_SUBREDDIT % sub
+        if os.path.exists(p):
+            print('Found %s' % p)
         print(prompt_lowerbound, end='')
         lower  = input().lower()
         if lower == '':
@@ -490,12 +503,13 @@ def commentaugment(databasename, limit, threshold, numthresh, skips, verbose):
         if len(hundred) == 0:
             return
 
+        if verbose:
+            spacer = '\n\t'
+        else:
+            spacer = ' '
+
         for submission in hundred:
             submission = r.get_submission(submission_id=submission.split('_')[-1])
-            if verbose:
-                spacer = '\n\t'
-            else:
-                spacer = ' '
             print('Processing %s%sexpecting %d | ' % (submission.fullname, spacer, submission.num_comments), end='')
             sys.stdout.flush()
             if verbose:
@@ -505,7 +519,7 @@ def commentaugment(databasename, limit, threshold, numthresh, skips, verbose):
             scannedthreads += 1
             if verbose:
                 print('\t', end='')
-            print('Found %d | %d / %d threads complete' % (len(comments), scannedthreads, totalthreads))
+            print('Found %d |%s%d / %d threads complete' % (len(comments), spacer, scannedthreads, totalthreads))
 
 def get_comments_for_thread(submission, limit, threshold, verbose):
     comments = nofailrequest(lambda x: x.comments)(submission)
@@ -564,9 +578,10 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
                 break
             if len(morecomments) == 0:
                 break
-            morecomments.sort(key=lambda x: x.count, reverse=True)
-            mc = morecomments[0]
-            morecomments = morecomments[1:]
+            morecomments.sort(key=lambda x: x.count)
+            mc = morecomments.pop()
+            #mc = morecomments[0]
+            #morecomments = morecomments[1:]
             additional = nofailrequest(mc.comments)()
             additionals = 0
             if limit is not None:
@@ -632,6 +647,10 @@ def commentaugment_prompt():
 
     commentaugment(databasename, limit, threshold, numthresh, skips, verbose)
     print('Done')
+
+def existing_databases():
+    files = os.listdir(DATABASE_FOLDER)
+    print(files)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

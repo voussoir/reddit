@@ -382,17 +382,17 @@ def datetimedict(outputdict, timestamp, strftime):
     outputdict[dtd] = outputdict.get(dtd, 0) + 1
 
 def show():
-    file_all_time = open('show\\all-time.txt', 'w')
-    file_all_name = open('show\\all-name.txt', 'w')
-    file_all_subscribers = open('show\\all-subscribers.txt', 'w')
-    file_dirty_time = open('show\\dirty-time.txt', 'w')
-    file_dirty_name = open('show\\dirty-name.txt', 'w')
-    file_dirty_subscribers = open('show\\dirty-subscribers.txt', 'w')
-    file_jumble_sfw = open('show\\jumble.txt', 'w')
-    file_jumble_nsfw = open('show\\jumble-nsfw.txt', 'w')
-    file_duplicates = open('show\\duplicates.txt', 'w')
-    file_missing = open('show\\missing.txt', 'w')
-    file_stats = open('show\\statistics.txt', 'w')
+    file_all_time = open('show\\all-time.vdump', 'w')
+    file_all_name = open('show\\all-name.vdump', 'w')
+    file_all_subscribers = open('show\\all-subscribers.vdump', 'w')
+    file_dirty_time = open('show\\dirty-time.vdump', 'w')
+    file_dirty_name = open('show\\dirty-name.vdump', 'w')
+    file_dirty_subscribers = open('show\\dirty-subscribers.vdump', 'w')
+    file_jumble_sfw = open('show\\jumble.vdump', 'w')
+    file_jumble_nsfw = open('show\\jumble-nsfw.vdump', 'w')
+    file_duplicates = open('show\\duplicates.vdump', 'w')
+    file_missing = open('show\\missing.vdump', 'w')
+    file_stats = open('show\\statistics.vdump', 'w')
     file_readme = open('README.md', 'r')
 
     cur.execute('SELECT COUNT(idint) FROM subreddits WHERE created != 0')

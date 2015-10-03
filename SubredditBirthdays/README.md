@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 914,751 subreddits
+#####Collected 919,008 subreddits
 
-#####[Today's jumble](http://reddit.com/r/wanttobelieve+AnimalsFailing+TrueFilm+VapePorn+kryptguide+Magicdeckbuilding+bodybuilding+baww+MortalKombat+pokemonshowdown+warlizard+fatpeoplehate51+ukulele+bears+calvinandhobbes+stevenuniverse+worldbuilding+brasil+Aquariums+raidsecrets)
+#####[Today's jumble](http://reddit.com/r/dykesgonemild+spikes+Anthropology+twerk+deftones+ImaginaryBattlefields+LordsOfMinecraft+firefox+askwomenadvice+CrazyHand+pigs+FirstWorldConformists+bridgeporn+Metallica+SuperShibe+NinaDobrev+realbatfacts+perth+AmiiboCanada+minimalism)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -22,6 +22,8 @@ Some subreddits are not properly marked as NSFW. This is either the fault of the
 24 December 2014: **Massive speed boost** - I just learned about sql INDEX; and I've also added a column to the table where subreddit IDs are stored in integers instead of b36 strings. Together, these changes make updates go like 20x faster. Why have I waited so long?
 
 18 February 2015: Database is now TOO BIG for github! ZIP is provided in its place. The db is now tracking subreddit_type and submission_type to help detect spam. This has put the file over the allowed 100 megabyte limit. I'll probably forget to re-zip it on every commit but I'll do my best.
+
+03 October 2015: I'm starting to migrate to Git LFS for storing the big stuff. All of the /show/ text files are now using the extension "vdump" so that they can be registered to lfs without interfering with any other text files I use. They are still text files.
 ______
 
 
