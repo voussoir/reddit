@@ -6,25 +6,25 @@ Obviously I can't tell if a deleted post was its if I find it too late,
 so these numbers should be considered lower than is correct.  
 [click here](https://github.com/voussoir/reddit/raw/master/Prawtimestamps/%40gallowboob.db) to download the sqlite db.
 
-Submissions on record: 8606  
-Submissions alive: 5660  
-Submissions deleted: 2943  
+Submissions on record: 8971  
+Submissions alive: 5749  
+Submissions deleted: 3219  
 
-Selfposts: 54  
-Linkposts: 8552  
+Selfposts: 56  
+Linkposts: 8915  
 
-Average score: 767  
-Average score of living: 1161  
-Average score of deleted: 10  
+Average score: 752  
+Average score of living: 1168  
+Average score of deleted: 9  
 
 &nbsp;
 
 #reposts
 
-Submissions with the same link as another: 1372  
+Submissions with the same link as another: 1437  
 Submissions living with the same link as another living: 272  
-Submissions deleted with the same link as another deleted: 717  
-Submissions deleted with the same link as another living: 383  
+Submissions deleted with the same link as another deleted: 765  
+Submissions deleted with the same link as another living: 400  
 
 &nbsp;
 
@@ -56,6 +56,7 @@ http://i.imgur.com/O6WwWwW.gifv | [`398gjz+`](http://redd.it/398gjz), [`398hz2+`
 https://i.imgur.com/g1w2X6O.gifv | [`35ig13-`](http://redd.it/35ig13), [`35ig0t-`](http://redd.it/35ig0t), [`35ig0d-`](http://redd.it/35ig0d), [`35igbf-`](http://redd.it/35igbf), [`35igb3-`](http://redd.it/35igb3), [`35igar-`](http://redd.it/35igar)
 https://imgur.com/gallery/iRJmCUt | [`35id7v+`](http://redd.it/35id7v), [`35idbl-`](http://redd.it/35idbl), [`35id9b-`](http://redd.it/35id9b), [`35id8u-`](http://redd.it/35id8u), [`35id8i-`](http://redd.it/35id8i), [`35ie13-`](http://redd.it/35ie13)
 https://i.imgur.com/DCg7hWw.gifv | [`35asrf+`](http://redd.it/35asrf), [`35ancb-`](http://redd.it/35ancb), [`35anc2-`](http://redd.it/35anc2), [`35aq1n-`](http://redd.it/35aq1n), [`35arz8-`](http://redd.it/35arz8), [`35as39-`](http://redd.it/35as39)
+http://i.imgur.com/2N6i5OR.gifv | [`3oxavy-`](http://redd.it/3oxavy), [`3oxavu-`](http://redd.it/3oxavu), [`3oxbqv-`](http://redd.it/3oxbqv), [`3oxc8a-`](http://redd.it/3oxc8a), [`3oxc7p-`](http://redd.it/3oxc7p)
 http://i.imgur.com/jSxB3Ap.gifv | [`3mkzoj+`](http://redd.it/3mkzoj), [`3mkwa4-`](http://redd.it/3mkwa4), [`3mkw9w-`](http://redd.it/3mkw9w), [`3mkxem-`](http://redd.it/3mkxem), [`3mkxee-`](http://redd.it/3mkxee)
 http://gfycat.com/IdioticEminentHogget | [`3lyfhp+`](http://redd.it/3lyfhp), [`3lyg9m+`](http://redd.it/3lyg9m), [`3lyo5k+`](http://redd.it/3lyo5k), [`3lyfev-`](http://redd.it/3lyfev), [`3lyq9x-`](http://redd.it/3lyq9x)
 http://gfycat.com/DrearyWildFieldspaniel | [`3jwm3h-`](http://redd.it/3jwm3h), [`3jwmg1-`](http://redd.it/3jwmg1), [`3jwmn6-`](http://redd.it/3jwmn6), [`3jwmro-`](http://redd.it/3jwmro), [`3jwo04-`](http://redd.it/3jwo04)
@@ -89,6 +90,9 @@ https://i.imgur.com/PruNIg9.gifv | [`35b018+`](http://redd.it/35b018), [`35ayb6-
 https://i.imgur.com/dZgmPsB.gifv | [`358rar+`](http://redd.it/358rar), [`358nj9-`](http://redd.it/358nj9), [`358nir-`](http://redd.it/358nir), [`358nm6-`](http://redd.it/358nm6), [`358px7-`](http://redd.it/358px7)
 https://i.imgur.com/fxYMc6V.gifv | [`34odrg+`](http://redd.it/34odrg), [`34odpe-`](http://redd.it/34odpe), [`34ods3-`](http://redd.it/34ods3), [`34odqy-`](http://redd.it/34odqy), [`34oe0z-`](http://redd.it/34oe0z)
 http://imgur.com/a/xBuzF | [`2o1u8j+`](http://redd.it/2o1u8j), [`2o1u8q+`](http://redd.it/2o1u8q), [`2o1u8y+`](http://redd.it/2o1u8y), [`2o1u94+`](http://redd.it/2o1u94), [`2o378o+`](http://redd.it/2o378o)
+http://i.imgur.com/GF1HaUZ.jpg | [`3p073r+`](http://redd.it/3p073r), [`3p02mj-`](http://redd.it/3p02mj), [`3p04lj-`](http://redd.it/3p04lj), [`3p051w-`](http://redd.it/3p051w)
+http://i.imgur.com/X7w3rcI.jpg | [`3oipe5+`](http://redd.it/3oipe5), [`3oinmh-`](http://redd.it/3oinmh), [`3oipef-`](http://redd.it/3oipef), [`3oltkv-`](http://redd.it/3oltkv)
+http://i.imgur.com/HfHL4wq.gifv | [`3ngn1q-`](http://redd.it/3ngn1q), [`3ngn36-`](http://redd.it/3ngn36), [`3ngou2-`](http://redd.it/3ngou2), [`3ngp7y-`](http://redd.it/3ngp7y)
 http://i.imgur.com/xp51yyt.gifv | [`3ms4lo-`](http://redd.it/3ms4lo), [`3ms5hy-`](http://redd.it/3ms5hy), [`3ms6ig-`](http://redd.it/3ms6ig), [`3ms933-`](http://redd.it/3ms933)
 http://i.imgur.com/DTN4V0W.gifv | [`3m09st+`](http://redd.it/3m09st), [`3m09o5-`](http://redd.it/3m09o5), [`3m09nu-`](http://redd.it/3m09nu), [`3m09se-`](http://redd.it/3m09se)
 http://i.imgur.com/FBMM1il.gifv | [`3lygli-`](http://redd.it/3lygli), [`3lyhkx-`](http://redd.it/3lyhkx), [`3lyixi-`](http://redd.it/3lyixi), [`3lymqy-`](http://redd.it/3lymqy)
@@ -156,6 +160,22 @@ http://i.imgur.com/ef8cwRH.gifv | [`33mhs4+`](http://redd.it/33mhs4), [`33mht5+`
 http://i.imgur.com/pS08xXW.gifv | [`309vw4+`](http://redd.it/309vw4), [`309vwk+`](http://redd.it/309vwk), [`309vx1+`](http://redd.it/309vx1), [`309w1m+`](http://redd.it/309w1m)
 http://imgur.com/gallery/WZRkb | [`2zzaaj+`](http://redd.it/2zzaaj), [`2zzadt+`](http://redd.it/2zzadt), [`2zzant+`](http://redd.it/2zzant), [`2zzbej+`](http://redd.it/2zzbej)
 http://i.imgur.com/B9jZ0du.jpg | [`2qppuu+`](http://redd.it/2qppuu), [`2qppw9+`](http://redd.it/2qppw9), [`2qpvhy+`](http://redd.it/2qpvhy), [`2qpvi7+`](http://redd.it/2qpvi7)
+http://imgur.com/gallery/TzrsJ | [`3p1ohg+`](http://redd.it/3p1ohg), [`3p1o4u-`](http://redd.it/3p1o4u), [`3p1o2v-`](http://redd.it/3p1o2v)
+http://i.imgur.com/IAbYzRM.gifv | [`3p1md2-`](http://redd.it/3p1md2), [`3p1rn1-`](http://redd.it/3p1rn1), [`3p1ruo-`](http://redd.it/3p1ruo)
+http://i.imgur.com/cOIugwa.gifv | [`3oxmwf+`](http://redd.it/3oxmwf), [`3oxewp-`](http://redd.it/3oxewp), [`3oxf2r-`](http://redd.it/3oxf2r)
+http://imgur.com/cOIugwa.gifv | [`3oxf4z-`](http://redd.it/3oxf4z), [`3oxfbp-`](http://redd.it/3oxfbp), [`3p1duy-`](http://redd.it/3p1duy)
+http://i.imgur.com/y8UICJY.gifv | [`3oxbhp-`](http://redd.it/3oxbhp), [`3oxctb-`](http://redd.it/3oxctb), [`3oxeuc-`](http://redd.it/3oxeuc)
+http://imgur.com/HB16epU.jpg | [`3owjrs-`](http://redd.it/3owjrs), [`3owooo-`](http://redd.it/3owooo), [`3oxkyg-`](http://redd.it/3oxkyg)
+http://i.imgur.com/OCzBoiz.gifv | [`3os3kf+`](http://redd.it/3os3kf), [`3org6h-`](http://redd.it/3org6h), [`3os2jc-`](http://redd.it/3os2jc)
+http://i.imgur.com/UoJReTz.jpg | [`3opxo3-`](http://redd.it/3opxo3), [`3opxsg-`](http://redd.it/3opxsg), [`3opxxh-`](http://redd.it/3opxxh)
+http://imgur.com/2wzvFyQ.gifv | [`3olted+`](http://redd.it/3olted), [`3ols7i-`](http://redd.it/3ols7i), [`3ols79-`](http://redd.it/3ols79)
+http://i.imgur.com/eZjcF3c.jpg | [`3oirj5+`](http://redd.it/3oirj5), [`3oiog7-`](http://redd.it/3oiog7), [`3oiodx-`](http://redd.it/3oiodx)
+http://i.imgur.com/S8dKAUI.jpg | [`3nn8fa-`](http://redd.it/3nn8fa), [`3nn8t7-`](http://redd.it/3nn8t7), [`3nnh3a-`](http://redd.it/3nnh3a)
+http://i.imgur.com/wKUrGab.gifv | [`3nn25u-`](http://redd.it/3nn25u), [`3nn25m-`](http://redd.it/3nn25m), [`3nn2qn-`](http://redd.it/3nn2qn)
+http://i.imgur.com/0pxGdeG.jpg | [`3nmsdz-`](http://redd.it/3nmsdz), [`3nmsp1-`](http://redd.it/3nmsp1), [`3nmsor-`](http://redd.it/3nmsor)
+http://i.imgur.com/uKHzQoV.jpg | [`3nhv6q-`](http://redd.it/3nhv6q), [`3nhvmw-`](http://redd.it/3nhvmw), [`3nhvqm-`](http://redd.it/3nhvqm)
+http://imgur.com/edpbTbW.jpg | [`3nh8ea-`](http://redd.it/3nh8ea), [`3nh8p8-`](http://redd.it/3nh8p8), [`3nhcit-`](http://redd.it/3nhcit)
+http://i.imgur.com/YbhNVS0.jpg | [`3nh7iv-`](http://redd.it/3nh7iv), [`3nh8fn-`](http://redd.it/3nh8fn), [`3nhuvd-`](http://redd.it/3nhuvd)
 http://imgur.com/sq2Dbs4.gifv | [`3n0cv9+`](http://redd.it/3n0cv9), [`3n0cpf-`](http://redd.it/3n0cpf), [`3n0cp2-`](http://redd.it/3n0cp2)
 http://i.imgur.com/XdFDgL0.jpg | [`3mwuhl+`](http://redd.it/3mwuhl), [`3mwd49-`](http://redd.it/3mwd49), [`3mwuhb-`](http://redd.it/3mwuhb)
 http://i.imgur.com/Nym1Gyy.gifv | [`3muihz-`](http://redd.it/3muihz), [`3muiwg-`](http://redd.it/3muiwg), [`3muksr-`](http://redd.it/3muksr)
@@ -428,263 +448,265 @@ http://i.imgur.com/149ncjj.jpg | [`2ingqk+`](http://redd.it/2ingqk), [`2io02z+`]
 
 #subreddits
 
-Subreddits posted to: 251  
-Subreddits posted to, living: 207  
-Subreddits posted to, deleted: 160  
+Subreddits posted to: 253  
+Subreddits posted to, living: 209  
+Subreddits posted to, deleted: 163  
 
 subreddit | posts made | posts deleted | score total
 :-------- | ---------: | ------------: | ----------:
-pics | 1656 | 481 | 850903
-interestingasfuck | 1008 | 357 | 732904
-gifs | 757 | 303 | 822734
-woahdude | 671 | 286 | 462021
-aww | 518 | 267 | 504177
-tumblr | 379 | 14 | 221958
-gaming | 228 | 126 | 292667
-Unexpected | 191 | 74 | 185939
-gif | 169 | 58 | 92863
-photoshopbattles | 140 | 14 | 166467
-AnimalsBeingBros | 136 | 33 | 189550
-AnimalsBeingJerks | 134 | 32 | 177604
-oddlysatisfying | 132 | 65 | 113261
-cosplaygirls | 96 | 39 | 32190
-me_irl | 92 | 80 | 19071
-Eyebleach | 90 | 28 | 69652
-AnimalsBeingDerps | 89 | 12 | 63608
-funny | 89 | 0 | 136105
-holdmybeer | 87 | 28 | 107115
-reactiongifs | 82 | 44 | 81466
-Damnthatsinteresting | 80 | 13 | 68631
-creepy | 78 | 31 | 59344
-Whatcouldgowrong | 69 | 14 | 76027
-WTF | 63 | 3 | 122637
-videos | 55 | 45 | 13650
-GallowBoob | 47 | 8 | 324
-NatureGifs | 44 | 5 | 8970
-pcmasterrace | 41 | 17 | 46896
-Wellthatsucks | 38 | 13 | 12386
-facepalm | 37 | 11 | 36472
-StarWars | 36 | 18 | 30364
-HumansBeingBros | 35 | 16 | 34227
-BlackPeopleTwitter | 35 | 25 | 24002
-chemicalreactiongifs | 34 | 4 | 51762
-MadeMeSmile | 32 | 15 | 20306
-awwwtf | 31 | 3 | 14632
-Art | 30 | 2 | 23017
-cats | 28 | 8 | 6967
-PeopleBeingJerks | 27 | 6 | 7104
-PerfectTiming | 26 | 12 | 31487
-ChildrenFallingOver | 26 | 15 | 18291
-nononono | 25 | 10 | 14255
-holdmyjuicebox | 25 | 4 | 8703
-instant_regret | 24 | 11 | 23796
-StartledCats | 24 | 7 | 27919
-awesome | 21 | 3 | 6513
-WoahPoon | 21 | 1 | 3214
-blackpeoplegifs | 19 | 12 | 9311
-space | 18 | 4 | 36366
-OldSchoolCool | 17 | 5 | 14557
-SlyGifs | 16 | 5 | 5480
-combinedgifs | 16 | 7 | 12263
-trees | 16 | 4 | 19370
-burstingout | 16 | 0 | 2755
-pokemon | 15 | 3 | 13454
-lifehacks | 14 | 6 | 19544
-geek | 14 | 9 | 12783
-nonononoyes | 14 | 11 | 5860
-food | 14 | 9 | 4918
-GamePhysics | 14 | 8 | 4670
-birdswitharms | 14 | 1 | 5374
-ANormalDayInRussia | 12 | 6 | 4542
+pics | 1724 | 533 | 874862
+interestingasfuck | 1051 | 392 | 741967
+gifs | 808 | 340 | 851203
+woahdude | 697 | 306 | 467681
+aww | 551 | 297 | 511528
+tumblr | 382 | 16 | 222611
+gaming | 252 | 146 | 309945
+Unexpected | 198 | 78 | 190745
+gif | 169 | 58 | 92933
+photoshopbattles | 141 | 14 | 171540
+AnimalsBeingBros | 139 | 36 | 189893
+AnimalsBeingJerks | 136 | 34 | 177751
+oddlysatisfying | 133 | 65 | 114031
+me_irl | 102 | 88 | 21947
+cosplaygirls | 102 | 43 | 35633
+reactiongifs | 94 | 55 | 84739
+holdmybeer | 91 | 31 | 108167
+Eyebleach | 90 | 28 | 69782
+AnimalsBeingDerps | 90 | 13 | 63661
+funny | 89 | 0 | 136085
+Damnthatsinteresting | 80 | 13 | 68653
+creepy | 78 | 31 | 59554
+Whatcouldgowrong | 72 | 17 | 76348
+WTF | 63 | 3 | 122702
+videos | 59 | 49 | 13648
+GallowBoob | 48 | 8 | 362
+NatureGifs | 44 | 5 | 8980
+pcmasterrace | 42 | 18 | 46936
+StarWars | 40 | 22 | 30421
+Wellthatsucks | 40 | 13 | 13046
+facepalm | 40 | 12 | 39711
+BlackPeopleTwitter | 36 | 25 | 27828
+HumansBeingBros | 35 | 16 | 34897
+chemicalreactiongifs | 34 | 4 | 52010
+MadeMeSmile | 32 | 15 | 20595
+awwwtf | 31 | 3 | 14630
+Art | 30 | 2 | 23019
+PerfectTiming | 29 | 14 | 32238
+cats | 28 | 8 | 6971
+instant_regret | 28 | 14 | 24325
+PeopleBeingJerks | 27 | 6 | 7168
+ChildrenFallingOver | 26 | 15 | 18742
+holdmyjuicebox | 25 | 4 | 9121
+nononono | 25 | 10 | 14258
+blackpeoplegifs | 24 | 17 | 9613
+StartledCats | 24 | 7 | 28179
+WoahPoon | 21 | 1 | 3234
+awesome | 21 | 3 | 6515
+OldSchoolCool | 19 | 7 | 14542
+birdswitharms | 18 | 4 | 5593
+space | 18 | 4 | 36388
+combinedgifs | 16 | 7 | 12321
+trees | 16 | 4 | 19377
+SlyGifs | 16 | 5 | 5590
+pokemon | 16 | 4 | 13469
+burstingout | 16 | 0 | 2745
+food | 15 | 10 | 4929
+nonononoyes | 14 | 11 | 5867
+lifehacks | 14 | 6 | 19588
+GamePhysics | 14 | 8 | 4679
+geek | 14 | 9 | 12787
+sports | 14 | 9 | 7698
+whitepeoplegifs | 13 | 5 | 8224
+ANormalDayInRussia | 12 | 6 | 4596
+FeelsLikeTheFirstTime | 12 | 2 | 6419
 Showerthoughts | 12 | 2 | 4431
-educationalgifs | 11 | 2 | 15191
-atheism | 11 | 2 | 14306
-BirdsBeingDicks | 11 | 4 | 1503
-whitepeoplegifs | 11 | 5 | 5320
-Celebs | 11 | 5 | 3865
-shittyrobots | 11 | 4 | 17717
-sports | 10 | 6 | 7406
-FeelsLikeTheFirstTime | 10 | 2 | 5080
-Tinder | 10 | 2 | 5282
-Owls | 10 | 1 | 2284
-gameofthrones | 9 | 6 | 5749
-StoppedWorking | 9 | 2 | 3697
-StopTouchingMe | 9 | 0 | 2102
-motorcycles | 9 | 5 | 4327
-physicsgifs | 9 | 0 | 2844
-shittyreactiongifs | 9 | 5 | 5572
-TrollXChromosomes | 9 | 2 | 5626
-Military | 9 | 3 | 2870
-HappyOtterAndFriends | 9 | 0 | 169
+educationalgifs | 11 | 2 | 15316
+atheism | 11 | 2 | 14327
+Celebs | 11 | 5 | 3876
+Tinder | 11 | 3 | 5286
+Military | 11 | 4 | 3559
+shittyrobots | 11 | 4 | 17749
+BirdsBeingDicks | 11 | 4 | 1511
+Owls | 10 | 1 | 2299
+gameofthrones | 10 | 6 | 6427
+shittyreactiongifs | 9 | 5 | 5566
+StopTouchingMe | 9 | 0 | 2111
+ImGoingToHellForThis | 9 | 1 | 10271
+TrollXChromosomes | 9 | 2 | 5617
+HappyOtterAndFriends | 9 | 0 | 168
+CrappyDesign | 9 | 2 | 3009
+motorcycles | 9 | 5 | 4332
+foxes | 9 | 4 | 2311
+FoodPorn | 9 | 4 | 4321
+StoppedWorking | 9 | 2 | 3829
+WastedGifs | 9 | 2 | 16643
+physicsgifs | 9 | 0 | 2821
+UnnecessaryCensorship | 9 | 1 | 5267
 GrandTheftAutoV | 8 | 7 | 248
-foxes | 8 | 3 | 2293
-ImGoingToHellForThis | 8 | 1 | 8706
-FoodPorn | 8 | 4 | 4105
-UnnecessaryCensorship | 8 | 1 | 5055
-MyPeopleNeedMe | 7 | 3 | 1639
-loadingicon | 7 | 2 | 2610
-WastedGifs | 7 | 1 | 15371
-thalassophobia | 7 | 2 | 3941
-CrappyDesign | 7 | 2 | 633
-southpark | 7 | 3 | 3900
-lego | 7 | 1 | 10016
-firstworldanarchists | 6 | 5 | 44
+MURICA | 8 | 7 | 4084
+MyPeopleNeedMe | 7 | 3 | 1650
+WatchItForThePlot | 7 | 2 | 8034
+loadingicon | 7 | 2 | 2618
+thalassophobia | 7 | 2 | 3974
+lego | 7 | 1 | 10024
+southpark | 7 | 3 | 3906
+firstworldanarchists | 6 | 5 | 38
+BeAmazed | 6 | 3 | 1382
 DadReflexes | 6 | 3 | 2676
 AskReddit | 6 | 0 | 5
-BeAmazed | 6 | 3 | 1374
-MURICA | 6 | 5 | 4038
+gaminggifs | 5 | 1 | 736
+cosplay | 5 | 3 | 1770
+thingsforants | 5 | 0 | 888
+brokengifs | 5 | 4 | 2579
 AdviceAnimals | 5 | 0 | 7367
-thingsforants | 5 | 0 | 891
+perfectloops | 5 | 4 | 472
+corgi | 5 | 1 | 5864
+actuallyfunny | 5 | 0 | 130
 cringepics | 5 | 3 | 6370
-TheLastAirbender | 5 | 0 | 6378
-youdontsurf | 5 | 2 | 4784
-cosplay | 5 | 3 | 1765
-thatHappened | 5 | 1 | 523
-gaminggifs | 5 | 1 | 739
-babyelephantgifs | 5 | 0 | 5703
-actuallyfunny | 5 | 0 | 128
-WatchItForThePlot | 5 | 0 | 7878
-StuffOnCats | 5 | 1 | 993
-perfectloops | 5 | 4 | 470
-Cyberpunk | 4 | 0 | 2237
-corgi | 4 | 0 | 5840
-adventuretime | 4 | 0 | 4842
-brokengifs | 4 | 3 | 2555
-battleshops | 4 | 0 | 104
-mildlyinfuriating | 4 | 1 | 3173
-quityourbullshit | 3 | 2 | 225
-fatlogic | 3 | 0 | 6169
-OSHA | 3 | 3 | 96
-ConfusedBoners | 3 | 0 | 672
-drunk | 3 | 2 | 733
+Cyberpunk | 5 | 0 | 4445
+StuffOnCats | 5 | 1 | 999
+thatHappened | 5 | 1 | 510
+TheLastAirbender | 5 | 0 | 6374
+babyelephantgifs | 5 | 0 | 5700
+youdontsurf | 5 | 2 | 4772
+adventuretime | 4 | 0 | 4837
+mildlyinfuriating | 4 | 1 | 3184
+battleshops | 4 | 0 | 105
+ThingsCutInHalfPorn | 4 | 1 | 3361
+batman | 3 | 1 | 1136
+drunk | 3 | 2 | 735
+cutouts | 3 | 0 | 34
+DickButt | 3 | 1 | 369
 hardcoreaww | 3 | 3 | 1
-pitchforkemporium | 3 | 0 | 149
-cutouts | 3 | 0 | 35
-boop | 3 | 1 | 1108
-MensRights | 3 | 0 | 3105
-DickButt | 3 | 1 | 374
-TheSimpsons | 3 | 2 | 303
-batman | 3 | 1 | 1143
-Naruto | 2 | 0 | 568
-korrasami | 2 | 0 | 514
-pic | 2 | 2 | 12
-Jokes | 2 | 0 | 3810
-ThingsCutInHalfPorn | 2 | 0 | 2285
-bestof | 2 | 1 | 13
-MEOW_IRL | 2 | 0 | 301
-futurama | 2 | 0 | 3491
-GTAV | 2 | 0 | 1169
-babybigcatgifs | 2 | 0 | 590
-ShingekiNoKyojin | 2 | 0 | 1838
-MineralPorn | 2 | 0 | 375
-ArcherFX | 2 | 0 | 1510
-spaceporn | 2 | 0 | 5974
-Otters | 2 | 0 | 544
-dbz | 2 | 0 | 745
-trypophobia | 2 | 1 | 41
-mildlypenis | 2 | 0 | 562
-Wrapsterpiece | 2 | 0 | 22
-GetMotivated | 2 | 1 | 1073
-RealGirls | 2 | 0 | 966
-skyrim | 2 | 1 | 3858
-lotr | 2 | 1 | 685
-ShittyAnimalFacts | 2 | 1 | 49
-Frisson | 2 | 2 | 1
-Punny | 2 | 1 | 855
-SwiggitySwootyGifs | 2 | 0 | 615
+ConfusedBoners | 3 | 0 | 668
+quityourbullshit | 3 | 2 | 222
+fatlogic | 3 | 0 | 6190
+boop | 3 | 1 | 1117
+pitchforkemporium | 3 | 0 | 148
+TheSimpsons | 3 | 2 | 304
+MensRights | 3 | 0 | 3093
+OSHA | 3 | 3 | 93
+dbz | 2 | 0 | 750
+mildlypenis | 2 | 0 | 554
 movies | 2 | 1 | 3644
-firefly | 2 | 0 | 851
-Music | 2 | 0 | 22
-aviation | 2 | 2 | 1
 Bad_Cop_No_Donut | 2 | 2 | 5
-video | 1 | 1 | 1
+GetMotivated | 2 | 1 | 1077
+RealGirls | 2 | 0 | 966
+Otters | 2 | 0 | 545
+bestof | 2 | 1 | 17
+trypophobia | 2 | 1 | 45
+ShittyAnimalFacts | 2 | 1 | 48
+MineralPorn | 2 | 0 | 377
+Frisson | 2 | 2 | 1
+ArcherFX | 2 | 0 | 1500
+Jokes | 2 | 0 | 3815
+Naruto | 2 | 0 | 569
+Wrapsterpiece | 2 | 0 | 24
+firefly | 2 | 0 | 850
+spaceporn | 2 | 0 | 5970
+Punny | 2 | 1 | 858
+GTAV | 2 | 0 | 1195
+korrasami | 2 | 0 | 513
+futurama | 2 | 0 | 3504
+aviation | 2 | 2 | 1
+skyrim | 2 | 1 | 3855
+ShingekiNoKyojin | 2 | 0 | 1841
+Music | 2 | 0 | 22
+MEOW_IRL | 2 | 0 | 306
+babybigcatgifs | 2 | 0 | 863
+SwiggitySwootyGifs | 2 | 0 | 668
+lotr | 2 | 1 | 679
+pic | 2 | 2 | 10
+TelevisionQuotes | 1 | 1 | 1
+shitpost | 1 | 1 | 0
+peeling | 1 | 0 | 17
+pugs | 1 | 0 | 296
+ass | 1 | 0 | 26
 circlejerk | 1 | 1 | 1
+photoshawwp | 1 | 0 | 16
+coolguides | 1 | 1 | 1
+beards | 1 | 1 | 0
+DubbedGIFS | 1 | 1 | 0
+BestOfReports | 1 | 0 | 0
+HighQualityGifs | 1 | 0 | 381
+unexpectedjihad | 1 | 1 | 1
+marvelstudios | 1 | 1 | 0
+Creatures_of_earth | 1 | 1 | 66
+justneckbeardthings | 1 | 1 | 0
+onetruegod | 1 | 0 | 824
+HIFW | 1 | 0 | 289
+marijuanaenthusiasts | 1 | 1 | 1
+mildlyinteresting | 1 | 0 | 36
+goats | 1 | 1 | 1
+EmmaWatson | 1 | 0 | 811
+Cthulhu | 1 | 0 | 68
+cardsagainsthumanity | 1 | 0 | 148
+hockey | 1 | 1 | 0
+woodworking | 1 | 0 | 393
+MakeupAddiction | 1 | 0 | 814
 news | 1 | 1 | 2
 specializedtools | 1 | 1 | 1
-shitpost | 1 | 1 | 0
-marijuanaenthusiasts | 1 | 1 | 1
-harrypotter | 1 | 0 | 73
-knives | 1 | 0 | 111
-EmmaWatson | 1 | 0 | 814
-hockey | 1 | 1 | 0
-beards | 1 | 1 | 0
-Cthulhu | 1 | 0 | 66
-ResentfulAnimals | 1 | 0 | 185
+stolendogbeds | 1 | 0 | 205
 baconreader | 1 | 1 | 0
-FunnyandSad | 1 | 0 | 327
-IHATEIBLEEEDORANGE | 1 | 0 | 0
-peeling | 1 | 0 | 19
-photoshawwp | 1 | 0 | 18
-shittylifehacks | 1 | 1 | 1
-ExplosionPorn | 1 | 1 | 1
-worldnews | 1 | 0 | 40
-HIFW | 1 | 0 | 283
-casualiama | 1 | 0 | 1089
-pug | 1 | 1 | 2
-GTAgifs | 1 | 1 | 0
-creepyeyes | 1 | 0 | 0
-MilitaryPorn | 1 | 1 | 2
-racoongifs | 1 | 1 | 1
-ass | 1 | 0 | 27
-CanineCosplay | 1 | 1 | 3
-Creatures_of_earth | 1 | 1 | 72
-rage | 1 | 0 | 741
-Megaman | 1 | 1 | 12
-WastedGifRequests | 1 | 0 | 0
-HeavySeas | 1 | 0 | 513
-mechanical_gifs | 1 | 0 | 653
-babybeastgifs | 1 | 0 | 97
-girlsinyogapants | 1 | 0 | 540
-coolguides | 1 | 1 | 1
-bears | 1 | 0 | 80
-woodworking | 1 | 0 | 392
-spam | 1 | 0 | 0
-cutegirlgifs | 1 | 0 | 165
-snakes | 1 | 0 | 218
-4chan | 1 | 0 | 4091
-pucs | 1 | 1 | 1
-pugs | 1 | 0 | 296
-marvelstudios | 1 | 1 | 0
-Minecraft | 1 | 1 | 0
-starcraft | 1 | 0 | 987
-stolendogbeds | 1 | 0 | 199
-unexpectedjihad | 1 | 1 | 1
-RoastMe | 1 | 0 | 5140
+rage | 1 | 0 | 740
 karmawhoreproblems | 1 | 0 | 0
-DubbedGIFS | 1 | 1 | 0
-dashcamgifs | 1 | 0 | 170
-mycology | 1 | 1 | 1
-dogbird | 1 | 0 | 17
-RoomPorn | 1 | 1 | 0
-MensRants | 1 | 0 | 32
-TelevisionQuotes | 1 | 1 | 1
-NSFWCostumes | 1 | 0 | 278
-steampunk | 1 | 1 | 0
-TwoXChromosomes | 1 | 0 | 458
-MakeupAddiction | 1 | 0 | 806
-Fallout | 1 | 1 | 2
-unicorninabottle | 1 | 0 | 0
-FoggyPics | 1 | 0 | 52
-surfing | 1 | 1 | 12
-DownvoteGifs | 1 | 1 | 0
-HighQualityGifs | 1 | 0 | 378
-mfw | 1 | 1 | 1
-gifextra | 1 | 0 | 699
-MuricaNSFW | 1 | 1 | 1
-gentlemanboners | 1 | 0 | 239
-DCcomics | 1 | 1 | 3
-goats | 1 | 1 | 1
-EarthPorn | 1 | 0 | 53
-mildlyinteresting | 1 | 0 | 36
-misleadingthumbnails | 1 | 0 | 1374
-BestOfReports | 1 | 0 | 0
-cardsagainsthumanity | 1 | 0 | 150
-seaporn | 1 | 0 | 181
+girlsinyogapants | 1 | 0 | 540
 trashy | 1 | 1 | 1
-AbandonedPorn | 1 | 0 | 1107
-justneckbeardthings | 1 | 1 | 0
+mechanical_gifs | 1 | 0 | 654
+spam | 1 | 0 | 0
 nottheonion | 1 | 1 | 0
+unicorninabottle | 1 | 0 | 0
+MilitaryPorn | 1 | 1 | 2
+EarthPorn | 1 | 0 | 52
+surfing | 1 | 1 | 13
+harrypotter | 1 | 0 | 73
+seaporn | 1 | 0 | 179
+TwoXChromosomes | 1 | 0 | 458
+DCcomics | 1 | 1 | 4
+4chan | 1 | 0 | 4092
+babybeastgifs | 1 | 0 | 96
+video | 1 | 1 | 1
+ExplosionPorn | 1 | 1 | 1
+WastedGifRequests | 1 | 0 | 0
+casualiama | 1 | 0 | 1114
+Minecraft | 1 | 1 | 0
+racoongifs | 1 | 1 | 1
+HeavySeas | 1 | 0 | 520
+MuricaNSFW | 1 | 1 | 1
+mycology | 1 | 1 | 1
+gifextra | 1 | 0 | 726
+snakes | 1 | 0 | 220
+pucs | 1 | 1 | 1
+cutegirlgifs | 1 | 0 | 166
+worldnews | 1 | 0 | 36
+gentlemanboners | 1 | 0 | 239
+steampunk | 1 | 1 | 0
+RoomPorn | 1 | 1 | 0
+CanineCosplay | 1 | 1 | 1
+starcraft | 1 | 0 | 987
+creepyeyes | 1 | 0 | 0
+misleadingthumbnails | 1 | 0 | 1374
+FoggyPics | 1 | 0 | 46
+knives | 1 | 0 | 112
+bears | 1 | 0 | 84
+DownvoteGifs | 1 | 1 | 0
+RoastMe | 1 | 0 | 5326
+ResentfulAnimals | 1 | 0 | 183
 nicetrybutno | 1 | 0 | 7
+Megaman | 1 | 1 | 12
+MensRants | 1 | 0 | 31
+pug | 1 | 1 | 2
+shittylifehacks | 1 | 1 | 1
+mfw | 1 | 1 | 1
+ideasfortheadmins | 1 | 0 | 4
+AbandonedPorn | 1 | 0 | 1106
+NSFWCostumes | 1 | 0 | 280
+GTAgifs | 1 | 1 | 0
+dashcamgifs | 1 | 0 | 175
+Fallout | 1 | 1 | 3
+FunnyandSad | 1 | 0 | 323
+dogbird | 1 | 0 | 14
+IHATEIBLEEEDORANGE | 1 | 0 | 0
 
 
 &nbsp;
@@ -1162,7 +1184,15 @@ nicetrybutno | 1 | 0 | 7
 [`3m05a3`](http://redd.it/3m05a3), [`3m09st`](http://redd.it/3m09st), [`3mh773`](http://redd.it/3mh773), [`3mhmv7`](http://redd.it/3mhmv7), [`3mhnqe`](http://redd.it/3mhnqe), [`3mhnzw`](http://redd.it/3mhnzw), [`3mhnxl`](http://redd.it/3mhnxl), [`3mhnwq`](http://redd.it/3mhnwq), [`3mhqj2`](http://redd.it/3mhqj2), [`3mhsrz`](http://redd.it/3mhsrz), [`3mivhu`](http://redd.it/3mivhu), [`3miyse`](http://redd.it/3miyse)  
 [`3miz33`](http://redd.it/3miz33), [`3mizz0`](http://redd.it/3mizz0), [`3mkxuw`](http://redd.it/3mkxuw), [`3mky4o`](http://redd.it/3mky4o), [`3mky79`](http://redd.it/3mky79), [`3mkzoj`](http://redd.it/3mkzoj), [`3ml2zs`](http://redd.it/3ml2zs), [`3ml2zn`](http://redd.it/3ml2zn), [`3ml3fi`](http://redd.it/3ml3fi), [`3ml5mh`](http://redd.it/3ml5mh), [`3mli75`](http://redd.it/3mli75), [`3mmsl2`](http://redd.it/3mmsl2)  
 [`3mrx8u`](http://redd.it/3mrx8u), [`3mry2n`](http://redd.it/3mry2n), [`3mry9t`](http://redd.it/3mry9t), [`3mryla`](http://redd.it/3mryla), [`3mrzes`](http://redd.it/3mrzes), [`3mrzt9`](http://redd.it/3mrzt9), [`3ms3su`](http://redd.it/3ms3su), [`3muedn`](http://redd.it/3muedn), [`3muico`](http://redd.it/3muico), [`3muixg`](http://redd.it/3muixg), [`3muw4e`](http://redd.it/3muw4e), [`3mwa75`](http://redd.it/3mwa75)  
-[`3mwayw`](http://redd.it/3mwayw), [`3mwbmh`](http://redd.it/3mwbmh), [`3mwffw`](http://redd.it/3mwffw), [`3mwi8z`](http://redd.it/3mwi8z), [`3mwuhl`](http://redd.it/3mwuhl), [`3mzpb3`](http://redd.it/3mzpb3), [`3n0cv9`](http://redd.it/3n0cv9), [`3n7wsy`](http://redd.it/3n7wsy)  
+[`3mwayw`](http://redd.it/3mwayw), [`3mwbmh`](http://redd.it/3mwbmh), [`3mwffw`](http://redd.it/3mwffw), [`3mwi8z`](http://redd.it/3mwi8z), [`3mwuhl`](http://redd.it/3mwuhl), [`3mzpb3`](http://redd.it/3mzpb3), [`3n0cv9`](http://redd.it/3n0cv9), [`3n7wsy`](http://redd.it/3n7wsy), [`3ngt52`](http://redd.it/3ngt52), [`3ngxax`](http://redd.it/3ngxax), [`3ngyg8`](http://redd.it/3ngyg8), [`3ngyz8`](http://redd.it/3ngyz8)  
+[`3nh0p0`](http://redd.it/3nh0p0), [`3nh314`](http://redd.it/3nh314), [`3nh4nf`](http://redd.it/3nh4nf), [`3nh4n0`](http://redd.it/3nh4n0), [`3nh5pn`](http://redd.it/3nh5pn), [`3nh5xk`](http://redd.it/3nh5xk), [`3nh6gi`](http://redd.it/3nh6gi), [`3nh7bn`](http://redd.it/3nh7bn), [`3nhben`](http://redd.it/3nhben), [`3nhcd6`](http://redd.it/3nhcd6), [`3nhcad`](http://redd.it/3nhcad), [`3nmo8v`](http://redd.it/3nmo8v)  
+[`3nmtwl`](http://redd.it/3nmtwl), [`3nmua3`](http://redd.it/3nmua3), [`3nmuj5`](http://redd.it/3nmuj5), [`3nmz67`](http://redd.it/3nmz67), [`3nn1i1`](http://redd.it/3nn1i1), [`3o0ski`](http://redd.it/3o0ski), [`3o0jh1`](http://redd.it/3o0jh1), [`3o0j1l`](http://redd.it/3o0j1l), [`3o0fyp`](http://redd.it/3o0fyp), [`3o0egl`](http://redd.it/3o0egl), [`3nylom`](http://redd.it/3nylom), [`3nyiiy`](http://redd.it/3nyiiy)  
+[`3nyfeq`](http://redd.it/3nyfeq), [`3nyd06`](http://redd.it/3nyd06), [`3nyaxu`](http://redd.it/3nyaxu), [`3nyan9`](http://redd.it/3nyan9), [`3nyajp`](http://redd.it/3nyajp), [`3nsdxp`](http://redd.it/3nsdxp), [`3nsarz`](http://redd.it/3nsarz), [`3ns5rm`](http://redd.it/3ns5rm), [`3ns3yb`](http://redd.it/3ns3yb), [`3ns1p1`](http://redd.it/3ns1p1), [`3nrzok`](http://redd.it/3nrzok), [`3nrz6m`](http://redd.it/3nrz6m)  
+[`3nrxc1`](http://redd.it/3nrxc1), [`3nrx04`](http://redd.it/3nrx04), [`3oihsr`](http://redd.it/3oihsr), [`3oiiqr`](http://redd.it/3oiiqr), [`3oiizk`](http://redd.it/3oiizk), [`3oijqp`](http://redd.it/3oijqp), [`3oim9v`](http://redd.it/3oim9v), [`3oimwe`](http://redd.it/3oimwe), [`3oipe5`](http://redd.it/3oipe5), [`3oipol`](http://redd.it/3oipol), [`3oirci`](http://redd.it/3oirci), [`3oirj5`](http://redd.it/3oirj5)  
+[`3ols3j`](http://redd.it/3ols3j), [`3olted`](http://redd.it/3olted), [`3om6in`](http://redd.it/3om6in), [`3opylg`](http://redd.it/3opylg), [`3opysy`](http://redd.it/3opysy), [`3opzgp`](http://redd.it/3opzgp), [`3opzth`](http://redd.it/3opzth), [`3oq4u2`](http://redd.it/3oq4u2), [`3oreaj`](http://redd.it/3oreaj), [`3orf17`](http://redd.it/3orf17), [`3orfvu`](http://redd.it/3orfvu), [`3orh0q`](http://redd.it/3orh0q)  
+[`3os3kf`](http://redd.it/3os3kf), [`3owcep`](http://redd.it/3owcep), [`3owe0k`](http://redd.it/3owe0k), [`3owg0f`](http://redd.it/3owg0f), [`3owhdo`](http://redd.it/3owhdo), [`3owj9m`](http://redd.it/3owj9m), [`3owma4`](http://redd.it/3owma4), [`3ox6mb`](http://redd.it/3ox6mb), [`3ox80e`](http://redd.it/3ox80e), [`3oxa47`](http://redd.it/3oxa47), [`3oxgr2`](http://redd.it/3oxgr2), [`3oxiq4`](http://redd.it/3oxiq4)  
+[`3oxmwf`](http://redd.it/3oxmwf), [`3ozsn0`](http://redd.it/3ozsn0), [`3p073r`](http://redd.it/3p073r), [`3p0baq`](http://redd.it/3p0baq), [`3p1gos`](http://redd.it/3p1gos), [`3p1ljh`](http://redd.it/3p1ljh), [`3p1ohg`](http://redd.it/3p1ohg), [`3p1q06`](http://redd.it/3p1q06), [`3p1rg6`](http://redd.it/3p1rg6), [`3p1rq6`](http://redd.it/3p1rq6), [`3p1rpy`](http://redd.it/3p1rpy), [`3p1tq2`](http://redd.it/3p1tq2)  
+[`3p1wyn`](http://redd.it/3p1wyn)  
 
 
 &nbsp;
@@ -1414,7 +1444,30 @@ nicetrybutno | 1 | 0 | 7
 [`3muksr`](http://redd.it/3muksr), [`3mukyc`](http://redd.it/3mukyc), [`3mun6y`](http://redd.it/3mun6y), [`3muo53`](http://redd.it/3muo53), [`3muogp`](http://redd.it/3muogp), [`3muog8`](http://redd.it/3muog8), [`3muugh`](http://redd.it/3muugh), [`3mv40j`](http://redd.it/3mv40j), [`3mw6qn`](http://redd.it/3mw6qn), [`3mw85e`](http://redd.it/3mw85e), [`3mw8bt`](http://redd.it/3mw8bt), [`3mw8bh`](http://redd.it/3mw8bh)  
 [`3mw8ng`](http://redd.it/3mw8ng), [`3mw8pj`](http://redd.it/3mw8pj), [`3mw90e`](http://redd.it/3mw90e), [`3mw9ig`](http://redd.it/3mw9ig), [`3mw9q2`](http://redd.it/3mw9q2), [`3mwa26`](http://redd.it/3mwa26), [`3mwab1`](http://redd.it/3mwab1), [`3mwa85`](http://redd.it/3mwa85), [`3mwapx`](http://redd.it/3mwapx), [`3mwb8m`](http://redd.it/3mwb8m), [`3mwbdn`](http://redd.it/3mwbdn), [`3mwbp1`](http://redd.it/3mwbp1)  
 [`3mwcc3`](http://redd.it/3mwcc3), [`3mwcbo`](http://redd.it/3mwcbo), [`3mwd4r`](http://redd.it/3mwd4r), [`3mwd49`](http://redd.it/3mwd49), [`3mwfgf`](http://redd.it/3mwfgf), [`3mwfrx`](http://redd.it/3mwfrx), [`3mwhmc`](http://redd.it/3mwhmc), [`3mwkaz`](http://redd.it/3mwkaz), [`3mwl7e`](http://redd.it/3mwl7e), [`3mwnz1`](http://redd.it/3mwnz1), [`3mwuhb`](http://redd.it/3mwuhb), [`3mwxox`](http://redd.it/3mwxox)  
-[`3mzpiu`](http://redd.it/3mzpiu), [`3n0cpf`](http://redd.it/3n0cpf), [`3n0cp2`](http://redd.it/3n0cp2)  
+[`3mzpiu`](http://redd.it/3mzpiu), [`3n0cpf`](http://redd.it/3n0cpf), [`3n0cp2`](http://redd.it/3n0cp2), [`3ngn1q`](http://redd.it/3ngn1q), [`3ngn36`](http://redd.it/3ngn36), [`3ngnu5`](http://redd.it/3ngnu5), [`3ngovx`](http://redd.it/3ngovx), [`3ngou2`](http://redd.it/3ngou2), [`3ngp7y`](http://redd.it/3ngp7y), [`3ngs9k`](http://redd.it/3ngs9k), [`3ngsg0`](http://redd.it/3ngsg0), [`3ngso7`](http://redd.it/3ngso7)  
+[`3ngsym`](http://redd.it/3ngsym), [`3ngu8n`](http://redd.it/3ngu8n), [`3ngv30`](http://redd.it/3ngv30), [`3ngv79`](http://redd.it/3ngv79), [`3ngvhr`](http://redd.it/3ngvhr), [`3ngvf4`](http://redd.it/3ngvf4), [`3ngw65`](http://redd.it/3ngw65), [`3ngwnp`](http://redd.it/3ngwnp), [`3ngx8d`](http://redd.it/3ngx8d), [`3ngy53`](http://redd.it/3ngy53), [`3ngym0`](http://redd.it/3ngym0), [`3ngzeu`](http://redd.it/3ngzeu)  
+[`3nh1z8`](http://redd.it/3nh1z8), [`3nh271`](http://redd.it/3nh271), [`3nh3yj`](http://redd.it/3nh3yj), [`3nh66v`](http://redd.it/3nh66v), [`3nh7iv`](http://redd.it/3nh7iv), [`3nh8fn`](http://redd.it/3nh8fn), [`3nh8ea`](http://redd.it/3nh8ea), [`3nh8dq`](http://redd.it/3nh8dq), [`3nh8p8`](http://redd.it/3nh8p8), [`3nh97j`](http://redd.it/3nh97j), [`3nhads`](http://redd.it/3nhads), [`3nhax8`](http://redd.it/3nhax8)  
+[`3nhc65`](http://redd.it/3nhc65), [`3nhcit`](http://redd.it/3nhcit), [`3nhj5d`](http://redd.it/3nhj5d), [`3nhj4e`](http://redd.it/3nhj4e), [`3nhtwg`](http://redd.it/3nhtwg), [`3nhucd`](http://redd.it/3nhucd), [`3nhubt`](http://redd.it/3nhubt), [`3nhuvd`](http://redd.it/3nhuvd), [`3nhv6q`](http://redd.it/3nhv6q), [`3nhvmw`](http://redd.it/3nhvmw), [`3nhvit`](http://redd.it/3nhvit), [`3nhvqm`](http://redd.it/3nhvqm)  
+[`3nhvp8`](http://redd.it/3nhvp8), [`3nhw8y`](http://redd.it/3nhw8y), [`3nkxji`](http://redd.it/3nkxji), [`3nkxvn`](http://redd.it/3nkxvn), [`3nky51`](http://redd.it/3nky51), [`3nl138`](http://redd.it/3nl138), [`3nmot5`](http://redd.it/3nmot5), [`3nmqt4`](http://redd.it/3nmqt4), [`3nmsdz`](http://redd.it/3nmsdz), [`3nmsp1`](http://redd.it/3nmsp1), [`3nmsor`](http://redd.it/3nmsor), [`3nmtbj`](http://redd.it/3nmtbj)  
+[`3nmtg5`](http://redd.it/3nmtg5), [`3nmtfu`](http://redd.it/3nmtfu), [`3nmtlu`](http://redd.it/3nmtlu), [`3nmtj3`](http://redd.it/3nmtj3), [`3nmtzy`](http://redd.it/3nmtzy), [`3nmuey`](http://redd.it/3nmuey), [`3nmur3`](http://redd.it/3nmur3), [`3nmuxp`](http://redd.it/3nmuxp), [`3nmx29`](http://redd.it/3nmx29), [`3nmx21`](http://redd.it/3nmx21), [`3nmxd7`](http://redd.it/3nmxd7), [`3nmxrl`](http://redd.it/3nmxrl)  
+[`3nmyhk`](http://redd.it/3nmyhk), [`3nmzvg`](http://redd.it/3nmzvg), [`3nn025`](http://redd.it/3nn025), [`3nn0m8`](http://redd.it/3nn0m8), [`3nn13d`](http://redd.it/3nn13d), [`3nn0zp`](http://redd.it/3nn0zp), [`3nn15x`](http://redd.it/3nn15x), [`3nn1dk`](http://redd.it/3nn1dk), [`3nn25u`](http://redd.it/3nn25u), [`3nn25m`](http://redd.it/3nn25m), [`3nn2qn`](http://redd.it/3nn2qn), [`3nn33m`](http://redd.it/3nn33m)  
+[`3nn396`](http://redd.it/3nn396), [`3nn3cx`](http://redd.it/3nn3cx), [`3nn3jb`](http://redd.it/3nn3jb), [`3nn548`](http://redd.it/3nn548), [`3nn6ln`](http://redd.it/3nn6ln), [`3nn72g`](http://redd.it/3nn72g), [`3nn8gl`](http://redd.it/3nn8gl), [`3nn8fa`](http://redd.it/3nn8fa), [`3nn8t7`](http://redd.it/3nn8t7), [`3nnh3a`](http://redd.it/3nnh3a), [`3nnjfc`](http://redd.it/3nnjfc), [`3oiiqz`](http://redd.it/3oiiqz)  
+[`3oiiul`](http://redd.it/3oiiul), [`3oij0l`](http://redd.it/3oij0l), [`3oijfh`](http://redd.it/3oijfh), [`3oijur`](http://redd.it/3oijur), [`3oikl3`](http://redd.it/3oikl3), [`3oikig`](http://redd.it/3oikig), [`3oikzt`](http://redd.it/3oikzt), [`3oil2h`](http://redd.it/3oil2h), [`3oild9`](http://redd.it/3oild9), [`3oilmx`](http://redd.it/3oilmx), [`3oimrw`](http://redd.it/3oimrw), [`3oinmh`](http://redd.it/3oinmh)  
+[`3oiog7`](http://redd.it/3oiog7), [`3oiodx`](http://redd.it/3oiodx), [`3oipef`](http://redd.it/3oipef), [`3oiqnh`](http://redd.it/3oiqnh), [`3oiskg`](http://redd.it/3oiskg), [`3oistz`](http://redd.it/3oistz), [`3oitwd`](http://redd.it/3oitwd), [`3olsab`](http://redd.it/3olsab), [`3ols7i`](http://redd.it/3ols7i), [`3ols79`](http://redd.it/3ols79), [`3oltkv`](http://redd.it/3oltkv), [`3olw7l`](http://redd.it/3olw7l)  
+[`3olwe7`](http://redd.it/3olwe7), [`3om64r`](http://redd.it/3om64r), [`3onw9o`](http://redd.it/3onw9o), [`3opmqi`](http://redd.it/3opmqi), [`3opmtm`](http://redd.it/3opmtm), [`3opn1y`](http://redd.it/3opn1y), [`3opn4o`](http://redd.it/3opn4o), [`3opnb8`](http://redd.it/3opnb8), [`3opndc`](http://redd.it/3opndc), [`3opngf`](http://redd.it/3opngf), [`3opo20`](http://redd.it/3opo20), [`3opo0n`](http://redd.it/3opo0n)  
+[`3oprq4`](http://redd.it/3oprq4), [`3oprva`](http://redd.it/3oprva), [`3optfk`](http://redd.it/3optfk), [`3opttr`](http://redd.it/3opttr), [`3opttj`](http://redd.it/3opttj), [`3opung`](http://redd.it/3opung), [`3opusq`](http://redd.it/3opusq), [`3opxo3`](http://redd.it/3opxo3), [`3opxsg`](http://redd.it/3opxsg), [`3opxxh`](http://redd.it/3opxxh), [`3opya7`](http://redd.it/3opya7), [`3opyg5`](http://redd.it/3opyg5)  
+[`3opyfr`](http://redd.it/3opyfr), [`3opzcl`](http://redd.it/3opzcl), [`3oq05o`](http://redd.it/3oq05o), [`3oq0ik`](http://redd.it/3oq0ik), [`3oq1os`](http://redd.it/3oq1os), [`3oq1z0`](http://redd.it/3oq1z0), [`3oq1wx`](http://redd.it/3oq1wx), [`3oq338`](http://redd.it/3oq338), [`3oq3sk`](http://redd.it/3oq3sk), [`3oq41k`](http://redd.it/3oq41k), [`3oq458`](http://redd.it/3oq458), [`3oq4b1`](http://redd.it/3oq4b1)  
+[`3oqab5`](http://redd.it/3oqab5), [`3oqch0`](http://redd.it/3oqch0), [`3oqcm0`](http://redd.it/3oqcm0), [`3oqd80`](http://redd.it/3oqd80), [`3oqk5g`](http://redd.it/3oqk5g), [`3oqklb`](http://redd.it/3oqklb), [`3oql3t`](http://redd.it/3oql3t), [`3oqo8k`](http://redd.it/3oqo8k), [`3oqr0l`](http://redd.it/3oqr0l), [`3or41b`](http://redd.it/3or41b), [`3orehu`](http://redd.it/3orehu), [`3oret2`](http://redd.it/3oret2)  
+[`3orf69`](http://redd.it/3orf69), [`3orfmr`](http://redd.it/3orfmr), [`3org9d`](http://redd.it/3org9d), [`3org6h`](http://redd.it/3org6h), [`3orgcl`](http://redd.it/3orgcl), [`3orgn3`](http://redd.it/3orgn3), [`3orim3`](http://redd.it/3orim3), [`3orilq`](http://redd.it/3orilq), [`3os1i2`](http://redd.it/3os1i2), [`3os1oh`](http://redd.it/3os1oh), [`3os2jc`](http://redd.it/3os2jc), [`3os54s`](http://redd.it/3os54s)  
+[`3os5m6`](http://redd.it/3os5m6), [`3owdfx`](http://redd.it/3owdfx), [`3owdng`](http://redd.it/3owdng), [`3owdv7`](http://redd.it/3owdv7), [`3owefe`](http://redd.it/3owefe), [`3oweu1`](http://redd.it/3oweu1), [`3owetd`](http://redd.it/3owetd), [`3oweyy`](http://redd.it/3oweyy), [`3owf5q`](http://redd.it/3owf5q), [`3owfqz`](http://redd.it/3owfqz), [`3owg0x`](http://redd.it/3owg0x), [`3owg98`](http://redd.it/3owg98)  
+[`3owgj2`](http://redd.it/3owgj2), [`3owgr1`](http://redd.it/3owgr1), [`3owh3p`](http://redd.it/3owh3p), [`3owhjm`](http://redd.it/3owhjm), [`3owi7r`](http://redd.it/3owi7r), [`3owj4f`](http://redd.it/3owj4f), [`3owji0`](http://redd.it/3owji0), [`3owjrs`](http://redd.it/3owjrs), [`3owk7q`](http://redd.it/3owk7q), [`3owkki`](http://redd.it/3owkki), [`3owkq0`](http://redd.it/3owkq0), [`3owm90`](http://redd.it/3owm90)  
+[`3owooo`](http://redd.it/3owooo), [`3ox4dw`](http://redd.it/3ox4dw), [`3ox5c8`](http://redd.it/3ox5c8), [`3ox7u7`](http://redd.it/3ox7u7), [`3ox9vn`](http://redd.it/3ox9vn), [`3oxa3u`](http://redd.it/3oxa3u), [`3oxaap`](http://redd.it/3oxaap), [`3oxavy`](http://redd.it/3oxavy), [`3oxavu`](http://redd.it/3oxavu), [`3oxbj9`](http://redd.it/3oxbj9), [`3oxbhp`](http://redd.it/3oxbhp), [`3oxbqv`](http://redd.it/3oxbqv)  
+[`3oxc8a`](http://redd.it/3oxc8a), [`3oxc7p`](http://redd.it/3oxc7p), [`3oxc6d`](http://redd.it/3oxc6d), [`3oxcpn`](http://redd.it/3oxcpn), [`3oxctb`](http://redd.it/3oxctb), [`3oxd5n`](http://redd.it/3oxd5n), [`3oxdjz`](http://redd.it/3oxdjz), [`3oxect`](http://redd.it/3oxect), [`3oxeuc`](http://redd.it/3oxeuc), [`3oxewp`](http://redd.it/3oxewp), [`3oxf4z`](http://redd.it/3oxf4z), [`3oxf2r`](http://redd.it/3oxf2r)  
+[`3oxf14`](http://redd.it/3oxf14), [`3oxfbp`](http://redd.it/3oxfbp), [`3oxfmv`](http://redd.it/3oxfmv), [`3oxh2f`](http://redd.it/3oxh2f), [`3oxkqr`](http://redd.it/3oxkqr), [`3oxkyg`](http://redd.it/3oxkyg), [`3oxm1h`](http://redd.it/3oxm1h), [`3oxmyu`](http://redd.it/3oxmyu), [`3oxn80`](http://redd.it/3oxn80), [`3p02mj`](http://redd.it/3p02mj), [`3p04lj`](http://redd.it/3p04lj), [`3p051w`](http://redd.it/3p051w)  
+[`3p1duy`](http://redd.it/3p1duy), [`3p1fxc`](http://redd.it/3p1fxc), [`3p1fw5`](http://redd.it/3p1fw5), [`3p1hcz`](http://redd.it/3p1hcz), [`3p1hhi`](http://redd.it/3p1hhi), [`3p1huk`](http://redd.it/3p1huk), [`3p1itd`](http://redd.it/3p1itd), [`3p1j0p`](http://redd.it/3p1j0p), [`3p1k9l`](http://redd.it/3p1k9l), [`3p1kp5`](http://redd.it/3p1kp5), [`3p1kou`](http://redd.it/3p1kou), [`3p1l0v`](http://redd.it/3p1l0v)  
+[`3p1l3x`](http://redd.it/3p1l3x), [`3p1lo9`](http://redd.it/3p1lo9), [`3p1lvo`](http://redd.it/3p1lvo), [`3p1mew`](http://redd.it/3p1mew), [`3p1md2`](http://redd.it/3p1md2), [`3p1mu3`](http://redd.it/3p1mu3), [`3p1n79`](http://redd.it/3p1n79), [`3p1nh0`](http://redd.it/3p1nh0), [`3p1ns5`](http://redd.it/3p1ns5), [`3p1o4u`](http://redd.it/3p1o4u), [`3p1o2v`](http://redd.it/3p1o2v), [`3p1oqj`](http://redd.it/3p1oqj)  
+[`3p1pm6`](http://redd.it/3p1pm6), [`3p1pqz`](http://redd.it/3p1pqz), [`3p1pup`](http://redd.it/3p1pup), [`3p1qbs`](http://redd.it/3p1qbs), [`3p1qoa`](http://redd.it/3p1qoa), [`3p1qzl`](http://redd.it/3p1qzl), [`3p1raq`](http://redd.it/3p1raq), [`3p1rn1`](http://redd.it/3p1rn1), [`3p1ruo`](http://redd.it/3p1ruo), [`3p1rtm`](http://redd.it/3p1rtm), [`3p1s4e`](http://redd.it/3p1s4e), [`3p1s9m`](http://redd.it/3p1s9m)  
+[`3p1skk`](http://redd.it/3p1skk), [`3p1sud`](http://redd.it/3p1sud), [`3p1w1z`](http://redd.it/3p1w1z)  
 
 
 &nbsp;

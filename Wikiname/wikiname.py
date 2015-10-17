@@ -13,7 +13,7 @@ APP_REFRESH = ""
 # https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 USERAGENT = ""
 #This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
-SUBREDDIT = "all"
+SUBREDDIT = "pkmntcgreferences"
 #This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
 WIKISUBREDDIT = "GoldTesting"
 #This is the subreddit which owns the wikipage. Perhaps you wish to document posts on subs other than your own.
@@ -43,55 +43,94 @@ sql = sqlite3.connect('sql.db')
 print('Loaded SQL Database')
 cur = sql.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT)')
-print('Loaded Oldposts')
+cur.execute('CREATE INDEX IF NOT EXISTS idindex on oldposts(id)')
 sql.commit()
 
+print('Logging in')
 r = praw.Reddit(USERAGENT)
 r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
 r.refresh_access_information(APP_REFRESH)
 
-def scan():
-    print('Reading Wiki')
-    names = {}
+def create_alphabet_headers(names):
     finals = []
-    wikisubreddit = r.get_subreddit(WIKISUBREDDIT)
-    wikipage = r.get_wiki_page(wikisubreddit, WIKIPAGE)
-    pcontent = wikipage.content_md
-    print('Gathering names')
-    pcontentsplit = pcontent.split('\n')
-    for item in pcontentsplit:
-        if 'http' not in item:
-            continue
-        item = item.replace('\r','')
-        item = item.replace('\\_', '_')
-        item = item.split('](')
-        username = item[0].split('[')[1]
-        lastsubmission = item[1].split(')')[0]
-        names[username] = lastsubmission
+    # This section is treated differently than the rest
+    # because we don't want to break them up by their
+    # initial character
+    finals.append('**0-9 and others**\n\n_____\n\n')
+    for (itemindex, item) in enumerate(names):
+        if item[1] not in string.ascii_letters:
+            finals.append(item + '\n\n')
+        else:
+            # Now the rest of the list contains alphabetic items only
+            names = names[itemindex:]
+            break
 
+    # Go through each item in the names list and place
+    # it into the proper bucket
+    alphasections = {}
+    for item in names:
+        # [1] because we have a markdown bracket at 0
+        initial = item[1].upper()
+        item += '\n\n'
+        if initial in alphasections:
+            alphasections[initial].append(item)
+        else:
+            alphasections[initial] = [item]
+
+    # Go through each bucket and add their content to the final
+    for letter in string.ascii_uppercase:
+        finals.append('**' + letter + '**\n\n_____\n\n')
+        if letter not in alphasections:
+            continue
+        finals += alphasections[letter]
+
+    return finals
+
+def scan():
     print('Scanning ' + SUBREDDIT)
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = list(subreddit.get_new(limit=MAXPOSTS))
     # Place newest submissions at the end
     posts.reverse()
-    for post in posts:
+    names = {}
+    for post in posts[:]:
         pid = post.id
-
         cur.execute('SELECT * FROM oldposts WHERE id=?', [pid])
-
         if cur.fetchone():
+            # removing from the list is okay because it's a slice copy
+            posts.remove(post)
             continue
-
         try:
-            pauthor = post.author.name
+            print('%s: %s' % (pid, post.author.name))
+            names[post.author.name] = post.permalink
         except AttributeError:
             print(pid + ': Post deleted')
-            continue
-
-        print('%s: %s' % (pid, pauthor))
-        names[pauthor] = post.permalink
+            posts.remove(post)
         cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
         sql.commit()
+
+    if len(posts) == 0:
+        print('No new posts')
+        return
+
+    print('Reading Wiki')
+    wikipage = r.get_wiki_page(WIKISUBREDDIT, WIKIPAGE)
+    pagecontent = wikipage.content_md
+
+    print('Formatting names')
+    pcontentsplit = pagecontent.split('\n')
+    for item in pcontentsplit:
+        if 'reddit.com' not in item:
+            continue
+        # [name](hyperlink)
+        item = item.replace('\r','')
+        item = item.replace('\\_', '_')
+        item = item.split('](')
+        username = item[0].split('[')[1]
+        lastsubmission = item[1].split(')')[0]
+        # Names set by the posts above will not be overwritten
+        # because those ones are new.
+        names.setdefault(username, lastsubmission)
 
     names = ['[%s](%s)' % (username, names[username]) for username in names]
     names.sort(key=str.lower)
@@ -100,47 +139,19 @@ def scan():
     if VERBOSE:
         print(names)
 
-    finals.append('**0-9 and others**\n\n_____\n\n')
-    for (itemindex, item) in enumerate(names):
-        if item[1] not in string.ascii_letters:
-            finals.append(item + '\n\n')
-        else:
-            names = names[itemindex:]
-            break
+    finals = create_alphabet_headers(names)
 
-    alphasections = {}
-    for item in names:
-        initial = item[1].upper()
-        item += '\n\n'
-        if initial in alphasections:
-            alphasections[initial].append(item)
-        else:
-            alphasections[initial] = [item]
-
-    for letter in string.ascii_uppercase:
-        finals.append('**' + letter + '**\n\n_____\n\n')
-        if letter not in alphasections:
-            continue
-        finals += alphasections[letter]
-
-        #for (itemindex, item) in enumerate(names):
-        #    print(letter, item[:20])
-        #    if item[1].upper() == letter:
-        #        finals.append(item + '\n\n')
     if VERBOSE == True:
         print(finals)
     print('Saving wiki page')
     wikipage.edit(''.join(finals))
 
-
-
-
-
-while True:
-    try:
-        scan()
-        sql.commit()
-    except Exception:
-        traceback.print_exc()
-    print('Running again in %d seconds.\n' % WAIT)
-    time.sleep(WAIT)
+if __name__ == '__main__':
+    while True:
+        try:
+            scan()
+            sql.commit()
+        except Exception:
+            traceback.print_exc()
+        print('Running again in %d seconds.\n' % WAIT)
+        time.sleep(WAIT)

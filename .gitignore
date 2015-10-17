@@ -3,6 +3,7 @@
 ## Eclipse
 #################
 
+*.db-journal
 SubredditBirthdays/sql.db
 Usernames/un.db
 Usernames/show/available.txt

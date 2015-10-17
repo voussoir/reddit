@@ -26,7 +26,7 @@ cur.execute('''
     lastscan INT)
     ''')
 cur.execute('CREATE INDEX IF NOT EXISTS userindex ON users(idint)')
-cur.execute('CREATE INDEX IF NOT EXISTS nameindex ON users(name)')
+cur.execute('CREATE INDEX IF NOT EXISTS nameindex ON users(lowername)')
 sql.commit()
 #  0 - idint
 #  1 - idstr
@@ -38,7 +38,7 @@ sql.commit()
 #  7 - total karma
 #  8 - available
 #  9 - lastscan
-SQL_COLUMNCOUNT = 10
+SQL_COLUMNCOUNT = 11
 SQL_IDINT = 0
 SQL_IDSTR = 1
 SQL_CREATED = 2
@@ -49,6 +49,7 @@ SQL_COMMENT_KARMA = 6
 SQL_TOTAL_KARMA = 7
 SQL_AVAILABLE = 8
 SQL_LASTSCAN = 9
+SQL_LOWERNAME = 10
 
 USERAGENT = '''
 /u/GoldenSights Usernames data collection:
@@ -159,7 +160,7 @@ def getentry(**kwargs):
     elif kw == 'idstr':
         cur.execute('SELECT * FROM users WHERE idstr=?', [kwargs[kw]])
     elif kw == 'name':
-        cur.execute('SELECT * FROM users WHERE LOWER(name)=?', [kwargs[kw].lower()])
+        cur.execute('SELECT * FROM users WHERE lowername=?', [kwargs[kw].lower()])
     else:
         return None
     return cur.fetchone()
@@ -244,6 +245,7 @@ def process(users, quiet=False, knownid='', noskip=False):
             data[SQL_TOTAL_KARMA] = user.comment_karma + user.link_karma
             data[SQL_AVAILABLE] = 0
             preverify = user.preverify
+        data[SQL_LOWERNAME] = data[SQL_NAME].lower()
 
         # preverification happens within userify_list
         x = smartinsert(data, '%04d' % current, preverified=preverify)
@@ -295,7 +297,7 @@ def smartinsert(data, printprefix='', preverified=False):
     print_message(data, printprefix)
     check = False
     if not preverified:
-        cur.execute('SELECT * FROM users WHERE LOWER(name)=?', [data[SQL_NAME].lower()])
+        cur.execute('SELECT * FROM users WHERE lowername=?', [data[SQL_NAME].lower()])
         check = cur.fetchone()
         check = check is not None
     if preverified or check:
@@ -316,10 +318,10 @@ def smartinsert(data, printprefix='', preverified=False):
             idint=?, idstr=?, created=?, \
             human=?, link_karma=?, comment_karma=?, \
             total_karma=?, available=?, lastscan=?, \
-            name=? WHERE LOWER(name)=?', data)
+            name=? WHERE lowername=?', data)
     else:
         isnew = True
-        cur.execute('INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
+        cur.execute('INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
     sql.commit()
     return isnew
 
@@ -466,31 +468,31 @@ def show():
 
     print('Writing name file.')
     print(HEADER_FULL, file=file_name)
-    cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY LOWER(name) ASC')
+    cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY lowername ASC')
     fetchwriter(file_name)
     file_name.close()
     
     print('Writing karma total file.')
     print(HEADER_FULL, file=file_karma_total)
-    cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY total_karma DESC, LOWER(name) ASC')
+    cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY total_karma DESC, lowername ASC')
     fetchwriter(file_karma_total)
     file_karma_total.close()
 
     #print('Writing karma link file.')
     #print(HEADER_FULL, file=file_karma_link)
-    #cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY link_karma DESC, LOWER(name) ASC')
+    #cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY link_karma DESC, lowername ASC')
     #fetchwriter(file_karma_link)
     #file_karma_link.close()
 
     #print('Writing karma comment file.')
     #print(HEADER_FULL, file=file_karma_comment)
-    #cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY comment_karma DESC, LOWER(name) ASC')
+    #cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY comment_karma DESC, lowername ASC')
     #fetchwriter(file_karma_comment)
     #file_karma_comment.close()
 
     print('Writing available')
     print(HEADER_BRIEF, file=file_available)
-    cur.execute('SELECT * FROM users WHERE available == 1 AND LENGTH(name) > 3 ORDER BY LOWER(name) ASC')
+    cur.execute('SELECT * FROM users WHERE available == 1 AND LENGTH(name) > 3 ORDER BY lowername ASC')
     fetchwriter(file_available, spacer1=' ', brief=True)
     file_available.close()
 
@@ -569,7 +571,7 @@ def find(name, doreturn=False):
     '''
     Print the details of a username.
     '''
-    #cur.execute('SELECT * FROM users WHERE LOWER(name)=?', [name])
+    #cur.execute('SELECT * FROM users WHERE lowername=?', [name])
     f = getentry(name=name)
     if f:
         if doreturn:
