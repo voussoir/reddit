@@ -178,7 +178,7 @@ def reducetonames(users):
 def userify_list(users, noskip=False, quiet=False):
     users = list(reducetonames(users))
     if not quiet:
-        print('Processing %d names' % len(users))
+        print('Processing %d unique names' % len(users))
     for username in users:
         try:
             preexisting = getentry(name=username)
@@ -265,8 +265,9 @@ def processid(idnum, ranger=1):
     base = b36(idnum)
     for x in range(ranger):
         idnum = x + base
-        if getentry(idint=idnum) != None:
-            print('Skipping %s' % b36(idnum))
+        exists = getentry(idint=idnum)
+        if exists != None:
+            print('Skipping %s : %s' % (b36(idnum), exists[SQL_NAME]))
             continue
         idnum = 't2_' + b36(idnum)
         idnum = idnum.lower()
@@ -298,9 +299,8 @@ def smartinsert(data, printprefix='', preverified=False):
     check = False
     if not preverified:
         cur.execute('SELECT * FROM users WHERE lowername=?', [data[SQL_NAME].lower()])
-        check = cur.fetchone()
-        check = check is not None
-    if preverified or check:
+        exists_in_db = cur.fetchone() is not None
+    if preverified or exists_in_db:
         isnew = False
         data = [
             data[SQL_IDINT],
@@ -314,11 +314,21 @@ def smartinsert(data, printprefix='', preverified=False):
             data[SQL_LASTSCAN],
             data[SQL_NAME],
             data[SQL_NAME].lower()]
+        # coalesce allows us to fallback on the existing values
+        # if the given values are null, to avoid erasing data about users
+        # whose accounts are now deleted.
         cur.execute('UPDATE users SET \
-            idint=?, idstr=?, created=?, \
-            human=?, link_karma=?, comment_karma=?, \
-            total_karma=?, available=?, lastscan=?, \
-            name=? WHERE lowername=?', data)
+            idint = coalesce(?, idint), \
+            idstr = coalesce(?, idstr), \
+            created = coalesce(?, created), \
+            human = coalesce(?, human), \
+            link_karma = coalesce(?, link_karma), \
+            comment_karma = coalesce(?, comment_karma), \
+            total_karma = coalesce(?, total_karma), \
+            available = coalesce(?, available), \
+            lastscan = coalesce(?, lastscan), \
+            name = coalesce(?, name) \
+            WHERE lowername=?', data)
     else:
         isnew = True
         cur.execute('INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)

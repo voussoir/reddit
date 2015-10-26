@@ -6,7 +6,7 @@ import sqlite3
 
 import bot
 r=praw.Reddit(bot.aG)
-
+r.config.api_request_delay=1
 sql = sqlite3.connect('databases/@gallowboob.db')
 cur = sql.cursor()
 outfile = open('@hangman.md', 'w', encoding='utf-8')
@@ -50,6 +50,7 @@ submission | archive | note
 [`3fjws0`](http://redd.it/3fjws0) | https://archive.is/s1B1F | /r/pics RIP Hitchbot
 [`3fjy38`](http://redd.it/3fjy38) | https://archive.is/5Rhzu | /r/peoplebeingjerks RIP Hitchbot again
 [`3iivzt`](http://redd.it/3iivzt) | https://archive.is/R87l7 | /r/pics tiny wasp nest
+[`3ptf6r`](http://redd.it/3ptf6r) | https://archive.is/LsDbE | /r/pics elephant rock
 '''
 
 def out(text):

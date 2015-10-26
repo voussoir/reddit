@@ -94,6 +94,8 @@ def process(idstr, ranger=0):
 
     if isinstance(idstr, str):
         idstr = [idstr]
+    if isinstance(idstr, int):
+        idstr = [b36(idstr)]
     last = b36(idstr[-1])
     for x in range(ranger):
         # Take the last item in the list and get its ID in decimal
@@ -238,7 +240,7 @@ def human(timestamp):
 
 def lastitem():
     cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
-    return cur.fetchone()[SQL_IDSTR]
+    return cur.fetchone()[SQL_IDINT]
 
 def execit(*args, **kwargs):
     exec(*args, **kwargs)

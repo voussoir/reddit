@@ -88,10 +88,15 @@ def get_all_posts(subreddit, lower=None, maxupper=None,
     cur.execute('CREATE INDEX IF NOT EXISTS idstrindex ON posts(idstr)')
 
     offset = -time.timezone
-    subname = subreddit if type(subreddit)==str else subreddit.display_name
 
+    if isinstance(subreddit, praw.objects.Subreddit):
+        subreddit = subreddit.display_name
+    elif subreddit is None:
+        subreddit = 'all'
 
     if lower == 'update':
+        # Get the item with the highest ID number, and use it's
+        # timestamp as the lower.
         cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
         f = cur.fetchone()
         if f:
@@ -159,12 +164,12 @@ def get_all_posts(subreddit, lower=None, maxupper=None,
             diff = min(MAXIMUM_EXPANSION_MULTIPLIER, diff)
             interval = int(interval * diff)
         if itemsfound > 99:
+            #Intentionally not elif
             print('Too many results, reducing interval', end='')
             interval = int(interval * (0.8 - (0.05*toomany_inarow)))
             upper = lower + interval
             toomany_inarow += 1
         else:
-            #Intentionally not elif
             lower = upper
             upper = lower + interval
             toomany_inarow = max(0, toomany_inarow-1)
