@@ -149,31 +149,32 @@ def get_subscription_reddits(user=None, join=True):
 
     If `user` is None, get all users.
     If `join` is True, join the subreddits into /r/a+b+c
-
     '''
     if user is None:
         cur.execute('SELECT * FROM subscribers')
     else:
         user = user.lower()
-        cur.execute('SELECT * FROM subscribers WHERE LOWER(name)=?', [user])
+        cur.execute('SELECT * FROM subscribers WHERE LOWER(name) == ?', [user])
     fetch = cur.fetchall()
     fetch = [f[SQL_SUBREDDIT] for f in fetch]
     fetch = list(set(fetch))
     if not join:
         return fetch
-    return "+".join(fetch)
+    return '+'.join(fetch)
 
 def add_subscription(user, subreddit):
     user = user.lower()
     subreddit = subreddit.lower()
+    subreddit = subreddit.replace('/r/', '')
+    subreddit = subreddit.replace('r/', '')
     try:
+        # Using fetch=True will cause invalid subreddits to error immediately.
         subreddit = r.get_subreddit(subreddit, fetch=True).display_name
         pph = get_posts_per_hour(subreddit)
         if pph > MAX_SUBSCRIPTION_POSTS_PER_HOUR:
             return (MESSAGE_SUBSCRIBE_BLACKLISTED % subreddit)
-        cur.execute('SELECT * FROM subscribers WHERE LOWER(name)=? AND LOWER(reddit)=?', [user, subreddit])
-        fetch = cur.fetchall()
-        if len(fetch) > 0:
+        cur.execute('SELECT * FROM subscribers WHERE LOWER(name) == ? AND LOWER(reddit) == ?', [user, subreddit])
+        if cur.fetchone():
             printlog('\t%s is already subscribed to %s' % (user, subreddit))
             return (MESSAGE_SUBSCRIBE_ALREADY % subreddit)
         else:
@@ -181,7 +182,7 @@ def add_subscription(user, subreddit):
             sql.commit()
             printlog('\t%s has subscribed to %s' % (user, subreddit))
             return (MESSAGE_SUBSCRIBE % subreddit)
-    except (praw.errors.NotFound, praw.errors.Forbidden):
+    except (praw.errors.NotFound, praw.errors.Forbidden, praw.errors.InvalidSubreddit, praw.errors.RedirectException):
         printlog('\tSubreddit does not exist')
         return (MESSAGE_SUBREDDIT_FAIL % subreddit)
 
@@ -193,7 +194,7 @@ def drop_subscription(user, subreddit):
     if subreddit == 'all':
         cur.execute('SELECT * FROM subscribers WHERE LOWER(name) == ?', [user])
         if cur.fetchone():
-            cur.execute('DELETE FROM subscribers WHERE LOWER(name)=?', [user])
+            cur.execute('DELETE FROM subscribers WHERE LOWER(name) == ?', [user])
             sql.commit()
             printlog('\t%s has unsubscribed from everything' % user)
             return MESSAGE_UNSUBSCRIBE_ALL
@@ -201,9 +202,9 @@ def drop_subscription(user, subreddit):
             printlog('\t%s doesnt have any subscriptions' % user)
             return MESSAGE_UNSUBSCRIBE_ALREADY_ALL
 
-    cur.execute('SELECT * FROM subscribers WHERE LOWER(name) == ? AND LOWER(reddit) ==?', [user, subreddit])
+    cur.execute('SELECT * FROM subscribers WHERE LOWER(name) == ? AND LOWER(reddit) == ?', [user, subreddit])
     if cur.fetchone():
-        cur.execute('DELETE FROM subscribers WHERE LOWER(name) == ? AND LOWER(reddit) ==?', [user, subreddit])
+        cur.execute('DELETE FROM subscribers WHERE LOWER(name) == ? AND LOWER(reddit) == ?', [user, subreddit])
         sql.commit()
         printlog('\t%s has unsubscribed from %s' % (user, subreddit))
         return (MESSAGE_UNSUBSCRIBE % subreddit)
@@ -236,7 +237,7 @@ def add_to_spool(user, message):
         user = user.name
     user = user.lower()
     message = message.strip()
-    cur.execute('SELECT * FROM spool WHERE name==? AND message==?', [user, message])
+    cur.execute('SELECT * FROM spool WHERE name == ? AND message == ?', [user, message])
     if cur.fetchone():
         return False
         #raise Exception("Message already exists in spool")
@@ -250,7 +251,7 @@ def get_from_spool():
     return cur.fetchone()
 
 def drop_from_spool(rowid):
-    cur.execute('DELETE FROM spool WHERE ROWID=?', [rowid])
+    cur.execute('DELETE FROM spool WHERE ROWID == ?', [rowid])
     #printlog('\tdropped %s from spool' % spool[1])
     sql.commit()
 
@@ -289,7 +290,7 @@ def manage_inbox():
         try:
             author = message.author.name
             interpretation = interpret_message(message)
-            if interpretation:
+            if interpretation and NOSEND is False:
                 add_to_spool(author, interpretation)
         except AttributeError:
             pass
@@ -324,7 +325,7 @@ def manage_posts():
             subscriptions_per_user[user] = set([subreddit])
         all_subreddits.add(subreddit)
     all_subreddits = list(all_subreddits)
-    all_subreddits.sort(key=lambda x: x.lower())
+    all_subreddits.sort(key=str.lower)
 
     # First, go through all of the subreddits we have.
     # Take the items from their /new queue, remove the ones
@@ -347,7 +348,7 @@ def manage_posts():
         for submission in keep_submissions:
             formatted_submissions[submission.id] = format_post(submission)
         printlog(len(keep_submissions))
-    printlog()
+    print()
 
     # Now, go through each user and take the submission list
     # from the submissions_per_subreddit dict, then compile a message
@@ -487,16 +488,17 @@ def build_report(user):
         fetch = [f[0].lower() for f in fetch]
         userlist = list(set(fetch))
         status = get_subscription_reddits(None, join=True)
-        status = "ALL REDDITS: /r/" + status + '\n\n'
+        status = 'ALL REDDITS: /r/' + status + '\n\n'
         results.append(status)
     for user in userlist:
         # join=False because I want the list to contain all the individuals
         # as well as a join at the very end.
         status = get_subscription_reddits(user, join=False)
+        status.sort(key=str.lower)
         if len(status) > 0:
-            status.append('+'.join(status))
-            status = ['/r/' + f for f in status]
-            status[-1] = "All: " + status[-1]
+            if len(status) > 1:
+                status.append('+'.join(status))
+            status = [('/r/%s/new' % f) for f in status]
             status = '\n\n'.join(status)
             if get_all_users:
                 status = '/u/' + user + '\n\n' + status + '\n\n&nbsp;\n\n'

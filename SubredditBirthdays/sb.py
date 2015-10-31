@@ -828,10 +828,6 @@ def modsfromid(subid):
     return mods
 
 def modernize():
-    #cur.execute('SELECT * FROM subreddits')
-    #f=cur.fetchall()
-    #f.sort(key=lambda x: x[SQL_CREATED])
-    #finalitem = f[-1]
     cur.execute('SELECT * FROM subreddits ORDER BY created DESC LIMIT 1')
     finalitem = cur.fetchone()
     print('Current final item:')
