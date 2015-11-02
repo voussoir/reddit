@@ -1,0 +1,559 @@
+/* ------------------------- */
+/* BEGIN COPY */
+
+
+
+/* "No Participation"-Mode, aka "Read Only"-Mode
+ * by /u/KortoloB
+ * /r/NoParticipation
+ * 
+ * Link people to np.reddit.com/r/YourSubreddit to show them a read-only version.
+ * Subscribers will see the full page, only non-subscribers will see the read-only version.
+ * This is of course by no means fool-proof, but it should work for the average user.
+ *  */
+ 
+ 
+
+
+body:lang(np):not(.subscriber) .arrow
+{ 
+    visibility: hidden !important;
+}
+
+body:lang(np):not(.subscriber) .usertext-edit,
+body:lang(np):not(.subscriber) .sidebox.submit,
+body:lang(np):not(.subscriber) .commentingAs,
+body:lang(np):not(.subscriber) .markdownEditor, 
+body:lang(np):not(.subscriber) a[onclick*="return reply(this)"],
+body:lang(np):not(.subscriber) .subButtons,
+body:lang(np):not(.subscriber) .helplink,
+body:lang(np):not(.subscriber) .titlebox .fancy-toggle-button.toggle > .option.add,
+body:not(.moderator):not(.post-submitter):not(.contributor).post-linkflair-LockedPost .usertext-edit,
+body:not(.moderator):not(.post-submitter):not(.contributor).post-linkflair-LockedPost .sidebox.submit,
+body:not(.moderator):not(.post-submitter):not(.contributor).post-linkflair-LockedPost .commentingAs,
+body:not(.moderator):not(.post-submitter):not(.contributor).post-linkflair-LockedPost .markdownEditor, 
+body:not(.moderator):not(.post-submitter):not(.contributor).post-linkflair-LockedPost a[onclick*="return reply(this)"],
+body:not(.moderator):not(.post-submitter):not(.contributor).post-linkflair-LockedPost .subButtons,
+body:not(.moderator):not(.post-submitter):not(.contributor).post-linkflair-LockedPost .helplink,
+body:not(.moderator):not(.post-submitter):not(.contributor).post-linkflair-LockedPost .titlebox .fancy-toggle-button.toggle > .option.add
+{
+    display: none !important;
+}
+
+body:lang(np):not(.subscriber) #siteTable:before
+{
+    content: "You have been linked to a read-only version of this subreddit. Please respect the community by not voting.";
+    display: block;
+    max-width: 800px;
+    background-color: #F6E69F;
+    padding: 5px 10px;
+    margin: 5px 305px 5px 0px;
+    border: 1px solid orange;
+    font-size: small;
+}
+
+body:not(.moderator):not(.post-submitter):not(.contributor).post-linkflair-LockedPost #siteTable:before
+{
+    content: "This post has been locked from further commenting.";
+    display: block;
+    max-width: 800px;
+    background-color: #F6E69F;
+    padding: 5px 10px;
+    margin: 5px 305px 5px 0px;
+    border: 1px solid orange;
+    font-size: small;
+}
+
+body:lang(np):not(.subscriber) .entry.likes:not(.reddit-entry):before,
+body:lang(np):not(.subscriber) .entry.dislikes:not(.reddit-entry):before
+{
+    content: "Please do not vote or comment when you come from external subreddits.";
+    color: red;
+    font-size: large;
+    font-weight: bold;
+}
+
+/* Wiki protection */
+body.wiki-page:lang(np):not(.subscriber) span.pageactions a.wikiaction-edit:not(.wikiaction-current),
+body.wiki-page:lang(np):not(.subscriber) div.wiki-page-content form#editform label[for='reason'],
+body.wiki-page:lang(np):not(.subscriber) div.wiki-page-content form#editform input#wiki_revision_reason,
+body.wiki-page:lang(np):not(.subscriber) div.wiki-page-content form#editform input[type='submit']
+{
+    display: none !important;
+}
+
+
+
+/* END COPY */
+/* ------------------------- */
+
+
+/***************
+Stickies
+***************/
+.side h3:nth-of-type(1){
+left: 0;
+}
+.side h3:nth-of-type(2){
+left:205px;
+}
+.side h3:nth-of-type(1),.side h3:nth-of-type(2) {
+top: 60px;
+position:absolute;
+background-color:#cee3f8;
+color:#555555!important;
+text-align:left;
+margin: 15px;
+border-radius: 8px;
+box-shadow: 1px 1px 2px 0px #222222;
+padding: 7px 18px 7px 18px;
+}
+
+
+/* Submission hover display */
+.sidebox.submit.submit-text:hover:before {
+    position: fixed;
+    display: block;
+    top: 0;
+    text-align: center;
+    background-color: #CC3300;
+    color: white;
+    z-index: 1000;
+    width: 100%;
+    left: 0;
+    content: "Please follow the rules and check the Wiki before making your post.";
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 5px 3px 5px #888888;
+}
+
+/* Moves links down to make space */
+div.content {
+    margin-top: 50px 
+}
+
+/* Wiki links */
+
+.side .md ul:nth-of-type(1) {
+    margin: 0 0 0 0;
+    padding: 0;
+}
+
+.side .md ul:nth-of-type(1) a {
+    color: white;
+}
+
+.side .md ul:nth-of-type(1) li {
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: middle;
+    padding: 0.4em 0.4em 0.4em 0.4em; /* top right bottom left */
+    margin-bottom: 5px;
+    color: white;
+    text-decoration: none;
+    border-radius: 0;
+    position: relative;
+    text-align: center;
+}
+
+.side .md > ul:nth-of-type(1) > li:nth-child(1) { background-color: #19a53f; width: 99.5%; display: inline-block; }
+.side .md > ul:nth-of-type(1) > li:nth-child(2) { background-color: #19a53f; width: 49%; display: inline-block; }
+.side .md > ul:nth-of-type(1) > li:nth-child(3) { background-color: #19a53f; width: 49%; display: inline-block; }
+.side .md > ul:nth-of-type(1) > li:nth-child(4) { background-color: #1c8add; width: 49%; display: inline-block; }
+.side .md > ul:nth-of-type(1) > li:nth-child(5) { background-color: #cb5f16; width: 49%; display: inline-block; }
+.side .md > ul:nth-of-type(1) > li:nth-child(6) { background-color: #1c8add; width: 49%; display: inline-block; }
+.side .md > ul:nth-of-type(1) > li:nth-child(7) { background-color: #1c8add; width: 49%; display: inline-block; }
+.side .md > ul:nth-of-type(1) > li:nth-child(8) { background-color: #1c8add; width: 49%; display: inline-block; }
+.side .md > ul:nth-of-type(1) > li:nth-child(9) { background-color: #1c8add; width: 49%; display: inline-block; }
+.side .md > ul:nth-of-type(1) > li:nth-child(10) { background-color: #8233b7; width: 99.5%; display: inline-block; }
+
+/* link flair */
+
+.side .md > ul:nth-of-type(2) { font-size: 0; }
+.side .md > ul:nth-of-type(2), .side .md > ul:nth-of-type(2) > li  {
+    display: block;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+}
+.side .md > ul:nth-of-type(2) > li {
+    display: inline-block;
+    width: 50%;
+    margin-bottom: 5px;
+    font-size: 0.75rem;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+.side .md > ul:nth-of-type(2) > li:nth-of-type(odd) { padding-right: 0.25rem; }
+.side .md > ul:nth-of-type(2) > li a:after {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(255,255,255,0.3);
+    content: '';
+}
+.side .md > ul:nth-of-type(2) > li a:hover:after {
+    background-color: rgba(255,255,255,0.55) !important;
+    -webkit-transition: background-color .4s ease-in-out;
+    -moz-transition: background-color .4s ease-in-out;
+    -o-transition: background-color .4s ease-in-out;
+    transition: background-color .4s ease-in-out;
+}
+
+.side .md > ul:nth-of-type(2) > li a:before {
+    position: absolute;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    top: 0.5rem;
+    left: 0.5rem;
+    background-size: contain;
+    background-repeat: no-repeat;
+    content: '';
+}
+
+.linkflairlabel {
+    position: relative;
+    display: inline-block;
+    background: #555555;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+    min-width:82px;
+    max-width:44em !important ;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.linkflairlabel:before {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(255,255,255,0.3);
+    content: '';
+}
+
+.side .md > ul:nth-of-type(2) > li:nth-child(1) a:before { background-image: url(%%automobile-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(2) a:before { background-image: url(%%line-chart-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(3) a:before { background-image: url(%%pie-chart-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(4) a:before { background-image: url(%%edit-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(5) a:before { background-image: url(%%credit-card-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(6) a:before { background-image: url(%%plane-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(7) a:before { background-image: url(%%fire-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(8) a:before { background-image: url(%%dollar-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(9) a:before { background-image: url(%%coffee-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(10) a:before { background-image: url(%%meh-o-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(11) a:before { background-image: url(%%home-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(12) a:before { background-image: url(%%circle-o-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(13) a:before { background-image: url(%%umbrella-ffffff-32%%); }
+.side .md > ul:nth-of-type(2) > li:nth-child(14) a:before { background-image: url(%%comment-ffffff-32%%); }
+
+.linkflairlabel[title="Auto"], .side .md > ul:nth-of-type(2) > li:nth-child(1) a { background-color: #19A53f; }
+.linkflairlabel[title="Investing"], .side .md > ul:nth-of-type(2) > li:nth-child(2) a { background-color: #da333f; }
+.linkflairlabel[title="Budgeting"], .side .md > ul:nth-of-type(2) > li:nth-child(3) a { background-color: #2aa198; }
+.linkflairlabel[title="Planning"], .side .md > ul:nth-of-type(2) > li:nth-child(4) a { background-color: #cb5f16; }
+.linkflairlabel[title="Credit"], .side .md > ul:nth-of-type(2) > li:nth-child(5) a { background-color: #1c8add; }
+.linkflairlabel[title="Retirement"], .side .md > ul:nth-of-type(2) > li:nth-child(6) a { background-color: #aa8c10; }
+.linkflairlabel[title="Debt"], .side .md > ul:nth-of-type(2) > li:nth-child(7) a { background-color: #4743eb; }
+.linkflairlabel[title="Saving"], .side .md > ul:nth-of-type(2) > li:nth-child(8) a { background-color: #707022; }
+.linkflairlabel[title="Employment"], .side .md > ul:nth-of-type(2) > li:nth-child(9) a { background-color: #8233b7; }
+.linkflairlabel[title="Taxes"], .side .md > ul:nth-of-type(2) > li:nth-child(10) a { background-color: #375861; }
+.linkflairlabel[title="Housing"], .side .md > ul:nth-of-type(2) > li:nth-child(11) a { background-color: #c313d3; }
+.linkflairlabel[title="Other"], .side .md > ul:nth-of-type(2) > li:nth-child(12) a { background-color: #756178; }
+.linkflairlabel[title="Insurance"], .side .md > ul:nth-of-type(2) > li:nth-child(13) a { background-color: #d33682; }
+.linkflairlabel[title="Meta"], .side .md > ul:nth-of-type(2) > li:nth-child(14) a { background-color: #282; }
+.side .md > ul:nth-of-type(2) > li:nth-child(15) a { background-color: #b58900; }
+.linkflairlabel[title="Locked Post"] { background-color: #b11; }
+
+.side .md [href*="q=flair:"] {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.5rem 0.5rem 2rem;
+    color: #fff;
+    line-height: 1rem;
+    vertical-align: top;
+}
+
+/* flair selector box */
+.flairoptionpane ul .title { display: none; }
+.flairoptionpane .linkflairlabel {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+}
+.flairoptionpane { max-height: 500px }
+body:not(.moderator) .flairoptionpane .linkflair-LockedPost { display: none; }
+body:not(.moderator) .flairoptionpane .linkflair-Meta { display: none; }
+body:not(.moderator) .flairoptionpane .linkflair-Unset { display: none; }
+
+/* Submit page stuff */
+#text-desc:after {
+    display: block;
+    margin-top: 1em;
+    content: "Remember to follow the guidelines in the right side-bar."
+    }
+.roundfield .title {
+    display: block
+    }
+#title-field .title:after {
+    display: block;
+    color: black;
+    font-size: 11px;
+    font-weight: bold;
+    background-color:#dddddd;
+    border:1px solid black;
+    font-size: 11px;
+    font-weight: bold;
+    content: "If you are posting from outside the US, consider indicating your country with an abbreviation in parentheses at the start or end of the title: e.g. (AUS), (UK), (CAN). Ensure your title contains sufficient information."
+    }
+/*#text-field .title:after {
+    display: block;
+    color: red;
+    font-size: 12px;
+    content: "Please ensure you have read our subreddit rules before continuing to post. See the link on the sidebar."
+    }*/
+#text-field .title:after {
+    content: "Please note: /r/personalfinance is strictly moderated. Please ensure you have read and understood our Subreddit Rules link on the sidebar before posting.";
+    display: block;
+    text-align: center;
+/*    margin-top: -5px;
+    margin-bottom: 4px;
+    margin-right: -5px;
+    padding: 4px;*/
+    color: #000 !important;
+    background-color:#ffcccc;
+    border:1px solid red;
+    font-size: 11px;
+    font-weight: bold;
+}
+#text-field .gray {
+    display: none
+    }
+/*  BORDER AROUND PREFERENCES AND LOGOUT */
+#header-bottom-right {
+    border-color: #5f99cf;
+    border-style: solid none none solid;
+    border-width: 1px medium medium 1px;
+    background-color: #eff7ff
+    }
+
+
+/* Comment note (borrowed from /r/games) - above top-level reply box only */
+.commentarea .usertext-edit:before {
+    content: "Please note: /r/personalfinance is strictly moderated. Please ensure you have read and understood our Subreddit Rules link on the sidebar before commenting.";
+    display: block;
+    text-align: center;
+    margin-top: -5px;
+    margin-bottom: 4px;
+    margin-right: -5px;
+    padding: 4px;
+    color: #000 !important;
+    background-color:#ffcccc;
+    border:1px solid red;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+
+
+
+
+/* Flair */
+
+.flair {
+  border: none;
+  background-color: transparent;
+  color: #888;
+  position: relative;
+  line-height: 20px;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  font-size: .9em;
+  font-weight: 800;
+  padding-right: 5px;
+}
+
+
+/* Link Flair reminder */
+.post-submitter .link:not(.linkflair) .flairselectbtn,
+.post-submitter .link.linkflair-Unset .flairselectbtn {
+    position: relative;
+}
+.post-submitter .link:not(.linkflair) .flairselectbtn:before,
+.post-submitter .link.linkflair-Unset .flairselectbtn:before {
+    position: absolute;
+    content: 'Please click here to add flair to your post';
+    background: rgba(255,0,0,.7);
+    color: #fff;
+    top: -2.5em;
+    left: -8em;
+    height: 1.5em;
+    padding: 0 .5em;
+    line-height: 1.5;
+    text-align: center;
+}
+.post-submitter .link:not(.linkflair) .flairselectbtn:after,
+.post-submitter .link.linkflair-Unset .flairselectbtn:after {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 1em .5em 0;
+    border-color: rgba(255,0,0,.7) transparent transparent;
+    top: -1em;
+    left: 1em;
+    content: '';
+    position: absolute;
+}
+.post-submitter .link:not(.linkflair) .flairselectbtn:hover:before,
+.post-submitter .link.linkflair-Unset .flairselectbtn:hover:before {
+    background: #f00;
+}
+.post-submitter .link:not(.linkflair) .flairselectbtn:hover:after,
+.post-submitter .link.linkflair-Unset .flairselectbtn:hover:after {
+    border-color: #f00 transparent transparent;
+}
+
+/* START: RES nightmode workaround - can remove sometime after RES 4.6 is released */
+.res-nightmode .wiki-page .pageactions .wikiaction-current {
+    background-color: #777;
+}
+.res-nightmode .content .wiki-page-content .md.wiki,
+.res-nightmode .content .wiki-page-content .md.wiki h1,
+.res-nightmode .content .wiki-page-content .md.wiki h2,
+.res-nightmode .content .wiki-page-content .md.wiki h3,
+.res-nightmode .content .wiki-page-content .md.wiki h4,
+.res-nightmode .content .wiki-page-content .md.wiki h5,
+.res-nightmode .content .wiki-page-content .md.wiki h6,
+.res-nightmode .content .wiki-page-content .md.wiki ul,
+.res-nightmode .content .wiki-page-content .md.wiki ol,
+.res-nightmode .content .wiki-page-content .md.wiki li,
+.res-nightmode .content .wiki-page-content .md.wiki p {
+    color: #ddd;
+}
+.res-nightmode .wiki-page .wiki-page-content .md.wiki>.toc ul {
+    background-color: #222;
+}
+/* END: RES nightmode workaround */
+
+
+/* Sticky comments in a thread. Please see http://redd.it/2oi7bz for documentation
+
+*****************
+Tutorial:
+    1. Click your comment's permalink. The last section (usually 7 letters) of your URL is the code.
+    2. Add a comma to the last item in "PART A" below. Do not forget to separate everything with a comma, or it could wreck the code.
+    3. Append your code to the end of: .comments-page .sitetable.nestedlisting>.thing.id-t1_
+    4. If you wish to make other modhacks, do the same for "PART B", "PART C", and "PART D". These three do not require a comma to separate.
+*****************
+
+*/ 
+
+.comments-page .sitetable.nestedlisting {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-flex-wrap: nowrap;
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;    
+}
+
+
+/* BEGIN "PART A" *
+Comments to sticky to the top of their thread.
+How to use:
+1. Make an extra copy of the first line below it.
+2. On the new second line, replace "youridhere" with the ID of your moderator comment.  Add the date.
+3. Leave the first line unchanged for the next editor to use.
+4. Remove any lines older than a month.
+5. For this section, do not remove the "nocomma" line!
+PLEASE DO NOT FORGET TO SEPARATE ALL ITEMS WITH A COMMA, NO COMMA AFTER THE LAST ITEM. */
+
+.comments-page .sitetable.nestedlisting>.thing.id-t1_youridhere,/**/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cwl6ndc,/*2015-11-01, medical bill*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cvdam3a,/*2015-07-12, pregnant gf*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_csfg1v4,/*2015-06-22, maybe mint */
+.comments-page .sitetable.nestedlisting>.thing.id-t1_csa3bpb,/*2015-06-17, healthcare*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cs4vm4y,/*2015-06-12, bf wants co-signer*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cs0vk01,/*2015-06-09, mortgage paid off*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_crwkuo1,/*2015-06-05*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqwa0jt,/*2015-05-02*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqqlh7j,/*2015-04-27*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqjwtia,/*2015-04-21, 401k wipeout*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqj18vs,/*2015-04-20*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cpblomf,/*2015-03-11*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cprzm8t,/*2015-02-11*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqsjfd9,/*2015-03-10*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_nocomma/* do not remove this */
+
+/*End list of stickied comments*/
+
+{
+    -webkit-order: -1;
+    -ms-flex-order: -1;
+    order: -1;
+    border: solid 2px green !important;
+    background-color: #ddffdd;
+}
+
+/* BEGIN "PART B" *
+Comments to disable replies to.
+If you have time, please document the date the sticky occurred, and remove anything older than one week.
+PLEASE DO NOT SEPARATE WITH A COMMA HERE. */
+
+.comments-page .sitetable.nestedlisting>.thing.id-t1_youridhere  a[onclick="return reply(this)"]{ display: none; }/*datehere*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cwl6ndc  a[onclick="return reply(this)"]{ display: none; }/*2015-11-01*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cvdam3a  a[onclick="return reply(this)"]{ display: none; }/*2015-07-12*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cs4vm4y  a[onclick="return reply(this)"]{ display: none; }/*2015-06-12*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqwa0jt  a[onclick="return reply(this)"]{ display: none; }/*2015-05-02*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqqlh7j  a[onclick="return reply(this)"]{ display: none; }/*2015-04-27*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqj18vs  a[onclick="return reply(this)"]{ display: none; }/*2015-04-20*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cpblomf  a[onclick="return reply(this)"]{ display: none; }/*2015-03-11*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cprzm8t  a[onclick="return reply(this)"]{ display: none; }/*2015-02-11*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqsjfd9  a[onclick="return reply(this)"]{ display: none; }/*2015-02-11*/
+
+/*End list of comments which have reply disabled*/
+
+/* BEGIN "PART C" *
+Comments to disable upvotes and downvotes.
+If you have time, please document the date the sticky occurred, and remove anything older than one week.
+PLEASE DO NOT SEPARATE WITH A COMMA HERE. */
+
+.comments-page .sitetable.nestedlisting>.thing.id-t1_youridhere div[onclick="$(this).vote(r.config.vote_hash, null, event)"]{display:none;}/*datehere*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cwl6ndc div[onclick="$(this).vote(r.config.vote_hash, null, event)"]{display:none;}/*2015-11-01*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cvdam3a div[onclick="$(this).vote(r.config.vote_hash, null, event)"]{display:none;}/*2015-05-02*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqqlh7j div[onclick="$(this).vote(r.config.vote_hash, null, event)"]{display:none;}/*2015-04-27*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqj18vs div[onclick="$(this).vote(r.config.vote_hash, null, event)"]{display:none;}/*2015-04-20*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cprzm8t div[onclick="$(this).vote(r.config.vote_hash, null, event)"]{display:none;}/*2015-02-11*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqsjfd9 div[onclick="$(this).vote(r.config.vote_hash, null, event)"]{display:none;}/*2015-02-11*/
+
+
+/*End list of comments which have upvotes-downvotes disabled*/
+
+/* BEGIN "PART D" *
+Comments to hide the number of points.
+If you have time, please document the date the sticky occurred, and remove anything older than one week.
+PLEASE DO NOT SEPARATE WITH A COMMA HERE. */
+
+.comments-page .sitetable.nestedlisting>.thing.id-t1_youridhere span[class="score likes"]{display:none;}/*datehere*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cwl6ndc span[class="score likes"]{display:none;}/*2015-11-01*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cvdam3a span[class="score likes"]{display:none;}/*2015-05-02*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqj18vs span[class="score likes"]{display:none;}/*2015-04-20*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cprzm8t span[class="score likes"]{display:none;}/*2015-02-11*/
+.comments-page .sitetable.nestedlisting>.thing.id-t1_cqsjfd9 span[class="score likes"]{display:none;}/*2015-02-11*/
+
+/*End of comments to disable number of likes*/
+
+
+/* User flair */
+
+ .flair-ama { background-color: yellow; color: black; }
