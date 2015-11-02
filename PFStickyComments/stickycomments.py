@@ -3,6 +3,7 @@ import datetime
 import praw
 import sqlite3
 import time
+import traceback
 
 ''' User Config '''
 
