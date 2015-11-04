@@ -68,10 +68,10 @@ cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT, username TEXT)')
 cur.execute('CREATE INDEX IF NOT EXISTS oldpostindex on oldposts(id)')
 
 print('Logging in')
-#r = praw.Reddit(USERAGENT)
-#r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
-#r.refresh_access_information(APP_REFRESH)
-r=bot.o7()
+r = praw.Reddit(USERAGENT)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.refresh_access_information(APP_REFRESH)
+#r=bot.o7()
 
 def accept_pending_modinvites():
     print('Looking for mod invites')
