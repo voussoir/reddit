@@ -113,7 +113,7 @@ def allpossiblefromset(characters, length=None, minlength=None, maxlength=None):
             for item in allpossiblefromset(characters, x):
                 yield item
     elif length is None:
-        raise ValueError('`length` must be provided if you arent using the mix/max')
+        raise ValueError('`length` must be provided if you arent using the min/max')
     else:
         endingpoint = len(characters) ** length
 
