@@ -51,6 +51,9 @@ submission | archive | note
 [`3fjy38`](http://redd.it/3fjy38) | https://archive.is/5Rhzu | /r/peoplebeingjerks RIP Hitchbot again
 [`3iivzt`](http://redd.it/3iivzt) | https://archive.is/R87l7 | /r/pics tiny wasp nest
 [`3ptf6r`](http://redd.it/3ptf6r) | https://archive.is/LsDbE | /r/pics elephant rock
+[`3snplt`](http://redd.it/3snplt) | https://archive.is/AIYFU | /r/pics kurds & coalition
+[`3snr4u`](http://redd.it/3snr4u) | https://archive.is/GvYoZ | /r/pics dog was doing stuff
+[`3snrwh`](http://redd.it/3snrwh) | https://archive.is/Iq29E | /r/pics I touch the poop
 '''
 
 def out(text):

@@ -11,6 +11,9 @@ timesearch.py
     07 september 2015
     - fixed bug which allowed `livestream` to crash because
       `bot.refresh()` was outside of the trycatch.
+    11 november 2015
+    - created `offline_reading.py` which converts a timesearch database
+      into a comment tree that can be rendered into HTML
 
 It's all fresh all smooth
 

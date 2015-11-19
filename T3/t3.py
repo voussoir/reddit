@@ -1,5 +1,6 @@
 #/u/GoldenSights
 import datetime
+import math
 import praw
 import random
 import sqlite3
@@ -66,6 +67,14 @@ UPPERBOUND = 164790958
 #  120,932,352 = 200000
 #  164,790,958 = 2q41im
 
+# Some submissions don't seem to exist within a particular subreddit
+# ex: https://www.reddit.com/comments/6zm6h/ign_spore_review/
+ATTRIBUTE_ERROR_SUB = "'<class 'praw.objects.Submission'>' has no attribute 'subreddit'"
+# This string will be used for the database field instead.
+BROKEN_SUB = '!!BROKEN!!'
+
+lastids = []
+lastitems = []
 
 class Post:
     ''' Generic class to map the indices of DB entries to names '''
@@ -91,7 +100,8 @@ def process(idstr, ranger=0):
     Given a string or a set of strings that represent thread IDs,
     get those Submissions and put them into the database
     '''
-
+    global lastids
+    global lastitems
     if isinstance(idstr, str):
         idstr = [idstr]
     if isinstance(idstr, int):
@@ -103,26 +113,37 @@ def process(idstr, ranger=0):
         idstr.append(b36(last+x+1))
     idstr = remove_existing(idstr)
     idstr = verify_t3(idstr)
-    while len(idstr) > 0:
-        hundred = idstr[:100]
-        print('(%d) %s > %s' % (len(idstr), hundred[0], hundred[-1]))
-        try:
-            items = list(r.get_submissions(hundred))
-        except praw.errors.HTTPException as e:
-            # 404 error means no posts exist for that ID.
-            # So we know there's no posts here, and continue on
-            # Anything other than 404, we need to hear about please
-            if e._raw.status_code != 404:
-                raise e
-            items = []
-            pass
-        idstr = idstr[100:]
-        for item in items:
-            print(' %s, %s' % (item.fullname, item.subreddit.display_name))
-            item = dataformat(item)
-            # Preverification happens via remove_existing
-            smartinsert(item, preverified=True)
+    new_item_count = 0
+    try:
+        while len(idstr) > 0:
+            hundred = idstr[:100]
+            print('(%d) %s > %s' % (len(idstr), hundred[0], hundred[-1]))
+            lastids = hundred
+            try:
+                items = list(r.get_submissions(hundred))
+            except praw.errors.HTTPException as e:
+                # 404 error means no posts exist for that ID.
+                # Anything other than 404, we need to hear about please.
+                if e._raw.status_code != 404:
+                    raise
+                items = []
+                pass
+            lastitems = items
+            idstr = idstr[100:]
+            for item in items:
+                if not hasattr(item, 'subreddit'):
+                    item.subreddit = praw.objects.Subreddit(r, subreddit_name=BROKEN_SUB)
+                    item.subreddit.display_name = BROKEN_SUB
+                print(' %s, %s' % (item.fullname, item.subreddit.display_name))
+                item = dataformat(item)
+                # Preverification happens via remove_existing
+                smartinsert(item, preverified=True)
+                new_item_count += 1
+            sql.commit()
+    except KeyboardInterrupt:
         sql.commit()
+        print('Keyboard Interrupt')
+    return new_item_count
 p = process
 
 def remove_existing(idstr):
@@ -152,7 +173,6 @@ def dataformat(item):
     where the indices contain the data that corresponds
     to the the SQL column with the same indice
     '''
-
     data = [None] * SQL_COLUMNCOUNT
     data[SQL_IDINT] = b36(item.id)
     data[SQL_IDSTR] = item.id
@@ -192,7 +212,8 @@ def smartinsert(data, preverified=False):
     Preverification means that it will not perform a SELECT to see
     if the item exists, because you have already guaranteed this.
     '''
-
+    if isinstance(data, praw.objects.Submission):
+        data = dataformat(data)
     if not preverified:
         cur.execute('SELECT * FROM posts WHERE idint==?', [data[SQL_IDINT]])
     if (preverified) or (cur.fetchone() is None):
@@ -244,3 +265,42 @@ def lastitem():
 
 def execit(*args, **kwargs):
     exec(*args, **kwargs)
+
+def automatic_processor():
+    '''
+    Sometimes, submissions are broken and they cause a by_id request to
+    raise 500 server error. When this happens, I have no choice but to
+    cut the range in half. If it passes, then I know the broken item is
+    in the next half. Repeat until the broken item is identified.
+    
+    This function attempts to automate that process -- cut the range in
+    half until it is only processing a single item, then increment by 1
+    until we locate the broken item and can set our range back up to 100.
+    '''
+    bump = 0
+    ranger = 100
+    # The largest id which could be causing the problem. Once we pass it,
+    # we know we've re-entered safe territory and can go back to ranger=100
+    problem_range_max = 0
+    new_items = 0
+    while True:
+        try:
+            li = lastitem()
+            if li > problem_range_max:
+                bump = 0
+                ranger = 100
+            new_items = process(li + bump, ranger)
+            if new_items == 0:
+                # In case the post doesn't exist, we need to move on.
+                bump += 1
+        except (praw.errors.HTTPException, AttributeError) as e:
+            if isinstance(e, praw.errors.HTTPException) and e._raw.status_code != 500:
+                raise
+            if isinstance(e, AttributeError) and e.args[0] != ATTRIBUTE_ERROR_SUB:
+                raise
+            problem_range_max = li + ranger
+            ranger = math.floor(ranger / 2)
+            if ranger == 0:
+                bump += 1
+            print('Caught Exception. Bump=%d, range=%d, current=%d, problem_max=%d' %
+                  (bump, ranger, li, problem_range_max))
