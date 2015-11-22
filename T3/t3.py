@@ -142,7 +142,8 @@ def process(idstr, ranger=0):
             sql.commit()
     except KeyboardInterrupt:
         sql.commit()
-        print('Keyboard Interrupt')
+        print('Caught kbi, saved.')
+        raise
     return new_item_count
 p = process
 
@@ -304,3 +305,6 @@ def automatic_processor():
                 bump += 1
             print('Caught Exception. Bump=%d, range=%d, current=%d, problem_max=%d' %
                   (bump, ranger, li, problem_range_max))
+        except KeyboardInterrupt:
+            print('Caught kbi')
+            return

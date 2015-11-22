@@ -18,7 +18,8 @@ MAXIMUM_EXPANSION_MULTIPLIER = 2
 # The maximum amount by which it can multiply the interval
 # when not enough posts are found.
 DATABASE_FOLDER = 'databases'
-os.makedirs(DATABASE_FOLDER)
+if not os.path.exists(DATABASE_FOLDER):
+    os.makedirs(DATABASE_FOLDER)
 DATABASE_SUBREDDIT = '%s/%s.db' % (DATABASE_FOLDER, '%s')
 DATABASE_USER = '%s/@%s.db' % (DATABASE_FOLDER, '%s')
 try:

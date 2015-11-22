@@ -34,8 +34,19 @@ Commentaugment can be very slow, so you may wish to have verbosity=1 to see what
 
 ===============
 
+offline_reading.py
+==================
+
+    For the whole db:
+    > offline_reading.py databases\ack.db    
+
+    For a single submission:
+    > offline_reading.py databases\ack.db t3_20ib8z
+ 
+===============
+
 I want to live in a future where everyone uses UTC and agrees on daylight savings.
 
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/timesearch_logo_256.png?raw=true" alt="Timesearch"/>
+    <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/timesearch_logo_256.png?raw=true" alt="Timesearch"/>
 </p>

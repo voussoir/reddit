@@ -1,3 +1,7 @@
+import datetime
+import markdown
+import os
+import re
 import sqlite3
 import sys
 
@@ -18,13 +22,35 @@ SQL_NUM_COMMENTS = 13
 SQL_FLAIR_TEXT = 14
 SQL_FLAIR_CSS_CLASS = 15
 
-class Generic:
-    pass
+HTML_FOLDER = 'html'
+
+
+class DBEntry:
+    def __init__(self, fetch):
+        self.id = fetch[SQL_IDSTR]
+        self.author = fetch[SQL_AUTHOR]
+        self.created = fetch[SQL_CREATED]
+        self.score = fetch[SQL_SCORE]
+        self.text = fetch[SQL_SELFTEXT]
+        self.subreddit = fetch[SQL_SUBREDDIT]
+        self.distinguished = fetch[SQL_DISTINGUISHED]
+        if 't1_' in self.id:
+            self.object_type = 'comment'
+            self.parent = fetch[SQL_TITLE]
+            self.submission = fetch[SQL_URL]
+        else:
+            self.title = fetch[SQL_TITLE]
+            self.url = fetch[SQL_URL]
+            self.object_type = 'submission'
+
+    def __repr__(self):
+        return 'DBEntry(\'%s\')' % self.id
 
 
 class TreeNode:
     def __init__(self, identifier, data, parent=None):
         assert isinstance(identifier, str)
+        assert '\\' not in identifier
         self.identifier = identifier
         self.data = data
         self.parent = parent
@@ -32,6 +58,9 @@ class TreeNode:
 
     def __getitem__(self, key):
         return self.children[key]
+
+    def __repr__(self):
+        return 'TreeNode %s' % self.abspath()
 
     def abspath(self):
         node = self
@@ -51,9 +80,13 @@ class TreeNode:
 
     def check_child_availability(self, identifier):
         if ':' in identifier:
-            raise Exception('Only roots may have a colon ')
+            raise Exception('Only roots may have a colon')
         if identifier in self.children:
             raise Exception('Node %s already has child %s' % (self.identifier, identifier))
+
+    def detach(self):
+        del self.parent.children[self.identifier]
+        self.parent = None
 
     def listnodes(self, customsort=None):
         items = list(self.children.items())
@@ -84,7 +117,9 @@ class TreeNode:
     def walk(self, customsort=None):
         yield self
         for child in self.listnodes(customsort=customsort):
-            yield from child.walk()
+            #print(child)
+            #print(child.listnodes())
+            yield from child.walk(customsort=customsort)
 
 
 def fetchgenerator(cursor):
@@ -94,37 +129,154 @@ def fetchgenerator(cursor):
             break
         yield item
 
-def generic_from_fetch(fetch):
-    generic = Generic()
-    generic.id = fetch[SQL_IDSTR]
-    generic.author = fetch[SQL_AUTHOR]
-    generic.created = fetch[SQL_CREATED]
-    generic.score = fetch[SQL_SCORE]
-    generic.text = fetch[SQL_SELFTEXT]
-    if 't1_' in generic.id:
-        generic.parent = fetch[SQL_TITLE]
-    return generic
+def html_format_comment(comment):
+    text = '''
+    <div class="comment"
+        style="
+        padding-left: 20px;
+        margin-top: 4px;
+        margin-right: 4px;
+        margin-bottom: 4px;
+        border: 2px #000 solid;
+    ">
+        <p class="userinfo">
+            {usernamelink}
+            <span class="score"> | {score} points</span>
+            <span class="timestamp"> | {human}</span>
+        </p>
 
-def tree_from_submission_comments(submission, commentpool):
-    submission = generic_from_fetch(submission)
-    commentpool = [generic_from_fetch(c) for c in commentpool]
-    commentpool.sort(key=lambda x: x.created)
-    
-    print('Building tree for %s (%d comments)' % (submission.id, len(commentpool)))
-    tree = TreeNode(submission.id, submission)
-    while len(commentpool) > 0:
-        removals = []
-        for comment in commentpool:
-            for node in tree.walk():
-                if comment.parent == node.data.id:
-                    node.addchild(comment.id, comment)
-                    removals.append(comment)
-                    break
-        for removal in removals:
-            commentpool.remove(removal)
-    return tree
+        <p>{text}</p>
+
+        <p class="toolbar">
+            {permalink}
+        </p>
+    {children}
+    </div>
+    '''.format(
+        text = render_markdown(comment.text),
+        usernamelink = html_helper_userlink(comment),
+        score = comment.score,
+        human = human(comment.created),
+        permalink = html_helper_permalink(comment),
+        children = '{children}',
+    )
+    return text
+
+def html_format_submission(submission):
+    text = '''
+    <div class="submission"
+        style="
+        border: 4px #00f solid;
+        padding-left: 20px;
+    ">
+
+        <p class="userinfo">
+            {usernamelink}
+            <span class="score"> | {score} points</span>
+            <span class="timestamp"> | {human}</span>
+        </p>
+
+        <strong>{title}</strong>
+        <p>{url_or_text}</p>
+
+        <p class="toolbar">
+            {permalink}
+        </p>
+    </div>
+    {children}
+    '''.format(
+        title = submission.title,
+        usernamelink = html_helper_userlink(submission),
+        score = submission.score,
+        human = human(submission.created),
+        permalink = html_helper_permalink(submission),
+        url_or_text = html_helper_urlortext(submission),
+        children = '{children}',
+    )
+    return text
+
+def html_from_database(databasename, specific_submission=None):
+    t = tree_from_database(databasename, specific_submission)
+    for submission in t.listnodes():
+        print('Creating html for %s' % submission.identifier)
+        submission.detach()
+        page = html_from_tree(submission, sort=lambda x: x.data.score*-1)
+        if not os.path.exists(HTML_FOLDER):
+            os.makedirs(HTML_FOLDER)
+        htmlfile = HTML_FOLDER + '\\%s.html' % submission.identifier
+        x = open(htmlfile, 'w', encoding='utf-8')
+        x.write('<html><body>')
+        x.write(page)
+        x.write('</body></html>')
+
+def html_from_tree(tree, sort=None):
+    '''
+    Given a tree *whose root is the submission*, return
+    HTML-formatted text representing each submission's comment page.
+    '''
+    if tree.data.object_type == 'submission':
+        page = html_format_submission(tree.data)
+    elif tree.data.object_type == 'comment':
+        page = html_format_comment(tree.data)
+    children = tree.listnodes()
+    if sort != None:
+        children.sort(key=sort)
+    children = [html_from_tree(child, sort) for child in children]
+    if len(children) == 0:
+        children = ''
+    else:
+        children = '\n\n'.join(children)
+    try:
+        page = page.format(children=children)
+    except IndexError:
+        print(page)
+        raise
+    return page
+
+def html_helper_permalink(item):
+    link = 'https://www.reddit.com/r/%s/comments/' % item.subreddit
+    if item.object_type == 'submission':
+        link += item.id[3:]
+    elif item.object_type == 'comment':
+        link += '%s/_/%s' % (item.submission[3:], item.id[3:])
+    link = '<a href="%s">permalink</a>' % link
+    return link
+
+def html_helper_urlortext(item):
+    if item.url:
+        return '<a href="{url}">{url}</a>'.format(url=item.url)
+    elif item.text:
+        return render_markdown(item.text)
+
+def html_helper_userlink(item):
+    name = item.author
+    if name.lower() == '[deleted]':
+        return '[deleted]'
+    link = 'https://www.reddit.com/u/{name}'
+    link = '<a href="%s">{name}</a>' % link
+    link = link.format(name=name)
+    return link
+
+def human(timestamp):
+    x = datetime.datetime.utcfromtimestamp(timestamp)
+    x = datetime.datetime.strftime(x, "%b %d %Y %H:%M:%S")
+    return x
+
+def render_markdown(text):
+    text = markdown.markdown(text, output_format='html5')
+    text = text.replace('{', '{{')
+    text = text.replace('}', '}}')
+    return text
 
 def tree_from_database(databasename, specific_submission=None):
+    '''
+    Given a timesearch database filename, take all of the submission
+    ids, take all of the comments for each submission id, and run them
+    through `tree_from_submission_comments`.
+
+    Return a tree where the root is ':', and the first layer contains
+    all of the submission trees.
+    '''
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
     cur2 = sql.cursor()
@@ -138,8 +290,10 @@ def tree_from_database(databasename, specific_submission=None):
         submission_ids = fetchgenerator(cur2)
         generated = True
 
+    found_some_posts = False
     totaltree = TreeNode(':', None)
     for submission_id in submission_ids:
+        found_some_posts = True
         if generated:
             submission = submission_id
             submission_id = submission_id[1]
@@ -150,7 +304,37 @@ def tree_from_database(databasename, specific_submission=None):
         fetched_comments = cur.fetchall()
         submissiontree = tree_from_submission_comments(submission, fetched_comments)        
         totaltree.merge_other(submissiontree)
+    if found_some_posts == False:
+        raise Exception('Found no submissions!')
     return totaltree
+
+def tree_from_submission_comments(submission, commentpool):
+    '''
+    Given the sqlite data for a submission and all of its comments,
+    return a tree with the submission id as the root
+    '''
+    submission = DBEntry(submission)
+    commentpool = [DBEntry(c) for c in commentpool]
+    commentpool.sort(key=lambda x: x.created)
+    
+    print('Building tree for %s (%d comments)' % (submission.id, len(commentpool)))
+    tree = TreeNode(submission.id, submission)
+    while len(commentpool) > 0:
+        removals = []
+        for comment in commentpool:
+            foundparent = False
+            for node in tree.walk():
+                if comment.parent == node.data.id:
+                    node.addchild(comment.id, comment)
+                    removals.append(comment)
+                    foundparent = True
+                    break
+            if foundparent == False:
+                removals.append(comment)
+                continue
+        for removal in removals:
+            commentpool.remove(removal)
+    return tree
 
 #totaltree = tree_from_database('databases\\botwatch.db')
 #totaltree.printtree(customsort=lambda x: int(x[1].data.created, 36))
@@ -160,5 +344,4 @@ if __name__ == '__main__':
         specific_submission = sys.argv[2]
     except IndexError:
         specific_submission = None
-    t = tree_from_database(databasename, specific_submission)
-    t.printtree()
+    html_from_database(databasename, specific_submission)
