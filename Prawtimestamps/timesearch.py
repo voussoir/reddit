@@ -89,8 +89,10 @@ def commentaugment(databasename, limit, threshold, numthresh, skips, verbose, sp
         databasename = submission.subreddit.display_name
 
     databasename = databasename.replace('.db', '')
+    databasename = databasename.replace('/', '\\')
+    databasename = databasename.split('\\')[-1]
     databasename = DATABASE_SUBREDDIT % databasename
-
+    #print(databasename)
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
     cur2 = sql.cursor()
@@ -191,6 +193,7 @@ def commentaugment_prompt():
         print(prompt_ca_skips, end='')
         skips = input()
         skips = fixint(skips)
+        specific_submission = None
     else:
         numthresh = 0
         skips = 0
@@ -613,7 +616,7 @@ prompt_ts_startinginterval = '''
 - Starting interval
   Leave blank for standard
   ]: '''
-def timsearch_prompt():
+def timesearch_prompt():
     while True:
         usermode = False
         maxupper = None
