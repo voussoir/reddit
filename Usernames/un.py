@@ -449,12 +449,12 @@ def show():
     '''
     Create a bunch of text files that nobody will read
     '''
-    file_time = open('show\\time.vdump', 'w')
-    file_name = open('show\\name.vdump', 'w')
-    file_karma_total = open('show\\karma_total.vdump', 'w')
-    #file_karma_link = open('show\\karma_link.vdump', 'w')
-    #file_karma_comment = open('show\\karma_comment.vdump', 'w')
-    file_available = open('show\\available.vdump', 'w')
+    file_time = open('show\\time.txt', 'w')
+    file_name = open('show\\name.txt', 'w')
+    file_karma_total = open('show\\karma_total.txt', 'w')
+    #file_karma_link = open('show\\karma_link.txt', 'w')
+    #file_karma_comment = open('show\\karma_comment.txt', 'w')
+    file_available = open('show\\available.txt', 'w')
     file_readme = open('README.md', 'r')
 
     totalitems = count(validonly=False)
