@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 952,736 subreddits
+#####Collected 954,827 subreddits
 
-#####[Today's jumble](http://reddit.com/r/KylieJenner+wicked_edge+blackgirls+ConspiracyGrumps+melbourne+TheRealmOfMianite+Ooer+CTFxC+Bad_Cop_No_Donut+lol+vegas+thebutton+dota2circlejerk+suns+witcher+Gundam+TechNewsToday+buccos+Frontend+conservatives)
+#####[Today's jumble](http://reddit.com/r/whatsthisbug+RivalsOfAether+introvert+pussypassdenied+LSD+Honda+law+fo3+TumblrCirclejerk+asoiaf+bitcoin_uncensored+Browns+replications+harvestmoon+jigglegiggle+xboxone+nongolfers+TheOnion+ShitCosmoSays+CozyPlaces)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
