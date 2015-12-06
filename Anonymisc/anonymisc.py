@@ -79,15 +79,16 @@ def anonymisc():
 
 def process_message(message):
     print('Reading message %s' % message.fullname)
-    if message.subreddit is not None:
-        print('Ignoring message from subreddit')
-        if MARK_OTHER_AS_READ:
-            message.mark_as_read()
-        return
 
     if not isinstance(message, praw.objects.Message):
         print('Ignoring comment reply')
         if MARK_REPLIES_AS_READ:
+            message.mark_as_read()
+        return
+
+    if message.subreddit is not None:
+        print('Ignoring message from subreddit')
+        if MARK_OTHER_AS_READ:
             message.mark_as_read()
         return
 
