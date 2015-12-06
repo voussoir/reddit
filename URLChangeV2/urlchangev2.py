@@ -67,7 +67,7 @@ def scanPosts():
                 print(pid)
                 try:
                     pauthor = post.author.name
-                    if pauthor.lower() != r.user.name.lower() or IGNORESELF == False:
+                    if pauthor.lower() != r.user.name.lower() or IGNORESELF is False:
                         for key in PARENTSTRING:
                             if key in purl:
                                 result.append(purl.replace(key, REPLACESTRING)[:-4])
@@ -104,7 +104,7 @@ def scanComs():
                     if any(key.lower() in sent.lower() for key in PARENTSTRING):
                         try:
                             pauthor = post.author.name
-                            if pauthor.lower() != r.user.name.lower() or IGNORESELF == False:
+                            if pauthor.lower() != r.user.name.lower() or IGNORESELF is False:
                                 for key in PARENTSTRING:
                                     if key in sent:
                                         url = sent.replace(key, REPLACESTRING)

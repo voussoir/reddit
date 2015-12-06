@@ -125,7 +125,7 @@ r.refresh_access_information(APP_REFRESH)
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
 	timeUnix = timeNow.timestamp()
-	if bool == False:
+	if bool is False:
 		return timeNow
 	else:
 		return timeUnix
@@ -277,7 +277,7 @@ def updatepost(comment):
 
 		print('\tChecking schedule validity')
 		status = ispostvalid(data, errors)
-		if status[0] == False:
+		if status[0] is False:
 			data[1] = IMPOSSIBLETIME
 			critical = True
 		else:

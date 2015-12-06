@@ -56,7 +56,7 @@ print(r.user)
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
 	timeUnix = timeNow.timestamp()
-	if bool == False:
+	if bool is False:
 		return timeNow
 	else:
 		return timeUnix
@@ -87,9 +87,9 @@ def runtime():
 				text = member[5]
 				url =None
 			try:
-				if text != None:
+				if text is not None:
 					newpost = r.submit(member[1], title, text=text, captcha=None, resubmit=True, send_replies=True)
-				if url != None:
+				if url is not None:
 					newpost = r.submit(member[1], title, url=url, captcha=None, resubmit=True, send_replies=True)
 				cur.execute('DELETE FROM upcoming WHERE ID=?', [iid])
 				cur.execute('INSERT INTO past VALUES(?, ?, ?, ?, ?, ?, ?)', [iid, member[1], member[2], member[3], member[4], member[5], newpost.id])

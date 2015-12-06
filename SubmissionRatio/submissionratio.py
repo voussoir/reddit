@@ -91,7 +91,7 @@ r.refresh_access_information(APP_REFRESH)
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
 	timeUnix = timeNow.timestamp()
-	if bool == False:
+	if bool is False:
 		return timeNow
 	else:
 		return timeUnix

@@ -82,7 +82,7 @@ def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     return sign + base36
 
 def commentaugment(databasename, limit, threshold, numthresh, skips, verbose, specific_submission=None):
-    if specific_submission != None:
+    if specific_submission is not None:
         if not specific_submission.startswith('t3_'):
             specific_submission = 't3_' + specific_submission
         submission = r.get_submission(submission_id=specific_submission[3:])
@@ -98,7 +98,7 @@ def commentaugment(databasename, limit, threshold, numthresh, skips, verbose, sp
     cur2 = sql.cursor()
     initialize_database(sql, cur)
 
-    if specific_submission == None:
+    if specific_submission is None:
         cur.execute('SELECT idstr FROM posts WHERE idstr LIKE "t3_%" AND num_comments > ? ORDER BY num_comments DESC', [numthresh])
     else:
         smartinsert(sql, cur, [submission])

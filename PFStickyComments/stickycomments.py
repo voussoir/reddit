@@ -77,7 +77,7 @@ def accept_pending_modinvites():
     print('Looking for mod invites')
     unread = list(r.get_unread(limit=None))
     for message in unread:
-        if message.subreddit == None:
+        if message.subreddit is None:
             continue
         subject = 'invitation to moderate /r/%s' % message.subreddit.display_name
         if message.subject.lower() != subject.lower():
@@ -180,7 +180,7 @@ def stickycommentsbot():
     for subreddit in moderation:
         subreddit = subreddit.display_name
         vip = find_vip(subreddit)
-        if vip == None:
+        if vip is None:
             # Occurs when we can't find the anchors.
             continue
         comments = look_for_comments(vip, subreddit)

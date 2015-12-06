@@ -81,8 +81,8 @@ def scanSub():
             try:
                 pauthor = post.author.name
                 ptitle = post.title
-                if (post.is_self == True and IGNORESELF == False) or (post.is_self == False and IGNORELINK == False):
-                    if pauthor not in mods or IGNOREMODS == False:
+                if (post.is_self is True and IGNORESELF is False) or (post.is_self is False and IGNORELINK is False):
+                    if pauthor not in mods or IGNOREMODS is False:
                         if all(flag.lower() not in ptitle.lower() for flag in IGNOREFLAGS):
                             result = []
                             ilist = []
@@ -90,7 +90,7 @@ def scanSub():
                             search = r.search('author:"' + pauthor + '"', subreddit=SUBREDDIT, sort='new', limit=1000)
                             for item in search:
                                 if item.id != pid and all(flag.lower() not in item.title.lower() for flag in IGNOREFLAGS) and item.id not in ilist:
-                                    if (item.is_self == True and IGNORESELF == False) or (item.is_self == False and IGNORELINK == False):
+                                    if (item.is_self is True and IGNORESELF is False) or (item.is_self is False and IGNORELINK is False):
                                         print('\tResult: ' + item.id)
                                         ilist.append(item.id)
                                         result.append('- [' + item.title + '](' + item.short_link + ')')

@@ -88,7 +88,7 @@ r.refresh_access_information(APP_REFRESH)
 def getTime(bool):
     timeNow = datetime.datetime.now(datetime.timezone.utc)
     timeUnix = timeNow.timestamp()
-    if bool == False:
+    if bool is False:
         return timeNow
     else:
         return timeUnix
@@ -100,7 +100,7 @@ def scanSub():
     for post in posts:
         pid = post.id
         plink = post.permalink
-        if not post.is_self or ALLOWSELF == True:
+        if not post.is_self or ALLOWSELF is True:
             ptitle = post.title
             purl = post.url
             cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
@@ -123,14 +123,14 @@ def scanSub():
                             if len(newtitle) > 300:
                                 newtitle = newtitle[:297] + '...'
 
-                            if SUBDUMP == True:
+                            if SUBDUMP is True:
                                 print('\tDumping to ' + DSUB)
                                 try:
                                     create = r.submit(DSUB, newtitle, url=purl, captcha = None)
                                 except praw.errors.AlreadySubmitted:
                                     print('Error: Already Submitted. Skipping...')
                                 print('\tCreated post ' + create.id)
-                                if DISTINGUISHPOST == True:
+                                if DISTINGUISHPOST is True:
                                     print('\tDistinguishing post')
                                     create.distinguish()
                         except AttributeError:

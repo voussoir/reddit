@@ -97,17 +97,17 @@ def scansub():
                 try:
                     pauthor = post.author.name
                     print(pid + ', ' + pauthor)
-                    if TRUEURL == True:
+                    if TRUEURL is True:
                         plink = post.url
                     else:
                         plink = post.permalink
                     result.append(plink)
                     authors.append(pauthor + ' in /r/' + post.subreddit.display_name)
-                    if RSAVE == True:
+                    if RSAVE is True:
                         submission = post.submission
                         submission.save()
                         print('\tSaved submission')
-                    if SUBDUMP == True:
+                    if SUBDUMP is True:
                         print('\tDumping to ' + DSUB + '...')
                         newtitle = POSTTITLE
                         newtitle = newtitle.replace('_author_', pauthor)
@@ -120,7 +120,7 @@ def scansub():
                         print('\tDumped to ' + DSUB + '.')
                 except AttributeError:
                     print(pid + ': Author deleted. Ignoring comment')
-    if len(result) > 0 and MAILME == True:
+    if len(result) > 0 and MAILME is True:
         for m in range(len(result)):
             result[m] = '- [%s](%s)' % (authors[m], result[m])
         r.send_message(RECIPIENT, MTITLE, MHEADER + '\n\n' + '\n\n'.join(result), captcha=None)

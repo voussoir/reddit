@@ -3,10 +3,21 @@ AnonyMisc
 
 By sending this bot a PM, it can post comments for you
 
-[Here are the three fields you must fill out](http://www.reddit.com/message/compose?subject=Anonymisc&message=Permalink:%0A%0ALink%20Text:%0A%0ALink%20Url:). The bot will reply to the permalinked comment with a link. This bot supports user banlisting and whitelisting for security. Users may whitelist themselves if they type a secret password. Only the admins may manage banning. You may restrict which subreddits the bot will make comments in.
+The owners of the bot should put their username in the ADMINS list. They can add users to the whitelist.
 
-To display the name of the user who commissioned the comment (defeating the anonymity I guess) you can place "\_username_" (without quotes!) in COMHEADER or COMFOOTER and it will be automatically replaced.
+For admins:
 
-The end result is an account which multiple people can comment from without ever knowing the password
+- Whitelist user or subreddit (one or multiple. /u/ is implied if not specified):
 
-[Example](http://i.imgur.com/673idpl.png)
+        whitelist username
+        whitelist /u/username
+        whitelist /r/subreddit1
+        whitelist /u/username1 /u/username2 /u/username3
+
+- Unwhitelist user. Same as above
+
+        unwhitelist username1 /u/username2 /r/subreddit
+
+- Display the current whitelist entries
+
+        show

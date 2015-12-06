@@ -92,10 +92,10 @@ def scanSub():
 					try:
 						newpost = r.submit(SUBREDDIT, str(datetime.strftime(currentday, TITLE.replace('_country_', current))), \
 						url=SUBMISSION.replace('_country_', current.replace(' ', '%20')), captcha=None)
-						if DISTINGUISHPOST == True:
+						if DISTINGUISHPOST is True:
 							print('Distinguishing Post')
 							newpost.distinguish()
-						if LEAVECOMMENT == True:
+						if LEAVECOMMENT is True:
 							print('Creating comment')
 							try:
 								newcomm = newpost.add_comment(COMMENT.replace('_newcountry_', clist[currentm]))
@@ -103,7 +103,7 @@ def scanSub():
 								newcomm = newpost.add_comment(COMMENT.replace('_newcountry_', '*not available*'))
 								print('Next country not available!')
 	
-							if DISTINGUISHCOMMENT == True:
+							if DISTINGUISHCOMMENT is True:
 								print('Distinguishing Comment')
 								newcomm.distinguish()
 					except praw.errors.AlreadySubmitted:

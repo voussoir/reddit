@@ -86,7 +86,7 @@ def countTable(table):
     c = 0
     while True:
         row = cur.fetchone()
-        if row == None:
+        if row is None:
             break
         else:
             c += 1

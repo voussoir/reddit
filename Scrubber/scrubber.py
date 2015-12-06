@@ -44,7 +44,7 @@ def work(posts):
 		try:
 			pauthor = post.author.name
 			pid = post.id
-			if pauthor.lower() == USER.lower() and post.banned_by == None:
+			if pauthor.lower() == USER.lower() and post.banned_by is None:
 				print(pid + ' - Removing', end='')
 				sys.stdout.flush()
 				post.remove()
@@ -58,7 +58,7 @@ def worku(posts):
 		try:
 			psub = post.subreddit.display_name
 			pid = post.id
-			if psub.lower() == SUBREDDIT.lower() and post.banned_by == None:
+			if psub.lower() == SUBREDDIT.lower() and post.banned_by is None:
 				print(pid + ' - Removing', end='')
 				sys.stdout.flush()
 				post.remove()
@@ -80,7 +80,7 @@ def works(USER):
 			try:
 				pauthor = post.author.name
 				pid = post.id
-				if pauthor.lower() == USER.lower() and post.banned_by == None:
+				if pauthor.lower() == USER.lower() and post.banned_by is None:
 					print(pid + ' - Removing', end='')
 					sys.stdout.flush()
 					post.remove()

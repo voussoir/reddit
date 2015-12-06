@@ -219,7 +219,7 @@ def process(sr, database="subreddits", delaysaving=False, doupdates=True,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ''', data)
             elif doupdates:
-                if sub.subscribers != None:
+                if sub.subscribers is not None:
                     subscribers = sub.subscribers
                 else:
                     subscribers = 0
@@ -284,7 +284,7 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False,
         srinput = srinput.replace(' ', '')
         srinput = srinput.split(',')
 
-    if isrealname == False:
+    if isrealname is False:
         remaining = len(srinput)
         for x in range(len(srinput)):
             if 't5_' not in srinput[x]:
@@ -416,7 +416,7 @@ def show():
     inprogress = False
     cur.execute('SELECT * FROM subreddits WHERE created != 0 ORDER BY LOWER(name) ASC')
     for item in fetchgenerator():
-        if previousitem != None and item[SQL_NAME] == previousitem[SQL_NAME]:
+        if previousitem is not None and item[SQL_NAME] == previousitem[SQL_NAME]:
             print(memberformat(previousitem), file=file_duplicates)
             inprogress = True
         elif inprogress:

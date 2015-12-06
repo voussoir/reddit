@@ -137,7 +137,7 @@ def downloadimage(pid, purl, subreddit, mustrename, rtitle, albumname=""):
     filename = filename.replace('_subreddit_', subreddit)
     filename = filename.replace('_title_', rtitle)
 
-    if ALBUMSUBFOLDERS == True and albumname != "":
+    if ALBUMSUBFOLDERS is True and albumname != "":
         if not os.path.exists(FILEPATH + '\\' + albumname):
             os.makedirs(FILEPATH + '\\' + albumname)
         filename = albumname + '\\' + filename
@@ -153,7 +153,7 @@ def downloadimage(pid, purl, subreddit, mustrename, rtitle, albumname=""):
         print('DOWNLOAD FAILED')
         print(e)
 
-    if mustrename == True:
+    if mustrename is True:
         fileextension = determinefiletype(fullpath)
         print('\tFixing filename to ' + fileextension)
         os.rename(fullpath, fullpath.replace('.jpg', fileextension))

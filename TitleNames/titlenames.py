@@ -117,7 +117,7 @@ def scanSub():
                 final = HEADER + '\n\n'.join(result) + FOOTER
                 print('Creating comment.')
                 newcomment = post.add_comment(final)
-                if DISTINGUISHCOMMENT == True:
+                if DISTINGUISHCOMMENT is True:
                     print('Distinguishing Comment.')
                     newcomment.distinguish()
             else:

@@ -234,7 +234,7 @@ class ClippyPoints:
 		print('\t\tChecking flair for ' + username)
 		flairs = subreddit.get_flair(username)
 		flairs = flairs['flair_text']
-		if flairs != None and flairs != '':
+		if flairs is not None and flairs != '':
 			print('\t\t:' + flairs)
 			try:
 				flairs = int(flairs)
@@ -280,7 +280,7 @@ class ClippyPoints:
 							opid = comment.submission.id
 							if pauthor != cauthor:
 								if not any(exempt.lower() == pauthor.lower() for exempt in POINT_EXEMPT):
-									if POINT_OP_ONLY == False or cauthor == op or cauthor in moderators:
+									if POINT_OP_ONLY is False or cauthor == op or cauthor in moderators:
 										cur.execute('SELECT * FROM clippy_points_s WHERE ID=?', [opid])
 										fetched = cur.fetchone()
 										if not fetched:
@@ -299,7 +299,7 @@ class ClippyPoints:
 												comment.submission.set_flair(flair_text=FLAIR_SOLVED, flair_css_class="solvedcase")
 										else:
 											print('\t\tMaxPerThread has been reached')
-											if EXPLAINMAX == True:
+											if EXPLAINMAX is True:
 												print('\t\tWriting reply')
 												comment.reply(POINT_EXPLAIN)
 									else:
@@ -340,8 +340,8 @@ class ClippyFlairReminder:
 			
 			cur.execute('SELECT * FROM clippy_flair WHERE id=?', [pid])
 			if not cur.fetchone():
-				if post.is_self == False or FLAIR_IGNORE_SELF == False:
-					if pauthor not in moderators or FLAIR_IGNORE_MODS == False:
+				if post.is_self is False or FLAIR_IGNORE_SELF is False:
+					if pauthor not in moderators or FLAIR_IGNORE_MODS is False:
 						comments = praw.helpers.flatten_tree(post.comments)
 	
 						try:
@@ -378,7 +378,7 @@ class ClippyFlairReminder:
 									pbody = comment.body.lower()
 								else:
 									ctimes.append(comment.created_utc)
-							if found == True:
+							if found is True:
 								if not any(trigger in pbody for trigger in POINT_STRING_USR):
 									print('\tFound comment by OP. All clear, changing flair back to unsolved.')
 									post.set_flair(flair_text=FLAIR_UNSOLVED, flair_css_class="notsolvedcase")
@@ -389,7 +389,7 @@ class ClippyFlairReminder:
 										print('Replying to ' + pid + ' by ' + pauthor)
 										comment.reply(FLAIR_REMINDER)
 										newcomment.distinguish()
-							elif found == False and len(ctimes) > 0:
+							elif found is False and len(ctimes) > 0:
 								print('\tNo comments by OP. Checking time limit.')
 								ctime = min(ctimes)
 								difference = curtime - ctime
@@ -403,7 +403,7 @@ class ClippyFlairReminder:
 								else:
 									differences = str('%.0f' % (FLAIR_WARN_DELAY - difference))
 									print('\tStill has ' + differences + 's.')
-							elif found == False and len(ctimes) == 0:
+							elif found is False and len(ctimes) == 0:
 								print('\tNo comments by OP, but no other comments are available.')
 	
 						else:
@@ -437,11 +437,11 @@ class ClippyFlairReminder:
 								else:
 									#cur.execute('INSERT INTO flair VALUES("%s")' % pid)
 	
-									if pauthor in moderators and FLAIR_IGNORE_MODS == True:
+									if pauthor in moderators and FLAIR_IGNORE_MODS is True:
 										print(pid + ', ' + pauthor + ': Ignoring Moderator')
 										cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
 	
-			if post.is_self == True and FLAIR_IGNORE_SELF == True:
+			if post.is_self is True and FLAIR_IGNORE_SELF is True:
 				print(pid + ', ' + pauthor + ': Ignoring Selfpost')
 				cur.execute('INSERT INTO clippy_flair VALUES(?)', [pid])
 	
@@ -523,7 +523,7 @@ class ClippyReference:
 					if cauthor.lower() != r.user.name.lower():
 						cbody = comment.body.lower()
 					
-						if DICT_LEVENSHTEIN == True:
+						if DICT_LEVENSHTEIN is True:
 							results = self.findsuper(cbody)
 						else:
 							results = self.findsimple(cbody)
@@ -577,7 +577,7 @@ class ClippyWelcome:
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
 	timeUnix = timeNow.timestamp()
-	if bool == False:
+	if bool is False:
 		return timeNow
 	else:
 		return timeUnix

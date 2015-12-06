@@ -81,7 +81,7 @@ def operate():
 	if confirm == 'y':
 		subreddit = r.get_subreddit(SUBREDDIT)
 		userflair = subreddit.get_flair(username)['flair_text']
-		if userflair != '' and userflair != None:
+		if userflair != '' and userflair is not None:
 			try:
 				user = r.get_redditor(username, fetch=True)
 				cur.execute('SELECT * FROM users WHERE NAME=?', [user.name])

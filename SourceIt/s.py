@@ -54,7 +54,7 @@ r.refresh_access_information(APP_REFRESH)
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
 	timeUnix = timeNow.timestamp()
-	if bool == False:
+	if bool is False:
 		return timeNow
 	else:
 		return timeUnix
@@ -79,8 +79,8 @@ def scan():
 
 		cur.execute('SELECT * FROM oldposts WHERE id="%s"' % pid)
 		if not cur.fetchone():
-			if post.is_self == False or IGNORESELFPOST == False:
-				if pauthor not in mods or IGNOREMODS == False:
+			if post.is_self is False or IGNORESELFPOST is False:
+				if pauthor not in mods or IGNOREMODS is False:
 					difference = curtime - ptime
 					if difference > DELAY:
 						print(pid + ', ' + pauthor + ': Finding comments')
@@ -90,10 +90,10 @@ def scan():
 								cauthor = comment.author.name
 							except AttributeError:
 								cauthor = '[deleted]'
-							if cauthor == pauthor and found == False:
+							if cauthor == pauthor and found is False:
 								print('\tFound comment by OP')
 								found = True
-						if found == False:
+						if found is False:
 							print('\tComments were empty, or OP was not found. Post will be removed.')
 							response = post.add_comment(MESSAGE)
 							response.distinguish()
@@ -106,11 +106,11 @@ def scan():
 						differences = str('%.0f' % (DELAY - difference))
 						print(pid + ', ' + pauthor + ': Still has ' + differences + 's.')
 				
-				if pauthor in mods and IGNOREMODS == True:
+				if pauthor in mods and IGNOREMODS is True:
 					print(pid + ', ' + pauthor + ': Ignoring Moderator')
 					cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
 
-			if post.is_self == True and IGNORESELFPOST == True:
+			if post.is_self is True and IGNORESELFPOST is True:
 				print(pid + ', ' + pauthor + ': Ignoring Selfpost')
 				cur.execute('INSERT INTO oldposts VALUES("%s")' % pid)
 

@@ -61,6 +61,12 @@ MESSAGE_UNSUBSCRIBE_ALL = "You have unsubscribed from all subreddits."
 MESSAGE_UNSUBSCRIBE_ALREADY = "You are not currently subscribed to /r/%s"
 MESSAGE_UNSUBSCRIBE_ALREADY_ALL = "You don't have any subscriptions!"
 MESSAGE_UNSUBSCRIBE_FORCE = "You have forcefully removed /u/%s from /r/%s"
+MESSAGE_UNSUBSCRIBE_PRIVATIZED = '''
+While I was building your Newsletter for /r/%s, I received a 403 Forbidden error.
+This means the subreddit became private or banned, or I lost my Approved Submitter
+status. Your subscription has been removed -- please subscribe again when the
+issue has been resolved by the moderators of the subreddit.
+'''
 MESSAGE_REPORT_ALL = "All Newsletterly subscriptions:"
 MESSAGE_REPORT_EMPTY = "There's nothing here!"
 MESSAGE_REPORT_REQUEST = "You have requested a list of your subscriptions:"
@@ -134,6 +140,7 @@ def get_posts_per_hour(subreddit):
     of the last 100 submissions.
     '''
     subreddit = r.get_subreddit(subreddit)
+    # Any 403 errors will be caught by the calling function.
     submissions = list(subreddit.get_new())
     if len(submissions) < 2:
         return 0
@@ -164,6 +171,8 @@ def get_subscription_reddits(user=None, join=True):
 
 def add_subscription(user, subreddit):
     user = user.lower()
+    user = user.replace('/u/', '')
+    user = user.replace('u/', '')
     subreddit = subreddit.lower()
     subreddit = subreddit.replace('/r/', '')
     subreddit = subreddit.replace('r/', '')
@@ -187,10 +196,16 @@ def add_subscription(user, subreddit):
         return (MESSAGE_SUBREDDIT_FAIL % subreddit)
 
 def drop_subscription(user, subreddit):
-    user = user.lower()
     subreddit = subreddit.lower()
     subreddit = subreddit.replace('/r/', '')
     subreddit = subreddit.replace('r/', '')
+    if user is None:
+        # This happens on 403 Forbidden when making newsletters
+        print('Removing all subscriptions to /r/%s' % subreddit)
+        cur.execute('DELETE FROM subscribers WHERE LOWER(reddit) == ?', [subreddit])
+        return ''
+
+    user = user.lower()
     if subreddit == 'all':
         cur.execute('SELECT * FROM subscribers WHERE LOWER(name) == ?', [user])
         if cur.fetchone():
@@ -311,6 +326,7 @@ def manage_posts():
     printlog('Managing subscriptions.')
     submissions_per_subreddit = {}
     subscriptions_per_user = {}
+    users_per_subreddit = {}
     all_subreddits = set()
     all_new_submissions = set()
     formatted_submissions = {}
@@ -319,10 +335,8 @@ def manage_posts():
     for entry in fetchgenerator():
         user = entry[0].lower()
         subreddit = entry[1].lower()
-        if user in subscriptions_per_user:
-            subscriptions_per_user[user].add(subreddit)
-        else:
-            subscriptions_per_user[user] = set([subreddit])
+        subscriptions_per_user[user] = subscriptions_per_user.get(user, set()).union(set([subreddit]))
+        users_per_subreddit[subreddit] = users_per_subreddit.get(subreddit, set()).union(set([user]))
         all_subreddits.add(subreddit)
     all_subreddits = list(all_subreddits)
     all_subreddits.sort(key=str.lower)
@@ -336,7 +350,16 @@ def manage_posts():
         printlog('Checking /r/%s: ' % subreddit, end='')
         sys.stdout.flush()
         subreddit_obj = r.get_subreddit(subreddit)
-        submissions = list(subreddit_obj.get_new(limit=100))
+        try:
+            submissions = list(subreddit_obj.get_new(limit=100))
+        except praw.errors.Forbidden:
+            message = MESSAGE_UNSUBSCRIBE_PRIVATIZED % subreddit
+            message += MESSAGE_FOOTER
+            for user in users_per_subreddit[subreddit]:
+                add_to_spool(user, message)
+            drop_subscription(user=None, subreddit=subreddit)
+            submissions_per_subreddit[subreddit] = []
+            continue
         keep_submissions = []
         for submission in submissions:
             cur.execute('SELECT * FROM oldposts WHERE id == ?', [submission.id])

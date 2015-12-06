@@ -62,7 +62,7 @@ def scan():
             pauthor = post.author.name
             try:
                 pflair = post.author_flair_text
-                if pflair != None:
+                if pflair is not None:
                     cur.execute('SELECT * FROM users WHERE NAME=?', [pauthor])
                     fetched = cur.fetchone()
                     if not fetched:

@@ -292,8 +292,12 @@ def automatic_processor():
                 ranger = 100
             new_items = process(li + bump, ranger)
             if new_items == 0:
-                # In case the post doesn't exist, we need to move on.
-                bump += 1
+                if ranger >= 100:
+                    # If this ID range has no items for some reason.
+                    bump += 100
+                else:
+                    # In case the post doesn't exist, we need to move on.
+                    bump += 1
         except (praw.errors.HTTPException, AttributeError) as e:
             if isinstance(e, praw.errors.HTTPException) and e._raw.status_code != 500:
                 raise

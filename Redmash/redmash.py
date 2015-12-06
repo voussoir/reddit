@@ -110,7 +110,7 @@ try:
 	subreddit = r.get_subreddit(SUBREDDIT)
 	posts = subreddit.get_new(limit=MAXPOSTS)
 	for post in posts:
-		if not post.is_self or IGNORESELF == False:
+		if not post.is_self or IGNORESELF is False:
 			try:
 				author = post.author.name
 			except Exception:
@@ -124,7 +124,7 @@ try:
 		print(str(count) + ' / ' + MAXS + ' | ' + str(counta))
 	
 	for item in lista:
-		if item.author == None:
+		if item.author is None:
 			item.author = '[DELETED]'
 except Exception:
 	print('EMERGENCY')
@@ -176,7 +176,7 @@ for item in lista:
 		obj.author = item.author.name
 	except:
 		obj.author = '[DELETED]'
-	if item.is_self == True:
+	if item.is_self is True:
 		obj.is_self = True
 		obj.selftext = item.selftext
 	else:

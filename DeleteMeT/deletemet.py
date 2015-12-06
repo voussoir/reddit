@@ -24,7 +24,7 @@ def tprint(thing):
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
 	timeUnix = timeNow.timestamp()
-	if bool == False:
+	if bool is False:
 		return timeNow
 	else:
 		return timeUnix
@@ -50,7 +50,7 @@ def create():
 		input()
 		fail = True
 
-	if fail == False:
+	if fail is False:
 		if tsplit[1] == 'days' or tsplit[1] == 'day':
 			THRESHOLD *= 86400
 		elif tsplit[1] == 'hours' or tsplit[1] == 'hour':

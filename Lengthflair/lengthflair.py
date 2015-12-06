@@ -76,7 +76,7 @@ def lengthflair(string):
 def getTime(bool):
     timeNow = datetime.datetime.now(datetime.timezone.utc)
     timeUnix = timeNow.timestamp()
-    if bool == False:
+    if bool is False:
         return timeNow
     else:
         return timeUnix
@@ -103,12 +103,12 @@ def scanSub():
             ptime = post.created_utc
             curtime = getTime(True)
             tdiff = curtime - ptime
-            if pauthor not in mods or IGNOREMODS == False:
+            if pauthor not in mods or IGNOREMODS is False:
                 if tdiff > DELAY:
                     pflair = post.link_flair_text
-                    if pflair == '' or pflair == None:
+                    if pflair == '' or pflair is None:
                         newflair = lengthflair(pbody)
-                        if USECSS == True:
+                        if USECSS is True:
                             try:
                                 newcss = FLAIRCSS[newflair]
                             except KeyError:

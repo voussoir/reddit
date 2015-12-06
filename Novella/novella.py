@@ -87,16 +87,16 @@ def scanSub():
                     print(pid + ', ' + pauthor + ': ' + str(plen) + ' characters.')
                     result.append(plink)
                     authors.append(pauthor + ' in /r/' + post.submission.subreddit.display_name)
-                    if RSAVE == True:
+                    if RSAVE is True:
                         submission = post.submission
                         submission.save()
                         print('\tSaved submission')
-                    if SUBDUMP == True:
+                    if SUBDUMP is True:
                         create = r.submit(DSUB, pauthor + ' in /r/' + post.submission.subreddit.display_name, url=plink, captcha = None)
                         print('\tDumped to ' + DSUB)
                 except AttributeError:
                     print(pid + ': Author deleted. Ignoring comment')
-    if len(result) > 0 and MAILME == True:
+    if len(result) > 0 and MAILME is True:
         for m in range(len(result)):
             result[m] = '- [' + authors[m] + '](' + result[m] + ')'
         r.send_message(RECIPIENT, MTITLE, MHEADER + '\n\n' + '\n\n'.join(result), captcha=None)

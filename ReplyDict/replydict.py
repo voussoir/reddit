@@ -162,7 +162,7 @@ def scanSub():
             if pauthor.lower() != r.user.name.lower():
                 pbody = post.body.lower()
             
-                if LEVENMODE == True:
+                if LEVENMODE is True:
                     results = findsuper(pbody)
                 else:
                     results = findsimple(pbody)

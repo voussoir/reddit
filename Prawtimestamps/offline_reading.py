@@ -65,7 +65,7 @@ class TreeNode:
     def abspath(self):
         node = self
         nodes = [node]
-        while node.parent != None:
+        while node.parent is not None:
             node = node.parent
             nodes.append(node)
         nodes.reverse()
@@ -90,7 +90,7 @@ class TreeNode:
 
     def listnodes(self, customsort=None):
         items = list(self.children.items())
-        if customsort == None:
+        if customsort is None:
             items.sort(key=lambda x: x[0].lower())
         else:
             items.sort(key=customsort)
@@ -99,7 +99,7 @@ class TreeNode:
     def merge_other(self, othertree, otherroot=None):
         newroot = None
         if ':' in othertree.identifier:
-            if otherroot == None:
+            if otherroot is None:
                 raise Exception('Must specify a new name for the other tree\'s root')
             else:
                 newroot = otherroot
@@ -125,7 +125,7 @@ class TreeNode:
 def fetchgenerator(cursor):
     while True:
         item = cursor.fetchone()
-        if item == None:
+        if item is None:
             break
         yield item
 
@@ -219,7 +219,7 @@ def html_from_tree(tree, sort=None):
     elif tree.data.object_type == 'comment':
         page = html_format_comment(tree.data)
     children = tree.listnodes()
-    if sort != None:
+    if sort is not None:
         children.sort(key=sort)
     children = [html_from_tree(child, sort) for child in children]
     if len(children) == 0:
@@ -280,7 +280,7 @@ def tree_from_database(databasename, specific_submission=None):
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
     cur2 = sql.cursor()
-    if specific_submission != None:
+    if specific_submission is not None:
         if specific_submission[:3] != 't3_':
             specific_submission = 't3_' + specific_submission
         submission_ids = [specific_submission]
@@ -304,7 +304,7 @@ def tree_from_database(databasename, specific_submission=None):
         fetched_comments = cur.fetchall()
         submissiontree = tree_from_submission_comments(submission, fetched_comments)        
         totaltree.merge_other(submissiontree)
-    if found_some_posts == False:
+    if found_some_posts is False:
         raise Exception('Found no submissions!')
     return totaltree
 
@@ -329,7 +329,7 @@ def tree_from_submission_comments(submission, commentpool):
                     removals.append(comment)
                     foundparent = True
                     break
-            if foundparent == False:
+            if foundparent is False:
                 removals.append(comment)
                 continue
         for removal in removals:

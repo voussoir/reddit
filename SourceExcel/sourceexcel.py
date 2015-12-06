@@ -61,7 +61,7 @@ r.refresh_access_information(APP_REFRESH)
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
 	timeUnix = timeNow.timestamp()
-	if bool == False:
+	if bool is False:
 		return timeNow
 	else:
 		return timeUnix
@@ -88,8 +88,8 @@ def scan():
 		
 		cur.execute('SELECT * FROM oldposts WHERE id=?', [pid])
 		if not cur.fetchone():
-			if post.is_self == False or IGNORESELFPOST == False:
-				if pauthor not in mods or IGNOREMODS == False:
+			if post.is_self is False or IGNORESELFPOST is False:
+				if pauthor not in mods or IGNOREMODS is False:
 					comments = praw.helpers.flatten_tree(post.comments)
 
 					try:
@@ -107,7 +107,7 @@ def scan():
 							if cauthor != pauthor:
 								found = True
 								break
-						if found == False:
+						if found is False:
 							print('\tNo comments by another user. No action taken.')
 						else:
 							print('\tFound comment by other user. Marking as Waiting.')
@@ -126,11 +126,11 @@ def scan():
 								found = True
 							else:
 								ctimes.append(comment.created_utc)
-						if found == True:
+						if found is True:
 							print('\tFound comment by OP. All clear.')
 							post.set_flair(flair_text=FLAIRUNSOLVED, flair_css_class=CSSUNSOLVED)
 							cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
-						elif found == False and len(ctimes) > 0:
+						elif found is False and len(ctimes) > 0:
 							print('\tNo comments by OP. Checking time limit.')
 							ctime = min(ctimes)
 							difference = curtime - ctime
@@ -146,18 +146,18 @@ def scan():
 							else:
 								differences = str('%.0f' % (DELAY - difference))
 								print('\tStill has ' + differences + 's.')
-						elif found == False and len(ctimes) == 0:
+						elif found is False and len(ctimes) == 0:
 							print('\tNo comments by OP, but no other comments are available.')
 
 					else:
 						print(pid + ': Neither flair')
 						cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
-				if pauthor in mods and IGNOREMODS == True:
+				if pauthor in mods and IGNOREMODS is True:
 					print(pid + ', ' + pauthor + ': Ignoring Moderator')
 					cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
-			if post.is_self == True and IGNORESELFPOST == True:
+			if post.is_self is True and IGNORESELFPOST is True:
 				print(pid + ', ' + pauthor + ': Ignoring Selfpost')
 				cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 

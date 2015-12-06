@@ -125,7 +125,7 @@ class Example(Frame):
     def getTime(self, bool):
         timeNow = datetime.datetime.now(datetime.timezone.utc)
         timeUnix = timeNow.timestamp()
-        if bool == False:
+        if bool is False:
             return timeNow
         else:
             return timeUnix
@@ -265,7 +265,7 @@ class Example(Frame):
             except AttributeError:
                 pass
 
-        if fullclean == True:
+        if fullclean is True:
             print('Cleaning GUI')
             for item in self.labellist:
                 item.grid_forget()
@@ -378,7 +378,7 @@ class Example(Frame):
                 self.buttonPrinter.grid(row = 6, column=0, columnspan=90)
                 self.misclist.append(self.buttonPrinter)
 
-                if dobutton == True:
+                if dobutton is True:
                     self.entryDelete = Entry(self)
                     self.buttonDelete = Button(self, text="Delete Item: ", command=lambda: self.dropentryfrombase(self.entryDelete.get()))
                     self.buttonDelete.grid(row=5, column=0, sticky='e')

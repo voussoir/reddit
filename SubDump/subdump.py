@@ -91,11 +91,11 @@ def scanSub():
                     plink = post.permalink
                     result.append(plink)
                     authors.append(pauthor + ' in /r/' + post.subreddit.display_name)
-                    if RSAVE == True:
+                    if RSAVE is True:
                         submission = post.submission
                         submission.save()
                         print('\tSaved submission')
-                    if SUBDUMP == True:
+                    if SUBDUMP is True:
                         newtitle = POSTTITLE
                         newtitle = newtitle.replace('_author_', pauthor)
                         newtitle = newtitle.replace('_subreddit_', post.subreddit.display_name)
@@ -105,7 +105,7 @@ def scanSub():
                 except AttributeError:
                     print(pid + ': Author deleted. Ignoring comment')
             cur.execute('INSERT INTO oldposts VALUES(?)', [pid])    
-    if len(result) > 0 and MAILME == True:
+    if len(result) > 0 and MAILME is True:
         for m in range(len(result)):
             result[m] = '- [' + authors[m] + '](' + result[m] + ')'
         r.send_message(RECIPIENT, MTITLE, MHEADER + '\n\n' + '\n\n'.join(result), captcha=None)

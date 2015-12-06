@@ -97,7 +97,7 @@ print(MODERATORS)
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
 	timeUnix = timeNow.timestamp()
-	if bool == False:
+	if bool is False:
 		return timeNow
 	else:
 		return timeUnix
@@ -110,7 +110,7 @@ def flair(subreddit, username):
 	print('\tChecking flair for ' + username)
 	flairs = subreddit.get_flair(username)
 	flairs = flairs['flair_text']
-	if flairs != None and flairs != '':
+	if flairs is not None and flairs != '':
 		print('\t :' + flairs)
 		try:
 			flairs = int(flairs)
@@ -165,7 +165,7 @@ def scan():
 
 						if pauthor != cauthor:
 							if not any(exempt.lower() == pauthor.lower() for exempt in EXEMPT):
-								if OPONLY == False or cauthor == op or cauthor in MODERATORS:
+								if OPONLY is False or cauthor == op or cauthor in MODERATORS:
 									cur.execute('SELECT * FROM submissions WHERE ID=?', [opid])
 									fetched = cur.fetchone()
 									if not fetched:
@@ -181,7 +181,7 @@ def scan():
 											cur.execute('UPDATE submissions SET count=? WHERE ID=?', [fetched+1, opid])
 									else:
 										print('\tMaxPerThread has been reached')
-										if EXPLAINMAX == True:
+										if EXPLAINMAX is True:
 											print('\tWriting reply')
 											comment.reply(EXPLAINREPLY)
 								else:

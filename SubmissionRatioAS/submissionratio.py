@@ -78,7 +78,7 @@ r.refresh_access_information(APP_REFRESH)
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
 	timeUnix = timeNow.timestamp()
-	if bool == False:
+	if bool is False:
 		return timeNow
 	else:
 		return timeUnix
@@ -146,7 +146,7 @@ def updatebase(l):
 			try:
 				pauthor = post.author.name
 				userflair = post.author_flair_text
-				if userflair != '' and userflair != None:
+				if userflair != '' and userflair is not None:
 					userflair = userflair.replace('|', '/')
 					cur.execute('SELECT * FROM users WHERE NAME=?', [pauthor])
 					fetched = cur.fetchone()

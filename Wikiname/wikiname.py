@@ -141,7 +141,7 @@ def scan():
 
     finals = create_alphabet_headers(names)
 
-    if VERBOSE == True:
+    if VERBOSE is True:
         print(finals)
     print('Saving wiki page')
     wikipage.edit(''.join(finals))

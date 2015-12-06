@@ -64,7 +64,7 @@ r.refresh_access_information(APP_REFRESH)
 def getTime(bool):
 	timeNow = datetime.datetime.now(datetime.timezone.utc)
 	timeUnix = timeNow.timestamp()
-	if bool == False:
+	if bool is False:
 		return timeNow
 	else:
 		return timeUnix
@@ -88,8 +88,8 @@ def scan():
 		ptime = post.created_utc
 		cur.execute('SELECT * FROM oldposts WHERE id=?', [pid])
 		if not cur.fetchone():
-			if (post.is_self == True and IGNORESELFPOST == False) or (post.is_self == False and IGNORELINK == False):
-				if pauthor not in mods or IGNOREMODS == False:
+			if (post.is_self is True and IGNORESELFPOST is False) or (post.is_self is False and IGNORELINK is False):
+				if pauthor not in mods or IGNOREMODS is False:
 					if all(char.lower() in ptitle for char in TITLEREQS):
 						try:
 							flair = post.link_flair_text.lower()
@@ -130,7 +130,7 @@ def scan():
 						print(pid + ': Does not contain titlereq')
 						cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
-				if pauthor in mods and IGNOREMODS == True:
+				if pauthor in mods and IGNOREMODS is True:
 					print(pid + ', ' + pauthor + ': Ignoring Moderator')
 					cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
 
