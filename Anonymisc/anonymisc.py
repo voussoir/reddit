@@ -12,6 +12,9 @@ APP_URI = ""
 APP_REFRESH = ""
 # https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 
+DISTINGUISH_COMMENTS = True
+# Attempt to distinguish the comments we create. If it fails, continue normally.
+
 MARK_REPLIES_AS_READ = True
 # When scanning the inbox, mark comments as read without performing any action
 # on them, to keep the inbox clean.
@@ -144,6 +147,11 @@ def process_message(message):
         reply = item.reply(text)
     cur.execute('INSERT INTO commissions VALUES(?, ?, ?, ?)', [reply.created_utc, reply.fullname, reply.body, author])
     sql.commit()
+    if DISTINGUISH_COMMENTS:
+        try:
+            reply.distinguish()
+        except:
+            pass
     message.reply(reply.permalink)
     print('Created %s' % reply.fullname)
 
