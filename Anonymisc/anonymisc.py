@@ -15,6 +15,10 @@ APP_REFRESH = ""
 DISTINGUISH_COMMENTS = True
 # Attempt to distinguish the comments we create. If it fails, continue normally.
 
+COMMENT_FOOTER = '''
+*This text is at the bottom of the message.*
+'''
+
 MARK_REPLIES_AS_READ = True
 # When scanning the inbox, mark comments as read without performing any action
 # on them, to keep the inbox clean.
@@ -136,8 +140,9 @@ def process_message(message):
 
     text = message.body.replace(first_line, '')
     text = text.strip()
+    text += '\n\n' + COMMENT_FOOTER
     print('Creating reply.')
-    # I want to add to the mark read sooner rather than later,
+    # I want to mark as read sooner rather than later,
     # so no exception cases result in infinite commenting.
     # Some commissions may be lost but that's better than the alternative.
     message.mark_as_read()
