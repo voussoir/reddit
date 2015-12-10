@@ -21,7 +21,7 @@ class SysLabel:
         self.module = module
         self.maxsize = maxsize
     def write(self, data):
-        data = data.strip()
+        data = data.rstrip()
         data = data.split('\n')
         while '' in data:
             data.remove('')

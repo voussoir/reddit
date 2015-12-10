@@ -88,6 +88,8 @@ MEMBERFORMAT_BRIEF = '%s | %s'
 MIN_LASTSCAN_DIFF = 86400 * 365
 # Don't rescan a name if we scanned it this many days ago
 
+VALID_CHARS = string.ascii_letters + string.digits + '_-'
+
 
 def allpossiblefromset(characters, length=None, minlength=None, maxlength=None):
     '''
@@ -274,6 +276,7 @@ def get_from_listing(sr, limit, listfunction, submissions=True, comments=True, r
         process(items)
     except KeyboardInterrupt:
         sql.commit()
+        raise
 
 def get_from_new(sr, limit=None, submissions=True, comments=True, returnnames=False):
     '''
@@ -323,7 +326,7 @@ def idlenew(subreddit='all', sleepy=15):
         try:
             get_from_new(subreddit, 100)
         except KeyboardInterrupt:
-            return
+            raise
         except:
             traceback.print_exc()
         time.sleep(sleepy)
@@ -397,7 +400,7 @@ def popgenerator(x):
     while len(x) > 0:
         yield x.pop()
 
-def process(users, quiet=False, knownid='', noskip=False, sort=None):
+def process(users, quiet=False, knownid='', noskip=False):
     '''
     Fetch the /u/ page for a user or list of users
 
@@ -416,13 +419,12 @@ def process(users, quiet=False, knownid='', noskip=False, sort=None):
     # I don't want to import types.GeneratorType just for one isinstance
     if type(users).__name__ == 'generator' or len(users) > 1:
         knownid=''
-    users = userify_list(users, noskip=noskip, quiet=quiet, sort=sort)
+    users = userify_list(users, noskip=noskip, quiet=quiet)
     current = 0
     for user in users:
         current += 1
         data = [None] * SQL_COLUMNCOUNT
         data[SQL_LASTSCAN] = int(getnow())
-        preverify=False
         if isinstance(user, list):
             # This happens when we receive NotFound. [name, availability]
             if knownid != '':
@@ -442,11 +444,9 @@ def process(users, quiet=False, knownid='', noskip=False, sort=None):
             data[SQL_COMMENT_KARMA] = user.comment_karma
             data[SQL_TOTAL_KARMA] = user.comment_karma + user.link_karma
             data[SQL_AVAILABLE] = 0
-            preverify = user.preverify
         data[SQL_LOWERNAME] = data[SQL_NAME].lower()
 
-        # preverification happens within userify_list
-        x = smartinsert(data, '%04d' % current, preverified=preverify)
+        x = smartinsert(data, '%04d' % current)
 
         if x is False:
             olds += 1
@@ -483,24 +483,15 @@ def print_message(data, printprefix=''):
     if data[SQL_HUMAN] is not None:
         print('%s %s : %s : %s : %d : %d' % (
                 printprefix,
-                data[SQL_IDSTR],
+                data[SQL_IDSTR].rjust(5, ' '),
                 data[SQL_HUMAN],
                 data[SQL_NAME],
                 data[SQL_LINK_KARMA],
                 data[SQL_COMMENT_KARMA]))
     else:
         statement = 'available' if data[SQL_AVAILABLE] is 1 else 'unavailable'
-        print('%s %s : %s' % (printprefix, data[SQL_NAME], statement))
-
-def reducetonames(users):
-    outlist = set()
-    for name in users:
-        if isinstance(name, str):
-            if 2 < len(name) < 21:
-                outlist.add(name.lower())
-        elif isinstance(name, praw.objects.Redditor):
-            outlist.add(name.name.lower())
-    return outlist
+        statement = statement.rjust(32, ' ')
+        print('%s %s : %s' % (printprefix, statement, data[SQL_NAME]))
 
 def save_textfile(filename, lines):
     '''
@@ -573,18 +564,16 @@ def show():
     fetchwriter(file_available, spacer1=' ', brief=True)
     file_available.close()
 
-def smartinsert(data, printprefix='', preverified=False):
+def smartinsert(data, printprefix=''):
     '''
     Originally, all queries were based on idint, but this caused problems
     when accounts were deleted / banned, because it wasn't possible to
     sql-update without knowing the ID.
     '''
     print_message(data, printprefix)
-    check = False
-    if not preverified:
-        cur.execute('SELECT * FROM users WHERE lowername=?', [data[SQL_NAME].lower()])
-        exists_in_db = cur.fetchone() is not None
-    if preverified or exists_in_db:
+
+    exists_in_db = (getentry(name=data[SQL_NAME].lower()) != None)
+    if exists_in_db:
         isnew = False
         data = [
             data[SQL_IDINT],
@@ -619,32 +608,38 @@ def smartinsert(data, printprefix='', preverified=False):
     sql.commit()
     return isnew
 
-def userify_list(users, noskip=False, quiet=False, sort=None):
-    users = list(reducetonames(users))
-    if sort is not None:
-        users.sort(key=sort)
-    else:
-        # While I like alphabetical order, I think shuffling is good because you
-        # can ctrl+c a long process without feeling like you've created a bias
-        # to the front of the alphabet.
-        random.shuffle(users)
-    if not quiet:
-        print('Processing %d unique names' % len(users))
+def userify_list(users, noskip=False, quiet=False):
+    if quiet is False:
+        if hasattr(users, '__len__'):
+            print('Processing %d unique names' % len(users))
+
+
     for username in users:
+        if isinstance(username, str):
+            if len(username) < 3 or len(username) > 20:
+                print('%s : Invalid length of %d' % (username, len(username)))
+                continue
+            if not all(c in VALID_CHARS for c in username):
+                print('%s : Contains invalid characters' % username)
+                continue
+        elif isinstance(username, praw.objects.Redditor):
+            username = username.name.lower()
+        else:
+            print('Don\'t know what to do with %s' % username)
+
+        
+        existing_entry = getentry(name=username)
+        if existing_entry is not None:
+            lastscan = existing_entry[SQL_LASTSCAN]
+            should_rescan = (getnow() - lastscan) > MIN_LASTSCAN_DIFF
+            if should_rescan is False and noskip is False:
+                prefix = ' ' * 29
+                appendix = '(available)' if existing_entry[SQL_AVAILABLE] else ''
+                print('%sskipping : %s %s' % (prefix, username, appendix))
+                continue
+
         try:
-            preexisting = getentry(name=username)
-            if preexisting is not None:
-                lastscan = preexisting[SQL_LASTSCAN]
-                preverify = getnow() - lastscan
-                preverify = (preverify > MIN_LASTSCAN_DIFF)
-                if not preverify and noskip is False:
-                    appendix = '(available)' if preexisting[SQL_AVAILABLE] else ''
-                    print('skipping %s %s' % (username, appendix))
-                    continue
-            else:
-                preverify = noskip
             user = r.get_redditor(username, fetch=True)
-            user.preverify = preverify
             yield user
         except praw.errors.NotFound:
             availability = r.is_username_available(username)
