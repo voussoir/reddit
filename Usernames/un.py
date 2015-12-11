@@ -193,6 +193,45 @@ def count(validonly=False):
         cur.execute('SELECT COUNT(*) FROM users')
     return cur.fetchone()[0]
 
+def everyoneyouveeverinteractedwith(username):
+    '''
+    Not because I should have, but because I was able to.
+    '''
+    max_todo_length = 2 ** 10
+    max_done_length = 2 ** 13
+    def find_interactions(username2):
+        if username2 in done:
+            return
+        process(username2, quiet=True)
+        done.add(username2)
+        while len(done) >= max_done_length:
+            done.pop()
+        if len(todo) >= max_todo_length-100:
+            return
+        user = r.get_redditor(username2)
+        comments = user.get_comments(limit=max_todo_length)
+        for comment in comments:
+            author = comment.link_author.lower()
+            if len(todo) > max_todo_length:
+                break
+            if author == '[deleted]':
+                continue
+            if author in done:
+                continue
+            if author in todo:
+                continue
+            print('%s interacted with %s' % (username2, author))
+            todo.add(author)
+    todo = set()
+    done = set()
+    todo.add(username)
+    l = 1
+    while l > 0:
+        find_interactions(todo.pop())
+        l = len(todo)
+        print('Have %d names\r' % l, end='')
+        sys.stdout.flush()
+
 def execit(*args, **kwargs):
     '''
     Allows another module to do stuff here using local names instead of qual names.
@@ -239,7 +278,7 @@ def find(name, doreturn=False):
         print_message(f)
     return None
 
-def get_from_hot(sr, limit=None, submissions=True, comments=True, returnnames=False):
+def get_from_hot(sr, limit=None, submissions=True, comments=False, returnnames=False):
     '''
     Shortcut for get_from_listing, using /hot
     '''
@@ -256,24 +295,24 @@ def get_from_listing(sr, limit, listfunction, submissions=True, comments=True, r
     subreddit = r.get_subreddit(sr, fetch=sr != 'all')
     if limit is None:
         limit = 1000
-    items = []
+    authors = set()
     if submissions is True:
         print('/r/%s, %d submissions' % (subreddit.display_name, limit))
         subreddit.lf = listfunction
-        items += list(subreddit.lf(subreddit, limit=limit))
+        for item in subreddit.lf(subreddit, limit=limit):
+            if item.author is not None:
+                authors.add(item.author.name)
     if comments is True:
         print('/r/%s, %d comments' % (subreddit.display_name, limit))
-        items += list(subreddit.get_comments(limit=limit))
-
-    items = [x.author for x in items]
-    while None in items:
-        items.remove(None)
+        for item in subreddit.get_comments(limit=limit):
+            if item.author is not None:
+                authors.add(item.author.name)
 
     if returnnames is True:
-        return items
+        return authors
 
     try:
-        process(items)
+        process(authors)
     except KeyboardInterrupt:
         sql.commit()
         raise
@@ -285,7 +324,7 @@ def get_from_new(sr, limit=None, submissions=True, comments=True, returnnames=Fa
     listfunction = praw.objects.Subreddit.get_new
     return get_from_listing(sr, limit, listfunction, submissions, comments, returnnames)
 
-def get_from_top(sr, limit=None, submissions=True, comments=True, returnnames=False):
+def get_from_top(sr, limit=None, submissions=True, comments=False, returnnames=False):
     '''
     Shortcut for get_from_listing, using /top?t=all
     '''
@@ -414,6 +453,9 @@ def process(users, quiet=False, knownid='', noskip=False):
     noskip :  Do not skip usernames which are already in the database.
     '''
     olds = 0
+    if isinstance(users, list):
+        users = list(set(users))
+
     if isinstance(users, str):
         users = [users]
     # I don't want to import types.GeneratorType just for one isinstance
@@ -513,6 +555,7 @@ def show():
     #file_karma_link = open('show\\karma_link.txt', 'w')
     #file_karma_comment = open('show\\karma_comment.txt', 'w')
     file_available = open('show\\available.txt', 'w')
+    file_stats = open('show\\stats.txt', 'w')
     file_readme = open('README.md', 'r')
 
     totalitems = count(validonly=False)

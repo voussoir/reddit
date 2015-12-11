@@ -13,13 +13,12 @@ APP_REFRESH = ""
 # https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 
 SUBREDDIT_TO_SCAN = 'all'
-SUBREDDIT_TO_SUBMIT = 'unlockedposts'
+SUBREDDIT_TO_SUBMIT = 'OpenAndGenuine'
 
-SUBMISSION_TITLE = '/r/_subreddit_ locks _fullname_ "_title_" (+_score_) (_numcomments_ comments)'
+SUBMISSION_TITLE = '/r/_subreddit_ locks "_title_" (+_score_) (_numcomments_ comments)'
 SUBMISSION_URL = 'http://r.go1dfish.me/r/_subreddit_/comments/_id_/x'
 # The terms surrounded by underscores will be replaced by the submission's actual
 # properties. See `create_title` and `create_url`
-
 
 MAX_TITLE_LENGTH = 300
 
@@ -31,17 +30,18 @@ WAIT = 120
 
 try:
     import bot
-    USERAGENT = bot.aG
-    APP_ID = bot.oG_id
-    APP_SECRET = bot.oG_secret
-    APP_URI = bot.oG_uri
-    APP_REFRESH = bot.oG_scopes['all']
+    USERAGENT = bot.lock_ua
+    APP_ID = bot.lock_id
+    APP_SECRET = bot.lock_secret
+    APP_URI = bot.lock_uri
+    APP_REFRESH = bot.lock_refresh
 except ImportError:
     pass
 
 sql = sqlite3.connect('lockfinder.db')
 cur = sql.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS lockedposts(id TEXT, subreddit TEXT)')
+cur.execute('CREATE INDEX IF NOT EXISTS postindex on lockedposts(id)')
 
 print('Logging in.')
 r = praw.Reddit(USERAGENT)
