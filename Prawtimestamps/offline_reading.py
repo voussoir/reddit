@@ -132,6 +132,7 @@ def fetchgenerator(cursor):
 def html_format_comment(comment):
     text = '''
     <div class="comment"
+        id="{id}" 
         style="
         padding-left: 20px;
         margin-top: 4px;
@@ -153,7 +154,8 @@ def html_format_comment(comment):
     {children}
     </div>
     '''.format(
-        text = render_markdown(comment.text),
+        id = comment.id,
+        text = sanitize_braces(render_markdown(comment.text)),
         usernamelink = html_helper_userlink(comment),
         score = comment.score,
         human = human(comment.created),
@@ -165,6 +167,7 @@ def html_format_comment(comment):
 def html_format_submission(submission):
     text = '''
     <div class="submission"
+        id="{id}" 
         style="
         border: 4px #00f solid;
         padding-left: 20px;
@@ -185,7 +188,8 @@ def html_format_submission(submission):
     </div>
     {children}
     '''.format(
-        title = submission.title,
+        id = submission.id,
+        title = sanitize_braces(submission.title),
         usernamelink = html_helper_userlink(submission),
         score = submission.score,
         human = human(submission.created),
@@ -200,7 +204,7 @@ def html_from_database(databasename, specific_submission=None):
     for submission in t.listnodes():
         print('Creating html for %s' % submission.identifier)
         submission.detach()
-        page = html_from_tree(submission, sort=lambda x: x.data.score*-1)
+        page = html_from_tree(submission, sort=lambda x: x.data.score * -1)
         if not os.path.exists(HTML_FOLDER):
             os.makedirs(HTML_FOLDER)
         htmlfile = HTML_FOLDER + '\\%s.html' % submission.identifier
@@ -242,11 +246,13 @@ def html_helper_permalink(item):
     link = '<a href="%s">permalink</a>' % link
     return link
 
-def html_helper_urlortext(item):
-    if item.url:
-        return '<a href="{url}">{url}</a>'.format(url=item.url)
-    elif item.text:
-        return render_markdown(item.text)
+def html_helper_urlortext(submission):
+    if submission.url:
+        text = '<a href="{url}">{url}</a>'.format(url=submission.url)
+    elif submission.text:
+        text = render_markdown(submission.text)
+    text = sanitize_braces(text)
+    return text
 
 def html_helper_userlink(item):
     name = item.author
@@ -264,6 +270,9 @@ def human(timestamp):
 
 def render_markdown(text):
     text = markdown.markdown(text, output_format='html5')
+    return text
+
+def sanitize_braces(text):
     text = text.replace('{', '{{')
     text = text.replace('}', '}}')
     return text

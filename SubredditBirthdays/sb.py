@@ -370,7 +370,7 @@ def kill(sr):
     cur.execute('INSERT INTO subreddits VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
     sql.commit()
 
-def fetchgenerator():
+def fetchgenerator(cur):
     while True:
         fetch = cur.fetchone()
         if fetch is None:
@@ -402,7 +402,7 @@ def show():
 
     print('Writing time files.')
     cur.execute('SELECT * FROM subreddits WHERE created !=0 ORDER BY created ASC')
-    for item in fetchgenerator():
+    for item in fetchgenerator(cur):
         itemf = memberformat(item)
         print(itemf, file=file_all_time)
         if int(item[SQL_NSFW]) == 1:
@@ -415,7 +415,7 @@ def show():
     previousitem = None
     inprogress = False
     cur.execute('SELECT * FROM subreddits WHERE created != 0 ORDER BY LOWER(name) ASC')
-    for item in fetchgenerator():
+    for item in fetchgenerator(cur):
         if previousitem is not None and item[SQL_NAME] == previousitem[SQL_NAME]:
             print(memberformat(previousitem), file=file_duplicates)
             inprogress = True
@@ -436,7 +436,7 @@ def show():
     rank_all = 1
     rank_nsfw = 1
     cur.execute('SELECT * FROM subreddits WHERE created != 0 ORDER BY subscribers DESC')
-    for item in fetchgenerator():
+    for item in fetchgenerator(cur):
         if rank_all <= 20000:
             rankstr = commapadding(rank_all, ' ', 9)
             rank_all += 1
@@ -456,7 +456,7 @@ def show():
 
     print('Writing jumble.')
     cur.execute('SELECT * FROM subreddits WHERE jumble == 1 ORDER BY subscribers DESC')
-    for item in fetchgenerator():
+    for item in fetchgenerator(cur):
         itemf = memberformat(item)
         if int(item[SQL_NSFW]) == 0:
             print(itemf, file=file_jumble_sfw)
@@ -467,7 +467,7 @@ def show():
 
     print('Writing missing.')
     cur.execute('SELECT * FROM subreddits WHERE created == 0 ORDER BY idint ASC')
-    for item in fetchgenerator():
+    for item in fetchgenerator(cur):
         print(item[SQL_IDSTR], file=file_missing)
     file_missing.close()
 
@@ -496,7 +496,7 @@ def show():
     yerdict = {}
     cur.execute('SELECT * FROM subreddits WHERE created != 0')
     print('    performing time breakdown')
-    for item in fetchgenerator():
+    for item in fetchgenerator(cur):
         dt = datetime.datetime.utcfromtimestamp(item[SQL_CREATED])
 
         datetimedict(hoddict, dt, '%H') # 01
@@ -743,7 +743,7 @@ def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, d
         positional = False
 
     lenq = len(querys)
-    for item in fetchgenerator():
+    for item in fetchgenerator(cur):
         name = item[SQL_NAME]
         if casesense is False:
             name = name.lower()

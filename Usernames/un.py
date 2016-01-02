@@ -208,7 +208,10 @@ def everyoneyouveeverinteractedwith(username):
             done.pop()
         if len(todo) >= max_todo_length-100:
             return
-        user = r.get_redditor(username2)
+        try:
+            user = r.get_redditor(username2, fetch=True)
+        except:
+            return
         comments = user.get_comments(limit=max_todo_length)
         for comment in comments:
             author = comment.link_author.lower()
@@ -238,7 +241,7 @@ def execit(*args, **kwargs):
     '''
     exec(*args, **kwargs)
 
-def fetchgenerator():
+def fetchgenerator(cur):
     '''
     Create an generator from cur fetches so I don't
     have to use while loops for everything
@@ -249,7 +252,7 @@ def fetchgenerator():
             break
         yield fetch
 
-def fetchwriter(outfile, spacer1=' ', spacer2=None, brief=False):
+def fetchwriter(cur, outfile, spacer1=' ', spacer2=None, brief=False):
     '''
     Write items from the current sql query to the specified file.
 
@@ -257,7 +260,7 @@ def fetchwriter(outfile, spacer1=' ', spacer2=None, brief=False):
     on alternating lines to help readability.
     '''
     flipflop = True
-    for item in fetchgenerator():
+    for item in fetchgenerator(cur):
         spacer = spacer1 if flipflop else spacer2
         if brief:
             item = memberformat_brief(item, spacer)
@@ -368,6 +371,7 @@ def idlenew(subreddit='all', sleepy=15):
             raise
         except:
             traceback.print_exc()
+        r._use_oauth = False
         time.sleep(sleepy)
 
 def load_textfile(filename):
@@ -521,6 +525,16 @@ def processid(idnum, ranger=1):
             print('No idea.')
 pid = processid
 
+def process_from_database(filename, table, columnindex):
+    s = sqlite3.connect(filename)
+    c = s.cursor()
+    c.execute('SELECT * FROM %s' % table)
+    for item in fetchgenerator(c):
+        item = item[columnindex]
+        if item is None:
+            continue
+        p(item, quiet=True)
+
 def print_message(data, printprefix=''):
     if data[SQL_HUMAN] is not None:
         print('%s %s : %s : %s : %d : %d' % (
@@ -571,40 +585,44 @@ def show():
     file_readme.write(readmelines)
     file_readme.close()
 
+    print('Writing stats file.')
+    print('DO SOMETHING')
+    file_stats.close()
+
     print('Writing time file.')
     print(HEADER_FULL, file=file_time)
     cur.execute('SELECT * FROM users WHERE idint IS NOT NULL AND created IS NOT NULL ORDER BY created ASC')
-    fetchwriter(file_time)
+    fetchwriter(cur, file_time)
     file_time.close()
 
     print('Writing name file.')
     print(HEADER_FULL, file=file_name)
     cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY lowername ASC')
-    fetchwriter(file_name)
+    fetchwriter(cur, file_name)
     file_name.close()
     
     print('Writing karma total file.')
     print(HEADER_FULL, file=file_karma_total)
     cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY total_karma DESC, lowername ASC')
-    fetchwriter(file_karma_total)
+    fetchwriter(cur, file_karma_total)
     file_karma_total.close()
 
     #print('Writing karma link file.')
     #print(HEADER_FULL, file=file_karma_link)
     #cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY link_karma DESC, lowername ASC')
-    #fetchwriter(file_karma_link)
+    #fetchwriter(cur, file_karma_link)
     #file_karma_link.close()
 
     #print('Writing karma comment file.')
     #print(HEADER_FULL, file=file_karma_comment)
     #cur.execute('SELECT * FROM users WHERE idint IS NOT NULL ORDER BY comment_karma DESC, lowername ASC')
-    #fetchwriter(file_karma_comment)
+    #fetchwriter(cur, file_karma_comment)
     #file_karma_comment.close()
 
     print('Writing available')
     print(HEADER_BRIEF, file=file_available)
     cur.execute('SELECT * FROM users WHERE available == 1 AND LENGTH(name) > 3 ORDER BY lowername ASC')
-    fetchwriter(file_available, spacer1=' ', brief=True)
+    fetchwriter(cur, file_available, spacer1=' ', brief=True)
     file_available.close()
 
 def smartinsert(data, printprefix=''):
@@ -664,13 +682,13 @@ def userify_list(users, noskip=False, quiet=False):
                 continue
             if not all(c in VALID_CHARS for c in username):
                 print('%s : Contains invalid characters' % username)
-                continue
+                #continue
+                pass
         elif isinstance(username, praw.objects.Redditor):
             username = username.name.lower()
         else:
             print('Don\'t know what to do with %s' % username)
 
-        
         existing_entry = getentry(name=username)
         if existing_entry is not None:
             lastscan = existing_entry[SQL_LASTSCAN]

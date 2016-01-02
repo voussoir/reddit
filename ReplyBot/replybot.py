@@ -80,16 +80,18 @@ def replybot():
             # Post is already in the database
             continue
 
+        pbody = post.body.lower()
+        if not any(key.lower() in pbody for key in KEYWORDS):
+            # Does not contain our keyword
+            continue
+
         cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
         sql.commit()
-        pbody = post.body.lower()
-        if any(key.lower() in pbody for key in KEYWORDS):
-            print('Replying to %s by %s' % (pid, pauthor))
-            try:
-                post.reply(REPLYSTRING)
-            except praw.requests.exceptions.HTTPError as e:
-                if e.response.status_code == 403:
-                    print('403 FORBIDDEN - is the bot banned from %s?' % post.subreddit.display_name)
+        print('Replying to %s by %s' % (pid, pauthor))
+        try:
+            post.reply(REPLYSTRING)
+        except praw.errors.Forbidden:
+            print('403 FORBIDDEN - is the bot banned from %s?' % post.subreddit.display_name)
 
 cycles = 0
 while True:

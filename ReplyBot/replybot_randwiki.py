@@ -96,9 +96,8 @@ def replybot():
             try:
                 reply = get_random_wikipages(3)
                 post.reply(reply)
-            except praw.requests.exceptions.HTTPError as e:
-                if e.response.status_code == 403:
-                    print('403 FORBIDDEN - is the bot banned from %s?' % post.subreddit.display_name)
+            except praw.errors.Forbidden:
+                print('403 FORBIDDEN - is the bot banned from %s?' % post.subreddit.display_name)
 
 def get_random_wikipages(count):
     print('Generating wiki pages')
