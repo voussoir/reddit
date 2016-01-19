@@ -16,6 +16,9 @@ USERAGENT = ""
 # For example "Python automatic replybot v2.0 (by /u/GoldenSights)"
 SUBREDDIT = "pics"
 # This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
+DO_SUBMISSIONS = False
+DO_COMMENTS = True
+# Look for submissions, comments, or both.
 KEYWORDS = ["phrase 1", "phrase 2", "phrase 3", "phrase 4"]
 # These are the words you are looking for
 KEYAUTHORS = []
@@ -54,8 +57,13 @@ r.refresh_access_information(APP_REFRESH)
 def replybot():
     print('Searching %s.' % SUBREDDIT)
     subreddit = r.get_subreddit(SUBREDDIT)
-    posts = list(subreddit.get_comments(limit=MAXPOSTS))
+    posts = []
+    if DO_SUBMISSIONS:
+        posts += list(subreddit.get_new(limit=MAXPOSTS))
+    if DO_COMMENTS:
+        posts += list(subreddit.get_comments(limit=MAXPOSTS))
     posts.reverse()
+
     for post in posts:
         # Anything that needs to happen every loop goes here.
         pid = post.id
@@ -80,7 +88,12 @@ def replybot():
             # Post is already in the database
             continue
 
-        pbody = post.body.lower()
+        if isinstance(post, praw.objects.Comment):
+            pbody = post.body
+        else:
+            pbody = '%s %s' % (post.title, post.selftext)
+        pbody = pbody.lower()
+
         if not any(key.lower() in pbody for key in KEYWORDS):
             # Does not contain our keyword
             continue

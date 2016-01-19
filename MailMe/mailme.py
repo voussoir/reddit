@@ -103,8 +103,12 @@ def mailme():
             # Author is deleted. We don't care about this post.
             continue
 
-        if pauthor.lower() in [r.user.name.lower(), MAILME_RECIPIENT.lower()]:
-            # Don't reply to yourself, robot!
+        if r.has_scope('identity'):
+            myself = r.user.name.lower()
+        else:
+            myself = ''
+
+        if pauthor.lower() in [myself, MAILME_RECIPIENT.lower()]:
             print('Will not reply to myself.')
             continue
 

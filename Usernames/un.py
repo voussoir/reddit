@@ -90,6 +90,10 @@ MIN_LASTSCAN_DIFF = 86400 * 365
 
 VALID_CHARS = string.ascii_letters + string.digits + '_-'
 
+# If True, print the name of the user we're about to fetch.
+# Good for debugging problematic users.
+PREPRINT = False
+
 
 def allpossiblefromset(characters, length=None, minlength=None, maxlength=None):
     '''
@@ -525,12 +529,12 @@ def processid(idnum, ranger=1):
             print('No idea.')
 pid = processid
 
-def process_from_database(filename, table, columnindex):
+def process_from_database(filename, table, column, whereclause=''):
     s = sqlite3.connect(filename)
     c = s.cursor()
-    c.execute('SELECT * FROM %s' % table)
+    c.execute('SELECT DISTINCT %s FROM %s %s' % (column, table, whereclause))
     for item in fetchgenerator(c):
-        item = item[columnindex]
+        item = item[0]
         if item is None:
             continue
         p(item, quiet=True)
@@ -700,7 +704,13 @@ def userify_list(users, noskip=False, quiet=False):
                 continue
 
         try:
+            if PREPRINT:
+                print(username)
             user = r.get_redditor(username, fetch=True)
+            if getattr(user, 'is_suspended', False):
+                # Suspended accounts provide extremely little info
+                # {"kind": "t2", "data": {"is_suspended": true, "name": "*****"}}
+                continue
             yield user
         except praw.errors.NotFound:
             availability = r.is_username_available(username)

@@ -8,3 +8,7 @@ It will scan /r/subreddit/new, /top, and /comments. It will then scan /u/user/su
 Reddit only allows us to grab 1,000 items from each of the five areas mentioned. We can also use the search bar to find submissions, but not comments. It may be impossible to truly scrub the user, but if it's that far back in all directions, it's probably not worth worrying about.
 
 You must log in as a moderator, obviously.
+
+&nbsp;
+
+Check out the [timesearch tools](https://github.com/voussoir/reddit/tree/master/Prawtimestamps) for finding submissions as old as the subreddit itself. May help with additional scrubbing.

@@ -30,6 +30,11 @@ RESULTFORM = "[_key_](_value_)"
 #This preset will create a link where the text is the snake name and the url is the wiki link
 #You may delete one or both of these injectors.
 
+KEYAUTHORS = []
+# These are the names of the authors you are looking for
+# The bot will only reply to authors on this list
+# Keep it empty to allow anybody.
+
 LEVENMODE = True
 #If this is True it will use a function that is slow but can find misspelled keys
 #If this is False it will use a simple function that is very fast but can only find keys which are spelled exactly
@@ -69,6 +74,10 @@ r = praw.Reddit(USERAGENT)
 r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
 r.refresh_access_information(APP_REFRESH)
 
+if r.has_scope('identity'):
+    USERNAME = r.user.name.lower()
+else:
+    USERNAME = ''
 
 def levenshtein(s1, s2):
     #Levenshtein algorithm to figure out how close two strings are two each other
@@ -144,42 +153,53 @@ def findsimple(comment):
             results.append(result)
     return results
 
-def scanSub():
+def replydict():
     print('Searching '+ SUBREDDIT + '.')
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_comments(limit=MAXPOSTS)
     for post in posts:
         results = []
         pid = post.id
-        try:
-            pauthor = post.author.name
-        except AttributeError:
-            pauthor = '[DELETED]'
-        cur.execute('SELECT * FROM oldposts WHERE ID=?', [pid])
-        if not cur.fetchone():
-            cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
-            sql.commit()
-            if pauthor.lower() != r.user.name.lower():
-                pbody = post.body.lower()
-            
-                if LEVENMODE is True:
-                    results = findsuper(pbody)
-                else:
-                    results = findsimple(pbody)
 
-                if len(results) > 0:
-                        newcomment = COMMENTHEADER
-                        newcomment += '\n\n' + '\n\n'.join(results) + '\n\n'
-                        newcomment += COMMENTFOOTER
-                        print('Replying to ' + pid + ' by ' + pauthor + ' with ' + str(len(results)) + ' items')
-                        post.reply(newcomment)
-            else:
-                print('Will not reply to self')
+        try:
+            pauthor = post.author.name.lower()
+        except AttributeError:
+            continue
+
+        if KEYAUTHORS != [] and all(keyauthor != pauthor for keyauthor in KEYAUTHORS):
+            continue
+
+        if pauthor == USERNAME:
+            # Will not reply to self
+            continue
+
+        cur.execute('SELECT * FROM oldposts WHERE ID == ?', [pid])
+        if cur.fetchone():
+            # Already in database
+            continue
+
+        cur.execute('INSERT INTO oldposts VALUES(?)', [pid])
+        sql.commit()
+        pbody = post.body.lower()
+        
+        if LEVENMODE is True:
+            results = findsuper(pbody)
+        else:
+            results = findsimple(pbody)
+
+        if len(results) = 0:
+            continue
+
+        newcomment = COMMENTHEADER
+        newcomment += '\n\n' + '\n\n'.join(results) + '\n\n'
+        newcomment += COMMENTFOOTER
+        print('Replying to ' + pid + ' by ' + pauthor + ' with ' + str(len(results)) + ' items')
+        post.reply(newcomment)
 
 
 while True:
     try:
-        scanSub()
+        replydict()
     except Exception as e:
         traceback.print_exc()
     print('Running again in ' + WAITS + ' seconds \n')

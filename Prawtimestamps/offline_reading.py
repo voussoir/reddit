@@ -251,6 +251,8 @@ def html_helper_urlortext(submission):
         text = '<a href="{url}">{url}</a>'.format(url=submission.url)
     elif submission.text:
         text = render_markdown(submission.text)
+    else:
+        text = ''
     text = sanitize_braces(text)
     return text
 

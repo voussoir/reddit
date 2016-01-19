@@ -1,4 +1,4 @@
-from os import system
+import os
 import praw
 import time
 
@@ -27,22 +27,21 @@ r.refresh_access_information(APP_REFRESH)
 last_refresh = time.time()
 
 def clearscreen():
-    if system('cls') != 0:
-        system('clear')
+    if os.system('cls') != 0:
+        os.system('clear')
+
+def unreadwatch():
+    r.handler.clear_cache()
+    unread = list(r.get_unread(limit=None))
+    now = time.strftime('%H:%M:%S')
+    clearscreen()
+    print(now, len(unread))
+    for item in unread:
+        print('\t%s: %s' % (item.author, item.subject))
 
 while True:
     try:
-        now = time.time()
-        if now - last_refresh > 3590:
-            r.refresh_access_information(APP_REFRESH)
-            last_refresh = now
-        r.handler.clear_cache()
-        unread = list(r.get_unread(limit=None))
-        now = time.strftime('%H:%M:%S')
-        clearscreen()
-        print(now, len(unread))
-        for item in unread:
-            print('\t%s: %s' % (item.author, item.subject))
+        unreadwatch()
     except:
-        pass
+        traceback.print_exc()
     time.sleep(15)

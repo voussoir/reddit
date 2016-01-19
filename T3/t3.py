@@ -309,6 +309,8 @@ def automatic_processor():
                 bump += 1
             print('Caught Exception. Bump=%d, range=%d, current=%d, problem_max=%d' %
                   (bump, ranger, li, problem_range_max))
+        except praw.requests.exceptions.ConnectionError:
+            pass
         except KeyboardInterrupt:
             print('Caught kbi')
-            return
+            raise
