@@ -496,7 +496,8 @@ def process(users, quiet=False, knownid='', noskip=False):
             data[SQL_AVAILABLE] = 0
         data[SQL_LOWERNAME] = data[SQL_NAME].lower()
 
-        x = smartinsert(data, '%04d' % current)
+        printprefix = '%04d' % current
+        x = smartinsert(data, printprefix)
 
         if x is False:
             olds += 1
@@ -529,15 +530,29 @@ def processid(idnum, ranger=1):
             print('No idea.')
 pid = processid
 
-def process_from_database(filename, table, column, whereclause=''):
+def process_from_database(filename, table, column, delete_original=False):
+    '''
+    Warning: if delete_original is True, the original database will lose each username
+    as it is processed
+    '''
     s = sqlite3.connect(filename)
     c = s.cursor()
-    c.execute('SELECT DISTINCT %s FROM %s %s' % (column, table, whereclause))
-    for item in fetchgenerator(c):
-        item = item[0]
-        if item is None:
-            continue
-        p(item, quiet=True)
+    c2 = s.cursor()
+    c.execute('SELECT DISTINCT %s FROM %s' % (column, table))
+    try:
+        for item in fetchgenerator(c):
+            username = item[0]
+            if username is not None:
+                p(username, quiet=True)
+            if delete_original:
+                c2.execute('DELETE FROM %s WHERE %s == ?' % (table, column), [username])
+    except (Exception, KeyboardInterrupt) as e:
+        if delete_original:
+            print('Commiting changes...')
+            s.commit()
+        e.sql = s
+        raise e
+    return s
 
 def print_message(data, printprefix=''):
     if data[SQL_HUMAN] is not None:
@@ -637,7 +652,7 @@ def smartinsert(data, printprefix=''):
     '''
     print_message(data, printprefix)
 
-    exists_in_db = (getentry(name=data[SQL_NAME].lower()) != None)
+    exists_in_db = (getentry(name=data[SQL_NAME].lower()) is not None)
     if exists_in_db:
         isnew = False
         data = [
@@ -655,18 +670,21 @@ def smartinsert(data, printprefix=''):
         # coalesce allows us to fallback on the existing values
         # if the given values are null, to avoid erasing data about users
         # whose accounts are now deleted.
-        cur.execute('UPDATE users SET \
-            idint = coalesce(?, idint), \
-            idstr = coalesce(?, idstr), \
-            created = coalesce(?, created), \
-            human = coalesce(?, human), \
-            link_karma = coalesce(?, link_karma), \
-            comment_karma = coalesce(?, comment_karma), \
-            total_karma = coalesce(?, total_karma), \
-            available = coalesce(?, available), \
-            lastscan = coalesce(?, lastscan), \
-            name = coalesce(?, name) \
-            WHERE lowername=?', data)
+        command = '''
+            UPDATE users SET
+            idint = coalesce(?, idint),
+            idstr = coalesce(?, idstr),
+            created = coalesce(?, created),
+            human = coalesce(?, human),
+            link_karma = coalesce(?, link_karma),
+            comment_karma = coalesce(?, comment_karma),
+            total_karma = coalesce(?, total_karma),
+            available = coalesce(?, available),
+            lastscan = coalesce(?, lastscan),
+            name = coalesce(?, name)
+            WHERE lowername == ?
+        '''
+        cur.execute(command, data)
     else:
         isnew = True
         cur.execute('INSERT INTO users VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', data)
