@@ -187,7 +187,7 @@ def replydict():
         else:
             results = findsimple(pbody)
 
-        if len(results) = 0:
+        if len(results) == 0:
             continue
 
         newcomment = COMMENTHEADER
