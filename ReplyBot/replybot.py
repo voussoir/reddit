@@ -102,7 +102,10 @@ def replybot():
         sql.commit()
         print('Replying to %s by %s' % (pid, pauthor))
         try:
-            post.reply(REPLYSTRING)
+            if hasattr(post, "reply"):
+                post.reply(REPLYSTRING)
+            else:
+                post.add_comment(REPLYSTRING)
         except praw.errors.Forbidden:
             print('403 FORBIDDEN - is the bot banned from %s?' % post.subreddit.display_name)
 
