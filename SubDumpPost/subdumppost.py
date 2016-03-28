@@ -34,6 +34,11 @@ TITLE_FORMAT = "_title_"
 # _subreddit_
 # _score_
 # _title_
+
+DO_LINKPOSTS = True
+DO_SELFPOSTS = True
+# Which types of submissions to consider.
+
 TRUEURL = True
 # If True, submit the actual link or selftext from the original post.
 # If False, submit a permalink to the post.
@@ -99,14 +104,23 @@ def scansub():
         if submission.subreddit.display_name.lower() == DUMPSUBREDDIT.lower():
             continue
 
+        if submission.is_self and not DO_SELFPOSTS:
+            continue
+
+        if not submission.is_self and not DO_LINKPOSTS:
+            continue            
+
         body = '%s\n%s' % (submission.title, submission.selftext)
         body = body.lower()
         if KEYWORDS and not any(key in body for key in KEYWORDS):
             continue
 
-        url = submission.url.lower()
-        if KEYDOMAINS and not post.is_self and not any(key in url for key in KEYDOMAINS):
-            continue
+        if KEYDOMAINS:
+            url = submission.url.lower()
+            if submission.is_self:
+                continue
+            if not any(key in url for key in KEYDOMAINS):
+                continue
 
         cur.execute('SELECT * FROM oldposts WHERE id == ?', [submission.id])
         if cur.fetchone() is not None:

@@ -35,7 +35,7 @@ except ImportError:
 print('Logging in.')
 # http://redd.it/3cm1p8
 r = praw.Reddit(USERAGENT)
-r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_;URI)
 r.refresh_access_information(APP_REFRESH)
 
 SQL_COLUMNCOUNT = 16

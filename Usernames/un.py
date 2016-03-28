@@ -538,9 +538,14 @@ def process_from_database(filename, table, column, delete_original=False):
     s = sqlite3.connect(filename)
     c = s.cursor()
     c2 = s.cursor()
-    c.execute('SELECT DISTINCT %s FROM %s' % (column, table))
+    query = 'SELECT DISTINCT %s FROM %s' % (column, table)
+    c.execute(query)
+    i = 0
     try:
         for item in fetchgenerator(c):
+            i = (i + 1) % 100
+            if i == 0:
+                s.commit()
             username = item[0]
             if username is not None:
                 p(username, quiet=True)
@@ -548,7 +553,7 @@ def process_from_database(filename, table, column, delete_original=False):
                 c2.execute('DELETE FROM %s WHERE %s == ?' % (table, column), [username])
     except (Exception, KeyboardInterrupt) as e:
         if delete_original:
-            print('Commiting changes...')
+            print('Committing changes...')
             s.commit()
         e.sql = s
         raise e
