@@ -1,9 +1,10 @@
 #/u/GoldenSights
-import traceback
-import praw # simple interface to the reddit API, also handles rate limiting of requests
-import time
-import sqlite3
 import json
+import praw
+import random
+import sqlite3
+import time
+import traceback
 
 '''USER CONFIGURATION'''
 
@@ -35,6 +36,13 @@ KEYAUTHORS = []
 # The bot will only reply to authors on this list
 # Keep it empty to allow anybody.
 
+MULTIPLE_MATCHES = True
+# If True, the comment will respond to multiple keywords within the comment.
+# Using snakes.txt as an example, True means that we will link multiple snake URLs if
+# the comment contained multiple snake names.
+# If False, only keep the first generated response. Because dictionaries are unordered,
+# there is no guarantee which one will be picked.
+
 LEVENMODE = True
 #If this is True it will use a function that is slow but can find misspelled keys
 #If this is False it will use a simple function that is very fast but can only find keys which are spelled exactly
@@ -50,7 +58,6 @@ WAIT = 30
 
 
 
-WAITS = str(WAIT)
 try:
     import bot
     USERAGENT = bot.aG
@@ -129,8 +136,10 @@ def findsuper(comment, tolerance= 3):
                         used.append(itemname)
                         result = RESULTFORM
                         result = result.replace('_key_', itemname)
-                        result = result.replace('_value_', DICT[itemname])
+                        result = result.replace('_value_', get_response(itemname))
                         results.append(result)
+                        if MULTIPLE_MATCHES is False:
+                            return results
                 pos += 1
                 if pos > len(commentsplit):
                     end = True
@@ -149,9 +158,25 @@ def findsimple(comment):
         if itemname.lower() in comment.lower():
             result = RESULTFORM
             result = result.replace('_key_', itemname)
-            result = result.replace('_value_', DICT[itemname])
+            result = result.replace('_value_', get_response(itemname))
             results.append(result)
+            if MULTIPLE_MATCHES is False:
+                return results
     return results
+
+def get_response(key):
+    '''
+    Return the appropriate response for this keyword.
+    If the value for this key is a list, we will return one random
+    element using `random.choice`.
+    Otherwise just return whatever is there.
+
+    Does not protect against KeyErrors.
+    '''
+    value = DICT[key]
+    if isinstance(value, list):
+        return random.choice(value)
+    return value
 
 def replydict():
     print('Searching '+ SUBREDDIT + '.')
@@ -193,7 +218,11 @@ def replydict():
         newcomment = COMMENTHEADER
         newcomment += '\n\n' + '\n\n'.join(results) + '\n\n'
         newcomment += COMMENTFOOTER
-        print('Replying to ' + pid + ' by ' + pauthor + ' with ' + str(len(results)) + ' items')
+
+        note = 'Replying to {id} by {author} with {count} items'
+        note = note.format(id=pid, author=pauthor, count=len(results))
+        print(note)
+
         post.reply(newcomment)
 
 
@@ -202,6 +231,6 @@ while True:
         replydict()
     except Exception as e:
         traceback.print_exc()
-    print('Running again in ' + WAITS + ' seconds \n')
+    print('Running again in %d seconds \n' % WAIT)
     sql.commit()
     time.sleep(WAIT)

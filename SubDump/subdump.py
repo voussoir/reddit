@@ -1,6 +1,7 @@
 #/u/GoldenSights
-import praw # simple interface to the reddit API, also handles rate limiting of requests
+import praw
 import time
+import traceback
 import sqlite3
 
 '''USER CONFIGURATION'''
@@ -73,7 +74,7 @@ r = praw.Reddit(USERAGENT)
  r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
  r.refresh_access_information(APP_REFRESH) 
 
-def scanSub():
+def scan_sub():
     print('Searching '+ SUBREDDIT + '.')
     subreddit = r.get_subreddit(SUBREDDIT)
     posts = subreddit.get_comments(limit=MAXPOSTS)
@@ -115,9 +116,9 @@ def scanSub():
 
 while True:
     try:
-        scanSub()
+        scan_sub()
     except Exception as e:
-        print('An error has occured:', str(e))
+        traceback.print_exc()
     print('Running again in ' + WAITS + ' seconds \n')
     sql.commit()
     time.sleep(WAIT)

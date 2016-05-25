@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 1,066,054 subreddits
+#####Collected 1,131,035 subreddits
 
-#####[Today's jumble](http://reddit.com/r/mechmarket+mountandblade+ProGolf+FreckledGirls+cars+StuffOnCats+ongakur+schizophrenia+maximumfun+PalestineIntifada+StreetFighter+nugs+DMT+TexasForSanders+GermanGoneWild+ShitPoliticsSays+MarineBiologyGifs+whitebeauty+UCONN+nextdoorasians)
+#####[Today's jumble](http://reddit.com/r/edmproduction+visualnovels+Dublin+schnauzers+grilledcheese+TOR+nightvale+Texans+wsu+Military+porterrobinson+monsterhunterclan+animelegwear+SampleSize+pitchforkemporium+Astronomy+UWMadison+Sneks+LastManonEarthTV+watercooling)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -11,19 +11,36 @@ The earliest subreddit after which IDs are consistently incrementing is [/r/234]
 
 Some subreddits are not properly marked as NSFW. This is either the fault of the moderators or, in some cases, the data was collected while the subreddit was brand new.
 
-02 November 2014: Finally decided to start measuring subscribers. Numbers will be wrong for quite some time.
+02 November 2014
+- Finally decided to start measuring subscribers. Numbers will be wrong for quite some time.
 
-07 November 2014: 2009, 2010, and 2011 complete!
+07 November 2014
+- 2009, 2010, and 2011 complete!
 
-08 November 2014: 2012 and 2013 complete!
+08 November 2014
+- 2012 and 2013 complete!
 
-09 November 2014: 2014 up-to-date!!!!
+09 November 2014
+- 2014 up-to-date!!!!
 
-24 December 2014: **Massive speed boost** - I just learned about sql INDEX; and I've also added a column to the table where subreddit IDs are stored in integers instead of b36 strings. Together, these changes make updates go like 20x faster. Why have I waited so long?
+24 December 2014
+- **Massive speed boost** - I just learned about sql INDEX; and I've also added a column to the table where subreddit IDs are stored in integers instead of b36 strings. Together, these changes make updates go like 20x faster. Why have I waited so long?
 
-18 February 2015: Database is now TOO BIG for github! ZIP is provided in its place. The db is now tracking subreddit_type and submission_type to help detect spam. This has put the file over the allowed 100 megabyte limit. I'll probably forget to re-zip it on every commit but I'll do my best.
+18 February 2015
+- Database is now TOO BIG for github! ZIP is provided in its place. The db is now tracking subreddit_type and submission_type to help detect spam. This has put the file over the allowed 100 megabyte limit. I'll probably forget to re-zip it on every commit but I'll do my best.
 
-03 October 2015: I'm starting to migrate to Git LFS for storing the big stuff. All of the /show/ text files are now using the extension "vdump" so that they can be registered to lfs without interfering with any other text files I use. They are still text files.
+03 October 2015
+- I'm starting to migrate to Git LFS for storing the big stuff.
+- All of the /show/ text files are now using the extension "vdump" so that they can be registered to lfs without interfering with any other text files I use. They are still text files.
+
+Some time in 2015
+- Migrated back out of Git LFS because 1GB wasn't enough.
+- Back to using .txt. So much for vdump.
+
+08 April 2016
+- Removed `doupdates` parameter since I have no reason to use it ever again.
+- Now using named bindings for SQL operations for clarity.
+- Filenames and Labeling of bar plots greatly improved.
 ______
 
 

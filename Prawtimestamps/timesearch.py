@@ -35,7 +35,7 @@ except ImportError:
 print('Logging in.')
 # http://redd.it/3cm1p8
 r = praw.Reddit(USERAGENT)
-r.set_oauth_app_info(APP_ID, APP_SECRET, APP_;URI)
+r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
 r.refresh_access_information(APP_REFRESH)
 
 SQL_COLUMNCOUNT = 16
@@ -312,7 +312,7 @@ def get_all_posts(subreddit, lower=None, maxupper=None,
         if itemsfound > 99:
             #Intentionally not elif
             print('Too many results, reducing interval', end='')
-            interval = int(interval * (0.8 - (0.05*toomany_inarow)))
+            interval = int(interval * (0.8 - (0.05 * toomany_inarow)))
             upper = lower + interval
             toomany_inarow += 1
         else:

@@ -200,18 +200,22 @@ def html_format_submission(submission):
     return text
 
 def html_from_database(databasename, specific_submission=None):
-    t = tree_from_database(databasename, specific_submission)
-    for submission in t.listnodes():
-        print('Creating html for %s' % submission.identifier)
-        submission.detach()
-        page = html_from_tree(submission, sort=lambda x: x.data.score * -1)
+    '''
+    Given a timesearch database filename, produce .html files for each
+    of the submissions it contains (or one particular submission fullname)
+    '''
+    submission_trees = trees_from_database(databasename, specific_submission)
+    for submission_tree in submission_trees:
+        page = html_from_tree(submission_tree, sort=lambda x: x.data.score * -1)
         if not os.path.exists(HTML_FOLDER):
             os.makedirs(HTML_FOLDER)
-        htmlfile = HTML_FOLDER + '\\%s.html' % submission.identifier
-        x = open(htmlfile, 'w', encoding='utf-8')
-        x.write('<html><body>')
-        x.write(page)
-        x.write('</body></html>')
+        html_basename = '%s.html' % submission_tree.identifier
+        html_filename = os.path.join(HTML_FOLDER, html_basename)
+        html_handle = open(html_filename, 'w', encoding='utf-8')
+        html_handle.write('<html><body><meta charset="UTF-8">')
+        html_handle.write(page)
+        html_handle.write('</body></html>')
+        html_handle.close()
 
 def html_from_tree(tree, sort=None):
     '''
@@ -279,14 +283,13 @@ def sanitize_braces(text):
     text = text.replace('}', '}}')
     return text
 
-def tree_from_database(databasename, specific_submission=None):
+def trees_from_database(databasename, specific_submission=None):
     '''
     Given a timesearch database filename, take all of the submission
     ids, take all of the comments for each submission id, and run them
     through `tree_from_submission_comments`.
 
-    Return a tree where the root is ':', and the first layer contains
-    all of the submission trees.
+    Yield each submission's tree as it is generated.
     '''
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
@@ -302,7 +305,6 @@ def tree_from_database(databasename, specific_submission=None):
         generated = True
 
     found_some_posts = False
-    totaltree = TreeNode(':', None)
     for submission_id in submission_ids:
         found_some_posts = True
         if generated:
@@ -313,11 +315,10 @@ def tree_from_database(databasename, specific_submission=None):
             submission = cur.fetchone()
         cur.execute('SELECT * FROM posts WHERE url==?', [submission_id])
         fetched_comments = cur.fetchall()
-        submissiontree = tree_from_submission_comments(submission, fetched_comments)        
-        totaltree.merge_other(submissiontree)
+        submission_tree = tree_from_submission_comments(submission, fetched_comments)
+        yield submission_tree
     if found_some_posts is False:
         raise Exception('Found no submissions!')
-    return totaltree
 
 def tree_from_submission_comments(submission, commentpool):
     '''
@@ -347,8 +348,6 @@ def tree_from_submission_comments(submission, commentpool):
             commentpool.remove(removal)
     return tree
 
-#totaltree = tree_from_database('databases\\botwatch.db')
-#totaltree.printtree(customsort=lambda x: int(x[1].data.created, 36))
 if __name__ == '__main__':
     databasename = sys.argv[1]
     try:

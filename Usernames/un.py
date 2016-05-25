@@ -197,48 +197,6 @@ def count(validonly=False):
         cur.execute('SELECT COUNT(*) FROM users')
     return cur.fetchone()[0]
 
-def everyoneyouveeverinteractedwith(username):
-    '''
-    Not because I should have, but because I was able to.
-    '''
-    max_todo_length = 2 ** 10
-    max_done_length = 2 ** 13
-    def find_interactions(username2):
-        if username2 in done:
-            return
-        process(username2, quiet=True)
-        done.add(username2)
-        while len(done) >= max_done_length:
-            done.pop()
-        if len(todo) >= max_todo_length-100:
-            return
-        try:
-            user = r.get_redditor(username2, fetch=True)
-        except:
-            return
-        comments = user.get_comments(limit=max_todo_length)
-        for comment in comments:
-            author = comment.link_author.lower()
-            if len(todo) > max_todo_length:
-                break
-            if author == '[deleted]':
-                continue
-            if author in done:
-                continue
-            if author in todo:
-                continue
-            print('%s interacted with %s' % (username2, author))
-            todo.add(author)
-    todo = set()
-    done = set()
-    todo.add(username)
-    l = 1
-    while l > 0:
-        find_interactions(todo.pop())
-        l = len(todo)
-        print('Have %d names\r' % l, end='')
-        sys.stdout.flush()
-
 def execit(*args, **kwargs):
     '''
     Allows another module to do stuff here using local names instead of qual names.
@@ -363,14 +321,14 @@ def human(timestamp):
     human = datetime.datetime.strftime(day, "%b %d %Y %H:%M:%S UTC")
     return human
 
-def idlenew(subreddit='all', sleepy=15):
+def idlenew(subreddit='all', limit=100, sleepy=15):
     '''
     Infinitely grab the /new queue and process names, ignoring any
     exceptions. Great for processing while AFK.
     '''
     while True:
         try:
-            get_from_new(subreddit, 100)
+            get_from_new(subreddit, limit)
         except KeyboardInterrupt:
             raise
         except:
