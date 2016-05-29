@@ -62,7 +62,7 @@ def replybot():
         posts += list(subreddit.get_new(limit=MAXPOSTS))
     if DO_COMMENTS:
         posts += list(subreddit.get_comments(limit=MAXPOSTS))
-    post.sort(key=lambda x: x.created_utc)
+    posts.sort(key=lambda x: x.created_utc)
 
     for post in posts:
         # Anything that needs to happen every loop goes here.
