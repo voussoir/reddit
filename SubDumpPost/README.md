@@ -1,6 +1,4 @@
 SubDump - Post version
 =============
 
-This bot searches for posts that contain your keyword, and submits them to an alternate subreddit.
-
-If the KEYWORD list is empty, the bot will dump all posts from the target sub into the other
+Merged with [SubDump](https://github.com/voussoir/reddit/tree/master/SubDump). Use the `DO_LINKPOSTS` and `DO_SELFPOSTS` variables.

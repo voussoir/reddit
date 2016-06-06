@@ -22,6 +22,9 @@ if not os.path.exists(DATABASE_FOLDER):
     os.makedirs(DATABASE_FOLDER)
 DATABASE_SUBREDDIT = '%s/%s.db' % (DATABASE_FOLDER, '%s')
 DATABASE_USER = '%s/@%s.db' % (DATABASE_FOLDER, '%s')
+
+
+
 try:
     import bot
     USERAGENT = bot.aPT
@@ -38,23 +41,87 @@ r = praw.Reddit(USERAGENT)
 r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
 r.refresh_access_information(APP_REFRESH)
 
-SQL_COLUMNCOUNT = 16
-SQL_IDINT = 0
-SQL_IDSTR = 1
-SQL_CREATED = 2
-SQL_SELF = 3
-SQL_NSFW = 4
-SQL_AUTHOR = 5
-SQL_TITLE = 6
-SQL_URL = 7
-SQL_SELFTEXT = 8
-SQL_SCORE = 9
-SQL_SUBREDDIT = 10
-SQL_DISTINGUISHED = 11
-SQL_TEXTLEN = 12
-SQL_NUM_COMMENTS = 13
-SQL_FLAIR_TEXT = 14
-SQL_FLAIR_CSS_CLASS = 15
+SQL_SUBMISSION_COLUMNS = [
+    'idint',
+    'idstr',
+    'created',
+    'self',
+    'nsfw',
+    'author',
+    'title',
+    'url',
+    'selftext',
+    'score',
+    'subreddit',
+    'distinguish',
+    'textlen',
+    'num_comments',
+    'flair_text',
+    'flair_css_class',
+    'augmented_at',
+    'augmented_count',
+]
+
+SQL_COMMENT_COLUMNS = [
+    'idint',
+    'idstr',
+    'created',
+    'author',
+    'parent',
+    'submission',
+    'body',
+    'score',
+    'subreddit',
+    'distinguish',
+    'textlen',
+]
+
+SQL_SUBMISSION = {key:index for (index, key) in enumerate(SQL_SUBMISSION_COLUMNS)}
+SQL_COMMENT = {key:index for (index, key) in enumerate(SQL_COMMENT_COLUMNS)}
+
+prompt_ca_database = '''
+- Database filename
+  Leave blank to do 1 submission
+  ]: '''
+prompt_ca_specific = '''
+- ID of submisson
+  ]: '''
+prompt_ca_limit = '''
+- Limit - number of MoreComments objects to replace.
+  Enter 0 to have no limit and get all.
+  ]: '''
+prompt_ca_threshold = '''
+- Threshold - minimum number of children comments a MoreComments
+  object must have to warrant a replacement.
+  ]: '''
+prompt_ca_numthresh = '''
+- Minimum num_comments a thread must have to be scanned
+  ]: '''
+prompt_ca_skips = '''
+- Skips - Skip ahead by this many threads, to pick up where you left off.
+  ]: '''
+prompt_ca_verbosity = '''
+- Verbosity. 0=quiter, 1=louder
+  ]: '''
+
+prompt_ts_subreddit = '''
+- Subreddit
+  Leave blank to get username instead
+  /r/'''
+prompt_ts_username = '''
+- Get posts from user
+  /u/'''
+prompt_ts_lowerbound = '''
+- Lower bound
+  Leave blank to get ALL POSTS
+  Enter "update" to use last entry
+  ]: '''
+prompt_ts_startinginterval = '''
+- Starting interval
+  Leave blank for standard
+  ]: '''
+
+
 
 def b36(i):
     if type(i) == int:
@@ -82,16 +149,19 @@ def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     return sign + base36
 
 def commentaugment(databasename, limit, threshold, numthresh, skips, verbose, specific_submission=None):
+    '''
+    Take the IDs of collected submissions, and gather comments from those threads.
+    '''
     if specific_submission is not None:
         if not specific_submission.startswith('t3_'):
             specific_submission = 't3_' + specific_submission
-        submission = r.get_submission(submission_id=specific_submission[3:])
-        databasename = submission.subreddit.display_name
+        specific_submission_obj = r.get_submission(submission_id=specific_submission[3:])
+        databasename = specific_submission_obj.subreddit.display_name
 
     databasename = databasename.replace('.db', '')
     databasename = databasename.replace('/', '\\')
     databasename = databasename.split('\\')[-1]
-    databasename = DATABASE_SUBREDDIT % databasename
+    databasename = database_filename(subreddit=databasename)
     #print(databasename)
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
@@ -99,69 +169,56 @@ def commentaugment(databasename, limit, threshold, numthresh, skips, verbose, sp
     initialize_database(sql, cur)
 
     if specific_submission is None:
-        cur.execute('SELECT idstr FROM posts WHERE idstr LIKE "t3_%" AND num_comments > ? ORDER BY num_comments DESC', [numthresh])
+        cur.execute('''
+            SELECT idstr FROM submissions
+            WHERE augmented_at IS NULL
+            AND num_comments > ?
+            ORDER BY num_comments DESC''',
+            [numthresh])
+        fetchall = cur.fetchall()
+        fetchall = [item[0] for item in fetchall]
     else:
-        smartinsert(sql, cur, [submission])
-        cur.execute('SELECT idstr FROM posts WHERE idstr == ?', [specific_submission])
-    fetchall = cur.fetchall()
-    fetchall = [item[0] for item in fetchall]
+        # Make sure the object we're augmenting is in the table too!
+        smartinsert(sql, cur, [specific_submission_obj])
+        fetchall = [specific_submission]
+
     totalthreads = len(fetchall)
 
-    scannedthreads = skips
-    for trashindex, trash in enumerate(fetchall[:skips]):
-        # Use [0] because sql selected only idstr
-        print('Skipping %s, %d / %d' % (trash, trashindex+1, totalthreads))
-    fetchall = fetchall[skips:]
+    if verbose:
+        spacer = '\n\t'
+    else:
+        spacer = ' '
 
+    scannedthreads = 0
     while True:
-        hundred = fetchall[:100]
+        id_batch = fetchall[:100]
         fetchall = fetchall[100:]
-        hundred = list(filter(None, hundred))
-        if len(hundred) == 0:
+        id_batch = list(filter(None, id_batch))
+        if len(id_batch) == 0:
             return
 
-        if verbose:
-            spacer = '\n\t'
-        else:
-            spacer = ' '
-
-        for submission in hundred:
+        for submission in id_batch:
             submission = r.get_submission(submission_id=submission.split('_')[-1])
             print('Processing %s%sexpecting %d | ' % (submission.fullname, spacer, submission.num_comments), end='')
             sys.stdout.flush()
             if verbose:
                 print()
             comments = get_comments_for_thread(submission, limit, threshold, verbose)
-            smartinsert(sql, cur2, comments)
+
+            smartinsert(sql, cur, comments, nosave=True)
+            cur.execute('''
+                UPDATE submissions
+                set augmented_at = ?,
+                augmented_count = ?
+                WHERE idstr == ?''',
+                [get_now(), len(comments), submission.fullname])
+            sql.commit()
+
             scannedthreads += 1
             if verbose:
                 print('\t', end='')
             print('Found %d |%s%d / %d threads complete' % (len(comments), spacer, scannedthreads, totalthreads))
 
-prompt_ca_database = '''
-- Database filename
-  Leave blank to do 1 submission
-  ]: '''
-prompt_ca_specific = '''
-- ID of submisson
-  ]: '''
-prompt_ca_limit = '''
-- Limit - number of MoreComments objects to replace.
-  Enter 0 to have no limit and get all.
-  ]: '''
-prompt_ca_threshold = '''
-- Threshold - minimum number of children comments a MoreComments
-  object must have to warrant a replacement.
-  ]: '''
-prompt_ca_numthresh = '''
-- Minimum num_comments a thread must have to be scanned
-  ]: '''
-prompt_ca_skips = '''
-- Skips - Skip ahead by this many threads, to pick up where you left off.
-  ]: '''
-prompt_ca_verbosity = '''
-- Verbosity. 0=quiter, 1=louder
-  ]: '''
 def commentaugment_prompt():
     print(prompt_ca_database, end='')
     databasename = input()
@@ -206,9 +263,21 @@ def commentaugment_prompt():
     commentaugment(databasename, limit, threshold, numthresh, skips, verbose, specific_submission)
     print('Done')
 
-def existing_databases():
-    files = os.listdir(DATABASE_FOLDER)
-    print(files)
+def database_filename(subreddit=None, username=None):
+    '''
+    Given a subreddit name or username, return the appropriate database filename.
+    '''
+    if bool(subreddit) == bool(username):
+        raise ValueError('One and only one of subreddit and username please')
+    text = subreddit or username
+    if text.endswith('.db'):
+        text = text[:-3]
+    text = text.replace('/', '\\')
+    text = text.split('\\')[-1]
+    if subreddit:
+        return DATABASE_SUBREDDIT % text
+    else:
+        return DATABASE_USER % text
 
 def fixint(i):
     if i == '':
@@ -225,9 +294,9 @@ def get_all_posts(subreddit, lower=None, maxupper=None,
     If lower and upper are None, get ALL posts from the subreddit or user.
     '''
     if usermode is False:
-        databasename = DATABASE_SUBREDDIT % subreddit
+        databasename = database_filename(subreddit=subreddit)
     else:
-        databasename = DATABASE_USER % usermode
+        databasename = database_filename(username=usermode)
 
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
@@ -243,11 +312,11 @@ def get_all_posts(subreddit, lower=None, maxupper=None,
     if lower == 'update':
         # Get the item with the highest ID number, and use it's
         # timestamp as the lower.
-        cur.execute('SELECT * FROM posts ORDER BY idint DESC LIMIT 1')
+        cur.execute('SELECT * FROM submissions ORDER BY idint DESC LIMIT 1')
         f = cur.fetchone()
         if f:
-            lower = f[SQL_CREATED]
-            print(f[SQL_IDSTR], human(lower), lower)
+            lower = f[SQL_SUBMISSION['created']]
+            print(f[SQL_SUBMISSION['idstr']], human(lower), lower)
         else:
             lower = None
 
@@ -322,8 +391,8 @@ def get_all_posts(subreddit, lower=None, maxupper=None,
             smartinsert(sql, cur, searchresults)
         print()
 
-    cur.execute('SELECT COUNT(idint) FROM posts')
-    itemcount = cur.fetchone()[SQL_IDINT]
+    cur.execute('SELECT COUNT(idint) FROM submissions')
+    itemcount = cur.fetchone()[SQL_SUBMISSION['idint']]
     print('Ended with %d items in %s' % (itemcount, databasename))
     sql.close()
     del cur
@@ -335,18 +404,20 @@ def get_comments_for_thread(submission, limit, threshold, verbose):
     comments = manually_replace_comments(comments, limit, threshold, verbose)
     return comments
 
+def get_now(stamp=True):
+    now = datetime.datetime.now(datetime.timezone.utc)
+    if stamp:
+        return int(now.timestamp())
+    return now
+
 def human(timestamp):
     x = datetime.datetime.utcfromtimestamp(timestamp)
     x = datetime.datetime.strftime(x, "%b %d %Y %H:%M:%S")
     return x
 
-def humannow():
-    x = datetime.datetime.now(datetime.timezone.utc).timestamp()
-    x = human(x)
-    return x
-
 def initialize_database(sql, cur):
-    cur.execute('''CREATE TABLE IF NOT EXISTS posts(
+    cur.execute(
+        '''CREATE TABLE IF NOT EXISTS submissions(
         idint INT,
         idstr TEXT,
         created INT,
@@ -362,8 +433,25 @@ def initialize_database(sql, cur):
         textlen INT,
         num_comments INT,
         flair_text TEXT,
-        flair_css_class TEXT)''')
-    cur.execute('CREATE INDEX IF NOT EXISTS idstrindex ON posts(idstr)')
+        flair_css_class TEXT,
+        augmented_at INT,
+        augmented_count INT)''')
+    cur.execute(
+        '''CREATE TABLE IF NOT EXISTS comments(
+        idint INT,
+        idstr TEXT,
+        created INT,
+        author TEXT,
+        parent TEXT,
+        submission TEXT,
+        body TEXT,
+        score INT,
+        subreddit TEXT,
+        distinguish TEXT,
+        textlen INT)''')
+
+    cur.execute('CREATE INDEX IF NOT EXISTS submission_index ON submissions(idstr)')
+    cur.execute('CREATE INDEX IF NOT EXISTS comment_index ON comments(idstr)')
 
 def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=True, comments=False, debug=False):
     '''
@@ -379,13 +467,13 @@ def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=
 
     if subreddit:
         print('Getting subreddit %s' % subreddit)
-        sql = sqlite3.connect(DATABASE_SUBREDDIT % subreddit)
+        sql = sqlite3.connect(database_filename(subreddit=subreddit))
         item = r.get_subreddit(subreddit)
         submissions = item.get_new if submissions else None
         comments = item.get_comments if comments else None
     else:
         print('Getting redditor %s' % username)
-        sql = sqlite3.connect(DATABASE_USER % username)
+        sql = sqlite3.connect(database_filename(username=username))
         item = r.get_redditor(username)
         submissions = item.get_submitted if submissions else None
         comments = item.get_comments if comments else None
@@ -398,7 +486,7 @@ def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=
             bot.refresh(r)  # personal use
             items = livestreamer(limit=limit)
             newitems = smartinsert(sql, cur, items)
-            print('%s +%d' % (humannow(), newitems), end='')
+            print('%s +%d' % (human(get_now()), newitems), end='')
             if newitems == 0:
                 print('\r', end='')
             else:
@@ -418,22 +506,21 @@ def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=
             time.sleep(5)
 hangman = lambda: livestream(username='gallowboob', sleepy=60, submissions=True, comments=True)
 
-def livestream_helper(submissions=None, comments=None, debug=False, *a, **k):
+def livestream_helper(submission_function=None, comment_function=None, debug=False, *a, **k):
     '''
     Given a submission-retrieving function and/or a comment-retrieving function,
     collect submissions and comments in a list together and return that.
-
     '''
-    if (submissions, comments) == (None, None):
+    if (submission_function, comment_function) == (None, None):
         raise TypeError('livestream helper got double Nones')
     results = []
 
-    if submissions:
+    if submission_function:
         if debug: print('Getting submissions', a, k)
-        results += list(submissions(*a, **k))
-    if comments:
+        results += list(submission_function(*a, **k))
+    if comment_function:
         if debug: print('Getting comments', a, k)
-        results += list(comments(*a, **k))
+        results += list(comment_function(*a, **k))
     if debug:
         print('Collected. Saving...')
     return results
@@ -452,12 +539,11 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
     comments = []
     morecomments = []
     while len(incomments) > 0:
-        item = incomments[0]
+        item = incomments.pop()
         if isinstance(item, praw.objects.MoreComments) and item.count >= threshold:
             morecomments.append(item)
         elif isinstance(item, praw.objects.Comment):
             comments.append(item)
-        incomments = incomments[1:]
 
     try:
         while True:
@@ -467,8 +553,6 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
                 break
             morecomments.sort(key=lambda x: x.count)
             mc = morecomments.pop()
-            #mc = morecomments[0]
-            #morecomments = morecomments[1:]
             additional = nofailrequest(mc.comments)()
             additionals = 0
             if limit is not None:
@@ -518,7 +602,7 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
     '''
     Insert the data into the database
     Or update the listing if it already exists
-    `results` is a list of submissions
+    `results` is a list of submission or comment objects
     `delaysave` commits after all inserts
     `nosave` does not commit
 
@@ -526,73 +610,78 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
     '''
     newposts = 0
     for o in results:
-        cur.execute('SELECT * FROM posts WHERE idstr=?', [o.fullname])
-        if not cur.fetchone():
-            newposts += 1
-            try:
-                o.authorx = o.author.name
-            except AttributeError:
-                o.authorx = '[DELETED]'
+        author = o.author.name if o.author else '[DELETED]'
 
-            postdata = [None] * SQL_COLUMNCOUNT
-
-            if isinstance(o, praw.objects.Submission):
+        if isinstance(o, praw.objects.Submission):
+            cur.execute('SELECT * FROM submissions WHERE idstr == ?', [o.fullname])
+            if not cur.fetchone():
+                newposts += 1
+                postdata = [None] * len(SQL_SUBMISSION)
                 if o.is_self:
                     o.url = None
-                postdata[SQL_IDINT] = b36(o.id)
-                postdata[SQL_IDSTR] = o.fullname
-                postdata[SQL_CREATED] = o.created_utc
-                postdata[SQL_SELF] = o.is_self
-                postdata[SQL_NSFW] = o.over_18
-                postdata[SQL_AUTHOR] = o.authorx
-                postdata[SQL_TITLE] = o.title
-                postdata[SQL_URL] = o.url
-                postdata[SQL_SELFTEXT] = o.selftext
-                postdata[SQL_SCORE] = o.score
-                postdata[SQL_SUBREDDIT] = o.subreddit.display_name
-                postdata[SQL_DISTINGUISHED] = o.distinguished
-                postdata[SQL_TEXTLEN] = len(o.selftext)
-                postdata[SQL_NUM_COMMENTS] = o.num_comments
-                postdata[SQL_FLAIR_TEXT] = o.link_flair_text
-                postdata[SQL_FLAIR_CSS_CLASS] = o.link_flair_css_class
 
-            if isinstance(o, praw.objects.Comment):
-                postdata[SQL_IDINT] = b36(o.id)
-                postdata[SQL_IDSTR] = o.fullname
-                postdata[SQL_CREATED] = o.created_utc
-                postdata[SQL_SELF] = None
-                postdata[SQL_NSFW] = None
-                postdata[SQL_AUTHOR] = o.authorx
-                postdata[SQL_TITLE] = o.parent_id
-                postdata[SQL_URL] = o.link_id
-                postdata[SQL_SELFTEXT] = o.body
-                postdata[SQL_SCORE] = o.score
-                postdata[SQL_SUBREDDIT] = o.subreddit.display_name
-                postdata[SQL_DISTINGUISHED] = o.distinguished
-                postdata[SQL_TEXTLEN] = len(o.body)
-                postdata[SQL_NUM_COMMENTS] = None
-                postdata[SQL_FLAIR_TEXT] = None
-                postdata[SQL_FLAIR_CSS_CLASS] = None
+                postdata[SQL_SUBMISSION['idint']] = b36(o.id)
+                postdata[SQL_SUBMISSION['idstr']] = o.fullname
+                postdata[SQL_SUBMISSION['created']] = o.created_utc
+                postdata[SQL_SUBMISSION['self']] = o.is_self
+                postdata[SQL_SUBMISSION['nsfw']] = o.over_18
+                postdata[SQL_SUBMISSION['author']] = author
+                postdata[SQL_SUBMISSION['title']] = o.title
+                postdata[SQL_SUBMISSION['url']] = o.url
+                postdata[SQL_SUBMISSION['selftext']] = o.selftext
+                postdata[SQL_SUBMISSION['score']] = o.score
+                postdata[SQL_SUBMISSION['subreddit']] = o.subreddit.display_name
+                postdata[SQL_SUBMISSION['distinguish']] = o.distinguished
+                postdata[SQL_SUBMISSION['textlen']] = len(o.selftext)
+                postdata[SQL_SUBMISSION['num_comments']] = o.num_comments
+                postdata[SQL_SUBMISSION['flair_text']] = o.link_flair_text
+                postdata[SQL_SUBMISSION['flair_css_class']] = o.link_flair_css_class
 
-            cur.execute('''INSERT INTO posts VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', postdata)
-        else:
-            postdata = [None] * 5
-            
-            if isinstance(o, praw.objects.Submission):
-                postdata[0] = o.score
-                postdata[1] = o.num_comments
-                postdata[2] = o.selftext
-                postdata[3] = o.distinguished
-            
-            if isinstance(o, praw.objects.Comment):
-                postdata[0] = o.score
-                postdata[1] = None
-                postdata[2] = o.body
-                postdata[3] = o.distinguished
+                cur.execute('''INSERT INTO submissions VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', postdata)
+            else:
+                cur.execute('''
+                    UPDATE submissions SET
+                    nsfw = coalesce(?, nsfw),
+                    score = coalesce(?, score),
+                    selftext = coalesce(?, selftext),
+                    distinguish = coalesce(?, distinguish),
+                    num_comments = coalesce(?, num_comments),
+                    flair_text = coalesce(?, flair_text),
+                    flair_css_class = coalesce(?, flair_css_class)
+                    WHERE idstr == ?
+                ''',
+                [o.over_18, o.score, o.selftext, o.distinguished, o.num_comments,
+                o.link_flair_text, o.link_flair_css_class, o.fullname])
 
-            postdata[-1] = o.fullname
+        if isinstance(o, praw.objects.Comment):
+            cur.execute('SELECT * FROM comments WHERE idstr == ?', [o.fullname])
 
-            cur.execute('UPDATE posts SET score=?, num_comments=?, selftext=?, distinguish=? WHERE idstr=?', postdata)
+            if not cur.fetchone():
+                newposts += 1
+                postdata = [None] * len(SQL_COMMENT)
+
+                postdata[SQL_COMMENT['idint']] = b36(o.id)
+                postdata[SQL_COMMENT['idstr']] = o.fullname
+                postdata[SQL_COMMENT['created']] = o.created_utc
+                postdata[SQL_COMMENT['author']] = author
+                postdata[SQL_COMMENT['parent']] = o.parent_id
+                postdata[SQL_COMMENT['submission']] = o.link_id
+                postdata[SQL_COMMENT['body']] = o.body
+                postdata[SQL_COMMENT['score']] = o.score
+                postdata[SQL_COMMENT['subreddit']] = o.subreddit.display_name
+                postdata[SQL_COMMENT['distinguish']] = o.distinguished
+                postdata[SQL_COMMENT['textlen']] = len(o.body)
+
+                cur.execute('''INSERT INTO comments VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', postdata)
+            else:
+                cur.execute('''
+                    UPDATE comments SET
+                    score = coalesce(?, score),
+                    body = coalesce(?, body),
+                    distinguish = coalesce(?, distinguish)
+                    WHERE idstr == ?
+                ''',
+                [o.score, o.body, o.distinguished, o.fullname])
 
         if not delaysave and not nosave:
             sql.commit()
@@ -600,22 +689,6 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
         sql.commit()
     return newposts
 
-prompt_ts_subreddit = '''
-- Subreddit
-  Leave blank to get username instead
-  /r/'''
-prompt_ts_username = '''
-- Get posts from user
-  /u/'''
-prompt_ts_lowerbound = '''
-- Lower bound
-  Leave blank to get ALL POSTS
-  Enter "update" to use last entry
-  ]: '''
-prompt_ts_startinginterval = '''
-- Starting interval
-  Leave blank for standard
-  ]: '''
 def timesearch_prompt():
     while True:
         usermode = False
@@ -628,9 +701,9 @@ def timesearch_prompt():
             usermode = input()
             sub = 'all'
         if usermode:
-            p = DATABASE_USER % usermode
+            p = database_filename(username=usermode)
         else:
-            p = DATABASE_SUBREDDIT % sub
+            p = database_filename(subreddit=sub)
         if os.path.exists(p):
             print('Found %s' % p)
         print(prompt_ts_lowerbound, end='')
@@ -665,9 +738,7 @@ def updatescores(databasename, submissions=True, comments=False):
     Get all submissions or comments from the database, and update
     them with the current scores.
     '''
-
-    databasename = databasename.replace('.db', '')
-    databasename = DATABASE_SUBREDDIT % databasename
+    databasename = database_filename(subreddit=databasename)
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
     cur2 = sql.cursor()
@@ -691,7 +762,7 @@ def updatescores(databasename, submissions=True, comments=False):
         for x in range(100):
             x = cur.fetchone()
             if x is not None:
-                f.append(x[SQL_IDSTR])
+                f.append(x[SQL_SUBMISSION['idstr']])
         if len(f) == 0:
             break
         posts = r.get_info(thing_id=f)

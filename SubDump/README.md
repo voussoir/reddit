@@ -1,11 +1,14 @@
 SubDump
 =============
 
-This was almost entirely ripped from Novella.
+- 2016 06 05
+    - Merged SubDumpPosts with this. Use the `DO_LINKPOSTS` and `DO_SELFPOSTS` variables. I have not yet fully tested it.
 
-This bot searches for comments that contain your keyword, and saves them. You can choose any or all of three modes
+&nbsp;
 
-- Reddit Saving. PRAW doesn't allow you to save comments. No clue why. Bot will save the submission to its account
+This bot searches for comments or submissions that contain your keyword, and saves them. You can choose any or all of three modes
+
+- Reddit Saving.
 
 - MAILME. Bot will construct a list at the end of the cycle and send it to you. 
 

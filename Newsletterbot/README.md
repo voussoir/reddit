@@ -1,6 +1,9 @@
 Newsletterbot
 =============
 
+- 2016 06 05
+    - MULTIREDDITS. Newsletterly now properly uses multireddits to find posts in lots of subreddits at once. This reduces the amount of fine-tuning I can do on a per-subreddit basis, but the speed benefits are worth the trade off. If you are running a copy of Newsletterly you'll need to migrate all active subscription subreddits to one or more multireddits on the bot's account. Order and grouping does not matter.
+
 - 2016 04 15
     - Added broadcast functionality to send a message to all subscribers. Not operable via PM yet.
     - Added deletion functionality to remove inactive users. Everyone must send the bot a message within a certain time span, indicating they are active.

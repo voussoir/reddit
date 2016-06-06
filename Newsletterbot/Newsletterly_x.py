@@ -29,6 +29,8 @@ ADMINS = ["GoldenSights"]
 # turn off.
 # The first name on the list will receive the error messages.
 
+MULTIREDDIT_NAME_LENGTH = 21
+
 MAX_PER_MESSAGE = 20
 # Only this many posts may be compiled into a newsletter
 # to avoid massive walls of text
@@ -43,7 +45,7 @@ MAX_SUBSCRIPTION_POSTS_PER_HOUR = 2
 MESSAGE_DELETION_DROPPED = """
 Hi {username},
 
-On {warned_at}, you received a message regarding the cleanup of inactive
+On {warned_at}, your account was marked to have its
 Newsletterly users. Because you did not respond to that message, your subscriptions
 have been dropped. You may re-subscribe at any time.
 
@@ -123,11 +125,13 @@ WAITS = str(WAIT)
 
 sql = sqlite3.connect('newsletterly.db')
 cur = sql.cursor()
-cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
-cur.execute('CREATE INDEX IF NOT EXISTS oldpostindex ON oldposts(ID)')
-cur.execute('CREATE TABLE IF NOT EXISTS subscribers(name TEXT, reddit TEXT)')
-cur.execute('CREATE TABLE IF NOT EXISTS spool(name TEXT, message TEXT)')
 cur.execute('CREATE TABLE IF NOT EXISTS flag_deletion(username TEXT, warned_at INT, delete_at INT)')
+cur.execute('CREATE TABLE IF NOT EXISTS multireddits(subreddit TEXT, multireddit TEXT)')
+cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT)')
+cur.execute('CREATE TABLE IF NOT EXISTS spool(name TEXT, message TEXT)')
+cur.execute('CREATE TABLE IF NOT EXISTS subscribers(name TEXT, reddit TEXT)')
+
+cur.execute('CREATE INDEX IF NOT EXISTS oldpostindex on oldposts(id)')
 sql.commit()
 
 # Sqlite column names
@@ -139,12 +143,58 @@ r = praw.Reddit(USERAGENT)
 r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
 r.refresh_access_information(APP_REFRESH)
 
+# multireddit.add_subreddit is currently experiencing a bug under OAuth
+# because it's expecting the session to have a modhash. It means nothing.
+r.modhash = 'newsletters'
+
 #import bot
 #r = bot.o7()
 
 print('I am /u/%s' % r.user.name)
 
-def add_subscription(user, subreddit):
+def add_subreddit_to_multireddit(subreddit):
+    '''
+    Ensure that this subreddit is part of a multireddit, creating a new multi
+    if necessary.
+
+    Multireddits are not grouped by any criteria. Any multi with an open slot
+    will take this subreddit, or a new multi will be created.
+    '''
+    subreddit = normalize(subreddit)
+    printlog('Assigning /r/%s to a multireddit' % subreddit)
+    if get_subscriptions(subreddit=subreddit):
+        # Someone else is already subscribed here, so it must already be part
+        # of a multi.
+        return
+
+    # Originally I was going to keep multireddit-subreddit mappings in the local
+    # database, but decided against it because that makes it harder to edit the
+    # multis online and have the changes reflect.
+    r.handler.clear_cache()
+    my_multireddits = r.get_my_multireddits()
+    for multireddit in my_multireddits:
+        if len(multireddit.subreddits) >= 100:
+            continue
+
+        try:
+            multireddit.add_subreddit(subreddit)
+        except praw.errors.HTTPError as e:
+            if e._raw.status_code == 409:
+                # The multi is full
+                # Already checked for len < 100 but just in case...
+                pass
+            else:
+                raise
+        else:
+            break
+    else:
+        # No open multi was found
+        multireddit = create_multireddit()
+        multireddit.add_subreddit(subreddit)
+
+    print('Added /r/%s to /m/%s' % (subreddit, multireddit.name))
+
+def add_subscription(user, subreddit, bypass_pph=False):
     user = normalize(user)
     subreddit = normalize(subreddit)
     try:
@@ -157,23 +207,31 @@ def add_subscription(user, subreddit):
             praw.errors.OAuthException,
             praw.errors.RedirectException,
             ):
-        printlog('\tSubreddit does not exist')
+        printlog('Subreddit does not exist')
         return (MESSAGE_SUBREDDIT_FAIL % subreddit)
 
-    pph = get_posts_per_hour(subreddit)
-    if pph > MAX_SUBSCRIPTION_POSTS_PER_HOUR:
-        return (MESSAGE_SUBSCRIBE_BLACKLISTED % subreddit)
-    cur.execute('SELECT * FROM subscribers WHERE LOWER(name) == ? AND LOWER(reddit) == ?', [user, subreddit])
-    if cur.fetchone():
-        printlog('\t%s is already subscribed to %s' % (user, subreddit))
+    if not bypass_pph:
+        pph = get_posts_per_hour(subreddit)
+        if pph > MAX_SUBSCRIPTION_POSTS_PER_HOUR:
+            return (MESSAGE_SUBSCRIBE_BLACKLISTED % subreddit)
+
+    if get_subscriptions(user=user, subreddit=subreddit):
+        printlog('%s is already subscribed to %s' % (user, subreddit))
         return (MESSAGE_SUBSCRIBE_ALREADY % subreddit)
-    else:
-        cur.execute('INSERT INTO subscribers VALUES(?, ?)', [user, subreddit])
-        sql.commit()
-        printlog('\t%s has subscribed to %s' % (user, subreddit))
-        return (MESSAGE_SUBSCRIBE % subreddit)
+
+    add_subreddit_to_multireddit(subreddit)
+
+    cur.execute('INSERT INTO subscribers VALUES(?, ?)', [user, subreddit])
+    sql.commit()
+    printlog('%s has subscribed to %s' % (user, subreddit))
+    return (MESSAGE_SUBSCRIBE % subreddit)
 
 def add_to_spool(user, message, do_commit=True):
+    '''
+    Spool a message to be sent at a later time by the spool handler.
+    This keeps message sending separate from other operations and helps
+    isolate error handling.
+    '''
     if isinstance(user, praw.objects.Redditor):
         user = user.name
     user = user.lower()
@@ -188,16 +246,15 @@ def add_to_spool(user, message, do_commit=True):
 
 def broadcast(message):
     '''
-    Send this message to *ALL* users.
+    Spool this message for *ALL* users.
     '''
-    cur.execute('SELECT * FROM subscribers')
-    usernames = cur.fetchall()
+    subscriptions = get_subscriptions(user=None, subreddit=None)
     usernames = [item[SQL_USERNAME] for item in usernames]
-    usernames = list(set(usernames))
+    usernames = set(usernames)
     messages = 0
     for username in usernames:
-        status = add_to_spool(username, message)
-        if status:
+        new_message = add_to_spool(username, message)
+        if new_message:
             messages += 1
     printlog('Added %d messages to the spool.' % messages)
 
@@ -244,42 +301,63 @@ def count_subscriptions():
     cur.execute('SELECT COUNT(*) FROM subscribers')
     return cur.fetchone()[0]
 
+def create_multireddit():
+    '''
+    Create a new multireddit with a random name. Return the new object.
+    '''
+    for retry in range(10):
+        new_multi = uid(MULTIREDDIT_NAME_LENGTH)
+        try:
+            # In case the planets align
+            existing = r.get_multireddit(SELF_USERNAME, new_multi)
+            existing.id
+        except praw.errors.NotFound:
+            break
+    else:
+        raise Exception('Couldnt create a unique multireddit')
+    multireddit = r.create_multireddit(new_multi)
+    print('Created /m/%s' % multireddit.name)
+    return multireddit
+
 def drop_from_spool(rowid):
     cur.execute('DELETE FROM spool WHERE ROWID == ?', [rowid])
     sql.commit()
 
 def drop_subscription(user, subreddit, do_commit=True):
-    subreddit = subreddit.lower()
-    subreddit = subreddit.replace('/r/', '')
-    subreddit = subreddit.replace('r/', '')
+    user = normalize(user)
+    subreddit = normalize(subreddit)
     if user is None:
         # This happens on 403 Forbidden when making newsletters
         printlog('Removing all subscriptions to /r/%s' % subreddit)
         cur.execute('DELETE FROM subscribers WHERE LOWER(reddit) == ?', [subreddit])
         return ''
 
-    user = user.lower()
     if subreddit == 'all':
-        cur.execute('SELECT * FROM subscribers WHERE LOWER(name) == ?', [user])
-        if cur.fetchone():
+        subreddits_to_remove = []
+        subscriptions = get_subscriptions(user=user)
+        subreddits_to_remove.extend(subscriptions)
+        if subscriptions:
             cur.execute('DELETE FROM subscribers WHERE LOWER(name) == ?', [user])
             if do_commit:
                 sql.commit()
-            printlog('\t%s has unsubscribed from everything' % user)
+            printlog('%s has unsubscribed from everything' % user)
+            for subreddit in subreddits_to_remove:
+                remove_subreddit_from_multireddit(subreddit)
             return MESSAGE_UNSUBSCRIBE_ALL
         else:
-            printlog('\t%s doesnt have any subscriptions' % user)
+            printlog('%s doesnt have any subscriptions' % user)
             return MESSAGE_UNSUBSCRIBE_ALREADY_ALL
 
-    cur.execute('SELECT * FROM subscribers WHERE LOWER(name) == ? AND LOWER(reddit) == ?', [user, subreddit])
-    if cur.fetchone():
+    subscription = get_subscriptions(user=user, subreddit=subreddit)
+    if subscription:
         cur.execute('DELETE FROM subscribers WHERE LOWER(name) == ? AND LOWER(reddit) == ?', [user, subreddit])
         if do_commit:
             sql.commit()
-        printlog('\t%s has unsubscribed from %s' % (user, subreddit))
+        printlog('%s has unsubscribed from %s' % (user, subreddit))
+        remove_subreddit_from_multireddit(subscription[SQL_SUBREDDIT])
         return (MESSAGE_UNSUBSCRIBE % subreddit)
     else:
-        printlog('\t%s is already unsubscribed from %s' % (user, subreddit))
+        printlog('%s is already unsubscribed from %s' % (user, subreddit))
         return (MESSAGE_UNSUBSCRIBE_ALREADY % subreddit)
 
 def flag_for_deletion(username, seconds_from_now, message=None, do_commit=True):
@@ -585,20 +663,21 @@ def manage_posts():
 
     # Compile sets of all our subscribers
     printlog('Managing subscriptions.')
-    submissions_per_subreddit = {}
     subscriptions_per_user = {}
     users_per_subreddit = {}
     all_subreddits = set()
-    all_new_submissions = set()
-    formatted_submissions = {}
 
-    cur.execute('SELECT * FROM subscribers')
-    for entry in fetchgenerator(cur):
-        user = entry[0].lower()
-        subreddit = entry[1].lower()
-        subscriptions_per_user[user] = subscriptions_per_user.get(user, set()).union(set([subreddit]))
-        users_per_subreddit[subreddit] = users_per_subreddit.get(subreddit, set()).union(set([user]))
+    for subscription in get_subscriptions():
+        user = normalize(subscription[SQL_USERNAME])
+        subreddit = normalize(subscription[SQL_SUBREDDIT])
+
+        subscriptions_per_user.setdefault(user, set())
+        subscriptions_per_user[user].add(subreddit)
+        users_per_subreddit.setdefault(subreddit, set())
+        users_per_subreddit[subreddit].add(user)
+
         all_subreddits.add(subreddit)
+
     all_subreddits = list(all_subreddits)
     all_subreddits.sort(key=str.lower)
 
@@ -607,37 +686,32 @@ def manage_posts():
     # which are already in the database, and add the rest
     # to the submissions_per_subreddit dictionary, and render
     # them into text that can be sent in the newsletter.
-    for subreddit in all_subreddits:
-        printlog('Checking /r/%s: ' % subreddit, end='')
-        sys.stdout.flush()
-        subreddit_obj = r.get_subreddit(subreddit)
+    r.handler.clear_cache()
+    total_submissions = []
+    my_multireddits = r.get_my_multireddits()
+    for multireddit in my_multireddits:
+        print('Checking /m/%s' % multireddit.name)
+        total_submissions.extend(multireddit.get_new(limit=100))
 
-        try:
-            submissions = list(subreddit_obj.get_new(limit=100))
-        except praw.errors.Forbidden:
-            # Subreddit has become private or banned?
-            message = MESSAGE_UNSUBSCRIBE_PRIVATIZED % subreddit
-            message += MESSAGE_FOOTER
-            for user in users_per_subreddit[subreddit]:
-                add_to_spool(user, message)
-            # Drop all subcscriptions to this subreddit.
-            drop_subscription(user=None, subreddit=subreddit)
-            submissions_per_subreddit[subreddit] = []
+    keep_submissions = []
+    submissions_per_subreddit = {}
+    formatted_submissions = {}
+
+    # Discard old submissions, and sort the new ones into their subreddit bucket.
+    for submission in total_submissions:
+        cur.execute('SELECT * FROM oldposts WHERE id == ?', [submission.id])
+        if cur.fetchone():
             continue
 
-        keep_submissions = []
-        for submission in submissions:
-            cur.execute('SELECT * FROM oldposts WHERE id == ?', [submission.id])
-            if cur.fetchone():
-                continue
-            all_new_submissions.add(submission.id)
-            keep_submissions.append(submission)
-        submissions_per_subreddit[subreddit] = keep_submissions
-        for submission in keep_submissions:
-            formatted_submissions[submission.id] = format_post(submission)
-        printlog(len(keep_submissions))
+        subreddit = normalize(submission.subreddit.display_name)
+        keep_submissions.append(submission)
+        submissions_per_subreddit.setdefault(subreddit, list())
+        submissions_per_subreddit[subreddit].append(submission)
+        formatted_submissions[submission.id] = format_post(submission)
 
-    if len(all_new_submissions) == 0:
+    print('Found %d new submissions' % len(keep_submissions))
+
+    if len(keep_submissions) == 0:
         return
 
     print()
@@ -645,10 +719,13 @@ def manage_posts():
     # from the submissions_per_subreddit dict, then compile a message
     # and add the message to the spool
     printlog('Compiling per-user newsletters.')
-    for (user, subreddits) in subscriptions_per_user.items():
+
+    for (user, users_subreddits) in subscriptions_per_user.items():
         submissions_for_user = []
-        for subreddit in subreddits:
-            submissions_for_user += submissions_per_subreddit[subreddit]
+        for subreddit in users_subreddits:
+            if subreddit in submissions_per_subreddit:
+                submissions_for_user.extend(submissions_per_subreddit[subreddit])
+
         if len(submissions_for_user) == 0:
             continue
         submissions_for_user.sort(key=lambda x: x.created_utc, reverse=True)
@@ -665,9 +742,23 @@ def manage_posts():
             add_to_spool(user, message, do_commit=False)
 
     # Finally, mark all the submissions in the database.
-    for submission in all_new_submissions:
-        cur.execute('INSERT INTO oldposts VALUES(?)', [submission])
+    for submission in keep_submissions:
+        cur.execute('INSERT INTO oldposts VALUES(?)', [submission.id])
     sql.commit()
+
+
+        # try:
+        #     submissions = list(subreddit_obj.get_new(limit=100))
+        # except praw.errors.Forbidden:
+        #     # Subreddit has become private or banned?
+        #     message = MESSAGE_UNSUBSCRIBE_PRIVATIZED % subreddit
+        #     message += MESSAGE_FOOTER
+        #     for user in users_per_subreddit[subreddit]:
+        #         add_to_spool(user, message, do_commit=False)
+        #     # Drop all subcscriptions to this subreddit.
+        #     drop_subscription(user=None, subreddit=subreddit, do_commit=True)
+        #     submissions_per_subreddit[subreddit] = []
+        #     continue    
 
 def manage_spool():
     '''
@@ -725,8 +816,42 @@ def printlog(*args, **kwargs):
     args = [to_printable(x) for x in args]
     print(*args, **kwargs)
 
+def remove_subreddit_from_multireddit(subreddit, only_unused=True):
+    '''
+    Go through our multireddits and remove this subreddit from them.
+
+    Keep `only_unused` True to make sure you don't remove an active subscription.
+    '''
+    subreddit = normalize(subreddit)
+    if get_subscriptions(subreddit=subreddit):
+        # Someone else needs this
+        return
+
+    my_multireddits = r.get_my_multireddits()
+    for multireddit in my_multireddits:
+        if any(subreddit == s.display_name.lower() for s in multireddit.subreddits):
+            multireddit.remove_subreddit(subreddit)
+        print(multireddit.subreddits)
+        if len(multireddit.subreddits) == 1:
+            # This must have been the only subreddit in there.
+            printlog('Deleting /m/%s' % multireddit.name)
+            multireddit.delete()
+
+    print('Removed /r/%s from multireddits' % subreddit)
+
 def to_printable(s):
     return ''.join(character for character in s if character in string.printable)
+
+def uid(length=8):
+    '''
+    Generate a urandom hex string of `length` characters.
+    '''
+    import os
+    import math
+    identifier = ''.join('{:02x}'.format(x) for x in os.urandom(math.ceil(length / 2)))
+    if len(identifier) > length:
+        identifier = identifier[:length]
+    return identifier
 
 def unflag_for_deletion(username, do_commit=True):
     username = normalize(username)
