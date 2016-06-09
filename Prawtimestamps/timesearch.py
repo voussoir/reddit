@@ -30,14 +30,16 @@ timesearch:
     -l | --lower:
         If a number - the unix timestamp to start at.
         If "update" - continue from latest submission in db.
-        If not provided - start from the subreddit's creation date.
+        Default: update
 
     -up | --upper:
         If a number - the unix timestamp to stop at.
         If not provided - stop at current time.
+        Default: current time
 
     -i | --interval:
         The initial interval for the scanning window.
+        Default: 86400
 
 commentaugment:
     Collect comments for the submissions in the database.
@@ -50,12 +52,15 @@ commentaugment:
     flags:
     -l | --limit:
         The number of MoreComments objects to replace.
+        Default: No limit
 
     -t | --threshold:
         The number of comments a MoreComments object must claim to have for us to open it.
+        Default: >= 0
 
     -n | --num_thresh:
         The number of comments a submission must claim to have for us to scan it at all.
+        Default: >= 1
 
     -s | --specific:
         Given a submission ID in the form t3_xxxxxxx, scan only that submission.
