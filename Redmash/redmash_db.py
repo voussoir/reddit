@@ -161,41 +161,41 @@ def work(listfile):
 def writefiles():
 	print('Writing time files')
 	listfile = preparefile('_date')
-	cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY created DESC', [SCORETHRESH])
+	cur.execute('SELECT * FROM submissions WHERE score >= ? ORDER BY created DESC', [SCORETHRESH])
 	work(listfile)
 	closefile(listfile)
 	
 	print('Writing title files')
 	listfile = preparefile('_title')
-	cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY title ASC', [SCORETHRESH])
+	cur.execute('SELECT * FROM submissions WHERE score >= ? ORDER BY title ASC', [SCORETHRESH])
 	work(listfile)
 	closefile(listfile)
 
 	print('Writing score files')
 	listfile = preparefile('_score')
-	cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY score DESC', [SCORETHRESH])
+	cur.execute('SELECT * FROM submissions WHERE score >= ? ORDER BY score DESC', [SCORETHRESH])
 	work(listfile)
 	closefile(listfile)
 	
 	if USERMODE is False:
 		print('Writing author files')
 		listfile = preparefile('_author')
-		cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY author ASC', [SCORETHRESH])
+		cur.execute('SELECT * FROM submissions WHERE score >= ? ORDER BY author ASC', [SCORETHRESH])
 		work(listfile)
 		closefile(listfile)
 
 	if USERMODE is True:
 		print('Writing subreddit files')
 		listfile = preparefile('_subreddit')
-		cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY subreddit ASC', [SCORETHRESH])
+		cur.execute('SELECT * FROM submissions WHERE score >= ? ORDER BY subreddit ASC', [SCORETHRESH])
 		work(listfile)
 		closefile(listfile)
 	
 	print('Writing flair file')
 	listfile = preparefile('_flair')
-	cur.execute('SELECT * FROM posts WHERE score >= ? AND flair_text IS NOT NULL ORDER BY flair_text, created ASC', [SCORETHRESH])
+	cur.execute('SELECT * FROM submissions WHERE score >= ? AND flair_text IS NOT NULL ORDER BY flair_text, created ASC', [SCORETHRESH])
 	work(listfile)
-	cur.execute('SELECT * FROM posts WHERE score >= ? AND flair_text IS NULL ORDER BY flair_text, created ASC', [SCORETHRESH])
+	cur.execute('SELECT * FROM submissions WHERE score >= ? AND flair_text IS NULL ORDER BY flair_text, created ASC', [SCORETHRESH])
 	work(listfile)
 	closefile(listfile)
 
@@ -205,9 +205,9 @@ def breakdown(doreturn=False, mode='user'):
 	print('\nBreaking it down...')
 	listfile = preparefile('')
 	if mode == 'subreddit':
-		cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY author ASC', [SCORETHRESH])
+		cur.execute('SELECT * FROM submissions WHERE score >= ? ORDER BY author ASC', [SCORETHRESH])
 	if mode == 'user':
-		cur.execute('SELECT * FROM posts WHERE score >= ? ORDER BY subreddit ASC', [SCORETHRESH])
+		cur.execute('SELECT * FROM submissions WHERE score >= ? ORDER BY subreddit ASC', [SCORETHRESH])
 	count_submissions = 0
 	count_comments = 0
 	previous = ''

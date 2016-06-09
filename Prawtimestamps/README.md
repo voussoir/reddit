@@ -1,6 +1,11 @@
 timesearch.py
 =============
 
+- 2016 06 07
+    - Offline_reading has been merged with the main timesearch file
+    - `get_all_posts` renamed to `timesearch`
+    - Timesearch parameter `usermode` renamed to `username`; `maxupper` renamed to `upper`.
+    - Everything now accessible via commandline arguments. Read the docstring at the top of the file.
 - 2016 06 05
     - NEW DATABASE SCHEME. Submissions and comments now live in different tables like they should have all along. Submission table has two new columns for a little bit of commentaugment metadata. This allows commentaugment to only scan threads that are new.
     - You can use the `migrate_20160605.py` script to convert old databases into new ones.

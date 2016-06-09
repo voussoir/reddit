@@ -45,9 +45,9 @@ MAX_SUBSCRIPTION_POSTS_PER_HOUR = 2
 MESSAGE_DELETION_DROPPED = """
 Hi {username},
 
-On {warned_at}, your account was marked to have its
-Newsletterly users. Because you did not respond to that message, your subscriptions
-have been dropped. You may re-subscribe at any time.
+On {warned_at}, your account was marked to have its subscriptions dropped.
+Because you did not respond to that message, your subscriptions
+have been removed. You may re-subscribe at any time.
 
 Your subscriptions were:
 

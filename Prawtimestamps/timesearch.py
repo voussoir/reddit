@@ -1,5 +1,83 @@
 #/u/GoldenSights
+DOCSTRING='''
+Timesearch
+The subreddit archiver
+
+The basics:
+1. Collect a subreddit's submissions with
+    > timesearch timesearch -r subredditname
+2. Collect the comments for those submissions with
+    > timesearch commentaugment subredditname.db
+3. Render the threads to HTML with
+    > timesearch offline_reading subredditname.db
+
+
+Specifics:
+
+timesearch:
+    Collect submissions from the subreddit across all of history
+    Collect submissions by a user (as many as possible)
+
+    > timesearch timesearch -r subredditname <flags>
+    > timesearch timesearch -u username <flags>
+
+    -r | --subreddit:
+        The subreddit to scan. Mutually exclusive with username.
+
+    -u | --username:
+        The user to scan. Mutually exclusive with subreddit.
+
+    -l | --lower:
+        If a number - the unix timestamp to start at.
+        If "update" - continue from latest submission in db.
+        If not provided - start from the subreddit's creation date.
+
+    -up | --upper:
+        If a number - the unix timestamp to stop at.
+        If not provided - stop at current time.
+
+    -i | --interval:
+        The initial interval for the scanning window.
+
+commentaugment:
+    Collect comments for the submissions in the database.
+    NOTE - if you did a timesearch scan on a username, this function is useless
+    because it finds comments on the submissions you collected. It does not find
+    the user's comment history. That's not possible.
+
+    > timesearch commentaugment database.db <flags>
+
+    flags:
+    -l | --limit:
+        The number of MoreComments objects to replace.
+
+    -t | --threshold:
+        The number of comments a MoreComments object must claim to have for us to open it.
+
+    -n | --num_thresh:
+        The number of comments a submission must claim to have for us to scan it at all.
+
+    -s | --specific:
+        Given a submission ID in the form t3_xxxxxxx, scan only that submission.
+
+    -v | --verbose:
+        If provided, print more stuff while working.
+
+offline_reading:
+    Render submissions and comment threads to HTML.
+
+    > timesearch offline_reading database.db <flags>
+
+    flags:
+    -s | --specific:
+        Given a submission ID in the form t3_xxxxxxx, render only that submission.
+        Otherwise render every submission in the database.
+
+'''
+
+import argparse
 import datetime
+import markdown  # If you're not interested in offline_reading, you may delete
 import os
 import praw
 import sqlite3
@@ -7,6 +85,8 @@ import sys
 import time
 import traceback
 
+
+''' USER CONFIGURATION '''
 
 USERAGENT = ""
 APP_ID = ""
@@ -18,11 +98,11 @@ MAXIMUM_EXPANSION_MULTIPLIER = 2
 # The maximum amount by which it can multiply the interval
 # when not enough posts are found.
 DATABASE_FOLDER = 'databases'
-if not os.path.exists(DATABASE_FOLDER):
-    os.makedirs(DATABASE_FOLDER)
+HTML_FOLDER = 'html'
 DATABASE_SUBREDDIT = '%s/%s.db' % (DATABASE_FOLDER, '%s')
 DATABASE_USER = '%s/@%s.db' % (DATABASE_FOLDER, '%s')
 
+''' All done! '''
 
 
 try:
@@ -35,11 +115,8 @@ try:
 except ImportError:
     pass
 
-print('Logging in.')
 # http://redd.it/3cm1p8
 r = praw.Reddit(USERAGENT)
-r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
-r.refresh_access_information(APP_REFRESH)
 
 SQL_SUBMISSION_COLUMNS = [
     'idint',
@@ -94,11 +171,8 @@ prompt_ca_threshold = '''
 - Threshold - minimum number of children comments a MoreComments
   object must have to warrant a replacement.
   ]: '''
-prompt_ca_numthresh = '''
+prompt_ca_num_thresh = '''
 - Minimum num_comments a thread must have to be scanned
-  ]: '''
-prompt_ca_skips = '''
-- Skips - Skip ahead by this many threads, to pick up where you left off.
   ]: '''
 prompt_ca_verbosity = '''
 - Verbosity. 0=quiter, 1=louder
@@ -123,47 +197,278 @@ prompt_ts_startinginterval = '''
 
 
 
-def b36(i):
-    if type(i) == int:
-        return base36encode(i)
-    if type(i) == str:
-        return base36decode(i)
+############      ########  
+##  ####  ##    ####    ####
+    ####        ####    ####
+    ####        ####        
+    ####          ######    
+    ####              ####  
+    ####        ####    ####
+    ####        ####    ####
+  ########        ########  
 
-def base36decode(number):
-    return int(number, 36)
+def livestream(subreddit=None, username=None, sleepy=30, submissions=True, comments=False, debug=False):
+    '''
+    Continuously get posts from this source
+    and insert them into the database
+    '''
+    if bool(subreddit) == bool(username):
+        raise Exception('Enter either username / subreddit parameter, but not both')
+    login()
 
-def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
-    """Converts an integer to a base36 string."""
-    if not isinstance(number, (int)):
-        raise TypeError('number must be an integer')
-    base36 = ''
-    sign = ''
-    if number < 0:
-        sign = '-'
-        number = -number
-    if 0 <= number < len(alphabet):
-        return sign + alphabet[number]
-    while number != 0:
-        number, i = divmod(number, len(alphabet))
-        base36 = alphabet[i] + base36
-    return sign + base36
+    if subreddit:
+        print('Getting subreddit %s' % subreddit)
+        databasename = database_filename(subreddit=subreddit)
+        stream_target = r.get_subreddit(subreddit)
+        submissions = stream_target.get_new if submissions else None
+        comments = stream_target.get_comments if comments else None
+    else:
+        print('Getting redditor %s' % username)
+        databasename = database_filename(username=username)
+        stream_target = r.get_redditor(username)
+        submissions = stream_target.get_submitted if submissions else None
+        comments = stream_target.get_comments if comments else None
+    
+    sql = sql_open(databasename)
+    cur = sql.cursor()
+    while True:
+        try:
+            items = livestream_helper(
+                submission_function=submissions,
+                comment_function=comments,
+                debug=debug,
+                limit=100,
+                )
+            newitems = smartinsert(sql, cur, items)
+            print('%s +%d' % (human(get_now()), newitems), end='', flush=True)
+            if newitems == 0:
+                print('\r', end='')
+            else:
+                print()
+            if debug:
+                print('Loop finished.')
+            time.sleep(sleepy)
+        except KeyboardInterrupt:
+            print()
+            sql.commit()
+            sql.close()
+            return
+        except Exception as e:
+            traceback.print_exc()
+            time.sleep(5)
+hangman = lambda: livestream(username='gallowboob', sleepy=60, submissions=True, comments=True)
 
-def commentaugment(databasename, limit, threshold, numthresh, skips, verbose, specific_submission=None):
+def livestream_helper(submission_function=None, comment_function=None, debug=False, *a, **k):
+    '''
+    Given a submission-retrieving function and/or a comment-retrieving function,
+    collect submissions and comments in a list together and return that.
+    '''
+    if (submission_function, comment_function) == (None, None):
+        raise TypeError('livestream helper got double Nones')
+    results = []
+
+    if submission_function:
+        if debug: print('Getting submissions', a, k)
+        results += list(submission_function(*a, **k))
+    if comment_function:
+        if debug: print('Getting comments', a, k)
+        results += list(comment_function(*a, **k))
+    if debug:
+        print('Collected. Saving...')
+    return results
+
+def timesearch(
+        subreddit=None,
+        username=None,
+        lower=None,
+        upper=None,
+        interval=86400,
+        ):
+    '''
+    Collect submissions across time.
+    Please see the global DOCSTRING variable.
+    '''
+    if bool(subreddit) == bool(username):
+        raise Exception('Enter subreddit or username but not both')
+    login()
+
+    if subreddit:
+        databasename = database_filename(subreddit=subreddit)
+    else:
+        # When searching, we'll take the user's submissions from anywhere.
+        subreddit = 'all'
+        databasename = database_filename(username=username)
+
+    sql = sql_open(databasename)
+    cur = sql.cursor()
+    initialize_database(sql, cur)
+
+    offset = -time.timezone
+
+    if lower == 'update':
+        # Start from the latest submission
+        cur.execute('SELECT * FROM submissions ORDER BY idint DESC LIMIT 1')
+        f = cur.fetchone()
+        if f:
+            lower = f[SQL_SUBMISSION['created']]
+            print(f[SQL_SUBMISSION['idstr']], human(lower), lower)
+        else:
+            lower = None
+
+    if lower is None:
+        if subreddit:
+            if isinstance(subreddit, praw.objects.Subreddit):
+                creation = subreddit.created_utc
+            else:
+                subreddits = subreddit.split('+')
+                subreddits = [r.get_subreddit(sr) for sr in subreddits]
+                creation = min([sr.created_utc for sr in subreddits])
+        else:
+            if not isinstance(username, praw.objects.Redditor):
+                user = r.get_redditor(username)
+            creation = user.created_utc
+        lower = creation
+
+    maxupper = upper
+    if maxupper is None:
+        nowstamp = datetime.datetime.now(datetime.timezone.utc).timestamp()
+        maxupper = nowstamp
+
+    lower -= offset
+    maxupper -= offset
+    cutlower = lower
+    cutupper = maxupper
+    upper = lower + interval
+    itemcount = 0
+
+    toomany_inarow = 0
+    while lower < maxupper:
+        print('\nCurrent interval:', interval, 'seconds')
+        print('Lower', human(lower), lower)
+        print('Upper', human(upper), upper)
+        while True:
+            try:
+                if username:
+                    query = '(and author:"%s" (and timestamp:%d..%d))' % (
+                        username, lower, upper)
+                else:
+                    query = 'timestamp:%d..%d' % (lower, upper)
+                searchresults = list(r.search(query, subreddit=subreddit,
+                                              sort='new', limit=100,
+                                              syntax='cloudsearch'))
+                break
+            except:
+                traceback.print_exc()
+                print('resuming in 5...')
+                time.sleep(5)
+                continue
+
+        searchresults.reverse()
+        print([i.id for i in searchresults])
+
+        itemsfound = len(searchresults)
+        itemcount += itemsfound
+        print('Found', itemsfound, 'items')
+        if itemsfound < 75:
+            print('Too few results, increasing interval', end='')
+            diff = (1 - (itemsfound / 75)) + 1
+            diff = min(MAXIMUM_EXPANSION_MULTIPLIER, diff)
+            interval = int(interval * diff)
+        if itemsfound > 99:
+            #Intentionally not elif
+            print('Too many results, reducing interval', end='')
+            interval = int(interval * (0.8 - (0.05 * toomany_inarow)))
+            upper = lower + interval
+            toomany_inarow += 1
+        else:
+            lower = upper
+            upper = lower + interval
+            toomany_inarow = max(0, toomany_inarow-1)
+            smartinsert(sql, cur, searchresults)
+        print()
+
+    cur.execute('SELECT COUNT(idint) FROM submissions')
+    itemcount = cur.fetchone()[SQL_SUBMISSION['idint']]
+    print('Ended with %d items in %s' % (itemcount, databasename))
+    sql.close()
+
+def timesearch_prompt():
+    while True:
+        username = False
+        maxupper = None
+        interval = 86400
+        print(prompt_ts_subreddit, end='')
+        sub = input()
+        if sub == '':
+            print(prompt_ts_username, end='')
+            username = input()
+            sub = 'all'
+        if username:
+            p = database_filename(username=username)
+        else:
+            p = database_filename(subreddit=sub)
+        if os.path.exists(p):
+            print('Found %s' % p)
+        print(prompt_ts_lowerbound, end='')
+        lower  = input().lower()
+        if lower == '':
+            lower = None
+        if lower not in [None, 'update']:
+            print('- Maximum upper bound\n]: ', end='')
+            maxupper = input()
+            if maxupper == '':
+                maxupper = datetime.datetime.now(datetime.timezone.utc)
+                maxupper = maxupper.timestamp()
+            print(prompt_ts_startinginterval, end='')
+            interval = input()
+            if interval == '':
+                interval = 84600
+            try:
+                maxupper = int(maxupper)
+                lower = int(lower)
+                interval = int(interval)
+            except ValueError:
+                print("lower and upper bounds must be unix timestamps")
+                input()
+                quit()
+        get_all_posts(sub, lower, maxupper, interval, username)
+        print('\nDone. Press Enter to close window or type "restart"')
+        if input().lower() != 'restart':
+            break
+
+
+    ########        ####    
+  ####    ####    ########  
+####      ####  ####    ####
+####            ####    ####
+####            ####    ####
+####            ############
+####      ####  ####    ####
+  ####    ####  ####    ####
+    ########    ####    ####
+
+def commentaugment(
+        databasename,
+        limit=0,
+        num_thresh=0,
+        specific_submission=None,
+        threshold=0,
+        verbose=0,
+        ):
     '''
     Take the IDs of collected submissions, and gather comments from those threads.
+    Please see the global DOCSTRING variable.
     '''
+    login()
     if specific_submission is not None:
         if not specific_submission.startswith('t3_'):
             specific_submission = 't3_' + specific_submission
         specific_submission_obj = r.get_submission(submission_id=specific_submission[3:])
         databasename = specific_submission_obj.subreddit.display_name
 
-    databasename = databasename.replace('.db', '')
-    databasename = databasename.replace('/', '\\')
-    databasename = databasename.split('\\')[-1]
     databasename = database_filename(subreddit=databasename)
     #print(databasename)
-    sql = sqlite3.connect(databasename)
+    sql = sql_open(databasename)
     cur = sql.cursor()
     cur2 = sql.cursor()
     initialize_database(sql, cur)
@@ -172,9 +477,9 @@ def commentaugment(databasename, limit, threshold, numthresh, skips, verbose, sp
         cur.execute('''
             SELECT idstr FROM submissions
             WHERE augmented_at IS NULL
-            AND num_comments > ?
+            AND num_comments >= ?
             ORDER BY num_comments DESC''',
-            [numthresh])
+            [num_thresh])
         fetchall = cur.fetchall()
         fetchall = [item[0] for item in fetchall]
     else:
@@ -190,6 +495,7 @@ def commentaugment(databasename, limit, threshold, numthresh, skips, verbose, sp
         spacer = ' '
 
     scannedthreads = 0
+    get_submission = nofailrequest(r.get_submission)
     while True:
         id_batch = fetchall[:100]
         fetchall = fetchall[100:]
@@ -198,7 +504,7 @@ def commentaugment(databasename, limit, threshold, numthresh, skips, verbose, sp
             return
 
         for submission in id_batch:
-            submission = r.get_submission(submission_id=submission.split('_')[-1])
+            submission = get_submission(submission_id=submission.split('_')[-1])
             print('Processing %s%sexpecting %d | ' % (submission.fullname, spacer, submission.num_comments), end='')
             sys.stdout.flush()
             if verbose:
@@ -243,16 +549,13 @@ def commentaugment_prompt():
     threshold = fixint(threshold)
 
     if specific_submission == '':
-        print(prompt_ca_numthresh, end='')
-        numthresh = input()
-        numthresh = fixint(numthresh)
+        print(prompt_ca_num_thresh, end='')
+        num_thresh = input()
+        num_thresh = fixint(num_thresh)
 
-        print(prompt_ca_skips, end='')
-        skips = input()
-        skips = fixint(skips)
         specific_submission = None
     else:
-        numthresh = 0
+        num_thresh = 0
         skips = 0
 
     print(prompt_ca_verbosity, end='')
@@ -260,15 +563,434 @@ def commentaugment_prompt():
     verbose = fixint(verbose)
     verbose = (verbose is 1)
 
-    commentaugment(databasename, limit, threshold, numthresh, skips, verbose, specific_submission)
+    commentaugment(databasename, limit, threshold, num_thresh, verbose, specific_submission)
     print('Done')
+
+def get_comments_for_thread(submission, limit, threshold, verbose):
+    comments = nofailrequest(lambda x: x.comments)(submission)
+    comments = praw.helpers.flatten_tree(comments)
+    comments = manually_replace_comments(comments, limit, threshold, verbose)
+    return comments
+
+def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False):
+    '''
+    PRAW's replace_more_comments method cannot continue
+    where it left off in the case of an Ow! screen.
+    So I'm writing my own function to get each MoreComments item individually
+
+    Furthermore, this function will maximize the number of retrieved comments by
+    sorting the MoreComments objects and getting the big chunks before worrying
+    about the tail ends.
+    '''
+
+    comments = []
+    morecomments = []
+    while len(incomments) > 0:
+        item = incomments.pop()
+        if isinstance(item, praw.objects.MoreComments) and item.count >= threshold:
+            morecomments.append(item)
+        elif isinstance(item, praw.objects.Comment):
+            comments.append(item)
+
+    try:
+        while True:
+            if limit is not None and limit <= 0:
+                break
+            if len(morecomments) == 0:
+                break
+            morecomments.sort(key=lambda x: x.count)
+            mc = morecomments.pop()
+            additional = nofailrequest(mc.comments)()
+            additionals = 0
+            if limit is not None:
+                limit -= 1
+            for item in additional:
+                if isinstance(item, praw.objects.MoreComments) and item.count >= threshold:
+                    morecomments.append(item)
+                elif isinstance(item, praw.objects.Comment):
+                    comments.append(item)
+                    additionals += 1
+            if verbose:
+                s = '\tGot %d more, %d so far.' % (additionals, len(comments))
+                if limit is not None:
+                    s += ' Can perform %d more replacements' % limit
+                print(s)
+    except KeyboardInterrupt:
+        pass
+    except:
+        traceback.print_exc()
+    return comments
+
+
+    ######      ############  
+  ####  ####      ####    ####
+####      ####    ####    ####
+####      ####    ####    ####
+####      ####    ##########  
+####      ####    ####  ####  
+####      ####    ####    ####
+  ####  ####      ####    ####
+    ######      ######    ####
+
+class DBEntry:
+    def __init__(self, fetch):
+        if fetch[1].startswith('t3_'):
+            columns = SQL_SUBMISSION_COLUMNS
+            self.object_type = 'submission'
+        else:
+            columns = SQL_COMMENT_COLUMNS
+            self.object_type = 'comment'
+
+        for (index, attribute) in enumerate(columns):
+            setattr(self, attribute, fetch[index])
+
+    def __repr__(self):
+        return 'DBEntry(\'%s\')' % self.id
+
+
+class TreeNode:
+    def __init__(self, identifier, data, parent=None):
+        assert isinstance(identifier, str)
+        assert '\\' not in identifier
+        self.identifier = identifier
+        self.data = data
+        self.parent = parent
+        self.children = {}
+
+    def __getitem__(self, key):
+        return self.children[key]
+
+    def __repr__(self):
+        return 'TreeNode %s' % self.abspath()
+
+    def abspath(self):
+        node = self
+        nodes = [node]
+        while node.parent is not None:
+            node = node.parent
+            nodes.append(node)
+        nodes.reverse()
+        nodes = [node.identifier for node in nodes]
+        return '\\'.join(nodes)
+
+    def add_child(self, other_node, overwrite_parent=False):
+        self.check_child_availability(other_node.identifier)
+        if other_node.parent is not None and not overwrite_parent:
+            raise ValueError('That node already has a parent. Try `overwrite_parent=True`')
+
+        other_node.parent = self
+        self.children[other_node.identifier] = other_node
+        return other_node
+
+    def check_child_availability(self, identifier):
+        if ':' in identifier:
+            raise Exception('Only roots may have a colon')
+        if identifier in self.children:
+            raise Exception('Node %s already has child %s' % (self.identifier, identifier))
+
+    def detach(self):
+        del self.parent.children[self.identifier]
+        self.parent = None
+
+    def listnodes(self, customsort=None):
+        items = list(self.children.items())
+        if customsort is None:
+            items.sort(key=lambda x: x[0].lower())
+        else:
+            items.sort(key=customsort)
+        return [item[1] for item in items]
+
+    def merge_other(self, othertree, otherroot=None):
+        newroot = None
+        if ':' in othertree.identifier:
+            if otherroot is None:
+                raise Exception('Must specify a new name for the other tree\'s root')
+            else:
+                newroot = otherroot
+        else:
+            newroot = othertree.identifier
+        othertree.identifier = newroot
+        othertree.parent = self
+        self.check_child_availability(newroot)
+        self.children[newroot] = othertree
+
+    def printtree(self, customsort=None):
+        for node in self.walk(customsort):
+            print(node.abspath())
+
+    def walk(self, customsort=None):
+        yield self
+        for child in self.listnodes(customsort=customsort):
+            #print(child)
+            #print(child.listnodes())
+            yield from child.walk(customsort=customsort)
+
+def html_format_comment(comment):
+    text = '''
+    <div class="comment"
+        id="{id}" 
+        style="
+        padding-left: 20px;
+        margin-top: 4px;
+        margin-right: 4px;
+        margin-bottom: 4px;
+        border: 2px #000 solid;
+    ">
+        <p class="userinfo">
+            {usernamelink}
+            <span class="score"> | {score} points</span>
+            <span class="timestamp"> | {human}</span>
+        </p>
+
+        <p>{body}</p>
+
+        <p class="toolbar">
+            {permalink}
+        </p>
+    {children}
+    </div>
+    '''.format(
+        id = comment.idstr,
+        body = sanitize_braces(render_markdown(comment.body)),
+        usernamelink = html_helper_userlink(comment),
+        score = comment.score,
+        human = human(comment.created),
+        permalink = html_helper_permalink(comment),
+        children = '{children}',
+    )
+    return text
+
+def html_format_submission(submission):
+    text = '''
+    <div class="submission"
+        id="{id}" 
+        style="
+        border: 4px #00f solid;
+        padding-left: 20px;
+    ">
+
+        <p class="userinfo">
+            {usernamelink}
+            <span class="score"> | {score} points</span>
+            <span class="timestamp"> | {human}</span>
+        </p>
+
+        <strong>{title}</strong>
+        <p>{url_or_text}</p>
+
+        <p class="toolbar">
+            {permalink}
+        </p>
+    </div>
+    {children}
+    '''.format(
+        id = submission.idstr,
+        title = sanitize_braces(submission.title),
+        usernamelink = html_helper_userlink(submission),
+        score = submission.score,
+        human = human(submission.created),
+        permalink = html_helper_permalink(submission),
+        url_or_text = html_helper_urlortext(submission),
+        children = '{children}',
+    )
+    return text
+
+def html_from_database(databasename, specific_submission=None):
+    '''
+    Given a timesearch database filename, produce .html files for each
+    of the submissions it contains (or one particular submission fullname)
+    '''
+    submission_trees = trees_from_database(databasename, specific_submission)
+    for submission_tree in submission_trees:
+        page = html_from_tree(submission_tree, sort=lambda x: x.data.score * -1)
+        if not os.path.exists(HTML_FOLDER):
+            os.makedirs(HTML_FOLDER)
+        html_basename = '%s.html' % submission_tree.identifier
+        html_filename = os.path.join(HTML_FOLDER, html_basename)
+        html_handle = open(html_filename, 'w', encoding='utf-8')
+        html_handle.write('<html><body><meta charset="UTF-8">')
+        html_handle.write(page)
+        html_handle.write('</body></html>')
+        html_handle.close()
+
+def html_from_tree(tree, sort=None):
+    '''
+    Given a tree *whose root is the submission*, return
+    HTML-formatted text representing each submission's comment page.
+    '''
+    if tree.data.object_type == 'submission':
+        page = html_format_submission(tree.data)
+    elif tree.data.object_type == 'comment':
+        page = html_format_comment(tree.data)
+    children = tree.listnodes()
+    if sort is not None:
+        children.sort(key=sort)
+    children = [html_from_tree(child, sort) for child in children]
+    if len(children) == 0:
+        children = ''
+    else:
+        children = '\n\n'.join(children)
+    try:
+        page = page.format(children=children)
+    except IndexError:
+        print(page)
+        raise
+    return page
+
+def html_helper_permalink(item):
+    link = 'https://www.reddit.com/r/%s/comments/' % item.subreddit
+    if item.object_type == 'submission':
+        link += item.idstr[3:]
+    elif item.object_type == 'comment':
+        link += '%s/_/%s' % (item.submission[3:], item.idstr[3:])
+    link = '<a href="%s">permalink</a>' % link
+    return link
+
+def html_helper_urlortext(submission):
+    if submission.url:
+        text = '<a href="{url}">{url}</a>'.format(url=submission.url)
+    elif submission.selftext:
+        text = render_markdown(submission.selftext)
+    else:
+        text = ''
+    text = sanitize_braces(text)
+    return text
+
+def html_helper_userlink(item):
+    name = item.author
+    if name.lower() == '[deleted]':
+        return '[deleted]'
+    link = 'https://www.reddit.com/u/{name}'
+    link = '<a href="%s">{name}</a>' % link
+    link = link.format(name=name)
+    return link
+
+def render_markdown(text):
+    text = markdown.markdown(text, output_format='html5')
+    return text
+
+def sanitize_braces(text):
+    text = text.replace('{', '{{')
+    text = text.replace('}', '}}')
+    return text
+
+def trees_from_database(databasename, specific_submission=None):
+    '''
+    Given a timesearch database filename, take all of the submission
+    ids, take all of the comments for each submission id, and run them
+    through `tree_from_submission`.
+
+    Yield each submission's tree as it is generated.
+    '''
+    databasename = database_filename(databasename)
+    sql = sql_open(databasename)
+    cur1 = sql.cursor()
+    cur2 = sql.cursor()
+
+    if specific_submission is None:
+        cur1.execute('SELECT idstr FROM submissions ORDER BY created ASC')
+        submission_ids = fetchgenerator(cur1)
+    else:
+        specific_submission = 't3_' + specific_submission.split('_')[-1]
+        # Insert as a tuple to behave like the sql fetch results
+        submission_ids = [(specific_submission, None)]
+
+    found_some_posts = False
+    for submission_id in submission_ids:
+        # Extract sql fetch
+        submission_id = submission_id[0]
+        found_some_posts = True
+        cur2.execute('SELECT * FROM submissions WHERE idstr == ?', [submission_id])
+        submission = cur2.fetchone()
+        cur2.execute('SELECT * FROM comments WHERE submission == ?', [submission_id])
+        fetched_comments = cur2.fetchall()
+        submission_tree = tree_from_submission(submission, fetched_comments)
+        yield submission_tree
+
+    if not found_some_posts:
+        raise Exception('Found no submissions!')
+
+def tree_from_submission(submission, commentpool):
+    '''
+    Given the sqlite data for a submission and all of its comments,
+    return a tree with the submission id as the root
+    '''
+    submission = DBEntry(submission)
+    commentpool = [DBEntry(c) for c in commentpool]
+    commentpool.sort(key=lambda x: x.created)
+    
+    print('Building tree for %s (%d comments)' % (submission.idstr, len(commentpool)))
+    # Thanks Martin Schmidt for the algorithm
+    # http://stackoverflow.com/a/29942118/5430534
+    tree = TreeNode(submission.idstr, submission)
+    node_map = {}
+
+    for comment in commentpool:
+        # Ensure this comment is in a node of its own
+        this_node = node_map.get(comment.idstr, None)
+        if this_node:
+            # This ID was detected as a parent of a previous iteration
+            # Now we're actually filling it in.
+            this_node.data = comment
+        else:
+            this_node = TreeNode(comment.idstr, comment)
+            node_map[comment.idstr] = this_node
+
+        # Attach this node to the parent.
+        if comment.parent.startswith('t3_'):
+            tree.add_child(this_node)
+        else:
+            parent_node = node_map.get(comment.parent, None)
+            if not parent_node:
+                parent_node = TreeNode(comment.parent, data=None)
+                node_map[comment.parent] = parent_node
+            parent_node.add_child(this_node)
+            this_node.parent = parent_node
+    return tree
+
+
+    ########                                                                              ########    
+  ####    ####                                                                                ####    
+####      ####                                                                                ####    
+####              ########    ##########      ########    ######  ####      ########          ####    
+####            ####    ####  ####    ####  ####    ####    ####  ######          ####        ####    
+####    ######  ############  ####    ####  ############    ######  ####    ##########        ####    
+####      ####  ####          ####    ####  ####            ####          ####    ####        ####    
+  ####    ####  ####    ####  ####    ####  ####    ####    ####          ####    ####        ####    
+    ##########    ########    ####    ####    ########    ########          ######  ####  ############
+
+def b36(i):
+    if type(i) == int:
+        return base36encode(i)
+    if type(i) == str:
+        return base36decode(i)
+
+def base36decode(number):
+    return int(number, 36)
+
+def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
+    """Converts an integer to a base36 string."""
+    if not isinstance(number, (int)):
+        raise TypeError('number must be an integer')
+    base36 = ''
+    sign = ''
+    if number < 0:
+        sign = '-'
+        number = -number
+    if 0 <= number < len(alphabet):
+        return sign + alphabet[number]
+    while number != 0:
+        number, i = divmod(number, len(alphabet))
+        base36 = alphabet[i] + base36
+    return sign + base36
 
 def database_filename(subreddit=None, username=None):
     '''
     Given a subreddit name or username, return the appropriate database filename.
     '''
     if bool(subreddit) == bool(username):
-        raise ValueError('One and only one of subreddit and username please')
+        raise ValueError('Enter subreddit or username but not both')
+
     text = subreddit or username
     if text.endswith('.db'):
         text = text[:-3]
@@ -279,6 +1001,13 @@ def database_filename(subreddit=None, username=None):
     else:
         return DATABASE_USER % text
 
+def fetchgenerator(cursor):
+    while True:
+        item = cursor.fetchone()
+        if item is None:
+            break
+        yield item
+
 def fixint(i):
     if i == '':
         return 0
@@ -286,123 +1015,6 @@ def fixint(i):
     if i < 0:
         return 0
     return i
-
-def get_all_posts(subreddit, lower=None, maxupper=None,
-                  interval=86400, usermode=False):
-    '''
-    Get submissions from a subreddit or user between two points in time
-    If lower and upper are None, get ALL posts from the subreddit or user.
-    '''
-    if usermode is False:
-        databasename = database_filename(subreddit=subreddit)
-    else:
-        databasename = database_filename(username=usermode)
-
-    sql = sqlite3.connect(databasename)
-    cur = sql.cursor()
-    initialize_database(sql, cur)
-
-    offset = -time.timezone
-
-    if isinstance(subreddit, praw.objects.Subreddit):
-        subreddit = subreddit.display_name
-    elif subreddit is None:
-        subreddit = 'all'
-
-    if lower == 'update':
-        # Get the item with the highest ID number, and use it's
-        # timestamp as the lower.
-        cur.execute('SELECT * FROM submissions ORDER BY idint DESC LIMIT 1')
-        f = cur.fetchone()
-        if f:
-            lower = f[SQL_SUBMISSION['created']]
-            print(f[SQL_SUBMISSION['idstr']], human(lower), lower)
-        else:
-            lower = None
-
-    if lower is None:
-        if usermode is False:
-            if not isinstance(subreddit, praw.objects.Subreddit):
-                subreddits = subreddit.split('+')
-                subreddits = [r.get_subreddit(sr) for sr in subreddits]
-                creation = min([sr.created_utc for sr in subreddits])
-            else:
-                creation = subreddit.created_utc
-        else:
-            if not isinstance(usermode, praw.objects.Redditor):
-                user = r.get_redditor(usermode)
-            creation = user.created_utc
-        lower = creation
-
-    if maxupper is None:
-        nowstamp = datetime.datetime.now(datetime.timezone.utc).timestamp()
-        maxupper = nowstamp
-
-    lower -= offset
-    maxupper -= offset
-    cutlower = lower
-    cutupper = maxupper
-    upper = lower + interval
-    itemcount = 0
-
-    toomany_inarow = 0
-    while lower < maxupper:
-        print('\nCurrent interval:', interval, 'seconds')
-        print('Lower', human(lower), lower)
-        print('Upper', human(upper), upper)
-        while True:
-            try:
-                if usermode is not False:
-                    query = '(and author:"%s" (and timestamp:%d..%d))' % (
-                        usermode, lower, upper)
-                else:
-                    query = 'timestamp:%d..%d' % (lower, upper)
-                searchresults = list(r.search(query, subreddit=subreddit,
-                                              sort='new', limit=100,
-                                              syntax='cloudsearch'))
-                break
-            except:
-                traceback.print_exc()
-                print('resuming in 5...')
-                time.sleep(5)
-                continue
-
-        searchresults.reverse()
-        print([i.id for i in searchresults])
-
-        itemsfound = len(searchresults)
-        itemcount += itemsfound
-        print('Found', itemsfound, 'items')
-        if itemsfound < 75:
-            print('Too few results, increasing interval', end='')
-            diff = (1 - (itemsfound / 75)) + 1
-            diff = min(MAXIMUM_EXPANSION_MULTIPLIER, diff)
-            interval = int(interval * diff)
-        if itemsfound > 99:
-            #Intentionally not elif
-            print('Too many results, reducing interval', end='')
-            interval = int(interval * (0.8 - (0.05 * toomany_inarow)))
-            upper = lower + interval
-            toomany_inarow += 1
-        else:
-            lower = upper
-            upper = lower + interval
-            toomany_inarow = max(0, toomany_inarow-1)
-            smartinsert(sql, cur, searchresults)
-        print()
-
-    cur.execute('SELECT COUNT(idint) FROM submissions')
-    itemcount = cur.fetchone()[SQL_SUBMISSION['idint']]
-    print('Ended with %d items in %s' % (itemcount, databasename))
-    sql.close()
-    del cur
-    del sql
-
-def get_comments_for_thread(submission, limit, threshold, verbose):
-    comments = nofailrequest(lambda x: x.comments)(submission)
-    comments = praw.helpers.flatten_tree(comments)
-    comments = manually_replace_comments(comments, limit, threshold, verbose)
-    return comments
 
 def get_now(stamp=True):
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -453,126 +1065,17 @@ def initialize_database(sql, cur):
     cur.execute('CREATE INDEX IF NOT EXISTS submission_index ON submissions(idstr)')
     cur.execute('CREATE INDEX IF NOT EXISTS comment_index ON comments(idstr)')
 
-def livestream(subreddit=None, username=None, sleepy=30, limit=100, submissions=True, comments=False, debug=False):
-    '''
-    Continuously get posts from this source
-    and insert them into the database
-    '''
-    if subreddit is None and username is None:
-        print('Enter username or subreddit parameter')
-        return
-    if subreddit is not None and username is not None:
-        print('Enter subreddit OR username, not both')
-        return
-
-    if subreddit:
-        print('Getting subreddit %s' % subreddit)
-        sql = sqlite3.connect(database_filename(subreddit=subreddit))
-        item = r.get_subreddit(subreddit)
-        submissions = item.get_new if submissions else None
-        comments = item.get_comments if comments else None
-    else:
-        print('Getting redditor %s' % username)
-        sql = sqlite3.connect(database_filename(username=username))
-        item = r.get_redditor(username)
-        submissions = item.get_submitted if submissions else None
-        comments = item.get_comments if comments else None
-    
-    livestreamer = lambda *a, **k: livestream_helper(submissions, comments, debug, *a, **k)
-
-    cur = sql.cursor()
-    while True:
-        try:
-            bot.refresh(r)  # personal use
-            items = livestreamer(limit=limit)
-            newitems = smartinsert(sql, cur, items)
-            print('%s +%d' % (human(get_now()), newitems), end='')
-            if newitems == 0:
-                print('\r', end='')
-            else:
-                print()
-            if debug:
-                print('Loop finished.')
-            time.sleep(sleepy)
-        except KeyboardInterrupt:
-            print()
-            sql.commit()
-            sql.close()
-            del cur
-            del sql
-            return
-        except Exception as e:
-            traceback.print_exc()
-            time.sleep(5)
-hangman = lambda: livestream(username='gallowboob', sleepy=60, submissions=True, comments=True)
-
-def livestream_helper(submission_function=None, comment_function=None, debug=False, *a, **k):
-    '''
-    Given a submission-retrieving function and/or a comment-retrieving function,
-    collect submissions and comments in a list together and return that.
-    '''
-    if (submission_function, comment_function) == (None, None):
-        raise TypeError('livestream helper got double Nones')
-    results = []
-
-    if submission_function:
-        if debug: print('Getting submissions', a, k)
-        results += list(submission_function(*a, **k))
-    if comment_function:
-        if debug: print('Getting comments', a, k)
-        results += list(comment_function(*a, **k))
-    if debug:
-        print('Collected. Saving...')
-    return results
-
-def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False):
-    '''
-    PRAW's replace_more_comments method cannot continue
-    where it left off in the case of an Ow! screen.
-    So I'm writing my own function to get each MoreComments item individually
-
-    Furthermore, this function will maximize the number of retrieved comments by
-    sorting the MoreComments objects and getting the big chunks before worrying
-    about the tail ends.
-    '''
-
-    comments = []
-    morecomments = []
-    while len(incomments) > 0:
-        item = incomments.pop()
-        if isinstance(item, praw.objects.MoreComments) and item.count >= threshold:
-            morecomments.append(item)
-        elif isinstance(item, praw.objects.Comment):
-            comments.append(item)
-
+def listget(li, index, fallback=None):
     try:
-        while True:
-            if limit is not None and limit <= 0:
-                break
-            if len(morecomments) == 0:
-                break
-            morecomments.sort(key=lambda x: x.count)
-            mc = morecomments.pop()
-            additional = nofailrequest(mc.comments)()
-            additionals = 0
-            if limit is not None:
-                limit -= 1
-            for item in additional:
-                if isinstance(item, praw.objects.MoreComments) and item.count >= threshold:
-                    morecomments.append(item)
-                elif isinstance(item, praw.objects.Comment):
-                    comments.append(item)
-                    additionals += 1
-            if verbose:
-                s = '\tGot %d more, %d so far.' % (additionals, len(comments))
-                if limit is not None:
-                    s += ' Can perform %d more replacements' % limit
-                print(s)
-    except KeyboardInterrupt:
-        pass
-    except:
-        traceback.print_exc()
-    return comments
+        return li[index]
+    except IndexError:
+        return fallback
+
+def login():
+    if r.access_token is None:
+        print('Logging in.')
+        r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+        r.refresh_access_information(APP_REFRESH)
 
 def nofailrequest(function):
     '''
@@ -689,94 +1192,139 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
         sql.commit()
     return newposts
 
-def timesearch_prompt():
-    while True:
-        usermode = False
-        maxupper = None
-        interval = 86400
-        print(prompt_ts_subreddit, end='')
-        sub = input()
-        if sub == '':
-            print(prompt_ts_username, end='')
-            usermode = input()
-            sub = 'all'
-        if usermode:
-            p = database_filename(username=usermode)
-        else:
-            p = database_filename(subreddit=sub)
-        if os.path.exists(p):
-            print('Found %s' % p)
-        print(prompt_ts_lowerbound, end='')
-        lower  = input().lower()
-        if lower == '':
-            lower = None
-        if lower not in [None, 'update']:
-            print('- Maximum upper bound\n]: ', end='')
-            maxupper = input()
-            if maxupper == '':
-                maxupper = datetime.datetime.now(datetime.timezone.utc)
-                maxupper = maxupper.timestamp()
-            print(prompt_ts_startinginterval, end='')
-            interval = input()
-            if interval == '':
-                interval = 84600
-            try:
-                maxupper = int(maxupper)
-                lower = int(lower)
-                interval = int(interval)
-            except ValueError:
-                print("lower and upper bounds must be unix timestamps")
-                input()
-                quit()
-        get_all_posts(sub, lower, maxupper, interval, usermode)
-        print('\nDone. Press Enter to close window or type "restart"')
-        if input().lower() != 'restart':
-            break
+def sql_open(databasename):
+    '''
+    Open the sql connection, creating the folder if necessary.
+    '''
+    dirname = os.path.dirname(databasename)
+    if dirname != '':
+        os.makedirs(dirname, exist_ok=True)
+    return sqlite3.connect(databasename)
 
-def updatescores(databasename, submissions=True, comments=False):
+def update_scores(databasename, submissions=True, comments=False):
     '''
     Get all submissions or comments from the database, and update
     them with the current scores.
     '''
+    login()
+    import itertools
+
     databasename = database_filename(subreddit=databasename)
-    sql = sqlite3.connect(databasename)
-    cur = sql.cursor()
-    cur2 = sql.cursor()
-    
-    if submissions and comments:
-        cur2.execute('SELECT COUNT(*) FROM posts')
-        cur.execute('SELECT * FROM posts')
+    sql = sql_open(databasename)
+    cur_submission = sql.cursor()
+    cur_comment = sql.cursor()
+    cur_insert = sql.cursor()
 
-    elif submissions:
-        cur2.execute('SELECT COUNT(*) FROM posts WHERE idstr LIKE "t3_%"')
-        cur.execute('SELECT * FROM posts WHERE idstr LIKE "t3_%"')
+    generators = []
+    total_items = 0
+    if submissions:
+        cur_submission.execute('SELECT COUNT(idstr) FROM submissions')
+        submission_count = cur_submission.fetchone()[0]
+        total_items += submission_count
+        print('Updating %d submissions' % submission_count)
 
-    elif comments:
-        cur2.execute('SELECT COUNT(*) FROM posts WHERE idstr LIKE "t1_%"')
-        cur.execute('SELECT * FROM posts WHERE idstr LIKE "t1_%"')
-    
-    totalitems = cur2.fetchone()[0]
-    itemcount = 0
-    while True:
-        f = []
-        for x in range(100):
-            x = cur.fetchone()
-            if x is not None:
-                f.append(x[SQL_SUBMISSION['idstr']])
-        if len(f) == 0:
-            break
-        posts = r.get_info(thing_id=f)
-        itemcount += len(f)
-        print('%d / %d updated' % (itemcount, totalitems))
-        smartinsert(sql, cur2, posts, nosave=True)
-    sql.commit()
-    sql.close()
-    del cur
-    del sql
+        cur_submission.execute('SELECT idstr FROM submissions')
+        generators.append(fetchgenerator(cur_submission))
+
+    if comments:
+        cur_comment.execute('SELECT COUNT(idstr) FROM comments')
+        comment_count = cur_comment.fetchone()[0]
+        total_items += comment_count
+        print('Updating %d comments' % comment_count)
+
+        cur_comment.execute('SELECT idstr FROM comments')
+        generators.append(fetchgenerator(cur_comment))
+
+    items_updated = [0]
+    generators = itertools.chain(*generators)
+
+    def do_chunk(chunk):
+        if len(chunk) == 0:
+            return
+        info = r.get_info(thing_id=chunk)
+        smartinsert(sql, cur_insert, info, delaysave=True)
+        items_updated[0] += len(chunk)
+        print('Updated %d/%d' % (items_updated[0], total_items))
+
+    chunk_cache = []
+    for item in generators:
+        chunk_cache.append(item[0])
+        if len(chunk_cache) == 100:
+            do_chunk(chunk_cache)
+            chunk_cache = []
+    else:
+        do_chunk(chunk_cache)
+
+
+    ####                                                  
+  ########                                                
+####    ####                                              
+####    ####  ######  ####      ######  ####    ########  
+####    ####    ####  ######  ####    ####    ####    ####
+############    ######  ####  ####    ####      ####      
+####    ####    ####          ####    ####          ####  
+####    ####    ####            ##########    ####    ####
+####    ####  ########                ####      ########  
+                              ####    ####                
+                                ########                  
+
+int_none = lambda x: int(x) if (x is not None or isinstance(x, str)) else x
+def timesearch_argparse(args):
+    login()
+    return timesearch(
+        subreddit=args.subreddit,
+        username=args.username,
+        lower=int_none(args.lower),
+        upper=int_none(args.upper),
+        interval=int_none(args.interval),
+        )
+
+def commentaugment_argparse(args):
+    login()
+    return commentaugment(
+        databasename=args.databasename,
+        limit=int_none(args.limit),
+        threshold=int_none(args.threshold),
+        num_thresh=int_none(args.num_thresh),
+        verbose=args.verbose,
+        specific_submission=args.specific_submission,
+        )
+
+def offline_reading_argparse(args):
+    return html_from_database(
+        databasename=args.databasename,
+        specific_submission=args.specific_submission,
+        )
+
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        c = sys.argv[1]
-        exec(c)
-    else:
-        timesearch_prompt()
+    if listget(sys.argv, 1, '').lower() in ('help', '-h', '--help'):
+        print(DOCSTRING)
+        quit()
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
+
+    p_timesearch = subparsers.add_parser('timesearch')
+    p_timesearch.add_argument('-r', '--subreddit', dest='subreddit', default=None)
+    p_timesearch.add_argument('-u', '--user', dest='username', default=None)
+    p_timesearch.add_argument('-l', '--lower', dest='lower', default='update')
+    p_timesearch.add_argument('-up', '--uppper', dest='upper', default=None)
+    p_timesearch.add_argument('-i', '--interval', dest='interval', default=86400)
+    p_timesearch.set_defaults(func=timesearch_argparse)
+
+    p_commentaugment = subparsers.add_parser('commentaugment')
+    p_commentaugment.add_argument('databasename')
+    p_commentaugment.add_argument('-l', '--limit', dest='limit', default=0)
+    p_commentaugment.add_argument('-t', '--threshold', dest='threshold', default=0)
+    p_commentaugment.add_argument('-n', '--num_thresh', dest='num_thresh', default=1)
+    p_commentaugment.add_argument('-s', '--specific', dest='specific_submission', default=None)
+    p_commentaugment.add_argument('-v', '--verbose', dest='verbose', action='store_true')
+    p_commentaugment.set_defaults(func=commentaugment_argparse)
+
+    p_offline_reading = subparsers.add_parser('offline_reading')
+    p_offline_reading.add_argument('databasename')
+    p_offline_reading.add_argument('-s', '--specific', dest='specific_submission', default=None)
+    p_offline_reading.set_defaults(func=offline_reading_argparse)
+
+    args = parser.parse_args()
+    args.func(args)
