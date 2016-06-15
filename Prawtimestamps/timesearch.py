@@ -212,7 +212,7 @@ prompt_ts_startinginterval = '''
     ####        ####    ####
   ########        ########  
 
-def livestream(subreddit=None, username=None, sleepy=30, submissions=True, comments=False, debug=False):
+def livestream(subreddit=None, username=None, sleepy=30, submissions=True, comments=False, limit=100, debug=False):
     '''
     Continuously get posts from this source
     and insert them into the database
@@ -238,15 +238,18 @@ def livestream(subreddit=None, username=None, sleepy=30, submissions=True, comme
     cur = sql.cursor()
     while True:
         try:
+            r.handler.clear_cache()
             items = livestream_helper(
                 submission_function=submissions,
                 comment_function=comments,
                 debug=debug,
-                limit=100,
+                limit=limit,
                 )
-            newitems = smartinsert(sql, cur, items)
-            print('%s +%d' % (human(get_now()), newitems), end='', flush=True)
+            newitems = smartinsert(sql, cur, items, delaysave=True)
+            status = '{now} +{new}'.format(now=human(get_now()), new=newitems)
+            print(status, end='', flush=True)
             if newitems == 0:
+                # Since there were no news, allow the next line to overwrite status
                 print('\r', end='')
             else:
                 print()
@@ -478,6 +481,9 @@ def commentaugment(
     cur2 = sql.cursor()
     initialize_database(sql, cur)
 
+    if limit == 0:
+        limit = None
+
     if specific_submission is None:
         cur.execute('''
             SELECT idstr FROM submissions
@@ -500,6 +506,7 @@ def commentaugment(
         spacer = ' '
 
     scannedthreads = 0
+    r.handler.clear_cache()
     get_submission = nofailrequest(r.get_submission)
     while True:
         id_batch = fetchall[:100]
@@ -514,6 +521,7 @@ def commentaugment(
             sys.stdout.flush()
             if verbose:
                 print()
+
             comments = get_comments_for_thread(submission, limit, threshold, verbose)
 
             smartinsert(sql, cur, comments, nosave=True)
@@ -587,7 +595,6 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
     sorting the MoreComments objects and getting the big chunks before worrying
     about the tail ends.
     '''
-
     comments = []
     morecomments = []
     while len(incomments) > 0:
@@ -1117,36 +1124,50 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
     returns the number of posts that were new.
     '''
     newposts = 0
-    for o in results:
-        author = o.author.name if o.author else '[DELETED]'
+    for item in results:
+        if item.author is None:
+            author = '[DELETED]'
+        else:
+            author = item.author.name
 
-        if isinstance(o, praw.objects.Submission):
-            cur.execute('SELECT * FROM submissions WHERE idstr == ?', [o.fullname])
-            if not cur.fetchone():
+        if isinstance(item, praw.objects.Submission):
+            cur.execute('SELECT * FROM submissions WHERE idstr == ?', [item.fullname])
+            existing_entry = cur.fetchone()
+            if not existing_entry:
                 newposts += 1
-                postdata = [None] * len(SQL_SUBMISSION)
-                if o.is_self:
-                    o.url = None
 
-                postdata[SQL_SUBMISSION['idint']] = b36(o.id)
-                postdata[SQL_SUBMISSION['idstr']] = o.fullname
-                postdata[SQL_SUBMISSION['created']] = o.created_utc
-                postdata[SQL_SUBMISSION['self']] = o.is_self
-                postdata[SQL_SUBMISSION['nsfw']] = o.over_18
+                if item.is_self:
+                    url = None
+                else:
+                    url = item.url
+
+                postdata = [None] * len(SQL_SUBMISSION)
+                postdata[SQL_SUBMISSION['idint']] = b36(item.id)
+                postdata[SQL_SUBMISSION['idstr']] = item.fullname
+                postdata[SQL_SUBMISSION['created']] = item.created_utc
+                postdata[SQL_SUBMISSION['self']] = item.is_self
+                postdata[SQL_SUBMISSION['nsfw']] = item.over_18
                 postdata[SQL_SUBMISSION['author']] = author
-                postdata[SQL_SUBMISSION['title']] = o.title
-                postdata[SQL_SUBMISSION['url']] = o.url
-                postdata[SQL_SUBMISSION['selftext']] = o.selftext
-                postdata[SQL_SUBMISSION['score']] = o.score
-                postdata[SQL_SUBMISSION['subreddit']] = o.subreddit.display_name
-                postdata[SQL_SUBMISSION['distinguish']] = o.distinguished
-                postdata[SQL_SUBMISSION['textlen']] = len(o.selftext)
-                postdata[SQL_SUBMISSION['num_comments']] = o.num_comments
-                postdata[SQL_SUBMISSION['flair_text']] = o.link_flair_text
-                postdata[SQL_SUBMISSION['flair_css_class']] = o.link_flair_css_class
+                postdata[SQL_SUBMISSION['title']] = item.title
+                postdata[SQL_SUBMISSION['url']] = url
+                postdata[SQL_SUBMISSION['selftext']] = item.selftext
+                postdata[SQL_SUBMISSION['score']] = item.score
+                postdata[SQL_SUBMISSION['subreddit']] = item.subreddit.display_name
+                postdata[SQL_SUBMISSION['distinguish']] = item.distinguished
+                postdata[SQL_SUBMISSION['textlen']] = len(item.selftext)
+                postdata[SQL_SUBMISSION['num_comments']] = item.num_comments
+                postdata[SQL_SUBMISSION['flair_text']] = item.link_flair_text
+                postdata[SQL_SUBMISSION['flair_css_class']] = item.link_flair_css_class
 
                 cur.execute('''INSERT INTO submissions VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', postdata)
             else:
+                if item.author is None:
+                    # This post is deleted, therefore its text probably says [deleted] or [removed].
+                    # Discard that, and keep the data we already had here.
+                    selftext = existing_entry[SQL_SUBMISSION['selftext']]
+                else:
+                    selftext = item.selftext
+
                 cur.execute('''
                     UPDATE submissions SET
                     nsfw = coalesce(?, nsfw),
@@ -1158,30 +1179,36 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
                     flair_css_class = coalesce(?, flair_css_class)
                     WHERE idstr == ?
                 ''',
-                [o.over_18, o.score, o.selftext, o.distinguished, o.num_comments,
-                o.link_flair_text, o.link_flair_css_class, o.fullname])
+                [item.over_18, item.score, selftext, item.distinguished, item.num_comments,
+                item.link_flair_text, item.link_flair_css_class, item.fullname])
 
-        if isinstance(o, praw.objects.Comment):
-            cur.execute('SELECT * FROM comments WHERE idstr == ?', [o.fullname])
-
-            if not cur.fetchone():
+        if isinstance(item, praw.objects.Comment):
+            cur.execute('SELECT * FROM comments WHERE idstr == ?', [item.fullname])
+            existing_entry = cur.fetchone()
+            if not existing_entry:
                 newposts += 1
                 postdata = [None] * len(SQL_COMMENT)
 
-                postdata[SQL_COMMENT['idint']] = b36(o.id)
-                postdata[SQL_COMMENT['idstr']] = o.fullname
-                postdata[SQL_COMMENT['created']] = o.created_utc
+                postdata[SQL_COMMENT['idint']] = b36(item.id)
+                postdata[SQL_COMMENT['idstr']] = item.fullname
+                postdata[SQL_COMMENT['created']] = item.created_utc
                 postdata[SQL_COMMENT['author']] = author
-                postdata[SQL_COMMENT['parent']] = o.parent_id
-                postdata[SQL_COMMENT['submission']] = o.link_id
-                postdata[SQL_COMMENT['body']] = o.body
-                postdata[SQL_COMMENT['score']] = o.score
-                postdata[SQL_COMMENT['subreddit']] = o.subreddit.display_name
-                postdata[SQL_COMMENT['distinguish']] = o.distinguished
-                postdata[SQL_COMMENT['textlen']] = len(o.body)
+                postdata[SQL_COMMENT['parent']] = item.parent_id
+                postdata[SQL_COMMENT['submission']] = item.link_id
+                postdata[SQL_COMMENT['body']] = item.body
+                postdata[SQL_COMMENT['score']] = item.score
+                postdata[SQL_COMMENT['subreddit']] = item.subreddit.display_name
+                postdata[SQL_COMMENT['distinguish']] = item.distinguished
+                postdata[SQL_COMMENT['textlen']] = len(item.body)
 
                 cur.execute('''INSERT INTO comments VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', postdata)
             else:
+                greasy = 'This comment has been overwritten by an open source script to protect this user\'s privacy.'
+                if item.author is None or greasy in item.body:
+                    body = existing_entry[SQL_COMMENT['body']]
+                else:
+                    body = item.body
+
                 cur.execute('''
                     UPDATE comments SET
                     score = coalesce(?, score),
@@ -1189,7 +1216,7 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
                     distinguish = coalesce(?, distinguish)
                     WHERE idstr == ?
                 ''',
-                [o.score, o.body, o.distinguished, o.fullname])
+                [item.score, body, item.distinguished, item.fullname])
 
         if not delaysave and not nosave:
             sql.commit()
@@ -1302,7 +1329,8 @@ def offline_reading_argparse(args):
         )
 
 
-if __name__ == '__main__':
+
+def main():
     if listget(sys.argv, 1, '').lower() in ('help', '-h', '--help'):
         print(DOCSTRING)
         quit()
@@ -1319,7 +1347,7 @@ if __name__ == '__main__':
 
     p_commentaugment = subparsers.add_parser('commentaugment')
     p_commentaugment.add_argument('databasename')
-    p_commentaugment.add_argument('-l', '--limit', dest='limit', default=0)
+    p_commentaugment.add_argument('-l', '--limit', dest='limit', default=None)
     p_commentaugment.add_argument('-t', '--threshold', dest='threshold', default=0)
     p_commentaugment.add_argument('-n', '--num_thresh', dest='num_thresh', default=1)
     p_commentaugment.add_argument('-s', '--specific', dest='specific_submission', default=None)
@@ -1333,3 +1361,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     args.func(args)
+
+if __name__ == '__main__':
+    main()

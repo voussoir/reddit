@@ -218,7 +218,12 @@ def completesweep(shuffle=False, sleepy=0, query=None):
             # h[0] because the selection query calls for idstr
             # This is not a mistake
             hundred = [h[0] for h in hundred]
-            processmega(hundred, nosave=True)
+            for retry in range(20):
+                try:
+                    processmega(hundred, nosave=True)
+                    break
+                except Exception:
+                    traceback.print_exc()
             time.sleep(sleepy)
     except KeyboardInterrupt:
         pass
