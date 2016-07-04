@@ -59,7 +59,7 @@ WAITS = str(WAIT)
 
 GOODCHARS = string.ascii_letters + string.digits + '_'
 
-sql = sqlite3.connect('C:/git/reddit/subredditbirthdays/sql.db')
+sql = sqlite3.connect('C:\\git\\reddit\\subredditbirthdays\\sql.db')
 cur = sql.cursor()
 cur2 = sql.cursor()
 cur.execute('''
@@ -86,31 +86,21 @@ cur.execute('''
     ''')
 sql.commit()
 
-SQL_COLUMNCOUNT = 10
-
 # These numbers are used for interpreting the tuples that come from SELECT
-SQL_IDINT = 0
-SQL_IDSTR = 1
-SQL_CREATED = 2
-SQL_HUMAN = 3
-SQL_NAME = 4
-SQL_NSFW = 5
-SQL_SUBSCRIBERS = 6
-SQL_JUMBLE = 7
-SQL_SUBREDDIT_TYPE = 8
-SQL_SUBMISSION_TYPE = 9
+SQL_SUBREDDIT_COLUMNS = [
+    'idint',
+    'idstr',
+    'created',
+    'human',
+    'name',
+    'nsfw',
+    'subscribers',
+    'jumble',
+    'subreddit_type',
+    'submission_type',
+]
 
-# These strings are used for binding columns during INSERT AND UPDATE
-SQLS_IDINT = 'idint'
-SQLS_IDSTR = 'idstr'
-SQLS_CREATED = 'created'
-SQLS_HUMAN = 'human'
-SQLS_NAME = 'name'
-SQLS_NSFW = 'nsfw'
-SQLS_SUBSCRIBERS = 'subscribers'
-SQLS_JUMBLE = 'jumble'
-SQLS_SUBREDDIT_TYPE = 'subreddit_type'
-SQLS_SUBMISSION_TYPE = 'submission_type'
+SQL_SUBREDDIT = {key:index for (index, key) in enumerate(SQL_SUBREDDIT_COLUMNS)}
 
 print('Logging in.')
 r = praw.Reddit(USERAGENT)
@@ -196,13 +186,12 @@ def cls():
     if os.system('cls'):
         os.system('clear')
 
-def completesweep(shuffle=False, sleepy=0, query=None):
-    if shuffle is True:
-        cur2.execute('SELECT idstr FROM subreddits WHERE created > 0 ORDER BY RANDOM()')
-    elif query is None:
-        cur2.execute('SELECT idstr FROM subreddits WHERE created > 0')
-    elif query == 'subscribers':
-        cur2.execute('SELECT idstr FROM subreddits WHERE created > 0 ORDER BY subscribers DESC')
+def completesweep(sleepy=0, orderby=None, query=None):
+    if query is None:
+        if orderby is None:
+            cur2.execute('SELECT idstr FROM subreddits WHERE created > 0')
+        else:
+            cur2.execute('SELECT idstr FROM subreddits WHERE created > 0 ORDER BY %s' % orderby)
     elif query == 'restricted':
         cur2.execute('SELECT idstr FROM subreddits WHERE created > 0 AND subreddit_type != 0 ORDER BY subscribers DESC')
     else:
@@ -251,8 +240,8 @@ def modernize():
     cur.execute('SELECT * FROM subreddits ORDER BY created DESC LIMIT 1')
     finalitem = cur.fetchone()
     print('Current final item:')
-    print(finalitem[SQL_IDSTR], finalitem[SQL_HUMAN], finalitem[SQL_NAME])
-    finalid = finalitem[SQL_IDINT]
+    print(finalitem[SQL_SUBREDDIT['idstr']], finalitem[SQL_SUBREDDIT['human']], finalitem[SQL_SUBREDDIT['name']])
+    finalid = finalitem[SQL_SUBREDDIT['idint']]
 
     print('Newest item:')
     newestid = get_newest_sub()
@@ -351,16 +340,16 @@ def process(
             print(message)
 
             data = {
-                SQLS_IDINT: idint,
-                SQLS_IDSTR: idstr,
-                SQLS_CREATED: created,
-                SQLS_HUMAN: created_human,
-                SQLS_NSFW: is_nsfw,
-                SQLS_NAME: name,
-                SQLS_SUBSCRIBERS: subscribers,
-                SQLS_JUMBLE: isjumbled,
-                SQLS_SUBREDDIT_TYPE: subreddit_type,
-                SQLS_SUBMISSION_TYPE: submission_type,
+                'idint': idint,
+                'idstr': idstr,
+                'created': created,
+                'human': created_human,
+                'nsfw': is_nsfw,
+                'name': name,
+                'subscribers': subscribers,
+                'jumble': isjumbled,
+                'subreddit_type': subreddit_type,
+                'submission_type': submission_type,
             }
 
             cur.execute('''
@@ -377,17 +366,17 @@ def process(
                     @submission_type
                     )''', data)
         else:
-            isjumbled = isjumbled or int(f[SQL_JUMBLE]) or 0
-            old_subscribers = f[SQL_SUBSCRIBERS]
+            isjumbled = isjumbled or int(f[SQL_SUBREDDIT['jumble']]) or 0
+            old_subscribers = f[SQL_SUBREDDIT['subscribers']]
             subscriber_diff = subscribers - old_subscribers
 
             if subscribers == 0 and old_subscribers > 2 and subreddit_type != SUBREDDIT_TYPE['private']:
                 print('SUSPICIOUS %s' % name)
                 data = {
-                    SQLS_IDINT: idint,
-                    SQLS_IDSTR: idstr,
-                    SQLS_NAME: name,
-                    SQLS_SUBSCRIBERS: old_subscribers,
+                    'idint': idint,
+                    'idstr': idstr,
+                    'name': name,
+                    'subscribers': old_subscribers,
                 }
                 cur.execute('''
                     INSERT INTO suspicious VALUES(
@@ -408,11 +397,11 @@ def process(
             print(message)
 
             data = {
-                SQLS_IDINT: idint,
-                SQLS_SUBSCRIBERS: subscribers,
-                SQLS_JUMBLE: isjumbled,
-                SQLS_SUBREDDIT_TYPE: subreddit_type,
-                SQLS_SUBMISSION_TYPE: submission_type,
+                'idint': idint,
+                'subscribers': subscribers,
+                'jumble': isjumbled,
+                'subreddit_type': subreddit_type,
+                'submission_type': submission_type,
             }
             cur.execute('''
                 UPDATE subreddits SET
@@ -425,6 +414,14 @@ def process(
 
     if not nosave:
         sql.commit()
+
+def process_input():
+    while True:
+        x = input('p> ')
+        try:
+                process(x)
+        except:
+                traceback.print_exc()
 
 def processmega(srinput, isrealname=False, chunksize=100, docrash=False, nosave=False):
     '''
@@ -498,14 +495,14 @@ def processrand(count, doublecheck=False, sleepy=0):
     lower = LOWERBOUND_INT
 
     cur.execute('SELECT * FROM subreddits ORDER BY idint DESC LIMIT 1')
-    upper = cur.fetchone()[SQL_IDSTR]
+    upper = cur.fetchone()[SQL_SUBREDDIT['idstr']]
     print('<' + b36(lower).lower() + ',',  upper + '>', end=', ')
     upper = b36(upper)
     totalpossible = upper-lower
     print(totalpossible, 'possible')
     rands = []
     if doublecheck:
-        allids = [x[SQL_IDSTR] for x in fetched]
+        allids = [x[SQL_SUBREDDIT['idstr']] for x in fetched]
     for x in range(count):
         rand = random.randint(lower, upper)
         rand = b36(rand).lower()
@@ -548,7 +545,7 @@ def show():
     for item in fetchgenerator(cur):
         itemf = memberformat(item)
         print(itemf, file=file_all_time)
-        if int(item[SQL_NSFW]) == 1:
+        if int(item[SQL_SUBREDDIT['nsfw']]) == 1:
             print(itemf, file=file_dirty_time)
             itemcount_nsfw += 1
     file_all_time.close()
@@ -559,7 +556,7 @@ def show():
     inprogress = False
     cur.execute('SELECT * FROM subreddits WHERE created != 0 ORDER BY LOWER(name) ASC')
     for item in fetchgenerator(cur):
-        if previousitem is not None and item[SQL_NAME] == previousitem[SQL_NAME]:
+        if previousitem is not None and item[SQL_SUBREDDIT['name']] == previousitem[SQL_SUBREDDIT['name']]:
             print(memberformat(previousitem), file=file_duplicates)
             inprogress = True
         elif inprogress:
@@ -567,17 +564,17 @@ def show():
             inprogress = False
         previousitem = item
 
-        name_length = len(item[SQL_NAME])
+        name_length = len(item[SQL_SUBREDDIT['name']])
         name_lengths[name_length] = name_lengths.get(name_length, 0) + 1
 
         itemf = memberformat(item)
         print(itemf, file=file_all_name)
-        if int(item[SQL_NSFW]) == 1:
+        if int(item[SQL_SUBREDDIT['nsfw']]) == 1:
             print(itemf, file=file_dirty_name)
     file_duplicates.close()
     file_all_name.close()
     file_dirty_name.close()
-    name_lengths = {'%02d'%k:v for (k,v) in name_lengths.items()}
+    name_lengths = {'%02d'%k: v for (k,v) in name_lengths.items()}
 
 
     print('Writing subscriber files.')
@@ -593,7 +590,7 @@ def show():
     for item in fetchgenerator(cur):
         itemf = memberformat(item)
         write_with_rank(itemf, 'all', file_all_subscribers)
-        if int(item[SQL_NSFW]) == 1:
+        if int(item[SQL_SUBREDDIT['nsfw']]) == 1:
             write_with_rank(itemf, 'nsfw', file_dirty_subscribers)
     file_all_subscribers.close()
     file_dirty_subscribers.close()
@@ -601,7 +598,7 @@ def show():
     print('Writing jumble.')
     cur.execute('SELECT * FROM subreddits WHERE jumble == 1 ORDER BY subscribers DESC')
     for item in fetchgenerator(cur):
-        if int(item[SQL_NSFW]) == 0:
+        if int(item[SQL_SUBREDDIT['nsfw']]) == 0:
             print(itemf, file=file_jumble_sfw)
         else:
             print(itemf, file=file_jumble_nsfw)
@@ -611,7 +608,7 @@ def show():
     print('Writing missing.')
     cur.execute('SELECT * FROM subreddits WHERE created == 0 ORDER BY idint ASC')
     for item in fetchgenerator(cur):
-        print(item[SQL_IDSTR], file=file_missing)
+        print(item[SQL_SUBREDDIT['idstr']], file=file_missing)
     file_missing.close()
 
 
@@ -645,7 +642,7 @@ def show():
     statisticoutput += '\n\n'
     cur.execute('SELECT * FROM subreddits WHERE created != 0 ORDER BY created DESC limit 20000')
     last20k = cur.fetchall()
-    timediff = last20k[0][SQL_CREATED] - last20k[-1][SQL_CREATED]
+    timediff = last20k[0][SQL_SUBREDDIT['created']] - last20k[-1][SQL_SUBREDDIT['created']]
     statisticoutput += 'Over the last 20,000 subreddits:\n'
     statisticoutput += '%.2f subs are created each hour\n' % (20000 / (timediff/3600))
     statisticoutput += '%.2f subs are created each day\n\n\n' % (20000 / (timediff/86400))
@@ -666,25 +663,35 @@ def show():
     print('    performing time breakdown')
     cur.execute('SELECT * FROM subreddits WHERE created != 0')
     for item in fetchgenerator(cur):
-        dt = datetime.datetime.utcfromtimestamp(item[SQL_CREATED])
+        dt = datetime.datetime.utcfromtimestamp(item[SQL_SUBREDDIT['created']])
         strftimes = strftime_dict(dt)
 
-        datetimedict(hoddict, strftimes['%H']) # 01
-        datetimedict(dowdict, strftimes['%A']) # Monday
-        datetimedict(domdict, strftimes['%d']) # 01
-        datetimedict(moydict, strftimes['%B']) # January
-        datetimedict(myrdict, strftimes['%b%Y']) # Jan2015
-        datetimedict(yerdict, strftimes['%Y']) # 2015
+        datetimedict(hoddict, dt.strftime('%H')) # 01
+        datetimedict(dowdict, dt.strftime('%A')) # Monday
+        datetimedict(domdict, dt.strftime('%d')) # 01
+        datetimedict(moydict, dt.strftime('%B')) # January
+        datetimedict(myrdict, dt.strftime('%b%Y')) # Jan2015
+        datetimedict(yerdict, dt.strftime('%Y')) # 2015
 
     print('    forming columns')
     plotnum = 0
     labels = ['hour of day', 'day of week', 'day of month', 'month of year', 'year', 'month-year', 'name length']
-    modes = [None,    'day',   None,    'month', None,    'monthyear', None]
-    dicts = [hoddict, dowdict, domdict, moydict, yerdict, myrdict, name_lengths]
-    for (index, d) in enumerate(dicts):
+    modes =  [None,    'day',   None,    'month', None,    'monthyear', None]
+    dicts =  [hoddict, dowdict, domdict, moydict, yerdict, myrdict, name_lengths]
+    mapping = [
+        {'label': 'hour of day', 'specialsort': None, 'dict': hoddict,},
+        {'label': 'day of week', 'specialsort': 'day', 'dict': dowdict,},
+        {'label': 'day of month', 'specialsort': None, 'dict': domdict,},
+        {'label': 'month of year', 'specialsort': 'month', 'dict': moydict,},
+        {'label': 'year', 'specialsort': None, 'dict': yerdict,},
+        {'label': 'month-year', 'specialsort': 'monthyear', 'dict': myrdict,},
+        {'label': 'name length', 'specialsort': None, 'dict': name_lengths,},
+    ]
+    for collection in mapping:
+        d = collection['dict']
         dkeys_primary = list(d.keys())
         dkeys_primary.sort(key=d.get)
-        dkeys_secondary = specialsort(dkeys_primary, modes[index])
+        dkeys_secondary = specialsort(dkeys_primary, collection['specialsort'])
         dvals = [d[x] for x in dkeys_secondary]
 
         statisticoutput += labels[index] + '\n'
@@ -708,7 +715,7 @@ def show():
         if d is name_lengths:
             upperlabel = 'Name Lengths'
         else:
-            upperlabel = 'Subreddits created - %s' % labels[index]
+            upperlabel = 'Subreddits created - %s' % collection['label']
         plotbars(
             filename=upperlabel,
             upperlabel=upperlabel,
@@ -751,11 +758,11 @@ def show():
 
 def memberformat(member):
     member = FORMAT_MEMBER.format(
-        idstr=member[SQL_IDSTR],
-        human=member[SQL_HUMAN],
-        nsfw=member[SQL_NSFW],
-        name=member[SQL_NAME],
-        subscribers=member[SQL_SUBSCRIBERS])
+        idstr=member[SQL_SUBREDDIT['idstr']],
+        human=member[SQL_SUBREDDIT['human']],
+        nsfw=member[SQL_SUBREDDIT['nsfw']],
+        name=member[SQL_SUBREDDIT['name']],
+        subscribers=member[SQL_SUBREDDIT['subscribers']])
     return member
 
 def dictadding(targetdict, item):
@@ -809,7 +816,7 @@ def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, d
                to no sort.
     """
     querys = ''.join([c for c in query if c in GOODCHARS])
-    queryx = '%%%s%%' % querys
+    queryx = '%%{term}%%'.format(term=querys)
     if '!' in query:
         cur.execute('SELECT * FROM subreddits WHERE name LIKE ?', [querys])
         return cur.fetchone()
@@ -838,7 +845,7 @@ def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, d
 
     lenq = len(querys)
     for item in fetchgenerator(cur):
-        name = item[SQL_NAME]
+        name = item[SQL_SUBREDDIT['name']]
         if casesense is False:
             name = name.lower()
         if querys not in name:
@@ -858,30 +865,29 @@ def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, d
             continue
         results.append(item)
 
+    if len(results) == 0:
+        if doreturn:
+            return []
+        else:
+            return
+
     if sort is not None:
-        results.sort(key=lambda x: x[sort], reverse=True)
+        is_numeric = isinstance(results[0][sort], int)
+        if is_numeric:
+            results.sort(key=lambda x: x[sort], reverse=True)
+        else:
+            results.sort(key=lambda x: x[sort].lower())
+
     if doreturn is True:
         return results
     else:
         for item in results:
             print(item)
 
-def strftime_dict(dt):
-    '''
-    Given a datetime object, prepare a dictionary containing the strftime strings
-    for the following formatters:'%H', '%A', '%d', '%B', '%b%Y', '%Y'.
-    '''
-    formatters = ['%H', '%A', '%d', '%B', '%b%Y', '%Y']
-    fmt = '||'.join(formatters)
-    strf = datetime.datetime.strftime(dt, fmt)
-    strf = strf.split('||')
-    d = {formatters[i]:strf[i] for i in range(len(formatters))}
-    return d
-
 def findwrong():
     cur.execute('SELECT * FROM subreddits WHERE NAME!=?', ['?'])
     fetch = cur.fetchall()
-    fetch.sort(key=lambda x: x[SQL_IDINT])
+    fetch.sort(key=lambda x: x[SQL_SUBREDDIT['idint']])
     #sorted by ID
     fetch = fetch[25:]
     
@@ -911,7 +917,7 @@ def jumble(count=20, doreturn=False, nsfw=False):
     random.shuffle(fetch)
     fetch = fetch[:count]
     fetch = [f[:-1] for f in fetch]
-    fetchstr = [i[SQL_NAME] for i in fetch]
+    fetchstr = [i[SQL_SUBREDDIT['name']] for i in fetch]
     fetchstr = '+'.join(fetchstr)
     output = [fetchstr, fetch]
     if doreturn:

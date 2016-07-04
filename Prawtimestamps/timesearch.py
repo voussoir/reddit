@@ -21,23 +21,23 @@ timesearch:
     > timesearch timesearch -r subredditname <flags>
     > timesearch timesearch -u username <flags>
 
-    -r | --subreddit:
+    -r "test" | --subreddit "test":
         The subreddit to scan. Mutually exclusive with username.
 
-    -u | --username:
+    -u "test" | --username "test":
         The user to scan. Mutually exclusive with subreddit.
 
-    -l | --lower:
+    -l "update" | --lower "update":
         If a number - the unix timestamp to start at.
         If "update" - continue from latest submission in db.
         Default: update
 
-    -up | --upper:
+    -up 1467460221 | --upper 1467460221:
         If a number - the unix timestamp to stop at.
         If not provided - stop at current time.
         Default: current time
 
-    -i | --interval:
+    -i 86400 | --interval 86400:
         The initial interval for the scanning window.
         Default: 86400
 
@@ -50,19 +50,19 @@ commentaugment:
     > timesearch commentaugment database.db <flags>
 
     flags:
-    -l | --limit:
+    -l 18 | --limit 18:
         The number of MoreComments objects to replace.
         Default: No limit
 
-    -t | --threshold:
+    -t 5 | --threshold 5:
         The number of comments a MoreComments object must claim to have for us to open it.
         Default: >= 0
 
-    -n | --num_thresh:
+    -n 4 | --num_thresh 4:
         The number of comments a submission must claim to have for us to scan it at all.
         Default: >= 1
 
-    -s | --specific:
+    -s "t3_xxxxxx" | --specific "t3_xxxxxx":
         Given a submission ID in the form t3_xxxxxxx, scan only that submission.
 
     -v | --verbose:
@@ -74,9 +74,27 @@ offline_reading:
     > timesearch offline_reading database.db <flags>
 
     flags:
-    -s | --specific:
+    -s "t3_xxxxxx" | --specific "t3_xxxxxx":
         Given a submission ID in the form t3_xxxxxxx, render only that submission.
         Otherwise render every submission in the database.
+
+livestream:
+    Continously collect posts
+
+    > timesearch livestream <flags>
+
+    flags:
+    -r "test" | --subreddit "test":
+        The subreddit to collect from
+
+    -u "test" | --username "test":
+        The redditor to collect from
+
+    -s | --submissions:
+        If provided, do collect submissions. Otherwise don't.
+
+    -c | --comments:
+        If provided, do collect comments. Otherwise don't.
 
 '''
 
@@ -104,8 +122,8 @@ MAXIMUM_EXPANSION_MULTIPLIER = 2
 # when not enough posts are found.
 DATABASE_FOLDER = 'databases'
 HTML_FOLDER = 'html'
-DATABASE_SUBREDDIT = '%s/%s.db' % (DATABASE_FOLDER, '%s')
-DATABASE_USER = '%s/@%s.db' % (DATABASE_FOLDER, '%s')
+DATABASE_SUBREDDIT = '%s/%s' % (DATABASE_FOLDER, '%s')
+DATABASE_USER = '%s/@%s' % (DATABASE_FOLDER, '%s')
 
 ''' All done! '''
 
@@ -218,7 +236,9 @@ def livestream(subreddit=None, username=None, sleepy=30, submissions=True, comme
     and insert them into the database
     '''
     if bool(subreddit) == bool(username):
-        raise Exception('Enter either username / subreddit parameter, but not both')
+        raise Exception('Require either username / subreddit parameter, but not both')
+    if bool(submissions) is bool(comments) is False:
+        raise Exception('Require submissions and/or comments parameter')
     login()
 
     if subreddit:
@@ -236,6 +256,7 @@ def livestream(subreddit=None, username=None, sleepy=30, submissions=True, comme
     
     sql = sql_open(databasename)
     cur = sql.cursor()
+    initialize_database(sql, cur)
     while True:
         try:
             r.handler.clear_cache()
@@ -271,8 +292,8 @@ def livestream_helper(submission_function=None, comment_function=None, debug=Fal
     Given a submission-retrieving function and/or a comment-retrieving function,
     collect submissions and comments in a list together and return that.
     '''
-    if (submission_function, comment_function) == (None, None):
-        raise TypeError('livestream helper got double Nones')
+    if bool(submission_function) is bool(comment_function) is False:
+        raise Exception('Require submissions and/or comments parameter')
     results = []
 
     if submission_function:
@@ -604,15 +625,17 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
         elif isinstance(item, praw.objects.Comment):
             comments.append(item)
 
-    try:
-        while True:
+    while True:
+        try:
             if limit is not None and limit <= 0:
                 break
             if len(morecomments) == 0:
                 break
             morecomments.sort(key=lambda x: x.count)
             mc = morecomments.pop()
+            print('more')
             additional = nofailrequest(mc.comments)()
+            print('moremore')
             additionals = 0
             if limit is not None:
                 limit -= 1
@@ -627,10 +650,10 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
                 if limit is not None:
                     s += ' Can perform %d more replacements' % limit
                 print(s)
-    except KeyboardInterrupt:
-        pass
-    except:
-        traceback.print_exc()
+        except KeyboardInterrupt:
+            raise
+        except:
+            traceback.print_exc()
     return comments
 
 
@@ -934,7 +957,7 @@ def tree_from_submission(submission, commentpool):
     print('Building tree for %s (%d comments)' % (submission.idstr, len(commentpool)))
     # Thanks Martin Schmidt for the algorithm
     # http://stackoverflow.com/a/29942118/5430534
-    tree = TreeNode(submission.idstr, submission)
+    tree = TreeNode(identifier=submission.idstr, data=submission)
     node_map = {}
 
     for comment in commentpool:
@@ -1004,14 +1027,29 @@ def database_filename(subreddit=None, username=None):
         raise ValueError('Enter subreddit or username but not both')
 
     text = subreddit or username
-    if text.endswith('.db'):
-        text = text[:-3]
-    text = text.replace('/', '\\')
-    text = text.split('\\')[-1]
+    text = text.replace('/', os.sep)
+
+    if os.sep in text:
+        # If they've given us a full path, don't mess
+        # with it
+        return text
+
+    text = text.replace('\\', os.sep)
+    if not text.endswith('.db'):
+        text += '.db'
+
     if subreddit:
-        return DATABASE_SUBREDDIT % text
+        full_path = DATABASE_SUBREDDIT % text
     else:
-        return DATABASE_USER % text
+        full_path = DATABASE_USER % text
+
+    basename = os.path.basename(full_path)
+    if os.path.exists(basename):
+        # Prioritize existing local files of the same name before creating
+        # the deeper, proper one.
+        return basename
+
+    return full_path
 
 def fetchgenerator(cursor):
     while True:
@@ -1302,17 +1340,20 @@ def update_scores(databasename, submissions=True, comments=False):
 
 int_none = lambda x: int(x) if (x is not None or isinstance(x, str)) else x
 def timesearch_argparse(args):
-    login()
+    if args.lower == 'update':
+        lower = 'update'
+    else:
+        lower = int_none(args.lower)
+
     return timesearch(
         subreddit=args.subreddit,
         username=args.username,
-        lower=int_none(args.lower),
+        lower=lower,
         upper=int_none(args.upper),
         interval=int_none(args.interval),
         )
 
 def commentaugment_argparse(args):
-    login()
     return commentaugment(
         databasename=args.databasename,
         limit=int_none(args.limit),
@@ -1328,12 +1369,21 @@ def offline_reading_argparse(args):
         specific_submission=args.specific_submission,
         )
 
-
+def livestream_argparse(args):
+    if args.submissions is args.comments is False:
+        raise ValueError('At least -s or -c must be provided')
+    return livestream(
+        subreddit=args.subreddit,
+        username=args.username,
+        submissions=args.submissions,
+        comments=args.comments,
+        sleepy=args.sleepy
+        )
 
 def main():
-    if listget(sys.argv, 1, '').lower() in ('help', '-h', '--help'):
+    if listget(sys.argv, 1, '').lower() in ('', 'help', '-h', '--help'):
         print(DOCSTRING)
-        quit()
+        return
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
 
@@ -1358,6 +1408,14 @@ def main():
     p_offline_reading.add_argument('databasename')
     p_offline_reading.add_argument('-s', '--specific', dest='specific_submission', default=None)
     p_offline_reading.set_defaults(func=offline_reading_argparse)
+
+    p_livestream = subparsers.add_parser('livestream')
+    p_livestream.add_argument('-r', '--subreddit', dest='subreddit', default=None)
+    p_livestream.add_argument('-u', '--user', dest='username', default=None)
+    p_livestream.add_argument('-s', '--submissions', dest='submissions', action='store_true')
+    p_livestream.add_argument('-c', '--comments', dest='comments', action='store_true')
+    p_livestream.add_argument('-w', '--wait', dest='sleepy', default=30)
+    p_livestream.set_defaults(func=livestream_argparse)
 
     args = parser.parse_args()
     args.func(args)

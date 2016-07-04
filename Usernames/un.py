@@ -488,6 +488,14 @@ def processid(idnum, ranger=1):
             print('No idea.')
 pid = processid
 
+def process_input():
+    while True:
+        x = input('p> ')
+        try:
+                process(x, quiet=True, noskip=True)
+        except:
+                traceback.print_exc()
+
 def process_from_database(filename, table, column, delete_original=False):
     '''
     Warning: if delete_original is True, the original database will lose each username
