@@ -10,7 +10,7 @@ import time
 import traceback
 
 
-sql = sqlite3.connect('C:/git/reddit/usernames/un.db')
+sql = sqlite3.connect('C:\\git\\reddit\\usernames\\un.db')
 cur = sql.cursor()
 cur.execute('''
     CREATE TABLE IF NOT EXISTS users(
@@ -28,28 +28,24 @@ cur.execute('''
 cur.execute('CREATE INDEX IF NOT EXISTS userindex ON users(idint)')
 cur.execute('CREATE INDEX IF NOT EXISTS nameindex ON users(lowername)')
 sql.commit()
-#  0 - idint
-#  1 - idstr
-#  2 - created
-#  3 - human
-#  4 - name
-#  5 - link karma
-#  6 - comment karma
-#  7 - total karma
-#  8 - available
-#  9 - lastscan
-SQL_COLUMNCOUNT = 11
-SQL_IDINT = 0
-SQL_IDSTR = 1
-SQL_CREATED = 2
-SQL_HUMAN = 3
-SQL_NAME = 4
-SQL_LINK_KARMA = 5
-SQL_COMMENT_KARMA = 6
-SQL_TOTAL_KARMA = 7
-SQL_AVAILABLE = 8
-SQL_LASTSCAN = 9
-SQL_LOWERNAME = 10
+
+# These numbers are used for interpreting the tuples that come from SELECT
+SQL_USER_COLUMNS = [
+    'idint',
+    'idstr',
+    'created',
+    'human',
+    'name',
+    'link_karma',
+    'comment_karma',
+    'total_karma',
+    'available',
+    'lastscan',
+    'lowername',
+]
+
+SQL_USER = {key:index for (index, key) in enumerate(SQL_USER_COLUMNS)}
+
 
 USERAGENT = '''
 /u/GoldenSights Usernames data collection:
@@ -350,8 +346,8 @@ def memberformat_brief(data, spacer='.'):
     '''
     Shorter version of memberformat which I'm using for the "available" list.
     '''
-    name = data[SQL_NAME]
-    lastscan = data[SQL_LASTSCAN]
+    name = data[SQL_USER['name']]
+    lastscan = data[SQL_USER['lastscan']]
     lastscan = human(lastscan)
 
     out = MEMBERFORMAT_BRIEF % (lastscan, name)
@@ -362,19 +358,19 @@ def memberformat_full(data, spacer='.'):
     Given a data list, create a string that will
     become a single row in one of the show files.
     '''
-    idstr = data[SQL_IDSTR]
+    idstr = data[SQL_USER['idstr']]
     idstr = commapadding(idstr, spacer, 5, forcestring=True)
 
     # Usernames are maximum of 20 chars
-    name = data[SQL_NAME]
+    name = data[SQL_USER['name']]
     name += spacer*(20 - len(name))
 
-    thuman = data[SQL_HUMAN]
+    thuman = data[SQL_USER['human']]
     if thuman is None:
         thuman = ' '*24
-    link_karma = data[SQL_LINK_KARMA]
-    comment_karma = data[SQL_COMMENT_KARMA]
-    total_karma = data[SQL_TOTAL_KARMA]
+    link_karma = data[SQL_USER['link_karma']]
+    comment_karma = data[SQL_USER['comment_karma']]
+    total_karma = data[SQL_USER['total_karma']]
     if link_karma is None:
         link_karma = commapadding('None', spacer, 9)
         comment_karma = commapadding('None', spacer, 9)
@@ -384,7 +380,7 @@ def memberformat_full(data, spacer='.'):
         comment_karma = commapadding(comment_karma, spacer, 9)
         total_karma = commapadding(total_karma, spacer, 10)
 
-    lastscan = data[SQL_LASTSCAN]
+    lastscan = data[SQL_USER['lastscan']]
     lastscan = human(lastscan)
     out = MEMBERFORMAT_FULL % (
         idstr,
@@ -431,28 +427,28 @@ def process(users, quiet=False, knownid='', noskip=False):
     current = 0
     for user in users:
         current += 1
-        data = [None] * SQL_COLUMNCOUNT
-        data[SQL_LASTSCAN] = int(getnow())
+        data = [None] * len(SQL_USER)
+        data[SQL_USER['lastscan']] = int(getnow())
         if isinstance(user, list):
             # This happens when we receive NotFound. [name, availability]
             if knownid != '':
-                data[SQL_IDINT] = b36(knownid)
-                data[SQL_IDSTR] = knownid
+                data[SQL_USER['idint']] = b36(knownid)
+                data[SQL_USER['idstr']] = knownid
             data[SQL_NAME] = user[0]
             data[SQL_AVAILABLE] = AVAILABILITY[user[1]]
         else:
             # We have a Redditor object.
             h = human(user.created_utc)
-            data[SQL_IDINT] = b36(user.id)
-            data[SQL_IDSTR] = user.id
-            data[SQL_CREATED] = user.created_utc
-            data[SQL_HUMAN] = h
-            data[SQL_NAME] = user.name
-            data[SQL_LINK_KARMA] = user.link_karma
-            data[SQL_COMMENT_KARMA] = user.comment_karma
-            data[SQL_TOTAL_KARMA] = user.comment_karma + user.link_karma
-            data[SQL_AVAILABLE] = 0
-        data[SQL_LOWERNAME] = data[SQL_NAME].lower()
+            data[SQL_USER['idint']] = b36(user.id)
+            data[SQL_USER['idstr']] = user.id
+            data[SQL_USER['created']] = user.created_utc
+            data[SQL_USER['human']] = h
+            data[SQL_USER['name']] = user.name
+            data[SQL_USER['link_karma']] = user.link_karma
+            data[SQL_USER['comment_karma']] = user.comment_karma
+            data[SQL_USER['total_karma']] = user.comment_karma + user.link_karma
+            data[SQL_USER['available']] = 0
+        data[SQL_USER['lowername']] = data[SQL_USER['name']].lower()
 
         printprefix = '%04d' % current
         x = smartinsert(data, printprefix)
@@ -474,7 +470,7 @@ def processid(idnum, ranger=1):
         idnum = x + base
         exists = getentry(idint=idnum)
         if exists is not None:
-            print('Skipping %s : %s' % (b36(idnum), exists[SQL_NAME]))
+            print('Skipping %s : %s' % (b36(idnum), exists[SQL_USER['name']]))
             continue
         idnum = 't2_' + b36(idnum)
         idnum = idnum.lower()
@@ -526,18 +522,24 @@ def process_from_database(filename, table, column, delete_original=False):
     return s
 
 def print_message(data, printprefix=''):
-    if data[SQL_HUMAN] is not None:
-        print('%s %s : %s : %s : %d : %d' % (
-                printprefix,
-                data[SQL_IDSTR].rjust(5, ' '),
-                data[SQL_HUMAN],
-                data[SQL_NAME],
-                data[SQL_LINK_KARMA],
-                data[SQL_COMMENT_KARMA]))
+    if data[SQL_USER['human']] is not None:
+        print('{prefix:>5} {idstr} : {human} : {name} : {link_karma} : {comment_karma}'.format(
+            prefix=printprefix,
+            idstr=data[SQL_USER['idstr']],
+            human=data[SQL_USER['human']],
+            name=data[SQL_USER['name']],
+            link_karma=data[SQL_USER['link_karma']],
+            comment_karma=data[SQL_USER['comment_karma']],
+            )
+        )
     else:
-        statement = 'available' if data[SQL_AVAILABLE] is 1 else 'unavailable'
-        statement = statement.rjust(32, ' ')
-        print('%s %s : %s' % (printprefix, statement, data[SQL_NAME]))
+        availability = 'available' if data[SQL_USER['available']] is 1 else 'unavailable'
+        print('{prefix:>5} {availability:>32} : {name}'.format(
+            prefix=printprefix,
+            availability=statement,
+            name=data[SQL_USER['name']],
+            )
+        )
 
 def save_textfile(filename, lines):
     '''

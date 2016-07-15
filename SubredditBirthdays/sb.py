@@ -654,6 +654,7 @@ def show():
 
     def datetimedict(statsdict, strf):
         statsdict[strf] = statsdict.get(strf, 0) + 1
+
     hoddict = {}
     dowdict = {}
     domdict = {}
@@ -664,7 +665,6 @@ def show():
     cur.execute('SELECT * FROM subreddits WHERE created != 0')
     for item in fetchgenerator(cur):
         dt = datetime.datetime.utcfromtimestamp(item[SQL_SUBREDDIT['created']])
-        strftimes = strftime_dict(dt)
 
         datetimedict(hoddict, dt.strftime('%H')) # 01
         datetimedict(dowdict, dt.strftime('%A')) # Monday

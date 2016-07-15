@@ -1,224 +1,289 @@
-#/u/GoldenSights
+#/u/goldensights
+import datetime
 import praw
 import time
 import sqlite3
-import datetime
 import traceback
 
-'''USER CONFIGURATION'''
+''' USER CONFIGURATION '''
 
+USERAGENT = ""
 APP_ID = ""
 APP_SECRET = ""
 APP_URI = ""
 APP_REFRESH = ""
 # https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
-USERAGENT = ""
-#This is a short description of what the bot does. For example "/u/GoldenSights' Newsletter bot"
+
 SUBREDDIT = "GoldTesting"
-#This is the sub or list of subs to scan for new posts. For a single sub, use "sub1". For multiple subreddits, use "sub1+sub2+sub3+..."
-RATIO = 2
-#This is the required ratio of COMMENTS divided by SUBMISSIONS
-
-PUNISHMENTREPORT = False
-#Should the bot report the comment? (Use True or False. Use Capitals, no quotations.)
-
-PUNISHMENTREMOVE = False
-#Should the bot remove the comment? (Use True or False. Use Capitals, no quotations.)
-
-PUNISHMENTREPLY = False
-PUNISHMENTREPLYSTR = "You have fallen below the comment/submission ratio of " + str(RATIO) + "."
-PUNISHMENTREPLYDISTINGUISH = True
-#Should the bot reply to the comment? If True, it will use this string. 
-
-PUSHTOWIKI = True
-PUSHTOWIKIFILE = "wiki.txt"
-PUSHTOWIKISUBREDDIT = "GoldTesting"
-PUSHTOWIKIPAGE = "heyo"
-#Should the database be displayed on a subreddit wiki page?
-#The wiki page (PUSHTOWIKIPAGE) will be updated in accordance to a file (PUSHTOWIKIFILE) stored in the same directory as this .py
-#You must restart this bot if you edit the wiki file
-PUSHTOWIKIWAIT = 120
-#This is how many seconds you will wait between wiki page updates. The wiki does not need to be updated on every run
-
-TABLESORT = 3
-#This is how the Table on the wiki will be sorted
-#0 = Username
-#1 = Comment count
-#2 = Submission count
-#3 = Comment/Submission ratio
+# Subreddit to scan for posts. For a single sub, use "subreddit"
+# For multiple subreddits, use "sub1+sub2+..."
 
 MAXPOSTS = 100
-#This is how many posts you want to retrieve all at once. PRAW can download 100 at a time.
-WAIT = 20
-#This is how many seconds you will wait between cycles. The bot is completely inactive during this time.
+# How many submissions and comments (each) to collect on each cycle
+# Can get up to 100 in a single request. Max 1000 per subreddit.
 
+REQUIRED_RATIO = 2
+# The required ratio of COMMENTS divided by SUBMISSIONS
 
-'''All done!'''
+REQUIRED_RATIO_DO_MODMAIL = False
+REQUIRED_RATIO_MESSAGE_SUBREDDIT = "GoldTesting"
+REQUIRED_RATIO_MESSAGE_SUBJECT = "SubmissionRatio warning"
+REQUIRED_RATIO_MESSAGE_TEXT = '''
+/u/{username} has fallen below the required ratio of {required}.
+Their current ratio is {ratio:.2f}.
 
+Please investigate.
+'''
+# When a user falls below the required threshold, should the bot notify the
+# moderators?
 
+PUSH_TO_WIKI = True
+# Should the bot publish ratios on a wiki page?
+PUSH_TO_WIKI_SUBREDDIT = "GoldTesting"
+# The subreddit whose wiki page will receive the publish.
+# This is separate from SUBREDDIT because SUBREDDIT can be multiple subs.
+PUSH_TO_WIKI_PAGE = "heyo"
+# The wiki page
+PUSH_TO_WIKI_TEMPLATE_FILE = "wiki.txt"
+# The base text for the wiki page.
+PUSH_TO_WIKI_WAIT = 3600
+# How many seconds between wiki publishes?
 
-WAITS = str(WAIT)
-lastwikiupdate = 0
+TABLE_SORT = 'ratio'
+# How will the table on the wiki page be sorted. Pick one:
+# 'username'
+# 'submissions'
+# 'comments'
+# 'ratio'
+TABLE_DESCENDING = True
+# Should the table be greatest-first
+
+''' All done! '''
 
 try:
-	import bot
-	USERAGENT = bot.aG
+    import bot
+    USERAGENT = bot.aG
+    APP_ID = bot.oG_id
+    APP_SECRET = bot.oG_secret
+    APP_URI = bot.oG_uri
+    APP_REFRESH = bot.oG_scopes['all']
 except ImportError:
     pass
 
+SQL_USER_COLUMNS = [
+    'username',
+    'submissions',
+    'comments',
+    'warned',
+]
+SQL_USER = {key:index for (index, key) in enumerate(SQL_USER_COLUMNS)}
+
+TABLE_TEMPLATE = '''
+Username | Comments | Submissions | Ratio
+:-       |       -: |          -: |    -:
+{rows}
+'''
+ROW_TEMPLATE = '{username} | {comments} | {submissions} | {ratio:.2f}'
+
 sql = sqlite3.connect('sql.db')
-print('Loaded SQL Database')
 cur = sql.cursor()
 
-cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
-cur.execute('CREATE TABLE IF NOT EXISTS users(NAME TEXT, COMMENTS INT, SUBMISSIONS INT, RATIO REAL)')
-print('Loaded Completed table')
-
-if PUSHTOWIKI:
-	try:
-		wikifile = open(PUSHTOWIKIFILE, 'r')
-		print('Loaded Wiki file')
-	except FileNotFoundError:
-		wikifile = open(PUSHTOWIKIFILE, 'w')
-		print('Wiki File was not found, and has been created')
-
+cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT, author TEXT)')
+cur.execute('CREATE TABLE IF NOT EXISTS users(username TEXT, submissions INT, comments INT, warned INT)')
+cur.execute('CREATE INDEX IF NOT EXISTS post_index ON oldposts(id)')
+cur.execute('CREATE INDEX IF NOT EXISTS user_index ON users(username)')
 sql.commit()
+
+last_wiki_update = 0
 
 r = praw.Reddit(USERAGENT)
 r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
 r.refresh_access_information(APP_REFRESH)
 
-def getTime(bool):
-	timeNow = datetime.datetime.now(datetime.timezone.utc)
-	timeUnix = timeNow.timestamp()
-	if bool is False:
-		return timeNow
-	else:
-		return timeUnix
+def build_table(table_sort=None, table_descending=None):
+    table_sort = table_sort or TABLE_SORT
+    if table_descending is None:
+        table_descending = TABLE_DESCENDING
+    cur.execute('SELECT * FROM users')
+    users = cur.fetchall()
+    user_details = []
 
-def updatewiki():
-	global lastwikiupdate
-	if PUSHTOWIKI:
-		now = getTime(True)
-		if now - lastwikiupdate > PUSHTOWIKIWAIT:
-			print('Updating wiki page "' + PUSHTOWIKIPAGE + '"')
-			with open(PUSHTOWIKIFILE, 'r') as temp:
-				lines = [line.strip() for line in temp]
+    for user in users:
+        detail = {columnname: user[index] for (columnname, index) in SQL_USER.items()}
+        user_details.append(detail)
 
-			for pos in range(len(lines)):
-				line = lines[pos]
+    for detail in user_details:
+        detail['ratio'] = detail['comments'] / max(detail['submissions'], 1)
 
-				try:
-					if line[0] == '#':
-						lines[pos] = ''
-					else:
-						if "__BUILDTABLE__" in line:
-							print('\tBuilding Table')
-							cur.execute('SELECT * FROM users')
-							fetched = cur.fetchall()
-							try:
-								fetched.sort(key=lambda x: x[TABLESORT].lower())
-							except:
-								fetched.sort(key=lambda x: x[TABLESORT])
-							if TABLESORT != 0:
-								fetched.reverse()
-							table = '\n\nUsername | Comments | Submissions | Ratio\n'
-							table += ':- | -: | -: | -:\n'
-							for item in fetched:
-								table += '/u/' + item[0] + ' | ' + str(item[1]) + ' | ' + str(item[2]) + ' | ' + str(item[3]) + '\n'
-							table += '\n\n'
-							lines[pos] = line.replace('__BUILDTABLE__', table)
+    def key(x):
+        if table_sort in x:
+            entry = x[table_sort]
+        else:
+            entry = x['username']
 
-						if "__STRFTIME" in line:
-							print('\tBuilding timestamp')
-							form = line.split('"')[1]
-							now = getTime(False)
-							now = now.strftime(form)
-							lines[pos] = line.replace('__STRFTIME("' + form + '")__', now)
-				except:
-					pass
+        try:
+            return entry.lower()
+        except AttributeError:
+            return entry
 
-			final = '\n\n'.join(lines)
-			r.edit_wiki_page(PUSHTOWIKISUBREDDIT, PUSHTOWIKIPAGE, final, reason=str(now))
-			lastwikiupdate = now
-			print('\tDone')
+    user_details.sort(key=key, reverse=table_descending)
 
-		else:
-			print('Wiki page will update in ' + str(round(PUSHTOWIKIWAIT - (now-lastwikiupdate))) + ' seconds.')
+    rows = [format_row(detail) for detail in user_details]
+    rows = '\n'.join(rows)
+    table = TABLE_TEMPLATE.format(rows=rows)
+    table = '\n\n{t}\n\n'.format(t=table)
+    return table
 
-def updatebase(l):
-	for post in l:
-		cur.execute('SELECT * FROM oldposts WHERE ID=?', [post.fullname])
-		if not cur.fetchone():
-			print(post.id)
-			try:
-				pauthor = post.author.name
-				cur.execute('SELECT * FROM users WHERE NAME=?', [pauthor])
-				fetched = cur.fetchone()
-				if not fetched:
-					print('\tNew user: ' + pauthor)
-					cur.execute('INSERT INTO users VALUES(?, ?, ?, ?)', [pauthor, 0, 0, 0])
-					fetched = [pauthor, 0, 0, 0]
+def digest_posts(posts):
+    '''
+    Given a list of Submission and Comment objects, update the user data
+    '''
+    user_posts_map = posts_to_user_map(posts)
+
+    for (username, user_posts) in user_posts_map.items():
+        new_submissions = 0
+        new_comments = 0
+        for post in user_posts:
+            cur.execute('SELECT * FROM oldposts WHERE id == ?', [post.fullname])
+            if cur.fetchone():
+                continue
+
+            cur.execute('INSERT INTO oldposts VALUES(@id, @author)', [post.fullname, username])
+
+            if isinstance(post, praw.objects.Submission):
+                new_submissions += 1
+            elif isinstance(post, praw.objects.Comment):
+                new_comments += 1
+
+        cur.execute('SELECT * FROM users WHERE username == ?', [username])
+        user_detail = cur.fetchone()
+        if user_detail is None:
+            total_submissions = new_submissions
+            total_comments = new_comments
+            warned = False
+            cur.execute('INSERT INTO users VALUES(@username, @submissions, @comments, @warned)', [username, total_submissions, total_comments, 0])
+        else:
+            total_submissions = new_submissions + user_detail[SQL_USER['submissions']]
+            total_comments = new_comments + user_detail[SQL_USER['comments']]
+            warned = user_detail[SQL_USER['warned']]
+            cur.execute('UPDATE users SET submissions = ?, comments = ? WHERE username == ?', [total_submissions, total_comments, username])
+
+        sql.commit()
+
+def format_row(detail):
+    row = ROW_TEMPLATE.format(
+        username=detail['username'],
+        comments=detail['comments'],
+        submissions=detail['submissions'],
+        ratio=detail['ratio'],
+    )
+    return row
+
+def get_now(timestamp=True):
+    now = datetime.datetime.now(datetime.timezone.utc)
+    if timestamp:
+        return now.timestamp()
+    return now
+
+def posts_to_user_map(posts):
+    subreddits = SUBREDDIT.lower()
+    subreddits = set(subreddits.split('+'))
+    user_posts_map = {}
+    for post in posts:
+        if post.author is None:
+            continue
+        if post.subreddit.display_name.lower() not in subreddits:
+            continue
+        author = post.author.name
+        user_posts_map.setdefault(author, [])
+        user_posts_map[author].append(post)
+    return user_posts_map
+
+def scan(limit=None):
+    limit = limit or MAXPOSTS
+    print('Scanning /r/%s' % SUBREDDIT)
+    subreddit = r.get_subreddit(SUBREDDIT)
+    posts = []
+    posts.extend(subreddit.get_new(limit=limit))
+    posts.extend(subreddit.get_comments(limit=limit))
+
+    digest_posts(posts)
+
+def send_warnings():
+    cur.execute('SELECT * FROM users')
+    users = cur.fetchall()
+    for user in users:
+        username = user[SQL_USER['username']]
+        submissions = user[SQL_USER['submissions']]
+        comments = user[SQL_USER['comments']]
+        previous_warned = user[SQL_USER['warned']]
+        ratio = comments / max(submissions, 1)
+
+        if ratio < REQUIRED_RATIO:
+            warned = True
+        else:
+            warned = False
+        cur.execute('UPDATE users SET warned = ? WHERE username == ?', [warned, username])
+
+        if warned and not previous_warned and REQUIRED_RATIO_DO_MODMAIL:
+            print('Warning {username} for ratio {ratio:.2f}'.format(username=username, ratio=ratio))
+            recipient = '/r/' + REQUIRED_RATIO_MESSAGE_SUBREDDIT
+            subject = REQUIRED_RATIO_MESSAGE_SUBJECT
+            text = REQUIRED_RATIO_MESSAGE_TEXT.format(
+                username=username,
+                required=REQUIRED_RATIO,
+                ratio=ratio,
+                )
+            r.send_message(recipient, subject, text)
+            sql.commit()
+    sql.commit()
+
+def update_wiki_page():
+    global last_wiki_update
+    now = get_now()
+
+    if now - last_wiki_update < PUSH_TO_WIKI_WAIT:
+        return
+
+    print('Updating wiki page')
+    with open(PUSH_TO_WIKI_TEMPLATE_FILE, 'r') as template_file:
+        lines = [line.strip() for line in template_file]
+
+    for (line_index, line) in enumerate(lines):
+        if len(line) == 0:
+            continue
+        if line[0] == '#':
+            # Blank out the comments
+            lines[line_index] = ''
+            continue
+        if '__BUILDTABLE__' in line:
+            table = build_table()
+            lines[line_index] = line.replace('__BUILDTABLE__', table)
+        if '__STRFTIME' in line:
+            # If the user formatted their line badly, it's their fault.
+            strf = line.split('__STRFTIME')[1]
+            strf = strf.split('"')[1]
+            timestamp = get_now(timestamp=False)
+            timestamp = timestamp.strftime(strf)
+            form = '__STRFTIME("' + strf + '")__'
+            lines[line_index] = line.replace(form, timestamp)
+
+    final = '\n\n'.join(lines)
+    r.edit_wiki_page(PUSH_TO_WIKI_SUBREDDIT, PUSH_TO_WIKI_PAGE, final, reason=now)
+    last_wiki_update = now
 
 
-				comments = fetched[1]
-				submissions = fetched[2]
-				if type(post) == praw.objects.Comment:
-					comments = comments + 1
-				if type(post) == praw.objects.Submission:
-					submissions = submissions + 1
-				denominator = (1 if submissions == 0 else submissions)
-				ratio = "%0.2f" % (comments / denominator)
-				print('\t' + pauthor)
-				print('\t' + str(comments) + 'c / ' + str(denominator) + 's = ' + str((comments / denominator))[:3])
-				ratio = float(ratio)
-				cur.execute('UPDATE users SET COMMENTS=?, SUBMISSIONS=?, RATIO=? WHERE NAME=?', [comments, submissions, ratio, pauthor])
+def main_once():
+    try:
+        scan()
+        send_warnings()
+        update_wiki_page()
+    except Exception:
+        traceback.print_exc()
 
-				if ratio < RATIO:
-					print("\tUser's ratio is too low!")
-					if PUNISHMENTREPORT:
-						print('\tReporting post')
-						post.report()
-					if PUNISHMENTREMOVE:
-						print('\tRemoving post')
-						post.remove()
-					if PUNISHMENTREPLY:
-						print('\tReplying to post')
-						if type(post) == praw.objects.Submission:
-							new = post.add_comment(PUNISHMENTREPLYSTR)
-						if type(post) == praw.objects.Comment:
-							new = post.reply(PUNISHMENTREPLYSTR)
-						if PUNISHMENTREPLYDISTINGUISH:
-							print('\tDistinguishing reply')
-							new.distinguish()
+def main_forever():
+    while True:
+        main_once()
 
-			except AttributeError:
-				print('\tComment or Author has been deleted')
-			cur.execute('INSERT INTO oldposts VALUES(?)', [post.fullname])
-		sql.commit()
-
-def scan():
-	print('Scanning ' + SUBREDDIT)
-	subreddit = r.get_subreddit(SUBREDDIT)
-
-	print('\tGathering submissions')
-	posts = list(subreddit.get_new(limit=MAXPOSTS))
-	updatebase(posts)
-
-	print()
-
-	print('\tGathering comments')
-	comments = list(subreddit.get_comments(limit=MAXPOSTS))
-	updatebase(comments)
-
-
-	
-while True:
-	try:
-		scan()
-		print()
-		updatewiki()
-	except:
-		traceback.print_exc()
-	print('Running again in ' + WAITS + ' seconds.\n')
-	time.sleep(WAIT)
+if __name__ == '__main__':
+    main_forever()

@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 1,131,035 subreddits
+#####Collected 1,164,240 subreddits
 
-#####[Today's jumble](http://reddit.com/r/edmproduction+visualnovels+Dublin+schnauzers+grilledcheese+TOR+nightvale+Texans+wsu+Military+porterrobinson+monsterhunterclan+animelegwear+SampleSize+pitchforkemporium+Astronomy+UWMadison+Sneks+LastManonEarthTV+watercooling)
+#####[Today's jumble](http://reddit.com/r/technews+nerdcubed+EmilyRatajkowski+fandomnatural+Blacksmith+dirtgame+AskDoctorSmeeee+saskatoon+projectcar+educationalgifs+spacex+BackYardChickens+simpsonsdidit+PennyDreadful+badMovies+Whiskyporn+Rateme+femalefashionadvice+BernTheConvention+accidjental)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

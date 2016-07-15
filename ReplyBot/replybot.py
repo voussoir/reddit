@@ -79,7 +79,7 @@ def replybot():
             print('Will not reply to myself.')
             continue
 
-        if KEYAUTHORS != [] and all(auth.lower() != pauthor for auth in KEYAUTHORS):
+        if KEYAUTHORS != [] and not any(auth.lower() == pauthor.lower() for auth in KEYAUTHORS):
             # This post was not made by a keyauthor
             continue
 

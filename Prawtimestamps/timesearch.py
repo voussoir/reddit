@@ -56,10 +56,12 @@ commentaugment:
 
     -t 5 | --threshold 5:
         The number of comments a MoreComments object must claim to have for us to open it.
+        Actual number received may be lower.
         Default: >= 0
 
     -n 4 | --num_thresh 4:
         The number of comments a submission must claim to have for us to scan it at all.
+        Actual number received may be lower.
         Default: >= 1
 
     -s "t3_xxxxxx" | --specific "t3_xxxxxx":
@@ -79,16 +81,17 @@ offline_reading:
         Otherwise render every submission in the database.
 
 livestream:
-    Continously collect posts
+    Continously collect posts.
 
-    > timesearch livestream <flags>
+    > timesearch livestream -r subredditname <flags>
+    > timesearch livestream -u username <flags>
 
     flags:
     -r "test" | --subreddit "test":
-        The subreddit to collect from
+        The subreddit to collect from.
 
     -u "test" | --username "test":
-        The redditor to collect from
+        The redditor to collect from.
 
     -s | --submissions:
         If provided, do collect submissions. Otherwise don't.
