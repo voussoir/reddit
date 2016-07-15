@@ -13,8 +13,4 @@ The first time you run the bot, set MAXPOSTS to 1000 and turn the modmail warnin
 
 Because Reddit only allows us to get [1,000](http://www.reddit.com/r/redditdev/comments/2ffide/listing_old_comments/ck8qlme) submissions and 1,000 comments, there are probably going to be a **TON** of people who didn't make it into your database, or are not fairly represented in your database. For this reason, you may not want to enable the modmail warning until you think the database has enough data.
 
-You may use AddUser.py to scan a user's profile for material in your subreddit to augment what the bot was able to collect. This is subject to the same 1k limits, but may pick up the scraps.
-
-You may use ChangeUser.py to manually enter a user's information, but you need to run AddUser on him first.
-
 You should download my wiki.txt file as a starting point, and modify it to your liking. Compare the contents of wiki.txt to [this page](http://www.reddit.com/r/GoldTesting/wiki/heyo) to understand how they match up.

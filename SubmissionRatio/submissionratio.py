@@ -22,6 +22,9 @@ MAXPOSTS = 100
 # How many submissions and comments (each) to collect on each cycle
 # Can get up to 100 in a single request. Max 1000 per subreddit.
 
+WAIT = 30
+# The number of seconds between cycles
+
 REQUIRED_RATIO = 2
 # The required ratio of COMMENTS divided by SUBMISSIONS
 
@@ -284,6 +287,8 @@ def main_once():
 def main_forever():
     while True:
         main_once()
+        print('Sleeping %d seconds' % WAIT)
+        time.sleep(WAIT)
 
 if __name__ == '__main__':
     main_forever()
