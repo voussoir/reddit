@@ -99,6 +99,48 @@ livestream:
     -c | --comments:
         If provided, do collect comments. Otherwise don't.
 
+redmash:
+    Dump submission information to a readable file in the `REDMASH_FOLDER`
+
+    > timesearch redmash -r subredditname <flags>
+    > timesearch redmash -u username <flags>
+
+    flags:
+    -r "test" | --subreddit "test":
+        The subreddit database to dump
+
+    -u "test" | --username "test":
+        The username database to dump
+
+    --all:
+        Perform all of the mashes listed below.
+
+    --date:
+        Perform a mash sorted by date.
+
+    --title:
+        Perform a mash sorted by title.
+
+    --score:
+        Perform a mash sorted by score.
+
+    --author:
+        For subreddit databases only.
+        Perform a mash sorted by author.
+
+    --sub:
+        For username databases only.
+        Perform a mash sorted by subreddit.
+
+    --flair:
+        Perform a mash sorted by flair.
+
+    --html:
+        Write HTML files instead of plain text.
+
+    -st 50 | --score_threshold 50:
+        Only mash posts with at least this many points.
+
 '''
 
 import argparse
@@ -120,13 +162,42 @@ APP_SECRET = ""
 APP_URI = ""
 APP_REFRESH = ""
 # https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
+
 MAXIMUM_EXPANSION_MULTIPLIER = 2
 # The maximum amount by which it can multiply the interval
 # when not enough posts are found.
-DATABASE_FOLDER = 'databases'
-HTML_FOLDER = 'html'
-DATABASE_SUBREDDIT = '%s/%s' % (DATABASE_FOLDER, '%s')
-DATABASE_USER = '%s/@%s' % (DATABASE_FOLDER, '%s')
+
+DATABASE_FOLDER = 'databases/'
+HTML_FOLDER = 'html/'
+REDMASH_FOLDER = 'redmash/'
+
+DATABASE_PLAIN = '%s%s' % (DATABASE_FOLDER, '%s')
+DATABASE_SUBREDDIT = '%s%s' % (DATABASE_FOLDER, '%s')
+DATABASE_USER = '%s@%s' % (DATABASE_FOLDER, '%s')
+
+REDMASH_FORMAT_TXT = '''
+{timestamp}: [{title}]({shortlink}) - /u/{author} (+{score})
+'''.replace('\n', '')
+REDMASH_FORMAT_HTML = '''
+{timestamp}: <a href=\"{shortlink}\">[{flairtext}] {title}</a> - <a href=\"{authorlink}\">{author}</a> (+{score})<br>
+'''.replace('\n', '')
+
+REDMASH_TIMESTAMP = '%Y %b %d'
+#The time format.
+# "%Y %b %d" = "2016 August 10"
+# See http://strftime.org/
+
+REDMASH_HTML_HEAD = '''
+<head>
+<meta charset="UTF-8">
+<style>
+    *
+    {
+        font-family: Consolas;
+    }
+</style>
+</head>
+'''
 
 ''' All done! '''
 
@@ -232,8 +303,17 @@ prompt_ts_startinginterval = '''
     ####        ####    ####
     ####        ####    ####
   ########        ########  
+# Timesearch
 
-def livestream(subreddit=None, username=None, sleepy=30, submissions=True, comments=False, limit=100, debug=False):
+def livestream(
+        subreddit=None,
+        username=None,
+        sleepy=30,
+        submissions=True,
+        comments=False,
+        limit=100,
+        debug=False,
+    ):
     '''
     Continuously get posts from this source
     and insert them into the database
@@ -478,6 +558,7 @@ def timesearch_prompt():
 ####      ####  ####    ####
   ####    ####  ####    ####
     ########    ####    ####
+# Commentaugment
 
 def commentaugment(
         databasename,
@@ -486,7 +567,7 @@ def commentaugment(
         specific_submission=None,
         threshold=0,
         verbose=0,
-        ):
+    ):
     '''
     Take the IDs of collected submissions, and gather comments from those threads.
     Please see the global DOCSTRING variable.
@@ -636,9 +717,9 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
                 break
             morecomments.sort(key=lambda x: x.count)
             mc = morecomments.pop()
-            print('more')
+            #print('more')
             additional = nofailrequest(mc.comments)()
-            print('moremore')
+            #print('moremore')
             additionals = 0
             if limit is not None:
                 limit -= 1
@@ -669,6 +750,7 @@ def manually_replace_comments(incomments, limit=None, threshold=0, verbose=False
 ####      ####    ####    ####
   ####  ####      ####    ####
     ######      ######    ####
+# Offline Reading
 
 class DBEntry:
     def __init__(self, fetch):
@@ -841,8 +923,8 @@ def html_from_database(databasename, specific_submission=None):
     submission_trees = trees_from_database(databasename, specific_submission)
     for submission_tree in submission_trees:
         page = html_from_tree(submission_tree, sort=lambda x: x.data.score * -1)
-        if not os.path.exists(HTML_FOLDER):
-            os.makedirs(HTML_FOLDER)
+        if HTML_FOLDER != '':
+            os.makedirs(HTML_FOLDER, exist_ok=True)
         html_basename = '%s.html' % submission_tree.identifier
         html_filename = os.path.join(HTML_FOLDER, html_basename)
         html_handle = open(html_filename, 'w', encoding='utf-8')
@@ -987,6 +1069,142 @@ def tree_from_submission(submission, commentpool):
     return tree
 
 
+############    ####      #### 
+  ####    ####  ######  ###### 
+  ####    ####  ############## 
+  ####    ####  ############## 
+  ##########    ####  ##  #### 
+  ####  ####    ####      #### 
+  ####    ####  ####      #### 
+  ####    ####  ####      #### 
+######    ####  ####      #### 
+# Redmash
+
+def redmash(
+        subreddit=None,
+        username=None,
+        do_all=False,
+        do_date=False,
+        do_title=False,
+        do_score=False,
+        do_author=False,
+        do_subreddit=False,
+        do_flair=False,
+        html=False,
+        score_threshold=0,
+    ):
+    databasename = database_filename(subreddit=subreddit, username=username)
+    sql = sqlite3.connect(databasename)
+    cur = sql.cursor()
+
+    kwargs = {'html': html, 'score_threshold': score_threshold}
+    wrote = None
+
+    if do_all or do_date:
+        print('Writing time file')
+        wrote = redmash_worker(databasename, suffix='_date', cur=cur, orderby='created ASC', **kwargs)
+        print('Wrote', wrote)
+    
+    if do_all or do_title:
+        print('Writing title file')
+        wrote = redmash_worker(databasename, suffix='_title', cur=cur, orderby='title ASC', **kwargs)
+        print('Wrote', wrote)
+
+    if do_all or do_score:
+        print('Writing score file')
+        wrote = redmash_worker(databasename, suffix='_score', cur=cur, orderby='score DESC', **kwargs)
+        print('Wrote', wrote)
+    
+    if not username and (do_all or do_author):
+        print('Writing author file')
+        wrote = redmash_worker(databasename, suffix='_author', cur=cur, orderby='author ASC', **kwargs)
+        print('Wrote', wrote)
+
+    if username and (do_all or do_subreddit):
+        print('Writing subreddit file')
+        wrote = redmash_worker(databasename, suffix='_subreddit', cur=cur, orderby='subreddit ASC', **kwargs)
+        print('Wrote', wrote)
+    
+    if do_all or do_flair:
+        print('Writing flair file')
+        # Items with flair come before items without. Each group is sorted by time separately.
+        orderby = 'flair_text IS NULL ASC, created ASC'
+        wrote = redmash_worker(databasename, suffix='_flair', cur=cur, orderby=orderby, **kwargs)
+        print('Wrote', wrote)
+
+    if not wrote:
+        raise Exception('Didn\'t do any work! Read the docstring')
+    print('Done.')
+
+def redmash_worker(
+        databasename,
+        suffix,
+        cur,
+        orderby,
+        score_threshold=0,
+        html=False,
+    ):
+    template = 'SELECT * FROM submissions WHERE score >= %d ORDER BY {order}' % score_threshold
+    statement = template.format(order=orderby)
+    cur.execute(statement)
+
+    if REDMASH_FOLDER != '':
+        os.makedirs(REDMASH_FOLDER, exist_ok=True)
+
+    mash_basename = os.path.basename(databasename)
+    mash_fullname = os.path.join(REDMASH_FOLDER, mash_basename)
+
+    # subreddit.db -> subreddit_date.html
+    extension = '.html' if html else '.txt'
+    extension = suffix + extension
+    mash_fullname = mash_fullname.replace('.db', extension)
+
+    mash_handle = open(mash_fullname, 'w', encoding='UTF-8')
+    if html:
+        mash_handle.write('<html>')
+        mash_handle.write(REDMASH_HTML_HEAD)
+        mash_handle.write('<body>\n')
+        line_format = REDMASH_FORMAT_HTML
+    else:
+        line_format = REDMASH_FORMAT_TXT
+
+    do_timestamp = '{timestamp}' in line_format
+
+    for item in fetchgenerator(cur):
+        if do_timestamp:
+            timestamp = int(item[SQL_SUBMISSION['created']])
+            timestamp = datetime.datetime.utcfromtimestamp(timestamp)
+            timestamp = timestamp.strftime(REDMASH_TIMESTAMP)
+        else:
+            timestamp = ''
+
+        short_link = 'https://redd.it/%s' % item[SQL_SUBMISSION['idstr']][3:]
+        author = item[SQL_SUBMISSION['author']]
+        if author.lower() == '[deleted]':
+            author_link = '#'
+        else:
+            author_link = 'https://reddit.com/u/%s' % author
+        line = line_format.format(
+            timestamp=timestamp,
+            title=item[SQL_SUBMISSION['title']].replace('\n', ' '),
+            url=item[SQL_SUBMISSION['url']] or short_link,
+            subreddit=item[SQL_SUBMISSION['subreddit']],
+            shortlink=short_link,
+            author=author,
+            authorlink=author_link,
+            numcomments=item[SQL_SUBMISSION['num_comments']],
+            score=item[SQL_SUBMISSION['score']],
+            flairtext=item[SQL_SUBMISSION['flair_text']] or '',
+            flaircss=item[SQL_SUBMISSION['flair_css_class']] or '',
+        )
+        line += '\n'
+        mash_handle.write(line)
+
+    if html:
+        mash_handle.write('</body></html>')
+    mash_handle.close()
+    return mash_fullname
+
     ########                                                                              ########    
   ####    ####                                                                                ####    
 ####      ####                                                                                ####    
@@ -996,6 +1214,7 @@ def tree_from_submission(submission, commentpool):
 ####      ####  ####          ####    ####  ####            ####          ####    ####        ####    
   ####    ####  ####    ####  ####    ####  ####    ####    ####          ####    ####        ####    
     ##########    ########    ####    ####    ########    ########          ######  ####  ############
+# General
 
 def b36(i):
     if type(i) == int:
@@ -1022,26 +1241,30 @@ def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
         base36 = alphabet[i] + base36
     return sign + base36
 
-def database_filename(subreddit=None, username=None):
+def database_filename(subreddit=None, username=None, plain=None):
     '''
     Given a subreddit name or username, return the appropriate database filename.
     '''
-    if bool(subreddit) == bool(username):
-        raise ValueError('Enter subreddit or username but not both')
 
-    text = subreddit or username
+    args = [subreddit, username, plain]
+    if args.count(None) != len(args)-1:
+        raise Exception('Incorrect number of arguments. One and only one please.')
+
+    text = subreddit or username or plain
     text = text.replace('/', os.sep)
+    text = text.replace('\\', os.sep)
 
     if os.sep in text:
         # If they've given us a full path, don't mess
         # with it
         return text
 
-    text = text.replace('\\', os.sep)
     if not text.endswith('.db'):
         text += '.db'
 
-    if subreddit:
+    if plain:
+        full_path = DATABASE_PLAIN % text
+    elif subreddit:
         full_path = DATABASE_SUBREDDIT % text
     else:
         full_path = DATABASE_USER % text
@@ -1100,7 +1323,8 @@ def initialize_database(sql, cur):
         flair_text TEXT,
         flair_css_class TEXT,
         augmented_at INT,
-        augmented_count INT)''')
+        augmented_count INT)'''
+    )
     cur.execute(
         '''CREATE TABLE IF NOT EXISTS comments(
         idint INT,
@@ -1113,7 +1337,8 @@ def initialize_database(sql, cur):
         score INT,
         subreddit TEXT,
         distinguish TEXT,
-        textlen INT)''')
+        textlen INT)'''
+    )
 
     cur.execute('CREATE INDEX IF NOT EXISTS submission_index ON submissions(idstr)')
     cur.execute('CREATE INDEX IF NOT EXISTS comment_index ON comments(idstr)')
@@ -1148,6 +1373,8 @@ def nofailrequest(function):
                     # To throw assertion error, so just ignore it
                     # And get onto the next one.
                     return []
+            except KeyboardInterrupt:
+                raise
             except:
                 traceback.print_exc()
                 print('Retrying in 2...')
@@ -1342,6 +1569,56 @@ def update_scores(databasename, submissions=True, comments=False):
                                 ########                  
 
 int_none = lambda x: int(x) if (x is not None or isinstance(x, str)) else x
+def commentaugment_argparse(args):
+    return commentaugment(
+        databasename=args.databasename,
+        limit=int_none(args.limit),
+        threshold=int_none(args.threshold),
+        num_thresh=int_none(args.num_thresh),
+        verbose=args.verbose,
+        specific_submission=args.specific_submission,
+    )
+
+def livestream_argparse(args):
+    if args.submissions is args.comments is False:
+        raise ValueError('At least -s or -c must be provided')
+    if args.limit is None:
+        limit = 100
+    else:
+        limit = int(args.limit)
+    return livestream(
+        subreddit=args.subreddit,
+        username=args.username,
+        submissions=args.submissions,
+        comments=args.comments,
+        limit=limit,
+        sleepy=args.sleepy
+    )
+
+def offline_reading_argparse(args):
+    return html_from_database(
+        databasename=args.databasename,
+        specific_submission=args.specific_submission,
+    )
+
+def redmash_argparse(args):
+    if args.subreddit is args.username is None:
+        raise ValueError('-r subreddit OR -u username must be provided')
+
+    return redmash(
+        subreddit=args.subreddit,
+        username=args.username,
+        do_all=args.do_all,
+        do_date=args.do_date,
+        do_title=args.do_title,
+        do_score=args.do_score,
+        do_author=args.do_author,
+        do_subreddit=args.do_subreddit,
+        do_flair=args.do_flair,
+        html=args.html,
+        score_threshold=int_none(args.score_threshold),
+    )
+
 def timesearch_argparse(args):
     if args.lower == 'update':
         lower = 'update'
@@ -1354,34 +1631,8 @@ def timesearch_argparse(args):
         lower=lower,
         upper=int_none(args.upper),
         interval=int_none(args.interval),
-        )
+    )
 
-def commentaugment_argparse(args):
-    return commentaugment(
-        databasename=args.databasename,
-        limit=int_none(args.limit),
-        threshold=int_none(args.threshold),
-        num_thresh=int_none(args.num_thresh),
-        verbose=args.verbose,
-        specific_submission=args.specific_submission,
-        )
-
-def offline_reading_argparse(args):
-    return html_from_database(
-        databasename=args.databasename,
-        specific_submission=args.specific_submission,
-        )
-
-def livestream_argparse(args):
-    if args.submissions is args.comments is False:
-        raise ValueError('At least -s or -c must be provided')
-    return livestream(
-        subreddit=args.subreddit,
-        username=args.username,
-        submissions=args.submissions,
-        comments=args.comments,
-        sleepy=args.sleepy
-        )
 
 def main():
     if listget(sys.argv, 1, '').lower() in ('', 'help', '-h', '--help'):
@@ -1389,14 +1640,6 @@ def main():
         return
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
-
-    p_timesearch = subparsers.add_parser('timesearch')
-    p_timesearch.add_argument('-r', '--subreddit', dest='subreddit', default=None)
-    p_timesearch.add_argument('-u', '--user', dest='username', default=None)
-    p_timesearch.add_argument('-l', '--lower', dest='lower', default='update')
-    p_timesearch.add_argument('-up', '--uppper', dest='upper', default=None)
-    p_timesearch.add_argument('-i', '--interval', dest='interval', default=86400)
-    p_timesearch.set_defaults(func=timesearch_argparse)
 
     p_commentaugment = subparsers.add_parser('commentaugment')
     p_commentaugment.add_argument('databasename')
@@ -1407,18 +1650,41 @@ def main():
     p_commentaugment.add_argument('-v', '--verbose', dest='verbose', action='store_true')
     p_commentaugment.set_defaults(func=commentaugment_argparse)
 
-    p_offline_reading = subparsers.add_parser('offline_reading')
-    p_offline_reading.add_argument('databasename')
-    p_offline_reading.add_argument('-s', '--specific', dest='specific_submission', default=None)
-    p_offline_reading.set_defaults(func=offline_reading_argparse)
-
     p_livestream = subparsers.add_parser('livestream')
     p_livestream.add_argument('-r', '--subreddit', dest='subreddit', default=None)
     p_livestream.add_argument('-u', '--user', dest='username', default=None)
     p_livestream.add_argument('-s', '--submissions', dest='submissions', action='store_true')
     p_livestream.add_argument('-c', '--comments', dest='comments', action='store_true')
+    p_livestream.add_argument('-l', '--limit', dest='limit', default=None)
     p_livestream.add_argument('-w', '--wait', dest='sleepy', default=30)
     p_livestream.set_defaults(func=livestream_argparse)
+
+    p_offline_reading = subparsers.add_parser('offline_reading')
+    p_offline_reading.add_argument('databasename')
+    p_offline_reading.add_argument('-s', '--specific', dest='specific_submission', default=None)
+    p_offline_reading.set_defaults(func=offline_reading_argparse)
+
+    p_redmash = subparsers.add_parser('redmash')
+    p_redmash.add_argument('-r', '--subreddit', dest='subreddit', default=None)
+    p_redmash.add_argument('-u', '--user', dest='username', default=None)
+    p_redmash.add_argument('--all', dest='do_all', action='store_true')
+    p_redmash.add_argument('--date', dest='do_date', action='store_true')
+    p_redmash.add_argument('--title', dest='do_title', action='store_true')
+    p_redmash.add_argument('--score', dest='do_score', action='store_true')
+    p_redmash.add_argument('--author', dest='do_author', action='store_true')
+    p_redmash.add_argument('--sub', dest='do_subreddit', action='store_true')
+    p_redmash.add_argument('--flair', dest='do_flair', action='store_true')
+    p_redmash.add_argument('--html', dest='html', action='store_true')
+    p_redmash.add_argument('-st', '--score_threshold', dest='score_threshold', default=0)
+    p_redmash.set_defaults(func=redmash_argparse)
+
+    p_timesearch = subparsers.add_parser('timesearch')
+    p_timesearch.add_argument('-r', '--subreddit', dest='subreddit', default=None)
+    p_timesearch.add_argument('-u', '--user', dest='username', default=None)
+    p_timesearch.add_argument('-l', '--lower', dest='lower', default='update')
+    p_timesearch.add_argument('-up', '--uppper', dest='upper', default=None)
+    p_timesearch.add_argument('-i', '--interval', dest='interval', default=86400)
+    p_timesearch.set_defaults(func=timesearch_argparse)
 
     args = parser.parse_args()
     args.func(args)

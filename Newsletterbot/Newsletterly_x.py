@@ -142,13 +142,12 @@ print('Logging in')
 r = praw.Reddit(USERAGENT)
 r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
 r.refresh_access_information(APP_REFRESH)
+# import bot
+# r = bot.o7()
 
 # multireddit.add_subreddit is currently experiencing a bug under OAuth
 # because it's expecting the session to have a modhash. It means nothing.
 r.modhash = 'newsletters'
-
-#import bot
-#r = bot.o7()
 
 print('I am /u/%s' % r.user.name)
 
@@ -162,10 +161,6 @@ def add_subreddit_to_multireddit(subreddit):
     '''
     subreddit = normalize(subreddit)
     printlog('Assigning /r/%s to a multireddit' % subreddit)
-    if get_subscriptions(subreddit=subreddit):
-        # Someone else is already subscribed here, so it must already be part
-        # of a multi.
-        return
 
     # Originally I was going to keep multireddit-subreddit mappings in the local
     # database, but decided against it because that makes it harder to edit the
@@ -173,22 +168,30 @@ def add_subreddit_to_multireddit(subreddit):
     r.handler.clear_cache()
     my_multireddits = r.get_my_multireddits()
     for multireddit in my_multireddits:
+        if any(subreddit == s.display_name.lower() for s in multireddit.subreddits):
+            printlog('Already have it')
+            return
+
+    for multireddit in my_multireddits:
         if len(multireddit.subreddits) >= 100:
             continue
-
         try:
+            r.modhash = 'newsletters'
             multireddit.add_subreddit(subreddit)
-        except praw.errors.HTTPError as e:
+        except praw.errors.HTTPException as e:
             if e._raw.status_code == 409:
                 # The multi is full
                 # Already checked for len < 100 but just in case...
                 pass
             else:
+                traceback.print_exc()
                 raise
         else:
+            # Addition was successful, break the for loop
             break
     else:
         # No open multi was found
+        r.modhash = 'newsletters'
         multireddit = create_multireddit()
         multireddit.add_subreddit(subreddit)
 
@@ -210,14 +213,14 @@ def add_subscription(user, subreddit, bypass_pph=False):
         printlog('Subreddit does not exist')
         return (MESSAGE_SUBREDDIT_FAIL % subreddit)
 
+    if get_subscriptions(user=user, subreddit=subreddit):
+        printlog('%s is already subscribed to %s' % (user, subreddit))
+        return (MESSAGE_SUBSCRIBE_ALREADY % subreddit)
+
     if not bypass_pph:
         pph = get_posts_per_hour(subreddit)
         if pph > MAX_SUBSCRIPTION_POSTS_PER_HOUR:
             return (MESSAGE_SUBSCRIBE_BLACKLISTED % subreddit)
-
-    if get_subscriptions(user=user, subreddit=subreddit):
-        printlog('%s is already subscribed to %s' % (user, subreddit))
-        return (MESSAGE_SUBSCRIBE_ALREADY % subreddit)
 
     add_subreddit_to_multireddit(subreddit)
 
@@ -508,7 +511,9 @@ def interpret_message(pm):
         if len(arguments) == 0:
             arguments.append('')
 
+        print(len(arguments), arguments)
         for argument in arguments:
+            print(argument)
             argument = argument.replace(',', '')
             argument = argument.replace(' ', '')
             printlog('%s : %s - %s' % (author, command, argument))
@@ -579,6 +584,7 @@ def interpret_message(pm):
         results = results[:9900]
         results += '\n\n' + MESSAGE_MESSAGE_LONG
     results += MESSAGE_FOOTER
+    #printlog('Generated', results)
     return results
 
 def manage_deletions():
@@ -633,11 +639,15 @@ def manage_inbox():
     for message in messages:
         try:
             author = message.author.name
+        except AttributeError:
+            continue
+
+        try:
             interpretation = interpret_message(message)
             if interpretation and NOSEND is False:
                 add_to_spool(author, interpretation)
-        except AttributeError:
-            pass
+        except Exception:
+            traceback.print_exc()
         message.mark_as_read()
 
 def manage_posts():
@@ -830,10 +840,13 @@ def remove_subreddit_from_multireddit(subreddit, only_unused=True):
     my_multireddits = r.get_my_multireddits()
     for multireddit in my_multireddits:
         if any(subreddit == s.display_name.lower() for s in multireddit.subreddits):
+            r.modhash = 'newsletters'
             multireddit.remove_subreddit(subreddit)
-        print(multireddit.subreddits)
-        if len(multireddit.subreddits) == 1:
+
+        if len(multireddit.subreddits) <= 1:
             # This must have been the only subreddit in there.
+            # The count is not updated by PRAW when removing a sub,
+            # so the len is whatever it was when we fetched it. Thus 1.
             printlog('Deleting /m/%s' % multireddit.name)
             multireddit.delete()
 

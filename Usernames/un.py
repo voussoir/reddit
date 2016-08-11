@@ -434,8 +434,8 @@ def process(users, quiet=False, knownid='', noskip=False):
             if knownid != '':
                 data[SQL_USER['idint']] = b36(knownid)
                 data[SQL_USER['idstr']] = knownid
-            data[SQL_NAME] = user[0]
-            data[SQL_AVAILABLE] = AVAILABILITY[user[1]]
+            data[SQL_USER['name']] = user[0]
+            data[SQL_USER['available']] = AVAILABILITY[user[1]]
         else:
             # We have a Redditor object.
             h = human(user.created_utc)
@@ -474,8 +474,7 @@ def processid(idnum, ranger=1):
             continue
         idnum = 't2_' + b36(idnum)
         idnum = idnum.lower()
-        print('%s - ' % idnum, end='')
-        sys.stdout.flush()
+        print('%s - ' % idnum, end='', flush=True)
         search = list(r.search('author_fullname:%s' % idnum))
         if len(search) > 0:
             item = search[0].author.name
@@ -536,7 +535,7 @@ def print_message(data, printprefix=''):
         availability = 'available' if data[SQL_USER['available']] is 1 else 'unavailable'
         print('{prefix:>5} {availability:>32} : {name}'.format(
             prefix=printprefix,
-            availability=statement,
+            availability=availability,
             name=data[SQL_USER['name']],
             )
         )
@@ -625,21 +624,21 @@ def smartinsert(data, printprefix=''):
     '''
     print_message(data, printprefix)
 
-    exists_in_db = (getentry(name=data[SQL_NAME].lower()) is not None)
+    exists_in_db = (getentry(name=data[SQL_USER['name']].lower()) is not None)
     if exists_in_db:
         isnew = False
         data = [
-            data[SQL_IDINT],
-            data[SQL_IDSTR],
-            data[SQL_CREATED],
-            data[SQL_HUMAN],
-            data[SQL_LINK_KARMA],
-            data[SQL_COMMENT_KARMA],
-            data[SQL_TOTAL_KARMA],
-            data[SQL_AVAILABLE],
-            data[SQL_LASTSCAN],
-            data[SQL_NAME],
-            data[SQL_NAME].lower()]
+            data[SQL_USER['idint']],
+            data[SQL_USER['idstr']],
+            data[SQL_USER['created']],
+            data[SQL_USER['human']],
+            data[SQL_USER['link_karma']],
+            data[SQL_USER['comment_karma']],
+            data[SQL_USER['total_karma']],
+            data[SQL_USER['available']],
+            data[SQL_USER['lastscan']],
+            data[SQL_USER['name']],
+            data[SQL_USER['name']].lower()]
         # coalesce allows us to fallback on the existing values
         # if the given values are null, to avoid erasing data about users
         # whose accounts are now deleted.
@@ -686,11 +685,11 @@ def userify_list(users, noskip=False, quiet=False):
 
         existing_entry = getentry(name=username)
         if existing_entry is not None:
-            lastscan = existing_entry[SQL_LASTSCAN]
+            lastscan = existing_entry[SQL_USER['lastscan']]
             should_rescan = (getnow() - lastscan) > MIN_LASTSCAN_DIFF
             if should_rescan is False and noskip is False:
                 prefix = ' ' * 29
-                appendix = '(available)' if existing_entry[SQL_AVAILABLE] else ''
+                appendix = '(available)' if existing_entry[SQL_USER['available']] else ''
                 print('%sskipping : %s %s' % (prefix, username, appendix))
                 continue
 

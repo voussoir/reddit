@@ -59,7 +59,7 @@ WAITS = str(WAIT)
 
 GOODCHARS = string.ascii_letters + string.digits + '_'
 
-sql = sqlite3.connect('C:\\git\\reddit\\subredditbirthdays\\sql.db')
+sql = sqlite3.connect('C:\\git\\reddit\\subredditbirthdays\\sb.db')
 cur = sql.cursor()
 cur2 = sql.cursor()
 cur.execute('''
@@ -283,9 +283,9 @@ def normalize_subreddit_object(thing):
     raise ValueError('Dont know how to normalize', type(thing))
 
 def process(
-    subreddit,
-    isjumbled=False,
-    nosave=False,
+        subreddit,
+        isjumbled=False,
+        nosave=False,
     ):
     '''
     Retrieve the API info for the subreddit and save it to the database
@@ -393,7 +393,7 @@ def process(
                 name=name,
                 subscribers=subscribers,
                 subscriber_diff=subscriber_diff
-                )
+            )
             print(message)
 
             data = {
@@ -722,7 +722,7 @@ def show():
             inputdata=[dkeys_secondary, dvals],
             colormid='#43443a',
             forcezero=True,
-            )
+        )
         plotnum += 1
         if d is myrdict:
             # In addition to the total month graph, plot the last 15 months
@@ -734,7 +734,7 @@ def show():
                 colorfg='#000',
                 colormid='#43443a',
                 forcezero=True,
-                )
+            )
             plotnum += 1
     #
     # Breakdown by time period
@@ -762,7 +762,8 @@ def memberformat(member):
         human=member[SQL_SUBREDDIT['human']],
         nsfw=member[SQL_SUBREDDIT['nsfw']],
         name=member[SQL_SUBREDDIT['name']],
-        subscribers=member[SQL_SUBREDDIT['subscribers']])
+        subscribers=member[SQL_SUBREDDIT['subscribers']],
+    )
     return member
 
 def dictadding(targetdict, item):
@@ -774,13 +775,13 @@ def dictadding(targetdict, item):
 
 def specialsort(inlist, mode=None):
     if mode == 'month':
-        return ['January', 'February', 'March', \
-                'April', 'May', 'June', 'July', \
-                'August', 'September', 'October', \
+        return ['January', 'February', 'March',
+                'April', 'May', 'June', 'July',
+                'August', 'September', 'October',
                 'November', 'December']
     if mode == 'day':
-        return ['Sunday', 'Monday', 'Tuesday', \
-                'Wednesday', 'Thursday', 'Friday', \
+        return ['Sunday', 'Monday', 'Tuesday',
+                'Wednesday', 'Thursday', 'Friday',
                 'Saturday']
     if mode == 'monthyear':
         td = {}

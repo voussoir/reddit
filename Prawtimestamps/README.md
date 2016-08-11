@@ -1,6 +1,9 @@
 timesearch.py
 =============
 
+- 2016 08 10
+    - Started merging redmash and wrote its argparser
+
 - 2016 07 03
     - Improved docstring clarity.
 

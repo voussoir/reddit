@@ -1,10 +1,10 @@
-<<<<<<< HEAD
 #################
 ## Eclipse
 #################
 
 *.db-journal
-SubredditBirthdays/sql.db
+SubredditBirthdays/sb.db
+SubredditBirthdays/sb.zip
 Usernames/un.db
 Usernames/show/available.txt
 
@@ -229,5 +229,3 @@ _build/
 build/
 dist/
 .DS_Store
-
->>>>>>> 6d673ccde561588b52d53ae6875c276f79341603

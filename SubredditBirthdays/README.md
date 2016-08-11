@@ -11,6 +11,9 @@ The earliest subreddit after which IDs are consistently incrementing is [/r/234]
 
 Some subreddits are not properly marked as NSFW. This is either the fault of the moderators or, in some cases, the data was collected while the subreddit was brand new.
 
+04 August 2016
+- Database files have been moved to [the release page](https://github.com/voussoir/reddit/releases)
+
 02 November 2014
 - Finally decided to start measuring subscribers. Numbers will be wrong for quite some time.
 
