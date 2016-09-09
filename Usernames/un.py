@@ -51,7 +51,7 @@ USERAGENT = '''
 /u/GoldenSights Usernames data collection:
 Gathering the creation dates of user accounts for visualization.
 More at https://github.com/voussoir/reddit/tree/master/Usernames
-'''.replace('\n', ' ')
+'''.replace('\n', ' ').strip()
 APP_ID = ""
 APP_SECRET = ""
 APP_URI = ""
@@ -522,7 +522,7 @@ def process_from_database(filename, table, column, delete_original=False):
 
 def print_message(data, printprefix=''):
     if data[SQL_USER['human']] is not None:
-        print('{prefix:>5} {idstr} : {human} : {name} : {link_karma} : {comment_karma}'.format(
+        print('{prefix:>5} {idstr:>6} : {human} : {name} : {link_karma} : {comment_karma}'.format(
             prefix=printprefix,
             idstr=data[SQL_USER['idstr']],
             human=data[SQL_USER['human']],
@@ -533,7 +533,7 @@ def print_message(data, printprefix=''):
         )
     else:
         availability = 'available' if data[SQL_USER['available']] is 1 else 'unavailable'
-        print('{prefix:>5} {availability:>32} : {name}'.format(
+        print('{prefix:>5} {availability:>33} : {name}'.format(
             prefix=printprefix,
             availability=availability,
             name=data[SQL_USER['name']],
@@ -688,7 +688,7 @@ def userify_list(users, noskip=False, quiet=False):
             lastscan = existing_entry[SQL_USER['lastscan']]
             should_rescan = (getnow() - lastscan) > MIN_LASTSCAN_DIFF
             if should_rescan is False and noskip is False:
-                prefix = ' ' * 29
+                prefix = ' ' * 31
                 appendix = '(available)' if existing_entry[SQL_USER['available']] else ''
                 print('%sskipping : %s %s' % (prefix, username, appendix))
                 continue

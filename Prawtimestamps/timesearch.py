@@ -140,6 +140,13 @@ redmash:
 
     -st 50 | --score_threshold 50:
         Only mash posts with at least this many points.
+        Applies to ALL mashes!
+
+    examples:
+        `timesearch redmash -r botwatch --date` does only the date file.
+        `timesearch redmash -r botwatch --score --title` does both the score and title files.
+        `timesearch redmash -r botwatch --score --score_threshold 50` only shows submissions with >= 50 points.
+        `timesearch redmash -r botwatch --all` performs all of the different mashes.
 
 '''
 
@@ -1204,6 +1211,7 @@ def redmash_worker(
         mash_handle.write('</body></html>')
     mash_handle.close()
     return mash_fullname
+
 
     ########                                                                              ########    
   ####    ####                                                                                ####    

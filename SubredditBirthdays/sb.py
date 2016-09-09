@@ -19,7 +19,7 @@ USERAGENT = '''
 /u/GoldenSights SubredditBirthdays data collection:
 Gathering the creation dates of subreddits for visualization.
 More at https://github.com/voussoir/reddit/tree/master/SubredditBirthdays
-'''.replace('\n', ' ')
+'''.replace('\n', ' ').strip()
 APP_ID = ""
 APP_SECRET = ""
 APP_URI = ""
