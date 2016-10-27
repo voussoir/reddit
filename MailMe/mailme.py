@@ -66,6 +66,7 @@ except ImportError:
 sql = sqlite3.connect('sql.db')
 cur = sql.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT)')
+cur.execute('CREATE INDEX IF NOT EXISTS oldpost_index ON oldposts(id)')
 sql.commit()
 
 print('Logging in...')

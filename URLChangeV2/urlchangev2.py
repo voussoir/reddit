@@ -45,6 +45,7 @@ print('Loaded SQL Database')
 cur = sql.cursor()
 
 cur.execute('CREATE TABLE IF NOT EXISTS oldposts(ID TEXT)')
+cur.execute('CREATE INDEX IF NOT EXISTS oldpost_index ON oldposts(id)')
 print('Loaded Completed table')
 
 sql.commit()

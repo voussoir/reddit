@@ -78,10 +78,10 @@ AVAILABILITY = {True:'available', False:'unavailable', 'available':1, 'unavailab
 HEADER_FULL = '  ID            CREATED                  NAME             LINK     COMMENT      TOTAL            LAST SCANNED'
 HEADER_BRIEF = '      LAST SCANNED       |   NAME'
 
-MEMBERFORMAT_FULL = '%s  %s  %s  %s  %s (%s) | %s'
-MEMBERFORMAT_BRIEF = '%s | %s'
+MEMBERFORMAT_FULL = '{id:>6} {created} {username:<20} {link_karma:>9} {comment_karma:>9} ({total_karma:>10}) | {lastscan}'
+MEMBERFORMAT_BRIEF = '{lastscan} | {username}'
 
-MIN_LASTSCAN_DIFF = 86400 * 365
+MIN_LASTSCAN_DIFF = 86400 * 2000
 # Don't rescan a name if we scanned it this many days ago
 
 VALID_CHARS = string.ascii_letters + string.digits + '_-'
@@ -164,27 +164,6 @@ def check_old(available=None, threshold=86400):
     availables = cur.fetchall()
     for item in availables:
         process(item, quiet=True, noskip=True)
-
-def commapadding(s, spacer, spaced, left=True, forcestring=False):
-    '''
-    Given a number 's', make it comma-delimted and then
-    pad it on the left or right using character 'spacer'
-    so the whole string is of length 'spaced'
-
-    Providing a non-numerical string will skip straight
-    to padding
-    '''
-    if not forcestring:
-        try:
-            s = int(s)
-            s = '{0:,}'.format(s)
-        except:
-            pass
-
-    spacer = spacer * (spaced - len(s))
-    if left:
-        return spacer + s
-    return s + spacer
 
 def count(validonly=False):
     if validonly:
@@ -342,7 +321,7 @@ def load_textfile(filename):
     f.close()
     return lines
 
-def memberformat_brief(data, spacer='.'):
+def memberformat_brief(data):
     '''
     Shorter version of memberformat which I'm using for the "available" list.
     '''
@@ -350,46 +329,44 @@ def memberformat_brief(data, spacer='.'):
     lastscan = data[SQL_USER['lastscan']]
     lastscan = human(lastscan)
 
-    out = MEMBERFORMAT_BRIEF % (lastscan, name)
+    out = MEMBERFORMAT_BRIEF.format(lastscan=lastscan, username=name)
     return out
 
-def memberformat_full(data, spacer='.'):
+def memberformat_full(data):
     '''
     Given a data list, create a string that will
     become a single row in one of the show files.
     '''
     idstr = data[SQL_USER['idstr']]
-    idstr = commapadding(idstr, spacer, 5, forcestring=True)
 
     # Usernames are maximum of 20 chars
     name = data[SQL_USER['name']]
-    name += spacer*(20 - len(name))
 
-    thuman = data[SQL_USER['human']]
-    if thuman is None:
-        thuman = ' '*24
+    created = data[SQL_USER['human']]
+    created = created or ''
     link_karma = data[SQL_USER['link_karma']]
     comment_karma = data[SQL_USER['comment_karma']]
     total_karma = data[SQL_USER['total_karma']]
     if link_karma is None:
-        link_karma = commapadding('None', spacer, 9)
-        comment_karma = commapadding('None', spacer, 9)
-        total_karma = commapadding('None', spacer, 10)
+        link_karma = 'None'
+        comment_karma = 'None'
+        total_karma = 'None'
     else:
-        link_karma = commapadding(link_karma, spacer, 9)
-        comment_karma = commapadding(comment_karma, spacer, 9)
-        total_karma = commapadding(total_karma, spacer, 10)
+        link_karma = '{:,}'.format(link_karma)
+        comment_karma = '{:,}'.format(comment_karma)
+        total_karma = '{:,}'.format(total_karma)
 
     lastscan = data[SQL_USER['lastscan']]
     lastscan = human(lastscan)
-    out = MEMBERFORMAT_FULL % (
-        idstr,
-        thuman,
-        name,
-        link_karma,
-        comment_karma,
-        total_karma,
-        lastscan)
+    out = MEMBERFORMAT_FULL.format(
+        id=idstr,
+        created=created,
+        username=name,
+        link_karma=link_karma,
+        comment_karma=comment_karma,
+        total_karma=total_karma,
+        lastscan=lastscan,
+    )
     return out
 
 def popgenerator(x):
@@ -485,11 +462,17 @@ pid = processid
 
 def process_input():
     while True:
-        x = input('p> ')
         try:
-                process(x, quiet=True, noskip=True)
+            x = input('p> ')
+        except KeyboardInterrupt:
+            print()
+            break
+        if not x:
+            continue
+        try:
+            process(x, quiet=True, noskip=True)
         except:
-                traceback.print_exc()
+            traceback.print_exc()
 
 def process_from_database(filename, table, column, delete_original=False):
     '''
@@ -676,8 +659,7 @@ def userify_list(users, noskip=False, quiet=False):
                 continue
             if not all(c in VALID_CHARS for c in username):
                 print('%s : Contains invalid characters' % username)
-                #continue
-                pass
+                continue
         elif isinstance(username, praw.objects.Redditor):
             username = username.name.lower()
         else:

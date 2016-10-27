@@ -76,6 +76,7 @@ cur.execute('''
     submission_type INT)
     ''')
 cur.execute('CREATE INDEX IF NOT EXISTS subindex ON subreddits(idint)')
+cur.execute('CREATE INDEX IF NOT EXISTS subindex_created ON subreddits(created)')
 
 cur.execute('''
     CREATE TABLE IF NOT EXISTS suspicious(
@@ -186,7 +187,7 @@ def cls():
     if os.system('cls'):
         os.system('clear')
 
-def completesweep(sleepy=0, orderby=None, query=None):
+def completesweep(sleepy=0, orderby='subscribers desc', query=None):
     if query is None:
         if orderby is None:
             cur2.execute('SELECT idstr FROM subreddits WHERE created > 0')

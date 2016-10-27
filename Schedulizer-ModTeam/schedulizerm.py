@@ -114,6 +114,8 @@ sql = sqlite3.connect('sql.db')
 cur = sql.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS schedules(ID TEXT, TIME INT, REDDIT TEXT, TITLE TEXT, DIST INT, STICKY INT, FLAIR TEXT, FLCSS TEXT, POST TEXT)')
 #                                                   0         1          2            3          4         5           6           7           *
+cur.execute('CREATE INDEX IF NOT EXISTS schedule_idindex ON schedules(id)')
+cur.execute('CREATE INDEX IF NOT EXISTS schedule_postindex ON schedules(post)')
 sql.commit()
 
 print('Logging in')

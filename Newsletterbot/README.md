@@ -79,12 +79,12 @@ Composing a message with multiple commands:
 &nbsp;
 Surviving a purge:
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_purge_keep.png?raw=true" alt="Stay tuned."/>
+  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_purgekeep.png?raw=true" alt="Stay tuned."/>
 </p>
 
 Failing a purge:
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_purge_drop.png?raw=true" alt="Stay tuned."/>
+  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_purgedrop.png?raw=true" alt="Stay tuned."/>
 </p>
 
 &nbsp;

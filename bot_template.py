@@ -29,8 +29,9 @@ except ImportError:
 #sql = sqlite3.connect('filename.db')
 #cur = sql.cursor()
 #cur.execute('CREATE TABLE IF NOT EXISTS tablename(column TEXT)')
-
-print('Logging in.')
+#cur.execute('CREATE INDEX IF NOT EXISTS indexname ON tablename(column)')
+p
+rint('Logging in.')
 r = praw.Reddit(USERAGENT)
 r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
 r.refresh_access_information(APP_REFRESH)

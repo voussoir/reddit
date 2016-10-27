@@ -33,6 +33,7 @@ cur = sql.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS users(name TEXT, lastpost TEXT)')
 print('Loaded Users')
 cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT)')
+cur.execute('CREATE INDEX IF NOT EXISTS oldpost_index ON oldposts(id)')
 print('Loaded Oldposts')
 sql.commit()
 

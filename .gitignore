@@ -13,6 +13,9 @@ SubredditBirthdays/show/dirty-time.txt
 SubredditBirthdays/show/dirty-subscribers.txt
 Usernames/un.db
 Usernames/show/available.txt
+Usernames/show/karma_total.txt
+Usernames/show/name.txt
+Usernames/show/time.txt
 
 *.pydevproject
 .project
