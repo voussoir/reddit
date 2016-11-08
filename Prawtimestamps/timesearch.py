@@ -101,7 +101,7 @@ livestream:
     -c | --comments:
         If provided, do collect comments. Otherwise don't.
 
-    -w | --wait
+    -w 30 | --wait 30:
         The number of seconds to wait between cycles.
 
 redmash:
