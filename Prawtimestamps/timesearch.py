@@ -44,8 +44,8 @@ timesearch:
 commentaugment:
     Collect comments for the submissions in the database.
     NOTE - if you did a timesearch scan on a username, this function is useless
-    because it finds comments on the submissions you collected. It does not find
-    the user's comment history. That's not possible.
+    because it finds comments on the submissions you collected. It does not
+    find the user's comment history. That's not possible.
 
     > timesearch commentaugment database.db <flags>
 
@@ -55,17 +55,19 @@ commentaugment:
         Default: No limit
 
     -t 5 | --threshold 5:
-        The number of comments a MoreComments object must claim to have for us to open it.
+        The number of comments a MoreComments object must claim to have for us
+        to open it.
         Actual number received may be lower.
         Default: >= 0
 
     -n 4 | --num_thresh 4:
-        The number of comments a submission must claim to have for us to scan it at all.
+        The number of comments a submission must claim to have for us to scan
+        it at all.
         Actual number received may be lower.
         Default: >= 1
 
     -s "t3_xxxxxx" | --specific "t3_xxxxxx":
-        Given a submission ID in the form t3_xxxxxxx, scan only that submission.
+        Given a submission ID, t3_xxxxxx, scan only that submission.
 
     -v | --verbose:
         If provided, print more stuff while working.
@@ -77,7 +79,7 @@ offline_reading:
 
     flags:
     -s "t3_xxxxxx" | --specific "t3_xxxxxx":
-        Given a submission ID in the form t3_xxxxxxx, render only that submission.
+        Given a submission ID, t3_xxxxxx, render only that submission.
         Otherwise render every submission in the database.
 
 livestream:
@@ -99,6 +101,9 @@ livestream:
     -c | --comments:
         If provided, do collect comments. Otherwise don't.
 
+    -w | --wait
+        The number of seconds to wait between cycles.
+
 redmash:
     Dump submission information to a readable file in the `REDMASH_FOLDER`
 
@@ -111,6 +116,13 @@ redmash:
 
     -u "test" | --username "test":
         The username database to dump
+
+    --html:
+        Write HTML files instead of plain text.
+
+    -st 50 | --score_threshold 50:
+        Only mash posts with at least this many points.
+        Applies to ALL mashes!
 
     --all:
         Perform all of the mashes listed below.
@@ -135,18 +147,18 @@ redmash:
     --flair:
         Perform a mash sorted by flair.
 
-    --html:
-        Write HTML files instead of plain text.
-
-    -st 50 | --score_threshold 50:
-        Only mash posts with at least this many points.
-        Applies to ALL mashes!
-
     examples:
-        `timesearch redmash -r botwatch --date` does only the date file.
-        `timesearch redmash -r botwatch --score --title` does both the score and title files.
-        `timesearch redmash -r botwatch --score --score_threshold 50` only shows submissions with >= 50 points.
-        `timesearch redmash -r botwatch --all` performs all of the different mashes.
+        `timesearch redmash -r botwatch --date`
+        does only the date file.
+
+        `timesearch redmash -r botwatch --score --title`
+        does both the score and title files.
+
+        `timesearch redmash -r botwatch --score --score_threshold 50`
+        only shows submissions with >= 50 points.
+
+        `timesearch redmash -r botwatch --all`
+        performs all of the different mashes.
 
 '''
 
@@ -583,7 +595,7 @@ def commentaugment(
     if specific_submission is not None:
         if not specific_submission.startswith('t3_'):
             specific_submission = 't3_' + specific_submission
-        specific_submission_obj = r.get_submission(submission_id=specific_submission[3:])
+        specific_submission_obj = r.get_submission(submission_id=specific_submission[3:], comment_limit=90000)
         databasename = specific_submission_obj.subreddit.display_name
 
     databasename = database_filename(subreddit=databasename)
@@ -628,7 +640,7 @@ def commentaugment(
             return
 
         for submission in id_batch:
-            submission = get_submission(submission_id=submission.split('_')[-1])
+            submission = get_submission(submission_id=submission.split('_')[-1], comment_limit=90000)
             print('Processing %s%sexpecting %d | ' % (submission.fullname, spacer, submission.num_comments), end='')
             sys.stdout.flush()
             if verbose:
@@ -939,6 +951,7 @@ def html_from_database(databasename, specific_submission=None):
         html_handle.write(page)
         html_handle.write('</body></html>')
         html_handle.close()
+        print('Wrote', html_filename)
 
 def html_from_tree(tree, sort=None):
     '''
@@ -1140,7 +1153,7 @@ def redmash(
         print('Wrote', wrote)
 
     if not wrote:
-        raise Exception('Didn\'t do any work! Read the docstring')
+        raise Exception('No sorts selected! Read the docstring')
     print('Done.')
 
 def redmash_worker(
@@ -1362,6 +1375,7 @@ def login():
         print('Logging in.')
         r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
         r.refresh_access_information(APP_REFRESH)
+        r.config.api_request_delay = 1
 
 def nofailrequest(function):
     '''
@@ -1600,7 +1614,7 @@ def livestream_argparse(args):
         submissions=args.submissions,
         comments=args.comments,
         limit=limit,
-        sleepy=args.sleepy
+        sleepy=int_none(args.sleepy),
     )
 
 def offline_reading_argparse(args):
