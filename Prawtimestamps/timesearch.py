@@ -160,10 +160,30 @@ redmash:
         `timesearch redmash -r botwatch --all`
         performs all of the different mashes.
 
+breakdown:
+    Give the comment / submission counts for users in a subreddit, or
+    the subreddits that a user posts to.
+
+    Automatically dumps into a <database>_breakdown.json file
+    in the same directory as the database.
+
+    > timesearch breakdown -r subredditname
+    > timesearch breakdown -u username
+
+    flags:
+    -r "test" | --subreddit "test":
+        The subreddit database to break down.
+
+    -u "test" | --username "test":
+        The username database to break down.
+
+    -p | --pretty
+        If provided, make the json file indented and sorted.
 '''
 
 import argparse
 import datetime
+import json
 import markdown  # If you're not interested in offline_reading, you may delete
 import os
 import praw
@@ -1022,7 +1042,10 @@ def trees_from_database(databasename, specific_submission=None):
 
     Yield each submission's tree as it is generated.
     '''
-    databasename = database_filename(databasename)
+    databasename = database_filename(plain=databasename)
+    if not os.path.exists(databasename):
+        raise ValueError(databasename, 'does not exist')
+
     sql = sql_open(databasename)
     cur1 = sql.cursor()
     cur2 = sql.cursor()
@@ -1114,6 +1137,9 @@ def redmash(
         score_threshold=0,
     ):
     databasename = database_filename(subreddit=subreddit, username=username)
+    if not os.path.exists(databasename):
+        raise ValueError(databasename, 'does not exist')
+
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
 
@@ -1205,17 +1231,18 @@ def redmash_worker(
         else:
             author_link = 'https://reddit.com/u/%s' % author
         line = line_format.format(
+            author=author,
+            authorlink=author_link,
+            flaircss=item[SQL_SUBMISSION['flair_css_class']] or '',
+            flairtext=item[SQL_SUBMISSION['flair_text']] or '',
+            id=item[SQL_SUBMISSION['idstr']],
+            numcomments=item[SQL_SUBMISSION['num_comments']],
+            score=item[SQL_SUBMISSION['score']],
+            shortlink=short_link,
+            subreddit=item[SQL_SUBMISSION['subreddit']],
             timestamp=timestamp,
             title=item[SQL_SUBMISSION['title']].replace('\n', ' '),
             url=item[SQL_SUBMISSION['url']] or short_link,
-            subreddit=item[SQL_SUBMISSION['subreddit']],
-            shortlink=short_link,
-            author=author,
-            authorlink=author_link,
-            numcomments=item[SQL_SUBMISSION['num_comments']],
-            score=item[SQL_SUBMISSION['score']],
-            flairtext=item[SQL_SUBMISSION['flair_text']] or '',
-            flaircss=item[SQL_SUBMISSION['flair_css_class']] or '',
         )
         line += '\n'
         mash_handle.write(line)
@@ -1224,6 +1251,58 @@ def redmash_worker(
         mash_handle.write('</body></html>')
     mash_handle.close()
     return mash_fullname
+
+
+############     ##########
+  ####    ####     ####  ####
+  ####    ####     ####    ####
+  ####    ####     ####    ####
+  ##########       ####    ####
+  ####    ####     ####    ####
+  ####    ####     ####    ####
+  ####    ####     ####  ####
+############     ##########
+# Breakdown
+
+def breakdown_database(databasename, breakdown_type):
+    '''
+    Given a database, return a json dict breaking down the submission / comment count for
+    users (if a subreddit database) or subreddits (if a user database).
+
+    breakdown_type:
+        String, either 'subreddit' or 'user' to indicate what kind of database this is.
+    '''
+    databasename = database_filename(plain=databasename)
+    if not os.path.exists(databasename):
+        raise ValueError(databasename, 'does not exist')
+
+    sql = sqlite3.connect(databasename)
+    submission_cur = sql.cursor()
+    comment_cur = sql.cursor()
+
+    breakdown_results = {}
+    def _ingest(generator, subkey):
+        for name in generator:
+            breakdown_results.setdefault(name, {})
+            breakdown_results[name].setdefault(subkey, 0)
+            breakdown_results[name][subkey] += 1
+
+    submission_cur.execute('SELECT * FROM submissions')
+    comment_cur.execute('SELECT * FROM comments')
+    if breakdown_type == 'subreddit':
+        submissions = (submission[SQL_SUBMISSION['author']] for submission in fetchgenerator(submission_cur))
+        comments = (comment[SQL_COMMENT['author']] for comment in fetchgenerator(comment_cur))
+    if breakdown_type == 'user':
+        submissions = (submission[SQL_SUBMISSION['subreddit']] for submission in fetchgenerator(submission_cur))
+        comments = (comment[SQL_COMMENT['subreddit']] for comment in fetchgenerator(comment_cur))
+    _ingest(submissions, 'submissions')
+    _ingest(comments, 'comments')
+    for name in breakdown_results:
+        breakdown_results[name].setdefault('submissions', 0)
+        breakdown_results[name].setdefault('comments', 0)
+
+    return breakdown_results
+
 
 
     ########                                                                              ########    
@@ -1590,7 +1669,35 @@ def update_scores(databasename, submissions=True, comments=False):
                               ####    ####                
                                 ########                  
 
-int_none = lambda x: int(x) if (x is not None or isinstance(x, str)) else x
+int_none = lambda x: int(x) if x is not None else x
+
+def breakdown_argparse(args):
+    if args.subreddit is args.username is None:
+        raise ValueError('-r subreddit OR -u username must be provided')
+    if args.subreddit:
+        databasename = database_filename(subreddit=args.subreddit)
+        breakdown_type = 'subreddit'
+    else:
+        databasename = database_filename(username=args.username)
+        breakdown_type = 'user'
+
+    breakdown_results = breakdown_database(
+        databasename=databasename,
+        breakdown_type=breakdown_type,
+    )
+
+    breakdown_filename = os.path.splitext(databasename)[0]
+    breakdown_filename = '%s_breakdown.json' % breakdown_filename
+    breakdown_file = open(breakdown_filename, 'w')
+    with breakdown_file:
+        if args.pretty:
+            dump = json.dumps(breakdown_results, sort_keys=True, indent=4)
+        else:
+            dump = json.dumps(breakdown_results)
+        breakdown_file.write(dump)
+
+    return breakdown_results
+
 def commentaugment_argparse(args):
     return commentaugment(
         databasename=args.databasename,
@@ -1699,6 +1806,12 @@ def main():
     p_redmash.add_argument('--html', dest='html', action='store_true')
     p_redmash.add_argument('-st', '--score_threshold', dest='score_threshold', default=0)
     p_redmash.set_defaults(func=redmash_argparse)
+
+    p_breakdown = subparsers.add_parser('breakdown')
+    p_breakdown.add_argument('-r', '--subreddit', dest='subreddit', default=None)
+    p_breakdown.add_argument('-u', '--user', dest='username', default=None)
+    p_breakdown.add_argument('-p', '--pretty', dest='pretty', action='store_true')
+    p_breakdown.set_defaults(func=breakdown_argparse)
 
     p_timesearch = subparsers.add_parser('timesearch')
     p_timesearch.add_argument('-r', '--subreddit', dest='subreddit', default=None)

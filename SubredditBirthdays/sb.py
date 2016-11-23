@@ -253,7 +253,8 @@ def modernize():
     modernlist = []
     for x in range(finalid, newestid+1):
         modernlist.append(b36(x).lower())
-    processmega(modernlist)
+    processmega(modernlist, nosave=True)
+    sql.commit()
 
 def modsfromid(subid):
     if 't5_' not in subid:
