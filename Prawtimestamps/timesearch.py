@@ -101,8 +101,14 @@ livestream:
     -c | --comments:
         If provided, do collect comments. Otherwise don't.
 
+    If submissions and comments are BOTH left unspecified, then they will BOTH
+    be collected. If only one is specified, the other will not be collected.
+
     -w 30 | --wait 30:
         The number of seconds to wait between cycles.
+
+    -1 | --once:
+        If provided, only do a single loop. Otherwise go forever.
 
 redmash:
     Dump submission information to a readable file in the `REDMASH_FOLDER`
@@ -226,7 +232,8 @@ REDMASH_TIMESTAMP = '%Y %b %d'
 # "%Y %b %d" = "2016 August 10"
 # See http://strftime.org/
 
-REDMASH_HTML_HEAD = '''
+REDMASH_HTML_HEADER = '''
+<html>
 <head>
 <meta charset="UTF-8">
 <style>
@@ -236,6 +243,12 @@ REDMASH_HTML_HEAD = '''
     }
 </style>
 </head>
+
+<body>
+'''
+REDMASH_HTML_FOOTER = '''
+</body>
+</html>
 '''
 
 ''' All done! '''
@@ -347,11 +360,12 @@ prompt_ts_startinginterval = '''
 def livestream(
         subreddit=None,
         username=None,
-        sleepy=30,
-        submissions=True,
-        comments=False,
-        limit=100,
         debug=False,
+        do_submissions=True,
+        do_comments=False,
+        limit=100,
+        only_once=False,
+        sleepy=30,
     ):
     '''
     Continuously get posts from this source
@@ -359,22 +373,22 @@ def livestream(
     '''
     if bool(subreddit) == bool(username):
         raise Exception('Require either username / subreddit parameter, but not both')
-    if bool(submissions) is bool(comments) is False:
-        raise Exception('Require submissions and/or comments parameter')
+    if bool(do_submissions) is bool(do_comments) is False:
+        raise Exception('Require do_submissions and/or do_comments parameter')
     login()
 
     if subreddit:
         print('Getting subreddit %s' % subreddit)
         databasename = database_filename(subreddit=subreddit)
         stream_target = r.get_subreddit(subreddit)
-        submissions = stream_target.get_new if submissions else None
-        comments = stream_target.get_comments if comments else None
+        submissions = stream_target.get_new if do_submissions else None
+        comments = stream_target.get_comments if do_comments else None
     else:
         print('Getting redditor %s' % username)
         databasename = database_filename(username=username)
         stream_target = r.get_redditor(username)
-        submissions = stream_target.get_submitted if submissions else None
-        comments = stream_target.get_comments if comments else None
+        submissions = stream_target.get_submitted if do_submissions else None
+        comments = stream_target.get_comments if do_comments else None
     
     sql = sql_open(databasename)
     cur = sql.cursor()
@@ -387,17 +401,22 @@ def livestream(
                 comment_function=comments,
                 debug=debug,
                 limit=limit,
+                params={'show': 'all'},
                 )
             newitems = smartinsert(sql, cur, items, delaysave=True)
-            status = '{now} +{new}'.format(now=human(get_now()), new=newitems)
+            newtext = '%ds, %dc' % (newitems['new_submissions'], newitems['new_comments'])
+            totalnew = newitems['new_submissions'] + newitems['new_comments']
+            status = '{now} +{new}'.format(now=human(get_now()), new=newtext)
             print(status, end='', flush=True)
-            if newitems == 0:
+            if totalnew == 0 and debug is False:
                 # Since there were no news, allow the next line to overwrite status
                 print('\r', end='')
             else:
                 print()
             if debug:
                 print('Loop finished.')
+            if only_once:
+                break
             time.sleep(sleepy)
         except KeyboardInterrupt:
             print()
@@ -407,6 +426,7 @@ def livestream(
         except Exception as e:
             traceback.print_exc()
             time.sleep(5)
+
 hangman = lambda: livestream(username='gallowboob', sleepy=60, submissions=True, comments=True)
 
 def livestream_helper(submission_function=None, comment_function=None, debug=False, *a, **k):
@@ -420,10 +440,10 @@ def livestream_helper(submission_function=None, comment_function=None, debug=Fal
 
     if submission_function:
         if debug: print('Getting submissions', a, k)
-        results += list(submission_function(*a, **k))
+        results.extend(submission_function(*a, **k))
     if comment_function:
         if debug: print('Getting comments', a, k)
-        results += list(comment_function(*a, **k))
+        results.extend(comment_function(*a, **k))
     if debug:
         print('Collected. Saving...')
     return results
@@ -1207,9 +1227,7 @@ def redmash_worker(
 
     mash_handle = open(mash_fullname, 'w', encoding='UTF-8')
     if html:
-        mash_handle.write('<html>')
-        mash_handle.write(REDMASH_HTML_HEAD)
-        mash_handle.write('<body>\n')
+        mash_handle.write(REDMASH_HTML_HEADER)
         line_format = REDMASH_FORMAT_HTML
     else:
         line_format = REDMASH_FORMAT_TXT
@@ -1248,7 +1266,7 @@ def redmash_worker(
         mash_handle.write(line)
 
     if html:
-        mash_handle.write('</body></html>')
+        mash_handle.write(REDMASH_HTML_FOOTER)
     mash_handle.close()
     return mash_fullname
 
@@ -1340,6 +1358,25 @@ def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
         number, i = divmod(number, len(alphabet))
         base36 = alphabet[i] + base36
     return sign + base36
+
+def binding_filler(column_names, values, require_all=True):
+    '''
+    Manually aligning question marks and bindings is annoying.
+    Given the table's column names and a dictionary of {column: value},
+    return the question marks and the list of bindings in the right order.
+    '''
+    values = values.copy()
+    for column in column_names:
+        if column in values:
+            continue
+        if require_all:
+            raise ValueError('Missing column "%s"' % column)
+        else:
+            values.setdefault(column, None)
+    qmarks = '?' * len(column_names)
+    qmarks = ', '.join(qmarks)
+    bindings = [values[column] for column in column_names]
+    return (qmarks, bindings)
 
 def database_filename(subreddit=None, username=None, plain=None):
     '''
@@ -1492,7 +1529,8 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
 
     returns the number of posts that were new.
     '''
-    newposts = 0
+    new_submissions = 0
+    new_comments = 0
     for item in results:
         if item.author is None:
             author = '[DELETED]'
@@ -1503,32 +1541,37 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
             cur.execute('SELECT * FROM submissions WHERE idstr == ?', [item.fullname])
             existing_entry = cur.fetchone()
             if not existing_entry:
-                newposts += 1
+                new_submissions += 1
 
                 if item.is_self:
+                    # Selfpost's URL leads back to itself, so just ignore it.
                     url = None
                 else:
                     url = item.url
 
-                postdata = [None] * len(SQL_SUBMISSION)
-                postdata[SQL_SUBMISSION['idint']] = b36(item.id)
-                postdata[SQL_SUBMISSION['idstr']] = item.fullname
-                postdata[SQL_SUBMISSION['created']] = item.created_utc
-                postdata[SQL_SUBMISSION['self']] = item.is_self
-                postdata[SQL_SUBMISSION['nsfw']] = item.over_18
-                postdata[SQL_SUBMISSION['author']] = author
-                postdata[SQL_SUBMISSION['title']] = item.title
-                postdata[SQL_SUBMISSION['url']] = url
-                postdata[SQL_SUBMISSION['selftext']] = item.selftext
-                postdata[SQL_SUBMISSION['score']] = item.score
-                postdata[SQL_SUBMISSION['subreddit']] = item.subreddit.display_name
-                postdata[SQL_SUBMISSION['distinguish']] = item.distinguished
-                postdata[SQL_SUBMISSION['textlen']] = len(item.selftext)
-                postdata[SQL_SUBMISSION['num_comments']] = item.num_comments
-                postdata[SQL_SUBMISSION['flair_text']] = item.link_flair_text
-                postdata[SQL_SUBMISSION['flair_css_class']] = item.link_flair_css_class
+                postdata = {}
+                postdata['idint'] = b36(item.id)
+                postdata['idstr'] = item.fullname
+                postdata['created'] = item.created_utc
+                postdata['self'] = item.is_self
+                postdata['nsfw'] = item.over_18
+                postdata['author'] = author
+                postdata['title'] = item.title
+                postdata['url'] = url
+                postdata['selftext'] = item.selftext
+                postdata['score'] = item.score
+                postdata['subreddit'] = item.subreddit.display_name
+                postdata['distinguish'] = item.distinguished
+                postdata['textlen'] = len(item.selftext)
+                postdata['num_comments'] = item.num_comments
+                postdata['flair_text'] = item.link_flair_text
+                postdata['flair_css_class'] = item.link_flair_css_class
+                postdata['augmented_at'] = None
+                postdata['augmented_count'] = None
+                (qmarks, bindings) = binding_filler(SQL_SUBMISSION_COLUMNS, postdata, require_all=True)
+                query = 'INSERT INTO submissions VALUES(%s)' % qmarks
+                cur.execute(query, bindings)
 
-                cur.execute('''INSERT INTO submissions VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', postdata)
             else:
                 if item.author is None:
                     # This post is deleted, therefore its text probably says [deleted] or [removed].
@@ -1555,24 +1598,26 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
             cur.execute('SELECT * FROM comments WHERE idstr == ?', [item.fullname])
             existing_entry = cur.fetchone()
             if not existing_entry:
-                newposts += 1
-                postdata = [None] * len(SQL_COMMENT)
+                new_comments += 1
 
-                postdata[SQL_COMMENT['idint']] = b36(item.id)
-                postdata[SQL_COMMENT['idstr']] = item.fullname
-                postdata[SQL_COMMENT['created']] = item.created_utc
-                postdata[SQL_COMMENT['author']] = author
-                postdata[SQL_COMMENT['parent']] = item.parent_id
-                postdata[SQL_COMMENT['submission']] = item.link_id
-                postdata[SQL_COMMENT['body']] = item.body
-                postdata[SQL_COMMENT['score']] = item.score
-                postdata[SQL_COMMENT['subreddit']] = item.subreddit.display_name
-                postdata[SQL_COMMENT['distinguish']] = item.distinguished
-                postdata[SQL_COMMENT['textlen']] = len(item.body)
+                postdata = {}
+                postdata['idint'] = b36(item.id)
+                postdata['idstr'] = item.fullname
+                postdata['created'] = item.created_utc
+                postdata['author'] = author
+                postdata['parent'] = item.parent_id
+                postdata['submission'] = item.link_id
+                postdata['body'] = item.body
+                postdata['score'] = item.score
+                postdata['subreddit'] = item.subreddit.display_name
+                postdata['distinguish'] = item.distinguished
+                postdata['textlen'] = len(item.body)
+                (qmarks, bindings) = binding_filler(SQL_COMMENT_COLUMNS, postdata, require_all=True)
+                query = 'INSERT INTO comments VALUES(%s)' % qmarks
+                cur.execute(query, bindings)
 
-                cur.execute('''INSERT INTO comments VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', postdata)
             else:
-                greasy = 'This comment has been overwritten by an open source script to protect this user\'s privacy.'
+                greasy = 'has been overwritten'
                 if item.author is None or greasy in item.body:
                     body = existing_entry[SQL_COMMENT['body']]
                 else:
@@ -1591,7 +1636,7 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
             sql.commit()
     if delaysave and not nosave:
         sql.commit()
-    return newposts
+    return {'new_submissions': new_submissions, 'new_comments': new_comments}
 
 def sql_open(databasename):
     '''
@@ -1715,12 +1760,18 @@ def livestream_argparse(args):
         limit = 100
     else:
         limit = int(args.limit)
+
+    if args.submissions is False and args.comments is False:
+        args.submissions = True
+        args.comments = True
+
     return livestream(
         subreddit=args.subreddit,
         username=args.username,
-        submissions=args.submissions,
-        comments=args.comments,
+        do_comments=args.comments,
+        do_submissions=args.submissions,
         limit=limit,
+        only_once=args.once,
         sleepy=int_none(args.sleepy),
     )
 
@@ -1786,6 +1837,7 @@ def main():
     p_livestream.add_argument('-c', '--comments', dest='comments', action='store_true')
     p_livestream.add_argument('-l', '--limit', dest='limit', default=None)
     p_livestream.add_argument('-w', '--wait', dest='sleepy', default=30)
+    p_livestream.add_argument('-1', '--once', dest='once', action='store_true')
     p_livestream.set_defaults(func=livestream_argparse)
 
     p_offline_reading = subparsers.add_parser('offline_reading')

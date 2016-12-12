@@ -15,10 +15,13 @@ APP_REFRESH = ""
 SUBREDDIT_TO_SCAN = 'all'
 SUBREDDIT_TO_SUBMIT = 'OpenAndGenuine'
 
-SUBMISSION_TITLE = '/r/_subreddit_ locks "_title_" (+_score_) (_numcomments_ comments)'
-SUBMISSION_URL = 'http://r.go1dfish.me/r/_subreddit_/comments/_id_/x'
-# The terms surrounded by underscores will be replaced by the submission's actual
-# properties. See `create_title` and `create_url`
+# _title_ is special because it has to be done after all the other formats.
+SUBMISSION_TITLE = '/r/{subreddit} locks "_title_" (+{score}) ({numcomments} comments)'
+SUBMISSION_TEXT = '''
+https://reddit.com/r/{subreddit}/comments/{id}
+
+https://r.go1dfish.me/r/{subreddit}/comments/{id}/
+'''
 
 MAX_TITLE_LENGTH = 300
 
@@ -66,12 +69,13 @@ def create_title(submission):
     else:
         author = '/u/' + submission.author.name
 
-    title = SUBMISSION_TITLE
-    title = title.replace('_author_', author)
-    title = title.replace('_fullname_', submission.fullname)
-    title = title.replace('_numcomments_', str(submission.num_comments))
-    title = title.replace('_score_', str(submission.score))
-    title = title.replace('_subreddit_', submission.subreddit.display_name)
+    title = SUBMISSION_TITLE.format(
+        author=author,
+        fullname=submission.fullname,
+        numcomments=str(submission.num_comments),
+        score=str(submission.score),
+        subreddit=submission.subreddit.display_name,
+    )
 
     # We're formatting the title last, because we need to know the length of
     # everything else to decide our ellipsis value for the original submission's
@@ -87,15 +91,16 @@ def create_title(submission):
     title = ellipsis(title, MAX_TITLE_LENGTH)
     return title
 
-def create_url(submission):
+def create_selftext(submission):
     '''
-    Format the submission's properties into the SUBMISSION_URL injectors.
-    Returns a string which will become our new submission's url.
+    Format the submission's properties into a string which will become our
+    new submission's body.
     '''
-    url = SUBMISSION_URL
-    url = url.replace('_id_', submission.id)
-    url = url.replace('_subreddit_', submission.subreddit.display_name.lower())
-    return url
+    text = SUBMISSION_TEXT.format(
+        subreddit=submission.subreddit.display_name.lower(),
+        id=submission.id
+    )
+    return text
 
 def ellipsis(text, length):
     '''
@@ -116,6 +121,18 @@ def ellipsis(text, length):
         text = text[:characters] + ('.' * dots)
     return text
 
+def submission_in_database(submission):
+    if isinstance(submission, praw.objects.Submission):
+        submission = submission.fullname
+    if '_' not in submission:
+        submission = 't3_' + submission
+
+    cur.execute('SELECT * FROM lockedposts WHERE id == ?', [submission])
+    item = cur.fetchone()
+    return (item is not None)
+
+
+
 def lockfinder():
     print('Checking /r/%s' % SUBREDDIT_TO_SCAN)
     subreddit = r.get_subreddit(SUBREDDIT_TO_SCAN)
@@ -129,24 +146,14 @@ def lockfinder():
 
         print('Found locked post %s' % submission.fullname)
         title = create_title(submission)
-        url = create_url(submission)
+        selftext = create_selftext(submission)
 
         #print(title)
         #print(url)
         print('Making submission')
-        new_submission = r.submit(SUBREDDIT_TO_SUBMIT, title, url=url)
+        new_submission = r.submit(SUBREDDIT_TO_SUBMIT, title, text=selftext)
         print('Created %s' % new_submission.fullname)
         add_to_database(submission)
-
-def submission_in_database(submission):
-    if isinstance(submission, praw.objects.Submission):
-        submission = submission.fullname
-    if '_' not in submission:
-        submission = 't3_' + submission
-
-    cur.execute('SELECT * FROM lockedposts WHERE id == ?', [submission])
-    item = cur.fetchone()
-    return (item is not None)
 
 
 if __name__ == '__main__':
