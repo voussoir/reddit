@@ -932,7 +932,7 @@ videos | 102 | 90 | 38787
 PerfectTiming | 94 | 55 | 149437
 Whatcouldgowrong | 92 | 30 | 106206
 AnimalsBeingDerps | 92 | 15 | 64351
-funny | 89 |  | 356967
+funny | 89 | 0 | 356967
 Damnthatsinteresting | 87 | 20 | 71249
 instant_regret | 86 | 53 | 158293
 StarWars | 84 | 61 | 86353
@@ -985,7 +985,7 @@ Military | 18 | 10 | 4892
 OSHA | 17 | 15 | 22247
 pokemongo | 16 | 12 | 20497
 GamePhysics | 16 | 10 | 4687
-burstingout | 16 |  | 2746
+burstingout | 16 | 0 | 2746
 WastedGifs | 15 | 7 | 23133
 gameofthrones | 15 | 10 | 17560
 BetterEveryLoop | 14 | 12 | 12670
@@ -1010,9 +1010,9 @@ foxes | 9 | 4 | 2305
 Cyberpunk | 9 | 3 | 5922
 lego | 9 | 3 | 13378
 TrollXChromosomes | 9 | 2 | 6294
-physicsgifs | 9 |  | 2848
-StopTouchingMe | 9 |  | 2116
-HappyOtterAndFriends | 9 |  | 166
+physicsgifs | 9 | 0 | 2848
+StopTouchingMe | 9 | 0 | 2116
+HappyOtterAndFriends | 9 | 0 | 166
 GrandTheftAutoV | 8 | 7 | 252
 circlejerk | 8 | 7 | 218
 movies | 8 | 7 | 14128
@@ -1042,18 +1042,18 @@ Marvel | 5 | 3 | 7089
 cosplay | 5 | 3 | 1781
 youdontsurf | 5 | 2 | 6250
 gaminggifs | 5 | 1 | 771
-thingsforants | 5 |  | 893
-TheLastAirbender | 5 |  | 6377
-babyelephantgifs | 5 |  | 5702
-actuallyfunny | 5 |  | 131
+thingsforants | 5 | 0 | 893
+TheLastAirbender | 5 | 0 | 6377
+babyelephantgifs | 5 | 0 | 5702
+actuallyfunny | 5 | 0 | 131
 TheSimpsons | 4 | 3 | 297
 mildlypenis | 4 | 2 | 565
 boop | 4 | 2 | 1156
 ConfusedBoners | 4 | 1 | 666
 DickButt | 4 | 1 | 623
 ThingsCutInHalfPorn | 4 | 1 | 3532
-MensRights | 4 |  | 11846
-battleshops | 4 |  | 109
+MensRights | 4 | 0 | 11846
+battleshops | 4 | 0 | 109
 Sneks | 3 | 3 | 3
 Minecraft | 3 | 3 | 3
 coolguides | 3 | 3 | 3
@@ -1067,9 +1067,9 @@ Music | 3 | 1 | 24
 mechanical_gifs | 3 | 1 | 1678
 reallifedoodles | 3 | 1 | 16036
 batman | 3 | 1 | 1147
-fatlogic | 3 |  | 6884
-cutouts | 3 |  | 37
-pitchforkemporium | 3 |  | 150
+fatlogic | 3 | 0 | 6884
+cutouts | 3 | 0 | 37
+pitchforkemporium | 3 | 0 | 150
 Bad_Cop_No_Donut | 2 | 2 | 5
 london | 2 | 2 | 3
 IdiotsFightingThings | 2 | 2 | 3
@@ -1088,23 +1088,23 @@ trypophobia | 2 | 1 | 42
 bitchimabus | 2 | 1 | 285
 PartyParrot | 2 | 1 | 234
 bestof | 2 | 1 | 13
-spam | 2 | 1 | 
-ideasfortheadmins | 2 | 1 | 
-RealGirls | 2 |  | 962
-babybigcatgifs | 2 |  | 904
-firefly | 2 |  | 857
-SwiggitySwootyGifs | 2 |  | 825
-ladybonersgw | 2 |  | 687
-spaceporn | 2 |  | 6845
-Naruto | 2 |  | 580
-Otters | 2 |  | 547
-korrasami | 2 |  | 518
-Jokes | 2 |  | 4739
-MineralPorn | 2 |  | 378
-Wrapsterpiece | 2 |  | 25
-mildlyinteresting | 2 |  | 20272
-ShingekiNoKyojin | 2 |  | 1855
-GTAV | 2 |  | 1281
+spam | 2 | 1 | 0
+ideasfortheadmins | 2 | 1 | 0
+RealGirls | 2 | 0 | 962
+babybigcatgifs | 2 | 0 | 904
+firefly | 2 | 0 | 857
+SwiggitySwootyGifs | 2 | 0 | 825
+ladybonersgw | 2 | 0 | 687
+spaceporn | 2 | 0 | 6845
+Naruto | 2 | 0 | 580
+Otters | 2 | 0 | 547
+korrasami | 2 | 0 | 518
+Jokes | 2 | 0 | 4739
+MineralPorn | 2 | 0 | 378
+Wrapsterpiece | 2 | 0 | 25
+mildlyinteresting | 2 | 0 | 20272
+ShingekiNoKyojin | 2 | 0 | 1855
+GTAV | 2 | 0 | 1281
 Creatures_of_earth | 1 | 1 | 68
 DCcomics | 1 | 1 | 4
 CanineCosplay | 1 | 1 | 3
@@ -1143,67 +1143,67 @@ confusing_perspective | 1 | 1 | 1
 books | 1 | 1 | 1
 surfing | 1 | 1 | 14
 Megaman | 1 | 1 | 13
-TsundereSharks | 1 | 1 | 
-steampunk | 1 | 1 | 
-snapchat | 1 | 1 | 
-showerbeer | 1 | 1 | 
-shitpost | 1 | 1 | 
-marvelstudios | 1 | 1 | 
-legaladvice | 1 | 1 | 
-justneckbeardthings | 1 | 1 | 
-hockey | 1 | 1 | 
-GTAgifs | 1 | 1 | 
-DubbedGIFS | 1 | 1 | 
-DownvoteGifs | 1 | 1 | 
-comicbooks | 1 | 1 | 
-baconreader | 1 | 1 | 
-starcraft | 1 |  | 985
-babybeastgifs | 1 |  | 94
-bears | 1 |  | 81
-onetruegod | 1 |  | 819
-EmmaWatson | 1 |  | 815
-MakeupAddiction | 1 |  | 809
-Ladybonersgonecuddly | 1 |  | 798
-harrypotter | 1 |  | 77
-RoastMe | 1 |  | 7748
-gifextra | 1 |  | 761
-rage | 1 |  | 739
-Cthulhu | 1 |  | 67
-HeavySeas | 1 |  | 585
-girlsinyogapants | 1 |  | 543
-EarthPorn | 1 |  | 53
-FoggyPics | 1 |  | 49
-Infographics | 1 |  | 481
-TwoXChromosomes | 1 |  | 459
-worldnews | 1 |  | 41
-woodworking | 1 |  | 393
-HighQualityGifs | 1 |  | 384
-FunnyandSad | 1 |  | 323
-ass | 1 |  | 30
-pugs | 1 |  | 297
-MensRants | 1 |  | 28
-HIFW | 1 |  | 286
-NSFWCostumes | 1 |  | 279
-gentlemanboners | 1 |  | 237
-snakes | 1 |  | 219
-stolendogbeds | 1 |  | 214
-peeling | 1 |  | 18
-ResentfulAnimals | 1 |  | 187
-seaporn | 1 |  | 181
-photoshawwp | 1 |  | 17
-dogbird | 1 |  | 17
-sexypizza | 1 |  | 178
-dashcamgifs | 1 |  | 175
-cutegirlgifs | 1 |  | 164
-nicetrybutno | 1 |  | 115
-knives | 1 |  | 115
-casualiama | 1 |  | 1159
-AbandonedPorn | 1 |  | 1109
-WastedGifRequests | 1 |  | 
-unicorninabottle | 1 |  | 
-karmawhoreproblems | 1 |  | 
-IHATEIBLEEEDORANGE | 1 |  | 
-creepyeyes | 1 |  | 
+TsundereSharks | 1 | 1 | 0
+steampunk | 1 | 1 | 0
+snapchat | 1 | 1 | 0
+showerbeer | 1 | 1 | 0
+shitpost | 1 | 1 | 0
+marvelstudios | 1 | 1 | 0
+legaladvice | 1 | 1 | 0
+justneckbeardthings | 1 | 1 | 0
+hockey | 1 | 1 | 0
+GTAgifs | 1 | 1 | 0
+DubbedGIFS | 1 | 1 | 0
+DownvoteGifs | 1 | 1 | 0
+comicbooks | 1 | 1 | 0
+baconreader | 1 | 1 | 0
+starcraft | 1 | 0 | 985
+babybeastgifs | 1 | 0 | 94
+bears | 1 | 0 | 81
+onetruegod | 1 | 0 | 819
+EmmaWatson | 1 | 0 | 815
+MakeupAddiction | 1 | 0 | 809
+Ladybonersgonecuddly | 1 | 0 | 798
+harrypotter | 1 | 0 | 77
+RoastMe | 1 | 0 | 7748
+gifextra | 1 | 0 | 761
+rage | 1 | 0 | 739
+Cthulhu | 1 | 0 | 67
+HeavySeas | 1 | 0 | 585
+girlsinyogapants | 1 | 0 | 543
+EarthPorn | 1 | 0 | 53
+FoggyPics | 1 | 0 | 49
+Infographics | 1 | 0 | 481
+TwoXChromosomes | 1 | 0 | 459
+worldnews | 1 | 0 | 41
+woodworking | 1 | 0 | 393
+HighQualityGifs | 1 | 0 | 384
+FunnyandSad | 1 | 0 | 323
+ass | 1 | 0 | 30
+pugs | 1 | 0 | 297
+MensRants | 1 | 0 | 28
+HIFW | 1 | 0 | 286
+NSFWCostumes | 1 | 0 | 279
+gentlemanboners | 1 | 0 | 237
+snakes | 1 | 0 | 219
+stolendogbeds | 1 | 0 | 214
+peeling | 1 | 0 | 18
+ResentfulAnimals | 1 | 0 | 187
+seaporn | 1 | 0 | 181
+photoshawwp | 1 | 0 | 17
+dogbird | 1 | 0 | 17
+sexypizza | 1 | 0 | 178
+dashcamgifs | 1 | 0 | 175
+cutegirlgifs | 1 | 0 | 164
+nicetrybutno | 1 | 0 | 115
+knives | 1 | 0 | 115
+casualiama | 1 | 0 | 1159
+AbandonedPorn | 1 | 0 | 1109
+WastedGifRequests | 1 | 0 | 0
+unicorninabottle | 1 | 0 | 0
+karmawhoreproblems | 1 | 0 | 0
+IHATEIBLEEEDORANGE | 1 | 0 | 0
+creepyeyes | 1 | 0 | 0
 
 
 &nbsp;
