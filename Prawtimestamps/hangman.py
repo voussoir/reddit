@@ -57,42 +57,65 @@ submission | archive | note
 '''
 
 def out(text):
-	outfile.write(text)
-	outfile.write('\n')
+    outfile.write(text)
+    outfile.write('\n')
 
 def frequencydict(datalist):
-	datadict = {}
-	print('freq')
-	for item in datalist:
-		datadict[item] = datadict.get(item, 0) + 1
-	return datadict
+    '''
+    Given a list, return a dictionary {item: occurances}
+    '''
+    datadict = {}
+    for item in datalist:
+        datadict[item] = datadict.get(item, 0) + 1
+    return datadict
 
-def average(datalist):
-	denominator = max(1, len(datalist))
-	return sum(datalist) / denominator
+def average(iterable):
+    total = 0
+    denominator = 0
+    for x in iterable:
+        total += x
+        denominator += 1
+
+    if denominator == 0:
+        return 0
+    return total / denominator
 
 def dictformat(datadict, joiner=', '):
-	keys = list(datadict.keys())
-	if isinstance(datadict[keys[0]], list):
-		keys.sort(key=lambda x: (len(datadict.get(x)), datadict.get(x)[0]), reverse=True)
-	else:
-		keys.sort(key=datadict.get, reverse=True)
-	longestkey = max([len(k) for k in keys])
-	out = ''
-	for key in keys:
-		val = datadict[key]
-		if isinstance(val, list):
-			val = joiner.join([str(x) for x in val])
-		out += '%s | %s\n' % (key, val)
-	return out
+    keys = list(datadict.keys())
+    samplekey = keys[0]
+    if isinstance(datadict[samplekey], list):
+        # For duplicate lists, sort by longest list .
+        keys.sort(key=lambda x: len(datadict[x]), reverse=True)
+    elif isinstance(datadict[samplekey], dict):
+        # For subreddit breakdowns, sort by total posts made.
+        keys.sort(key=lambda x: datadict[x]['posts_made'])
+    else:
+        # For frequency dicts, sort by highest count.
+        keys.sort(key=datadict.get, reverse=True)
+    out = ''
+    for key in keys:
+        val = datadict[key]
+        if isinstance(val, dict):
+            val = [val['posts_made'], val['posts_deleted'], val['total_karma']]
+        if isinstance(val, list):
+            val = joiner.join([str(x) for x in val])
+        out += '%s | %s\n' % (key, val)
+    return out
 
 def findduplicates(datalist, attribute):
-	datadict = {}
-	for item in datalist:
-		attr = getattr(item, attribute)
-		datadict[attr] = datadict.get(attr, []) + [item]
-	datadict = {x:datadict[x] for x in datadict if len(datadict[x]) > 2}
-	return datadict
+    '''
+    Given a list of objects, and an attribute of interest, return a dictionary
+    {value: [object, object, ...]}
+    which maps unique attribute values to a list of objects having that value,
+    and there are at least two objects.
+    '''
+    datadict = {}
+    for item in datalist:
+        value = getattr(item, attribute)
+        datadict.setdefault(value, [])
+        datadict[value].append(item)
+    datadict = {attribute:holders for (attribute, holders) in datadict.items() if len(holders) > 1}
+    return datadict
 
 def listblock(x, blocklength=12, joins=', '):
     out = ''
@@ -110,105 +133,119 @@ def listblock(x, blocklength=12, joins=', '):
 
 
 def main():
-	out('/u/GallowBoob\n======\n\n')
-	out('Obviously I can\'t tell if a deleted post was its if I find it too late,')
-	out('so these numbers should be considered lower than is correct.  ')
-	out('[click here](https://github.com/voussoir/reddit/raw/master/Prawtimestamps/%40gallowboob.db) to download the sqlite db.')
-	out('')
-	cur.execute('SELECT COUNT(idint) FROM posts WHERE idstr LIKE "t3_%"')
-	totalitems = cur.fetchone()[0]
-	out('Submissions on record: %d  ' % totalitems)
+    out('/u/GallowBoob\n======\n\n')
+    out('Obviously I can\'t tell if a deleted post was its if I find it too late,')
+    out('so these numbers should be considered lower than is correct.  ')
+    out('[click here](https://github.com/voussoir/reddit/raw/master/Prawtimestamps/databases/%40gallowboob.db) to download the sqlite db.')
+    out('')
 
-	cur.execute('SELECT idstr FROM posts WHERE idstr LIKE "t3_%"')
-	refreshids = [x[0] for x in cur.fetchall()]
-	living = []
-	nonliving = []
-	while len(refreshids) > 0:
-		print('Updating. %d remaining' % len(refreshids))
-		items = r.get_info(thing_id=refreshids[:100])
-		refreshids = refreshids[100:]
-		for item in items:
-			if item.author is None:
-				item.dot = '-'
-				nonliving.append(item)
-			else:
-				item.dot = '+'
-				living.append(item)
-	out('Submissions alive: %d  ' % len(living))
-	out('Submissions deleted: %d  ' % len(nonliving))
-	out('')
-	cur.execute('SELECT COUNT(idint) FROM posts WHERE self == 1')
-	selfposts = cur.fetchone()[0]
-	out('Selfposts: %d  ' % selfposts)
-	out('Linkposts: %d  ' % (totalitems-selfposts))
-	out('')
-	scores_total = [[item.score, item.id] for item in living+nonliving]
-	scores_living = [[item.score, item.id] for item in living]
-	scores_nonliving = [[item.score, item.id] for item in nonliving]
-	scores_total.sort(key=lambda x: x[0], reverse=True)
-	scores_living.sort(key=lambda x: x[0], reverse=True)
-	scores_nonliving.sort(key=lambda x: x[0], reverse=True)
-	print('Measuring scores')
-	out('Average score: %d  ' % (average([x[0] for x in scores_total])))
-	out('Average score of living: %d  ' % (average([x[0] for x in scores_living])))
-	out('Average score of deleted: %d  ' % (average([x[0] for x in scores_nonliving])))
-	out('')
-	freq_total = findduplicates(living+nonliving, 'url')
-	freq_living = findduplicates(living, 'url')
-	freq_nonliving = findduplicates(nonliving, 'url')
-	duplicates_total = sum([len(freq_total[x]) for x in freq_total])
-	duplicates_living = sum([len(freq_living[x]) for x in freq_living])
-	duplicates_nonliving = sum([len(freq_nonliving[x]) for x in freq_nonliving])
-	print('Measuring reposts')
-	out('&nbsp;\n\n#reposts\n')
-	out('Submissions with the same link as another: %d  ' % duplicates_total)
-	out('Submissions living with the same link as another living: %d  ' % duplicates_living)
-	out('Submissions deleted with the same link as another deleted: %d  ' % duplicates_nonliving)
-	out('Submissions deleted with the same link as another living: %d  ' % (duplicates_total - (duplicates_living+duplicates_nonliving)))
-	out('')
-	for key in freq_total:
-		val = freq_total[key]
-		freq_total[key] = ['[`{d}`](http://redd.it/{i})'.format(d=i.id+i.dot, i=i.id) for i in val]
-	out('&nbsp;\n')
-	# The >2 control is done within the findduplicates function
-	out('Only URLs with 3+ reposts are shown here.\n')
-	out('`+` : submission is alive\n')
-	out('`-` : submission is deleted')
-	out('')
-	out('url | karma farmas')
-	out('----- | -----')
-	out(dictformat(freq_total))
-	out('')
-	print('Measuring subreddits')
-	freq_total = frequencydict([x.subreddit.display_name for x in living+nonliving])
-	freq_living = frequencydict([x.subreddit.display_name for x in living])
-	freq_nonliving = frequencydict([x.subreddit.display_name for x in nonliving])
-	out('&nbsp;\n\n#subreddits\n')
-	out('Subreddits posted to: %d  ' % len(freq_total))
-	out('Subreddits posted to, living: %d  ' % len(freq_living))
-	out('Subreddits posted to, deleted: %d  ' % len(freq_nonliving))
-	out('')
-	for subreddit in freq_total:
-		karma = 0
-		deletions = 0
-		for post in living+nonliving:
-			if post.subreddit.display_name == subreddit:
-				karma += post.score
-				if post.author is None:
-					deletions += 1
-		freq_total[subreddit] = [freq_total[subreddit], deletions, karma]
-	out('subreddit | posts made | posts deleted | score total')
-	out(':-------- | ---------: | ------------: | ----------:')
-	out(dictformat(freq_total, joiner=' | '))
-	out('')
-	out('&nbsp;\n\n#living\n')
-	out(listblock([x.id for x in living]))
-	out('')
-	out('&nbsp;\n\n#deleted\n')
-	out(listblock([x.id for x in nonliving]))
-	out('')
-	out('&nbsp;\n\n#archives\n')
-	out(FOOTER)
+    cur.execute('SELECT idstr FROM posts WHERE idstr LIKE "t3_%" ORDER BY created DESC')
+    refreshids = [x[0] for x in cur.fetchall()]
+
+    submissions_total = []
+    submissions_living = []
+    submissions_nonliving = []
+    while len(refreshids) > 0:
+        print('Updating. %d remaining' % len(refreshids))
+        items = r.get_info(thing_id=refreshids[:100])
+        refreshids = refreshids[100:]
+        for item in items:
+            if item.author is None:
+                item.dot = '-'
+                submissions_nonliving.append(item)
+            else:
+                item.dot = '+'
+                submissions_living.append(item)
+            submissions_total.append(item)
+
+    out('Submissions on record: %d  ' % len(submissions_total))
+    out('Submissions alive: %d  ' % len(submissions_living))
+    out('Submissions deleted: %d  ' % len(submissions_nonliving))
+    out('')
+
+    cur.execute('SELECT COUNT(idint) FROM posts WHERE self == 1')
+    selfposts = cur.fetchone()[0]
+    out('Selfposts: %d  ' % selfposts)
+    out('Linkposts: %d  ' % (len(submissions_total)-selfposts))
+    out('')
+
+    print('Measuring scores')
+    out('Average score: %d  ' % average(x.score for x in submissions_total))
+    out('Average score of living: %d  ' % average(x.score for x in submissions_living))
+    out('Average score of deleted: %d  ' % average(x.score for x in submissions_nonliving))
+    out('')
+
+    print('Measuring reposts')
+    reposts_total = findduplicates(submissions_total, 'url')
+    reposts_living = findduplicates(submissions_living, 'url')
+    reposts_nonliving = findduplicates(submissions_nonliving, 'url')
+    repost_count_total = sum(len(holders) for holders in reposts_total.values())
+    repost_count_living = sum(len(holders) for holders in reposts_living.values())
+    repost_count_nonliving = sum(len(holders) for holders in reposts_nonliving.values())
+    out('&nbsp;\n\n#reposts\n')
+    out('Submissions with the same link as another: %d  ' % repost_count_total)
+    out('Submissions living with the same link as another living: %d  ' % repost_count_living)
+    out('Submissions deleted with the same link as another deleted: %d  ' % repost_count_nonliving)
+    out('Submissions deleted with the same link as another living: %d  ' % (repost_count_total - (repost_count_living+repost_count_nonliving)))
+    out('')
+
+    print('Drawing repost table')
+    # Minimum of 3 reposts to keep the table shorter and more interesting.
+    reposts_total = {attribute:holders for (attribute, holders) in reposts_total.items() if len(holders) > 2}
+    for (key, holders) in reposts_total.items():
+        holders = ['[`{i}{d}`](http://redd.it/{i})'.format(d=i.dot, i=i.id) for i in holders]
+        reposts_total[key] = holders
+    out('&nbsp;\n')
+    out('Only URLs with 3+ reposts are shown in this table.\n')
+    out('`+` : submission is alive\n')
+    out('`-` : submission is deleted')
+    out('')
+    out('url | karma farmas')
+    out('----- | -----')
+    out(dictformat(reposts_total))
+    out('')
+
+    print('Measuring subreddits')
+    subreddits_total = frequencydict(x.subreddit.display_name for x in submissions_total)
+    subreddits_living = frequencydict(x.subreddit.display_name for x in submissions_living)
+    subreddits_nonliving = frequencydict(x.subreddit.display_name for x in submissions_nonliving)
+    subreddits_allliving = set(subreddits_total).difference(set(subreddits_nonliving))
+    subreddits_alldead = set(subreddits_total).difference(set(subreddits_living))
+    out('&nbsp;\n\n#subreddits\n')
+    out('Subreddits posted to: %d  ' % len(subreddits_total))
+    out('Subreddits with living submissions: %d  ' % len(subreddits_living))
+    out('Subreddits with deleted submissions: %d  ' % len(subreddits_nonliving))
+    out('Subreddits where all submissions living: %d  ' % len(subreddits_allliving))
+    out('Subreddits where all submissions deleted: %d  ' % len(subreddits_alldead))
+    out('')
+
+    for subreddit in subreddits_total:
+        karma = 0
+        deletions = 0
+        for post in submissions_total:
+            if post.subreddit.display_name == subreddit:
+                karma += post.score
+                if post.author is None:
+                    deletions += 1
+        subreddits_total[subreddit] = {
+            'posts_made': subreddits_total[subreddit],
+            'posts_deleted': deletions,
+            'total_karma': karma,
+        }
+
+    print('Drawing subreddit table')
+    out('subreddit | posts made | posts deleted | score total')
+    out(':-------- | ---------: | ------------: | ----------:')
+    out(dictformat(subreddits_total, joiner=' | '))
+    out('')
+    out('&nbsp;\n\n#living\n')
+    out(listblock([x.id for x in submissions_living]))
+    out('')
+    out('&nbsp;\n\n#deleted\n')
+    out(listblock([x.id for x in submissions_nonliving]))
+    out('')
+    out('&nbsp;\n\n#archives\n')
+    out(FOOTER)
 
 main()
 outfile.close()
