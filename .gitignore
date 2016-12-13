@@ -5,12 +5,11 @@
 *.db-journal
 SubredditBirthdays/sb.db
 SubredditBirthdays/sb.zip
-SubredditBirthdays/show/all-name.txt
-SubredditBirthdays/show/all-time.txt
-SubredditBirthdays/show/all-subscribers.txt
-SubredditBirthdays/show/dirty-name.txt
-SubredditBirthdays/show/dirty-time.txt
-SubredditBirthdays/show/dirty-subscribers.txt
+SubredditBirthdays/spooky/*
+SubredditBirthdays/spooky.zip
+SubredditBirthdays/show/all-*
+SubredditBirthdays/show/dirty-*
+SubredditBirthdays/show/*.zip
 Usernames/un.db
 Usernames/show/available.txt
 Usernames/show/karma_total.txt

@@ -1,1 +1,0 @@
-C:\bit\ghostscript\bin\gswin64 -r180 -sDEVICE=png16m -dBATCH -dNOPAUSE -dSAFER -dEPSCrop -Ic:C:\Windows\Fonts -sOutputFile="%~n1.png" %1
