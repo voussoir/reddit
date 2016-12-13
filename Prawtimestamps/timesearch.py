@@ -100,9 +100,11 @@ livestream:
 
     -c | --comments:
         If provided, do collect comments. Otherwise don't.
-
     If submissions and comments are BOTH left unspecified, then they will BOTH
     be collected. If only one is specified, the other will not be collected.
+
+    -v | --verbose:
+        If provided, print extra information to the screen.
 
     -w 30 | --wait 30:
         The number of seconds to wait between cycles.
@@ -188,6 +190,7 @@ breakdown:
 '''
 
 import argparse
+import copy
 import datetime
 import json
 import markdown  # If you're not interested in offline_reading, you may delete
@@ -360,7 +363,7 @@ prompt_ts_startinginterval = '''
 def livestream(
         subreddit=None,
         username=None,
-        debug=False,
+        verbose=False,
         do_submissions=True,
         do_comments=False,
         limit=100,
@@ -399,52 +402,67 @@ def livestream(
             items = livestream_helper(
                 submission_function=submissions,
                 comment_function=comments,
-                debug=debug,
                 limit=limit,
                 params={'show': 'all'},
-                )
+                verbose=verbose,
+            )
             newitems = smartinsert(sql, cur, items, delaysave=True)
             newtext = '%ds, %dc' % (newitems['new_submissions'], newitems['new_comments'])
             totalnew = newitems['new_submissions'] + newitems['new_comments']
             status = '{now} +{new}'.format(now=human(get_now()), new=newtext)
             print(status, end='', flush=True)
-            if totalnew == 0 and debug is False:
+            if totalnew == 0 and verbose is False:
                 # Since there were no news, allow the next line to overwrite status
                 print('\r', end='')
             else:
                 print()
-            if debug:
+
+            if verbose:
                 print('Loop finished.')
             if only_once:
                 break
             time.sleep(sleepy)
+
         except KeyboardInterrupt:
             print()
             sql.commit()
             sql.close()
             return
+
         except Exception as e:
             traceback.print_exc()
             time.sleep(5)
 
 hangman = lambda: livestream(username='gallowboob', sleepy=60, submissions=True, comments=True)
 
-def livestream_helper(submission_function=None, comment_function=None, debug=False, *a, **k):
+def livestream_helper(
+        submission_function=None,
+        comment_function=None,
+        verbose=False,
+        *args,
+        **kwargs
+    ):
     '''
     Given a submission-retrieving function and/or a comment-retrieving function,
     collect submissions and comments in a list together and return that.
+
+    args and kwargs go into the collecting functions.
     '''
     if bool(submission_function) is bool(comment_function) is False:
         raise Exception('Require submissions and/or comments parameter')
     results = []
 
     if submission_function:
-        if debug: print('Getting submissions', a, k)
-        results.extend(submission_function(*a, **k))
+        if verbose: print('Getting submissions', args, kwargs)
+        this_kwargs = copy.deepcopy(kwargs)
+        submission_batch = submission_function(*args, **this_kwargs)
+        results.extend(submission_batch)
     if comment_function:
-        if debug: print('Getting comments', a, k)
-        results.extend(comment_function(*a, **k))
-    if debug:
+        if verbose: print('Getting comments', args, kwargs)
+        this_kwargs = copy.deepcopy(kwargs)
+        comment_batch = comment_function(*args, **this_kwargs)
+        results.extend(comment_batch)
+    if verbose:
         print('Collected. Saving...')
     return results
 
@@ -1771,6 +1789,7 @@ def livestream_argparse(args):
         do_comments=args.comments,
         do_submissions=args.submissions,
         limit=limit,
+        verbose=args.verbose,
         only_once=args.once,
         sleepy=int_none(args.sleepy),
     )
@@ -1835,9 +1854,10 @@ def main():
     p_livestream.add_argument('-u', '--user', dest='username', default=None)
     p_livestream.add_argument('-s', '--submissions', dest='submissions', action='store_true')
     p_livestream.add_argument('-c', '--comments', dest='comments', action='store_true')
-    p_livestream.add_argument('-l', '--limit', dest='limit', default=None)
-    p_livestream.add_argument('-w', '--wait', dest='sleepy', default=30)
     p_livestream.add_argument('-1', '--once', dest='once', action='store_true')
+    p_livestream.add_argument('-l', '--limit', dest='limit', default=None)
+    p_livestream.add_argument('-v', '--verbose', dest='verbose', action='store_true')
+    p_livestream.add_argument('-w', '--wait', dest='sleepy', default=30)
     p_livestream.set_defaults(func=livestream_argparse)
 
     p_offline_reading = subparsers.add_parser('offline_reading')

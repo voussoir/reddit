@@ -77,6 +77,7 @@ cur.execute('''
     ''')
 cur.execute('CREATE INDEX IF NOT EXISTS subindex ON subreddits(idint)')
 cur.execute('CREATE INDEX IF NOT EXISTS subindex_created ON subreddits(created)')
+cur.execute('CREATE INDEX IF NOT EXISTS subindex_subscribers ON subreddits(subscribers)')
 
 cur.execute('''
     CREATE TABLE IF NOT EXISTS suspicious(
