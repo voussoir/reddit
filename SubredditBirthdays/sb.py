@@ -601,6 +601,7 @@ def show():
     print('Writing jumble.')
     cur.execute('SELECT * FROM subreddits WHERE jumble == 1 ORDER BY subscribers DESC')
     for item in fetchgenerator(cur):
+        itemf = memberformat(item)
         if int(item[SQL_SUBREDDIT['nsfw']]) == 0:
             print(itemf, file=file_jumble_sfw)
         else:

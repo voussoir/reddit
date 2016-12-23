@@ -3,7 +3,7 @@ Subreddit Birthdays
 
 #####Collected 1,281,869 subreddits
 
-#####[Today's jumble](http://reddit.com/r/Pets+dating+slp+Milfie+upstreamjobs+VisitingIceland+birdstakingthetrain+btc+Nexusography+nekoatsume+day9+demonssouls+CelebsBR+eldertrees+WomenForTrump+nasa+EnterTheGungeon+functionalprint+NYKnicks+PeakyBlinders)
+#####[Today's jumble](http://reddit.com/r/Naruto+fatpeoplestories+Fiveheads+HarleyQuinn+ZenHabits+trumpet+seedboxes+weeabootales+WorldofTanksConsole+trashyboners+NLSSCircleJerk+AskFeminists+MGTOW+undeleteShadow+pokemon+ASU+blender+SandersForPresident+gtaonline+SarahHyland)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

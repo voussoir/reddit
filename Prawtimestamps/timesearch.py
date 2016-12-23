@@ -364,8 +364,9 @@ def livestream(
         subreddit=None,
         username=None,
         verbose=False,
+        as_a_generator=False,
         do_submissions=True,
-        do_comments=False,
+        do_comments=True,
         limit=100,
         only_once=False,
         sleepy=30,
@@ -373,6 +374,11 @@ def livestream(
     '''
     Continuously get posts from this source
     and insert them into the database
+
+    as_a_generator:
+        return a generator where every iteration does a single livestream loop.
+        This is good if you want to manage multiple livestreams yourself by
+        calling `next` on each of them, instead of getting stuck in here.
     '''
     if bool(subreddit) == bool(username):
         raise Exception('Require either username / subreddit parameter, but not both')
@@ -396,19 +402,24 @@ def livestream(
     sql = sql_open(databasename)
     cur = sql.cursor()
     initialize_database(sql, cur)
+
+    generator = _livestream_as_a_generator(
+        sql,
+        cur,
+        submission_function=submissions,
+        comment_function=comments,
+        limit=limit,
+        params={'show': 'all'},
+        verbose=verbose,
+    )
+    if as_a_generator:
+        return generator
+
     while True:
         try:
-            r.handler.clear_cache()
-            items = livestream_helper(
-                submission_function=submissions,
-                comment_function=comments,
-                limit=limit,
-                params={'show': 'all'},
-                verbose=verbose,
-            )
-            newitems = smartinsert(sql, cur, items, delaysave=True)
-            newtext = '%ds, %dc' % (newitems['new_submissions'], newitems['new_comments'])
-            totalnew = newitems['new_submissions'] + newitems['new_comments']
+            step = next(generator)
+            newtext = '%ds, %dc' % (step['new_submissions'], step['new_comments'])
+            totalnew = step['new_submissions'] + step['new_comments']
             status = '{now} +{new}'.format(now=human(get_now()), new=newtext)
             print(status, end='', flush=True)
             if totalnew == 0 and verbose is False:
@@ -435,7 +446,29 @@ def livestream(
 
 hangman = lambda: livestream(username='gallowboob', sleepy=60, submissions=True, comments=True)
 
-def livestream_helper(
+def _livestream_as_a_generator(
+        sql,
+        cur,
+        submission_function,
+        comment_function,
+        limit,
+        params,
+        verbose,
+    ):
+    while True:
+        r.handler.clear_cache()
+        items = _livestream_helper(
+            submission_function=submission_function,
+            comment_function=comment_function,
+            limit=limit,
+            params={'show': 'all'},
+            verbose=verbose,
+        )
+        newitems = smartinsert(sql, cur, items, delaysave=True)
+        yield newitems
+        
+
+def _livestream_helper(
         submission_function=None,
         comment_function=None,
         verbose=False,
@@ -504,18 +537,19 @@ def timesearch(
         else:
             lower = None
 
-    if lower is None:
-        if subreddit:
-            if isinstance(subreddit, praw.objects.Subreddit):
-                creation = subreddit.created_utc
-            else:
-                subreddits = subreddit.split('+')
-                subreddits = [r.get_subreddit(sr) for sr in subreddits]
-                creation = min([sr.created_utc for sr in subreddits])
+    if subreddit:
+        if isinstance(subreddit, praw.objects.Subreddit):
+            creation = subreddit.created_utc
         else:
-            if not isinstance(username, praw.objects.Redditor):
-                user = r.get_redditor(username)
-            creation = user.created_utc
+            subreddits = subreddit.split('+')
+            subreddits = [r.get_subreddit(sr) for sr in subreddits]
+            creation = min([sr.created_utc for sr in subreddits])
+    else:
+        if not isinstance(username, praw.objects.Redditor):
+            user = r.get_redditor(username)
+        creation = user.created_utc
+
+    if lower is None or lower < creation:
         lower = creation
 
     maxupper = upper
@@ -1773,7 +1807,8 @@ def commentaugment_argparse(args):
 
 def livestream_argparse(args):
     if args.submissions is args.comments is False:
-        raise ValueError('At least -s or -c must be provided')
+        args.submissions = True
+        args.comments = True
     if args.limit is None:
         limit = 100
     else:
