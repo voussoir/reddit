@@ -196,6 +196,7 @@ import json
 import markdown  # If you're not interested in offline_reading, you may delete
 import os
 import praw
+import requests
 import sqlite3
 import sys
 import time
@@ -215,6 +216,7 @@ MAXIMUM_EXPANSION_MULTIPLIER = 2
 # The maximum amount by which it can multiply the interval
 # when not enough posts are found.
 
+STYLE_FOLDER = 'styles/'
 DATABASE_FOLDER = 'databases/'
 HTML_FOLDER = 'html/'
 REDMASH_FOLDER = 'redmash/'
@@ -1374,6 +1376,50 @@ def breakdown_database(databasename, breakdown_type):
     return breakdown_results
 
 
+  ########                                  ########                                 
+####    ####      ##                            ####                                 
+####    ####    ####                            ####                                 
+####          ############    ####    ####      ####        ########      ########   
+  ######        ####          ####    ####      ####      ####    ####  ####    #### 
+      ####      ####          ####    ####      ####      ############    ####       
+####    ####    ####          ####    ####      ####      ####                ####   
+####    ####    ####  ####      ########        ####      ####    ####  ####    #### 
+  ########        ######            ####    ############    ########      ########   
+                                  ####                                               
+                            ########                                                 
+# Styles
+
+def getstyles(subreddit):
+    #login()
+    print('Getting styles for /r/%s' % subreddit)
+    download_directory = os.path.join(STYLE_FOLDER, subreddit)
+    subreddit = r.get_subreddit(subreddit)
+
+    # To perform the lazy load
+    subreddit.id
+    styles = subreddit.get_stylesheet()
+
+    # Only makedirs after the potential 404
+    os.makedirs(download_directory, exist_ok=True)
+
+    sidebar_filename = os.path.join(download_directory, 'sidebar.md')
+    print('Downloading %s' % sidebar_filename)
+    with open(sidebar_filename, 'w') as sidebar:
+        sidebar.write(subreddit.description)
+
+    stylesheet_filename = os.path.join(download_directory, 'stylesheet.css')
+    print('Downloading %s' % stylesheet_filename)
+    with open(stylesheet_filename, 'w') as stylesheet:
+        stylesheet.write(styles['stylesheet'])
+
+    for image in styles['images']:
+        filename = os.path.join(download_directory, image['name'])
+        filename += '.' + image['url'].split('.')[-1]
+        print('Downloading %s' % filename)
+        with open(filename, 'wb') as image_file:
+            response = requests.get(image['url'])
+            image_file.write(response.content)
+
 
     ########                                                                              ########    
   ####    ####                                                                                ####    
@@ -1805,6 +1851,9 @@ def commentaugment_argparse(args):
         specific_submission=args.specific_submission,
     )
 
+def getstyles_argparse(args):
+    return getstyles(args.subreddit)
+
 def livestream_argparse(args):
     if args.submissions is args.comments is False:
         args.submissions = True
@@ -1927,6 +1976,10 @@ def main():
     p_timesearch.add_argument('-up', '--uppper', dest='upper', default=None)
     p_timesearch.add_argument('-i', '--interval', dest='interval', default=86400)
     p_timesearch.set_defaults(func=timesearch_argparse)
+
+    p_getstyles = subparsers.add_parser('getstyles')
+    p_getstyles.add_argument('subreddit')
+    p_getstyles.set_defaults(func=getstyles_argparse)
 
     args = parser.parse_args()
     args.func(args)
