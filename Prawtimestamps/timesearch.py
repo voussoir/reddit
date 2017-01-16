@@ -4,19 +4,32 @@ Timesearch
 The subreddit archiver
 
 The basics:
-1. Collect a subreddit's submissions with
+1. Collect a subreddit's submissions
     > timesearch timesearch -r subredditname
-2. Collect the comments for those submissions with
+
+2. Collect the comments for those submissions
     > timesearch commentaugment subredditname.db
-3. Render the threads to HTML with
-    > timesearch offline_reading subredditname.db
 
 
-Specifics:
+Commands for collecting:
+{docheader_timesearch}
+{docheader_commentaugment}
+{docheader_livestream}
+{docheader_getstyles}
 
+Commands for processing:
+{docheader_offline_reading}
+{docheader_redmash}
+{docheader_breakdown}
+
+TO SEE DETAILS ON EACH COMMAND, RUN
+> timesearch <command>
+'''
+
+DOCSTRING_TIMESEARCH = '''
 timesearch:
-    Collect submissions from the subreddit across all of history
-    Collect submissions by a user (as many as possible)
+    Collect submissions from the subreddit across all of history, or
+    Collect submissions by a user (as many as possible).
 
     > timesearch timesearch -r subredditname <flags>
     > timesearch timesearch -u username <flags>
@@ -38,14 +51,19 @@ timesearch:
         Default: current time
 
     -i 86400 | --interval 86400:
-        The initial interval for the scanning window.
+        The initial interval for the scanning window, in seconds.
+        This is only a starting value. The window will shrink and stretch
+        as necessary based on received submission counts.
         Default: 86400
+'''
 
+DOCSTRING_COMMENTAUGMENT = '''
 commentaugment:
     Collect comments for the submissions in the database.
-    NOTE - if you did a timesearch scan on a username, this function is useless
-    because it finds comments on the submissions you collected. It does not
-    find the user's comment history. That's not possible.
+    NOTE - if you did a timesearch scan on a username, this function is
+    useless because it finds comments on the submissions you collected,
+    even if the target user was not the OP.
+    It does not find the user's comment history. That's not possible.
 
     > timesearch commentaugment database.db <flags>
 
@@ -55,14 +73,14 @@ commentaugment:
         Default: No limit
 
     -t 5 | --threshold 5:
-        The number of comments a MoreComments object must claim to have for us
-        to open it.
+        The number of comments a MoreComments object must claim to have
+        for us to open it.
         Actual number received may be lower.
         Default: >= 0
 
     -n 4 | --num_thresh 4:
-        The number of comments a submission must claim to have for us to scan
-        it at all.
+        The number of comments a submission must claim to have for us to
+        scan it at all.
         Actual number received may be lower.
         Default: >= 1
 
@@ -71,19 +89,11 @@ commentaugment:
 
     -v | --verbose:
         If provided, print more stuff while working.
+'''
 
-offline_reading:
-    Render submissions and comment threads to HTML.
-
-    > timesearch offline_reading database.db <flags>
-
-    flags:
-    -s "t3_xxxxxx" | --specific "t3_xxxxxx":
-        Given a submission ID, t3_xxxxxx, render only that submission.
-        Otherwise render every submission in the database.
-
+DOCSTRING_LIVESTREAM = '''
 livestream:
-    Continously collect posts.
+    Continously collect submissions and/or comments.
 
     > timesearch livestream -r subredditname <flags>
     > timesearch livestream -u username <flags>
@@ -100,8 +110,8 @@ livestream:
 
     -c | --comments:
         If provided, do collect comments. Otherwise don't.
-    If submissions and comments are BOTH left unspecified, then they will BOTH
-    be collected. If only one is specified, the other will not be collected.
+    If submissions and comments are BOTH left unspecified, then they will
+    BOTH be collected.
 
     -v | --verbose:
         If provided, print extra information to the screen.
@@ -111,7 +121,31 @@ livestream:
 
     -1 | --once:
         If provided, only do a single loop. Otherwise go forever.
+'''
 
+DOCSTRING_GETSTYLES = '''
+getstyles:
+    Collect the sidebar text, stylesheet, and css images.
+
+    > timesearch getstyles subredditname <flags>
+
+    flags:
+        There are no flags at this time.
+'''
+
+DOCSTRING_OFFLINE_READING = '''
+offline_reading:
+    Render submissions and comment threads to HTML.
+
+    > timesearch offline_reading database.db <flags>
+
+    flags:
+    -s "t3_xxxxxx" | --specific "t3_xxxxxx":
+        Given a submission ID, t3_xxxxxx, render only that submission.
+        Otherwise render every submission in the database.
+'''
+
+DOCSTRING_REDMASH = '''
 redmash:
     Dump submission information to a readable file in the `REDMASH_FOLDER`
 
@@ -167,7 +201,9 @@ redmash:
 
         `timesearch redmash -r botwatch --all`
         performs all of the different mashes.
+'''
 
+DOCSTRING_BREAKDOWN = '''
 breakdown:
     Give the comment / submission counts for users in a subreddit, or
     the subreddits that a user posts to.
@@ -188,6 +224,37 @@ breakdown:
     -p | --pretty
         If provided, make the json file indented and sorted.
 '''
+
+def indent(text, spaces=4):
+    spaces = ' ' * spaces
+    return '\n'.join(spaces + line if line.strip() != '' else line for line in text.split('\n'))
+
+def _docstring_headerify(text):
+    '''
+    Return the brief description at the top of the text.
+    User can get full text by looking at each specifically.
+    '''
+    return text.split('\n\n')[0]
+
+DOCSTRING_MAP = {
+    'timesearch': DOCSTRING_TIMESEARCH,
+    'commentaugment': DOCSTRING_COMMENTAUGMENT,
+    'offline_reading': DOCSTRING_OFFLINE_READING,
+    'livestream': DOCSTRING_LIVESTREAM,
+    'redmash': DOCSTRING_REDMASH,
+    'breakdown': DOCSTRING_BREAKDOWN,
+    'getstyles': DOCSTRING_GETSTYLES,
+}
+
+DOCSTRING = DOCSTRING.format(
+    docheader_timesearch=indent(_docstring_headerify(DOCSTRING_TIMESEARCH)),
+    docheader_commentaugment=indent(_docstring_headerify(DOCSTRING_COMMENTAUGMENT)),
+    docheader_livestream=indent(_docstring_headerify(DOCSTRING_LIVESTREAM)),
+    docheader_getstyles=indent(_docstring_headerify(DOCSTRING_GETSTYLES)),
+    docheader_offline_reading=indent(_docstring_headerify(DOCSTRING_OFFLINE_READING)),
+    docheader_redmash=indent(_docstring_headerify(DOCSTRING_REDMASH)),
+    docheader_breakdown=indent(_docstring_headerify(DOCSTRING_BREAKDOWN)),
+)
 
 import argparse
 import copy
@@ -683,16 +750,20 @@ def commentaugment(
     ):
     '''
     Take the IDs of collected submissions, and gather comments from those threads.
-    Please see the global DOCSTRING variable.
+    Please see the global DOCSTRING_COMMENTAUGMENT variable.
     '''
+    databasename = database_filename(subreddit=databasename)
+    assert_file_exists(databasename)
+
     login()
     if specific_submission is not None:
         if not specific_submission.startswith('t3_'):
             specific_submission = 't3_' + specific_submission
-        specific_submission_obj = r.get_submission(submission_id=specific_submission[3:], comment_limit=90000)
-        databasename = specific_submission_obj.subreddit.display_name
+        specific_submission_obj = r.get_submission(
+            submission_id=specific_submission[3:],
+            comment_limit=90000,
+        )
 
-    databasename = database_filename(subreddit=databasename)
     #print(databasename)
     sql = sql_open(databasename)
     cur = sql.cursor()
@@ -1117,8 +1188,7 @@ def trees_from_database(databasename, specific_submission=None):
     Yield each submission's tree as it is generated.
     '''
     databasename = database_filename(plain=databasename)
-    if not os.path.exists(databasename):
-        raise ValueError(databasename, 'does not exist')
+    assert_file_exists(databasename)
 
     sql = sql_open(databasename)
     cur1 = sql.cursor()
@@ -1211,8 +1281,7 @@ def redmash(
         score_threshold=0,
     ):
     databasename = database_filename(subreddit=subreddit, username=username)
-    if not os.path.exists(databasename):
-        raise ValueError(databasename, 'does not exist')
+    assert_file_exists(databasename)
 
     sql = sqlite3.connect(databasename)
     cur = sql.cursor()
@@ -1345,8 +1414,7 @@ def breakdown_database(databasename, breakdown_type):
         String, either 'subreddit' or 'user' to indicate what kind of database this is.
     '''
     databasename = database_filename(plain=databasename)
-    if not os.path.exists(databasename):
-        raise ValueError(databasename, 'does not exist')
+    assert_file_exists(databasename)
 
     sql = sqlite3.connect(databasename)
     submission_cur = sql.cursor()
@@ -1431,6 +1499,10 @@ def getstyles(subreddit):
   ####    ####  ####    ####  ####    ####  ####    ####    ####          ####    ####        ####    
     ##########    ########    ####    ####    ########    ########          ######  ####  ############
 # General
+
+def assert_file_exists(filepath):
+    if not os.path.exists(filepath):
+        raise FileNotFoundError(filepath)
 
 def b36(i):
     if type(i) == int:
@@ -1918,11 +1990,28 @@ def timesearch_argparse(args):
 
 
 def main():
-    if listget(sys.argv, 1, '').lower() in ('', 'help', '-h', '--help'):
+    helpstrings = {'', 'help', '-h', '--help'}
+    arg_1 = listget(sys.argv, 1, '').lower()
+
+    if arg_1 not in DOCSTRING_MAP:
         print(DOCSTRING)
-        return
+        raise SystemExit(1)
+
+    arg_2 = listget(sys.argv, 2, '').lower()
+    if arg_2 in helpstrings:
+        print(DOCSTRING_MAP[arg_1])
+        raise SystemExit(1)
+
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
+
+    p_timesearch = subparsers.add_parser('timesearch')
+    p_timesearch.add_argument('-r', '--subreddit', dest='subreddit', default=None)
+    p_timesearch.add_argument('-u', '--user', dest='username', default=None)
+    p_timesearch.add_argument('-l', '--lower', dest='lower', default='update')
+    p_timesearch.add_argument('-up', '--uppper', dest='upper', default=None)
+    p_timesearch.add_argument('-i', '--interval', dest='interval', default=86400)
+    p_timesearch.set_defaults(func=timesearch_argparse)
 
     p_commentaugment = subparsers.add_parser('commentaugment')
     p_commentaugment.add_argument('databasename')
@@ -1943,6 +2032,10 @@ def main():
     p_livestream.add_argument('-v', '--verbose', dest='verbose', action='store_true')
     p_livestream.add_argument('-w', '--wait', dest='sleepy', default=30)
     p_livestream.set_defaults(func=livestream_argparse)
+
+    p_getstyles = subparsers.add_parser('getstyles')
+    p_getstyles.add_argument('subreddit')
+    p_getstyles.set_defaults(func=getstyles_argparse)
 
     p_offline_reading = subparsers.add_parser('offline_reading')
     p_offline_reading.add_argument('databasename')
@@ -1968,18 +2061,6 @@ def main():
     p_breakdown.add_argument('-u', '--user', dest='username', default=None)
     p_breakdown.add_argument('-p', '--pretty', dest='pretty', action='store_true')
     p_breakdown.set_defaults(func=breakdown_argparse)
-
-    p_timesearch = subparsers.add_parser('timesearch')
-    p_timesearch.add_argument('-r', '--subreddit', dest='subreddit', default=None)
-    p_timesearch.add_argument('-u', '--user', dest='username', default=None)
-    p_timesearch.add_argument('-l', '--lower', dest='lower', default='update')
-    p_timesearch.add_argument('-up', '--uppper', dest='upper', default=None)
-    p_timesearch.add_argument('-i', '--interval', dest='interval', default=86400)
-    p_timesearch.set_defaults(func=timesearch_argparse)
-
-    p_getstyles = subparsers.add_parser('getstyles')
-    p_getstyles.add_argument('subreddit')
-    p_getstyles.set_defaults(func=getstyles_argparse)
 
     args = parser.parse_args()
     args.func(args)
