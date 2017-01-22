@@ -61,9 +61,9 @@ DOCSTRING_COMMENTAUGMENT = '''
 commentaugment:
     Collect comments for the submissions in the database.
     NOTE - if you did a timesearch scan on a username, this function is
-    useless because it finds comments on the submissions you collected,
-    even if the target user was not the OP.
-    It does not find the user's comment history. That's not possible.
+    mostly useless. It collects comments that were made on OP's submissions
+    but it does not find OP's comments on other people's submissions which is
+    what you probably wanted. Unfortunately that's not possible.
 
     > timesearch commentaugment database.db <flags>
 
@@ -257,6 +257,7 @@ DOCSTRING = DOCSTRING.format(
 )
 
 import argparse
+import bot
 import copy
 import datetime
 import json
@@ -269,16 +270,10 @@ import sys
 import time
 import traceback
 
+r = bot.anonymous()
+
 
 ''' USER CONFIGURATION '''
-
-USERAGENT = ""
-APP_ID = ""
-APP_SECRET = ""
-APP_URI = ""
-APP_REFRESH = ""
-# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
-
 MAXIMUM_EXPANSION_MULTIPLIER = 2
 # The maximum amount by which it can multiply the interval
 # when not enough posts are found.
@@ -324,20 +319,6 @@ REDMASH_HTML_FOOTER = '''
 '''
 
 ''' All done! '''
-
-
-try:
-    import bot
-    USERAGENT = bot.aPT
-    APP_ID = bot.oG_id
-    APP_SECRET = bot.oG_secret
-    APP_URI = bot.oG_uri
-    APP_REFRESH = bot.oG_scopes['all']
-except ImportError:
-    pass
-
-# http://redd.it/3cm1p8
-r = praw.Reddit(USERAGENT)
 
 SQL_SUBMISSION_COLUMNS = [
     'idint',
@@ -429,6 +410,134 @@ prompt_ts_startinginterval = '''
   ########        ########  
 # Timesearch
 
+def timesearch(
+        subreddit=None,
+        username=None,
+        lower=None,
+        upper=None,
+        interval=86400,
+        ):
+    '''
+    Collect submissions across time.
+    Please see the global DOCSTRING variable.
+    '''
+    if bool(subreddit) == bool(username):
+        raise Exception('Enter subreddit or username but not both')
+    bot.login(r)
+
+    if subreddit:
+        databasename = database_filename(subreddit=subreddit)
+    else:
+        # When searching, we'll take the user's submissions from anywhere.
+        subreddit = 'all'
+        databasename = database_filename(username=username)
+
+    sql = sql_open(databasename)
+    cur = sql.cursor()
+    initialize_database(sql, cur)
+
+    offset = -time.timezone
+
+    if lower == 'update':
+        # Start from the latest submission
+        cur.execute('SELECT * FROM submissions ORDER BY idint DESC LIMIT 1')
+        f = cur.fetchone()
+        if f:
+            lower = f[SQL_SUBMISSION['created']]
+            print(f[SQL_SUBMISSION['idstr']], human(lower), lower)
+        else:
+            lower = None
+
+    if subreddit and subreddit != 'all':
+        if isinstance(subreddit, praw.objects.Subreddit):
+            creation = subreddit.created_utc
+        else:
+            subreddits = subreddit.split('+')
+            subreddits = [r.get_subreddit(sr) for sr in subreddits]
+            creation = min([sr.created_utc for sr in subreddits])
+    else:
+        if not isinstance(username, praw.objects.Redditor):
+            user = r.get_redditor(username)
+        creation = user.created_utc
+
+    if lower is None or lower < creation:
+        lower = creation
+
+    maxupper = upper
+    if maxupper is None:
+        nowstamp = datetime.datetime.now(datetime.timezone.utc).timestamp()
+        maxupper = nowstamp
+
+    lower -= offset
+    maxupper -= offset
+    cutlower = lower
+    cutupper = maxupper
+    upper = lower + interval
+    itemcount = 0
+
+    toomany_inarow = 0
+    while lower < maxupper:
+        print('\nCurrent interval:', interval, 'seconds')
+        print('Lower', human(lower), lower)
+        print('Upper', human(upper), upper)
+        while True:
+            try:
+                if username:
+                    query = '(and author:"%s" (and timestamp:%d..%d))' % (
+                        username, lower, upper)
+                else:
+                    query = 'timestamp:%d..%d' % (lower, upper)
+                searchresults = list(r.search(query, subreddit=subreddit,
+                                              sort='new', limit=100,
+                                              syntax='cloudsearch'))
+                break
+            except:
+                traceback.print_exc()
+                print('resuming in 5...')
+                time.sleep(5)
+                continue
+
+        searchresults.reverse()
+        print([i.id for i in searchresults])
+
+        itemsfound = len(searchresults)
+        itemcount += itemsfound
+        print('Found', itemsfound, 'items')
+        if itemsfound < 75:
+            print('Too few results, increasing interval', end='')
+            diff = (1 - (itemsfound / 75)) + 1
+            diff = min(MAXIMUM_EXPANSION_MULTIPLIER, diff)
+            interval = int(interval * diff)
+        if itemsfound > 99:
+            #Intentionally not elif
+            print('Too many results, reducing interval', end='')
+            interval = int(interval * (0.8 - (0.05 * toomany_inarow)))
+            upper = lower + interval
+            toomany_inarow += 1
+        else:
+            lower = upper
+            upper = lower + interval
+            toomany_inarow = max(0, toomany_inarow-1)
+            smartinsert(sql, cur, searchresults)
+        print()
+
+    cur.execute('SELECT COUNT(idint) FROM submissions')
+    itemcount = cur.fetchone()[SQL_SUBMISSION['idint']]
+    print('Ended with %d items in %s' % (itemcount, databasename))
+    sql.close()
+
+
+########          ########
+  ####          ####    ####
+  ####          ####    ####
+  ####          ####
+  ####            ######
+  ####      ##        ####
+  ####    ####  ####    ####
+  ####    ####  ####    ####
+##############    ########
+# Livestream
+
 def livestream(
         subreddit=None,
         username=None,
@@ -453,7 +562,7 @@ def livestream(
         raise Exception('Require either username / subreddit parameter, but not both')
     if bool(do_submissions) is bool(do_comments) is False:
         raise Exception('Require do_submissions and/or do_comments parameter')
-    login()
+    bot.login(r)
 
     if subreddit:
         print('Getting subreddit %s' % subreddit)
@@ -568,166 +677,6 @@ def _livestream_helper(
         print('Collected. Saving...')
     return results
 
-def timesearch(
-        subreddit=None,
-        username=None,
-        lower=None,
-        upper=None,
-        interval=86400,
-        ):
-    '''
-    Collect submissions across time.
-    Please see the global DOCSTRING variable.
-    '''
-    if bool(subreddit) == bool(username):
-        raise Exception('Enter subreddit or username but not both')
-    login()
-
-    if subreddit:
-        databasename = database_filename(subreddit=subreddit)
-    else:
-        # When searching, we'll take the user's submissions from anywhere.
-        subreddit = 'all'
-        databasename = database_filename(username=username)
-
-    sql = sql_open(databasename)
-    cur = sql.cursor()
-    initialize_database(sql, cur)
-
-    offset = -time.timezone
-
-    if lower == 'update':
-        # Start from the latest submission
-        cur.execute('SELECT * FROM submissions ORDER BY idint DESC LIMIT 1')
-        f = cur.fetchone()
-        if f:
-            lower = f[SQL_SUBMISSION['created']]
-            print(f[SQL_SUBMISSION['idstr']], human(lower), lower)
-        else:
-            lower = None
-
-    if subreddit:
-        if isinstance(subreddit, praw.objects.Subreddit):
-            creation = subreddit.created_utc
-        else:
-            subreddits = subreddit.split('+')
-            subreddits = [r.get_subreddit(sr) for sr in subreddits]
-            creation = min([sr.created_utc for sr in subreddits])
-    else:
-        if not isinstance(username, praw.objects.Redditor):
-            user = r.get_redditor(username)
-        creation = user.created_utc
-
-    if lower is None or lower < creation:
-        lower = creation
-
-    maxupper = upper
-    if maxupper is None:
-        nowstamp = datetime.datetime.now(datetime.timezone.utc).timestamp()
-        maxupper = nowstamp
-
-    lower -= offset
-    maxupper -= offset
-    cutlower = lower
-    cutupper = maxupper
-    upper = lower + interval
-    itemcount = 0
-
-    toomany_inarow = 0
-    while lower < maxupper:
-        print('\nCurrent interval:', interval, 'seconds')
-        print('Lower', human(lower), lower)
-        print('Upper', human(upper), upper)
-        while True:
-            try:
-                if username:
-                    query = '(and author:"%s" (and timestamp:%d..%d))' % (
-                        username, lower, upper)
-                else:
-                    query = 'timestamp:%d..%d' % (lower, upper)
-                searchresults = list(r.search(query, subreddit=subreddit,
-                                              sort='new', limit=100,
-                                              syntax='cloudsearch'))
-                break
-            except:
-                traceback.print_exc()
-                print('resuming in 5...')
-                time.sleep(5)
-                continue
-
-        searchresults.reverse()
-        print([i.id for i in searchresults])
-
-        itemsfound = len(searchresults)
-        itemcount += itemsfound
-        print('Found', itemsfound, 'items')
-        if itemsfound < 75:
-            print('Too few results, increasing interval', end='')
-            diff = (1 - (itemsfound / 75)) + 1
-            diff = min(MAXIMUM_EXPANSION_MULTIPLIER, diff)
-            interval = int(interval * diff)
-        if itemsfound > 99:
-            #Intentionally not elif
-            print('Too many results, reducing interval', end='')
-            interval = int(interval * (0.8 - (0.05 * toomany_inarow)))
-            upper = lower + interval
-            toomany_inarow += 1
-        else:
-            lower = upper
-            upper = lower + interval
-            toomany_inarow = max(0, toomany_inarow-1)
-            smartinsert(sql, cur, searchresults)
-        print()
-
-    cur.execute('SELECT COUNT(idint) FROM submissions')
-    itemcount = cur.fetchone()[SQL_SUBMISSION['idint']]
-    print('Ended with %d items in %s' % (itemcount, databasename))
-    sql.close()
-
-def timesearch_prompt():
-    while True:
-        username = False
-        maxupper = None
-        interval = 86400
-        print(prompt_ts_subreddit, end='')
-        sub = input()
-        if sub == '':
-            print(prompt_ts_username, end='')
-            username = input()
-            sub = 'all'
-        if username:
-            p = database_filename(username=username)
-        else:
-            p = database_filename(subreddit=sub)
-        if os.path.exists(p):
-            print('Found %s' % p)
-        print(prompt_ts_lowerbound, end='')
-        lower  = input().lower()
-        if lower == '':
-            lower = None
-        if lower not in [None, 'update']:
-            print('- Maximum upper bound\n]: ', end='')
-            maxupper = input()
-            if maxupper == '':
-                maxupper = datetime.datetime.now(datetime.timezone.utc)
-                maxupper = maxupper.timestamp()
-            print(prompt_ts_startinginterval, end='')
-            interval = input()
-            if interval == '':
-                interval = 84600
-            try:
-                maxupper = int(maxupper)
-                lower = int(lower)
-                interval = int(interval)
-            except ValueError:
-                print("lower and upper bounds must be unix timestamps")
-                input()
-                quit()
-        get_all_posts(sub, lower, maxupper, interval, username)
-        print('\nDone. Press Enter to close window or type "restart"')
-        if input().lower() != 'restart':
-            break
-
 
     ########        ####    
   ####    ####    ########  
@@ -755,7 +704,7 @@ def commentaugment(
     databasename = database_filename(subreddit=databasename)
     assert_file_exists(databasename)
 
-    login()
+    bot.login(r)
     if specific_submission is not None:
         if not specific_submission.startswith('t3_'):
             specific_submission = 't3_' + specific_submission
@@ -1458,7 +1407,7 @@ def breakdown_database(databasename, breakdown_type):
 # Styles
 
 def getstyles(subreddit):
-    #login()
+    #bot.login(r)
     print('Getting styles for /r/%s' % subreddit)
     download_directory = os.path.join(STYLE_FOLDER, subreddit)
     subreddit = r.get_subreddit(subreddit)
@@ -1656,17 +1605,6 @@ def listget(li, index, fallback=None):
     except IndexError:
         return fallback
 
-def login():
-    if not all([APP_ID, APP_SECRET, APP_URI, APP_REFRESH]):
-        print('Some OAuth credentials are missing. Not logging in.')
-        return
-
-    if r.access_token is None:
-        print('Logging in.')
-        r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
-        r.refresh_access_information(APP_REFRESH)
-        r.config.api_request_delay = 1
-
 def nofailrequest(function):
     '''
     Creates a function that will retry until it succeeds.
@@ -1826,7 +1764,7 @@ def update_scores(databasename, submissions=True, comments=False):
     Get all submissions or comments from the database, and update
     them with the current scores.
     '''
-    login()
+    bot.login(r)
     import itertools
 
     databasename = database_filename(subreddit=databasename)
@@ -1887,6 +1825,7 @@ def update_scores(databasename, submissions=True, comments=False):
 ####    ####  ########                ####      ########  
                               ####    ####                
                                 ########                  
+# Argparse handlers
 
 int_none = lambda x: int(x) if x is not None else x
 

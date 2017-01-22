@@ -41,6 +41,7 @@ APP_ID = 'xxx'
 APP_SECRET = 'xxx'
 APP_URI = 'xxx'
 APP_REFRESH = 'xxx'
+# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 
 def anonymous():
     r = praw.Reddit(USERAGENT)
@@ -49,6 +50,10 @@ def anonymous():
 def login(r=None):
     if r is None:
         r = anonymous()
+
+    if r.access_token is not None:
+        return r
+
     r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
     r.refresh_access_information(APP_REFRESH)
     r.config.api_request_delay = 1
