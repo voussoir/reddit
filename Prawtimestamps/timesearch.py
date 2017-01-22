@@ -1657,6 +1657,10 @@ def listget(li, index, fallback=None):
         return fallback
 
 def login():
+    if not all([APP_ID, APP_SECRET, APP_URI, APP_REFRESH]):
+        print('Some OAuth credentials are missing. Not logging in.')
+        return
+
     if r.access_token is None:
         print('Logging in.')
         r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
