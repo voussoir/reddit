@@ -1,4 +1,5 @@
 #/u/GoldenSights
+import bot
 import datetime
 import json
 import os
@@ -14,19 +15,11 @@ import traceback
 import types
 
 
-'''USER CONFIGURATION'''
 USERAGENT = '''
 /u/GoldenSights SubredditBirthdays data collection:
 Gathering the creation dates of subreddits for visualization.
 More at https://github.com/voussoir/reddit/tree/master/SubredditBirthdays
 '''.replace('\n', ' ').strip()
-APP_ID = ""
-APP_SECRET = ""
-APP_URI = ""
-APP_REFRESH = ""
-# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
-# This is a short description of what the bot does.
-# For example "/u/GoldenSights' Newsletter bot"
 
 WAIT = 20
 # This is how many seconds you will wait between cycles.
@@ -41,19 +34,6 @@ FORMAT_MESSAGE_UPDATE = 'Upd: {idstr:>5s} : {human} : {nsfw} : {name} : {subscri
 
 RANKS_UP_TO = 20000
 # For the files sorted by subscriber count, display ranks up to this many.
-
-'''All done!'''
-
-try:
-    import bot
-    #USERAGENT = bot.aG
-    APP_ID = bot.oG_id
-    APP_SECRET = bot.oG_secret
-    APP_URI = bot.oG_uri
-    APP_REFRESH = bot.oG_scopes['all']
-except ImportError:
-    pass
-
 
 WAITS = str(WAIT)
 
@@ -104,11 +84,6 @@ SQL_SUBREDDIT_COLUMNS = [
 
 SQL_SUBREDDIT = {key:index for (index, key) in enumerate(SQL_SUBREDDIT_COLUMNS)}
 
-print('Logging in.')
-r = praw.Reddit(USERAGENT)
-r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
-r.refresh_access_information(APP_REFRESH)
-
 noinfolist = []
 
 monthnumbers = {
@@ -148,6 +123,12 @@ SUBMISSION_TYPE_REVERSE = {v:k for (k,v) in SUBMISSION_TYPE.items()}
 SUBMISSION_OBJ = praw.objects.Submission
 SUBREDDIT_OBJ = praw.objects.Subreddit
 COMMENT_OBJ = praw.objects.Comment
+
+
+print('Logging in.')
+r = praw.Reddit(USERAGENT)
+bot.login(r)
+
 
 def base36encode(number, alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
     """Converts an integer to a base36 string."""

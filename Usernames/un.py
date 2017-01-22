@@ -1,4 +1,5 @@
 #/u/GoldenSights
+import bot
 import datetime
 import praw
 import random
@@ -9,7 +10,12 @@ import sys
 import time
 import traceback
 
-
+USERAGENT = '''
+/u/GoldenSights Usernames data collection:
+Gathering the creation dates of user accounts for visualization.
+More at https://github.com/voussoir/reddit/tree/master/Usernames
+'''.replace('\n', ' ').strip()
+    
 sql = sqlite3.connect('C:\\git\\reddit\\usernames\\un.db')
 cur = sql.cursor()
 cur.execute('''
@@ -47,33 +53,6 @@ SQL_USER_COLUMNS = [
 SQL_USER = {key:index for (index, key) in enumerate(SQL_USER_COLUMNS)}
 
 
-USERAGENT = '''
-/u/GoldenSights Usernames data collection:
-Gathering the creation dates of user accounts for visualization.
-More at https://github.com/voussoir/reddit/tree/master/Usernames
-'''.replace('\n', ' ').strip()
-APP_ID = ""
-APP_SECRET = ""
-APP_URI = ""
-APP_REFRESH = ""
-# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
-try:
-    import bot
-    #USERAGENT = bot.aG
-    APP_ID = bot.oG_id
-    APP_SECRET = bot.oG_secret
-    APP_URI = bot.oG_uri
-    APP_REFRESH = bot.oG_scopes['all']
-except ImportError:
-    pass
-    
-print('Logging in.')
-# http://redd.it/3cm1p8
-r = praw.Reddit(USERAGENT)
-r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
-r.refresh_access_information(APP_REFRESH)
-
-
 AVAILABILITY = {True:'available', False:'unavailable', 'available':1, 'unavailable':0}
 HEADER_FULL = '  ID            CREATED                  NAME             LINK     COMMENT      TOTAL            LAST SCANNED'
 HEADER_BRIEF = '      LAST SCANNED       |   NAME'
@@ -89,6 +68,11 @@ VALID_CHARS = string.ascii_letters + string.digits + '_-'
 # If True, print the name of the user we're about to fetch.
 # Good for debugging problematic users.
 PREPRINT = False
+
+
+print('Logging in.')
+r = praw.Reddit(USERAGENT)
+bot.login(r)
 
 
 def allpossiblefromset(characters, length=None, minlength=None, maxlength=None):

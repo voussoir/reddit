@@ -32,6 +32,10 @@ this is by importing a standard library module and checking its location:
 
 But placing the file in the standard library means you will have to copy it over
 when you upgrade Python.
+
+If you need multiple separate bots, I would suggest creating copies of this file
+with different names, and then using `import specialbot as bot` within the
+application, so that the rest of the interface can stay the same.
 '''
 
 import praw
@@ -57,3 +61,4 @@ def login(r=None):
     r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
     r.refresh_access_information(APP_REFRESH)
     r.config.api_request_delay = 1
+    return r
