@@ -221,8 +221,8 @@ breakdown:
     -u "test" | --username "test":
         The username database to break down.
 
-    -p | --pretty
-        If provided, make the json file indented and sorted.
+    --sort "name" | "submissions" | "comments" | "total_posts"
+        Sort the output.
 '''
 
 def indent(text, spaces=4):
@@ -1729,8 +1729,8 @@ def smartinsert(sql, cur, results, delaysave=False, nosave=False):
                 cur.execute(query, bindings)
 
             else:
-                greasy = 'has been overwritten'
-                if item.author is None or greasy in item.body:
+                greasy = ['has been overwritten', 'pastebin.com/64GuVi2F']
+                if item.author is None or any(grease in item.body for grease in greasy):
                     body = existing_entry[SQL_COMMENT['body']]
                 else:
                     body = item.body
@@ -1844,14 +1844,45 @@ def breakdown_argparse(args):
         breakdown_type=breakdown_type,
     )
 
+    def sort_name(name):
+        return name.lower()
+    def sort_submissions(name):
+        invert_score = -1 * breakdown_results[name]['submissions']
+        return (invert_score, name.lower())
+    def sort_comments(name):
+        invert_score = -1 * breakdown_results[name]['comments']
+        return (invert_score, name.lower())
+    def sort_total_posts(name):
+        invert_score = breakdown_results[name]['submissions'] + breakdown_results[name]['comments']
+        invert_score = -1 * invert_score
+        return (invert_score, name.lower())
+    breakdown_sorters = {
+        'name': sort_name,
+        'submissions': sort_submissions,
+        'comments': sort_comments,
+        'total_posts': sort_total_posts,
+    }
+
+    breakdown_names = list(breakdown_results.keys())
+    if args.sort is not None:
+        try:
+            sorter = breakdown_sorters[args.sort.lower()]
+        except KeyError:
+            message = '{sorter} is not a sorter. Choose from {options}'
+            message = message.format(sorter=args.sort, options=list(breakdown_sorters.keys()))
+            raise KeyError(message)
+        breakdown_names.sort(key=sorter)
+        dump = '    "{name}": {{"submissions": {submissions}, "comments": {comments}}}'
+        dump = [dump.format(name=name, **breakdown_results[name]) for name in breakdown_names]
+        dump = ',\n'.join(dump)
+        dump = '{\n' + dump + '\n}\n'
+    else:
+        dump = json.dumps(breakdown_results)
+
     breakdown_filename = os.path.splitext(databasename)[0]
     breakdown_filename = '%s_breakdown.json' % breakdown_filename
     breakdown_file = open(breakdown_filename, 'w')
     with breakdown_file:
-        if args.pretty:
-            dump = json.dumps(breakdown_results, sort_keys=True, indent=4)
-        else:
-            dump = json.dumps(breakdown_results)
         breakdown_file.write(dump)
 
     return breakdown_results
@@ -2002,7 +2033,7 @@ def main():
     p_breakdown = subparsers.add_parser('breakdown')
     p_breakdown.add_argument('-r', '--subreddit', dest='subreddit', default=None)
     p_breakdown.add_argument('-u', '--user', dest='username', default=None)
-    p_breakdown.add_argument('-p', '--pretty', dest='pretty', action='store_true')
+    p_breakdown.add_argument('--sort', dest='sort', default=None)
     p_breakdown.set_defaults(func=breakdown_argparse)
 
     args = parser.parse_args()
