@@ -21,9 +21,6 @@ Gathering the creation dates of subreddits for visualization.
 More at https://github.com/voussoir/reddit/tree/master/SubredditBirthdays
 '''.replace('\n', ' ').strip()
 
-WAIT = 20
-# This is how many seconds you will wait between cycles.
-# The bot is completely inactive during this time.
 
 LOWERBOUND_STR = '2qh0j'
 LOWERBOUND_INT = 4594339
@@ -34,8 +31,6 @@ FORMAT_MESSAGE_UPDATE = 'Upd: {idstr:>5s} : {human} : {nsfw} : {name} : {subscri
 
 RANKS_UP_TO = 20000
 # For the files sorted by subscriber count, display ranks up to this many.
-
-WAITS = str(WAIT)
 
 GOODCHARS = string.ascii_letters + string.digits + '_'
 
@@ -53,19 +48,40 @@ cur.execute('''
     subscribers INT,
     jumble INT,
     subreddit_type INT,
-    submission_type INT)
-    ''')
-cur.execute('CREATE INDEX IF NOT EXISTS subindex ON subreddits(idint)')
-cur.execute('CREATE INDEX IF NOT EXISTS subindex_created ON subreddits(created)')
-cur.execute('CREATE INDEX IF NOT EXISTS subindex_subscribers ON subreddits(subscribers)')
+    submission_type INT,
+    last_scanned INT)
+''')
+cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_idint ON subreddits(idint)')
+cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_idstr ON subreddits(idint)')
+cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_name ON subreddits(name)')
+cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_created ON subreddits(created)')
+cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_subscribers ON subreddits(subscribers)')
+cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_last_scanned ON subreddits(last_scanned)')
 
 cur.execute('''
     CREATE TABLE IF NOT EXISTS suspicious(
     idint INT,
     idstr TEXT,
     name TEXT,
-    subscribers INT)
-    ''')
+    subscribers INT,
+    noticed INT)
+''')
+
+cur.execute('''
+    CREATE TABLE IF NOT EXISTS popular(
+    idstr TEXT,
+    last_seen INT)
+''')
+cur.execute('CREATE INDEX IF NOT EXISTS index_popular_idstr on popular(idstr)')
+cur.execute('CREATE INDEX IF NOT EXISTS index_popular_last_seen on popular(last_seen)')
+
+cur.execute('''
+    CREATE TABLE IF NOT EXISTS jumble(
+    idstr TEXT,
+    last_seen INT)
+''')
+cur.execute('CREATE INDEX IF NOT EXISTS index_jumble_idstr on jumble(idstr)')
+cur.execute('CREATE INDEX IF NOT EXISTS index_jumble_last_seen on jumble(last_seen)')
 sql.commit()
 
 # These numbers are used for interpreting the tuples that come from SELECT
@@ -77,9 +93,16 @@ SQL_SUBREDDIT_COLUMNS = [
     'name',
     'nsfw',
     'subscribers',
-    'jumble',
     'subreddit_type',
     'submission_type',
+    'last_scanned',
+]
+SQL_SUSPICIOUS_COLUMNS = [
+    'idint',
+    'idstr',
+    'name',
+    'subscribers',
+    'noticed',
 ]
 
 SQL_SUBREDDIT = {key:index for (index, key) in enumerate(SQL_SUBREDDIT_COLUMNS)}
@@ -110,6 +133,7 @@ SUBREDDIT_TYPE = {
     'employees_only':5,
     'gold_restricted':6,
     'gold_only':7,
+    'user': 8,
 }
 SUBMISSION_TYPE = {
     'any':0,
@@ -130,7 +154,7 @@ r = praw.Reddit(USERAGENT)
 bot.login(r)
 
 
-def base36encode(number, alphabet='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):
+def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     """Converts an integer to a base36 string."""
     if not isinstance(number, (int)):
         raise TypeError('number must be an integer')
@@ -154,6 +178,36 @@ def b36(i):
         return base36encode(i)
     if type(i) == str:
         return base36decode(i)
+
+def binding_filler(column_names, values, require_all=True):
+    '''
+    Manually aligning question marks and bindings is annoying.
+    Given the table's column names and a dictionary of {column: value},
+    return the question marks and the list of bindings in the right order.
+
+    require_all:
+        If `values` does not contain one of the column names, should we raise
+        an exception?
+        Otherwise, that column will simply receive None.
+
+    Ex:
+    column_names=['id', 'name', 'score'],
+    values={'score': 20, 'id': '1111', 'name': 'James'}
+    ->
+    returns ('?, ?, ?, ?', ['1111', 'James', 20])
+    '''
+    values = values.copy()
+    for column in column_names:
+        if column in values:
+            continue
+        if require_all:
+            raise ValueError('Missing column "%s"' % column)
+        else:
+            values.setdefault(column, None)
+    qmarks = '?' * len(column_names)
+    qmarks = ', '.join(qmarks)
+    bindings = [values[column] for column in column_names]
+    return (qmarks, bindings)
 
 def chunklist(inputlist, chunksize):
     if len(inputlist) < chunksize:
@@ -210,9 +264,21 @@ def fetchgenerator(cur):
             break
         yield fetch
 
+def get_jumble_subreddits():
+    cur.execute('SELECT idstr FROM jumble')
+    fetch = [x[0] for x in cur.fetchall()]
+    subreddits = []
+    for subreddit in fetch:
+        cur.execute('SELECT * FROM subreddits WHERE idstr == ?', [subreddit])
+        subreddits.append(cur.fetchone())
+    return subreddits
+
 def get_newest_sub():
     brandnewest = list(r.get_new_subreddits(limit=1))[0]
     return brandnewest.id
+
+def get_now():
+    return datetime.datetime.now(datetime.timezone.utc).timestamp()
 
 def humanize(timestamp):
     day = datetime.datetime.utcfromtimestamp(timestamp)
@@ -234,7 +300,7 @@ def modernize():
 
     modernlist = []
     for x in range(finalid, newestid+1):
-        modernlist.append(b36(x).lower())
+        modernlist.append(b36(x))
     processmega(modernlist, nosave=True)
     sql.commit()
 
@@ -246,9 +312,6 @@ def modsfromid(subid):
     for m in mods:
         print(m)
     return mods
-
-def now():
-    return datetime.datetime.now(datetime.timezone.utc).timestamp()
 
 def normalize_subreddit_object(thing):
     '''
@@ -268,7 +331,6 @@ def normalize_subreddit_object(thing):
 
 def process(
         subreddit,
-        isjumbled=False,
         nosave=False,
     ):
     '''
@@ -278,10 +340,6 @@ def process(
         The subreddit(s) to process. Can be an individual or list of:
         strings or Subreddit, Submission, or Comment objects.
 
-    isjumbled:
-        Indicate that this subreddit came from /r/random, because
-        the function has no way of knowing on its own.
-
     nosave:
         If True, don't do any database commits.
 
@@ -289,6 +347,7 @@ def process(
 
     '''
     subreddits = []
+    processed_subreddits = []
 
     if isinstance(subreddit, (tuple, list, set, types.GeneratorType)):
         subreddits = iter(subreddit)
@@ -297,6 +356,7 @@ def process(
 
     for subreddit in subreddits:
         subreddit = normalize_subreddit_object(subreddit)
+        processed_subreddits.append(subreddit)
 
         created = subreddit.created_utc
         created_human = humanize(subreddit.created_utc)
@@ -308,11 +368,12 @@ def process(
         subreddit_type = SUBREDDIT_TYPE[subreddit.subreddit_type]
         submission_type = SUBMISSION_TYPE[subreddit.submission_type]
         
+        now = int(get_now())
+
         cur.execute('SELECT * FROM subreddits WHERE idint == ?', [idint])
         f = cur.fetchone()
         if f is None:
             h = humanize(subreddit.created_utc)
-            isjumbled = isjumbled or 0
 
             message = FORMAT_MESSAGE_NEW.format(
                 idstr=idstr,
@@ -331,26 +392,15 @@ def process(
                 'nsfw': is_nsfw,
                 'name': name,
                 'subscribers': subscribers,
-                'jumble': isjumbled,
                 'subreddit_type': subreddit_type,
                 'submission_type': submission_type,
+                'last_scanned': now,
             }
 
-            cur.execute('''
-                INSERT INTO subreddits VALUES(
-                    @idint,
-                    @idstr,
-                    @created,
-                    @human,
-                    @name,
-                    @nsfw,
-                    @subscribers,
-                    @jumble,
-                    @subreddit_type,
-                    @submission_type
-                    )''', data)
+            (qmarks, bindings) = binding_filler(SQL_SUBREDDIT_COLUMNS, data)
+            query = 'INSERT INTO subreddits VALUES(%s)' % qmarks
+            cur.execute(query, bindings)
         else:
-            isjumbled = isjumbled or int(f[SQL_SUBREDDIT['jumble']]) or 0
             old_subscribers = f[SQL_SUBREDDIT['subscribers']]
             subscriber_diff = subscribers - old_subscribers
 
@@ -361,14 +411,11 @@ def process(
                     'idstr': idstr,
                     'name': name,
                     'subscribers': old_subscribers,
+                    'noticed': int(get_now()),
                 }
-                cur.execute('''
-                    INSERT INTO suspicious VALUES(
-                        @idint,
-                        @idstr,
-                        @name,
-                        @subscribers
-                        )''', data)
+                (qmarks, bindings) = binding_filler(SQL_SUSPICIOUS_COLUMNS, data)
+                query = 'INSERT INTO suspicious VALUES(%s)' % qmarks
+                cur.execute(query, bindings)
 
             message = FORMAT_MESSAGE_UPDATE.format(
                 idstr=idstr,
@@ -383,21 +430,23 @@ def process(
             data = {
                 'idint': idint,
                 'subscribers': subscribers,
-                'jumble': isjumbled,
                 'subreddit_type': subreddit_type,
                 'submission_type': submission_type,
+                'last_scanned': now,
             }
             cur.execute('''
                 UPDATE subreddits SET
-                subscribers == @subscribers,
-                jumble == @jumble,
-                subreddit_type == @subreddit_type,
-                submission_type == @submission_type
+                subscribers = @subscribers,
+                subreddit_type = @subreddit_type,
+                submission_type = @submission_type,
+                last_scanned = @last_scanned
                 WHERE idint == @idint
                 ''', data)
+        processed_subreddits.append(subreddit)
 
     if not nosave:
         sql.commit()
+    return processed_subreddits
 
 def process_input():
     while True:
@@ -435,6 +484,7 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, nosave=
             process(subname)
         return
 
+    processed_subreddits = []
     remaining = len(srinput)
     for x in range(len(srinput)):
         if 't5_' not in srinput[x]:
@@ -446,7 +496,7 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, nosave=
             subreddits = r.get_info(thing_id=subset)
             try:
                 for sub in subreddits:
-                    process(sub, nosave=nosave)
+                    processed_subreddits.extend(process(sub, nosave=nosave))
             except TypeError:
                 noinfolist = subset[:]
                 if len(noinfolist) == 1:
@@ -461,6 +511,7 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, nosave=
             print(vars(e))
             if docrash:
                 raise
+    return processed_subreddits
 
 def processrand(count, doublecheck=False, sleepy=0):
     '''
@@ -480,7 +531,7 @@ def processrand(count, doublecheck=False, sleepy=0):
 
     cur.execute('SELECT * FROM subreddits ORDER BY idint DESC LIMIT 1')
     upper = cur.fetchone()[SQL_SUBREDDIT['idstr']]
-    print('<' + b36(lower).lower() + ',',  upper + '>', end=', ')
+    print('<' + b36(lower) + ',',  upper + '>', end=', ')
     upper = b36(upper)
     totalpossible = upper-lower
     print(totalpossible, 'possible')
@@ -489,7 +540,7 @@ def processrand(count, doublecheck=False, sleepy=0):
         allids = [x[SQL_SUBREDDIT['idstr']] for x in fetched]
     for x in range(count):
         rand = random.randint(lower, upper)
-        rand = b36(rand).lower()
+        rand = b36(rand)
         if doublecheck:
             while rand in allids or rand in rands:
                 if rand in allids:
@@ -497,7 +548,7 @@ def processrand(count, doublecheck=False, sleepy=0):
                 else:
                     print('Old:', rand, 'Rerolling: in rands')
                 rand = random.randint(lower, upper)
-                rand = b36(rand).lower()
+                rand = b36(rand)
         rands.append(rand)
 
     rands.sort()
@@ -580,8 +631,7 @@ def show():
     file_dirty_subscribers.close()
 
     print('Writing jumble.')
-    cur.execute('SELECT * FROM subreddits WHERE jumble == 1 ORDER BY subscribers DESC')
-    for item in fetchgenerator(cur):
+    for item in get_jumble_subreddits():
         itemf = memberformat(item)
         if int(item[SQL_SUBREDDIT['nsfw']]) == 0:
             print(itemf, file=file_jumble_sfw)
@@ -732,7 +782,7 @@ def show():
     readmelines = file_readme.readlines()
     file_readme.close()
     readmelines[3] = '#####' + headline
-    readmelines[5] = '#####[Today\'s jumble](http://reddit.com/r/%s)\n' % jumble(doreturn=True)[0]
+    readmelines[5] = '#####[Today\'s jumble](http://reddit.com/r/%s)\n' % jumble(nsfw=False)
     file_readme = open('README.md', 'w')
     file_readme.write(''.join(readmelines))
     file_readme.close()
@@ -871,7 +921,7 @@ def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, d
             print(item)
 
 def findwrong():
-    cur.execute('SELECT * FROM subreddits WHERE NAME!=?', ['?'])
+    cur.execute('SELECT * FROM subreddits WHERE name != ?', ['?'])
     fetch = cur.fetchall()
     fetch.sort(key=lambda x: x[SQL_SUBREDDIT['idint']])
     #sorted by ID
@@ -893,24 +943,53 @@ def findwrong():
 def processjumble(count, nsfw=False):
     for x in range(count):
         sub = r.get_random_subreddit(nsfw=nsfw)
-        process(sub, isjumbled=True)
-        sql.commit()
+        process(sub, nosave=True)
+        last_seen = int(get_now())
+        cur.execute('SELECT * FROM jumble WHERE idstr == ?', [sub.id])
+        if cur.fetchone() is None:
+            cur.execute('INSERT INTO jumble VALUES(?, ?)', [sub.id, last_seen])
+        else:
+            cur.execute('UPDATE jumble SET last_seen = ? WHERE idstr == ?',
+                [sub.id, last_seen]
+            )
+    sql.commit()
 
-def jumble(count=20, doreturn=False, nsfw=False):
-    nsfw = 1 if nsfw else 0
-    cur.execute('SELECT * FROM subreddits WHERE jumble=1 AND nsfw=? ORDER BY RANDOM() LIMIT ?', [nsfw, count])
-    fetch = cur.fetchall()
-    random.shuffle(fetch)
-    fetch = fetch[:count]
-    fetch = [f[:-1] for f in fetch]
-    fetchstr = [i[SQL_SUBREDDIT['name']] for i in fetch]
-    fetchstr = '+'.join(fetchstr)
-    output = [fetchstr, fetch]
-    if doreturn:
-        return output
-    print(output[0])
-    for x in output[1]:
-        print(str(x).replace("'", ''))
+def processpopular(count, sort='hot'):
+    subreddit = r.get_subreddit('popular')
+    if sort == 'hot':
+        submissions = subreddit.get_hot(limit=count)
+    elif sort == 'new':
+        submissions = subreddit.get_new(limit=count)
+    else:
+        raise ValueError(sort)
+
+    submissions = list(submissions)
+    subreddit_ids = list({submission.subreddit_id for submission in submissions})
+    subreddits = processmega(subreddit_ids, nosave=True)
+    last_seen = int(get_now())
+    for subreddit in subreddits:
+        cur.execute('SELECT * FROM popular WHERE idstr == ?', [subreddit.id])
+        if cur.fetchone() is None:
+            cur.execute('INSERT INTO popular VALUES(?, ?)', [subreddit.id, last_seen])
+        else:
+            cur.execute(
+                'UPDATE popular SET last_seen = ? WHERE idstr == ?',
+                [last_seen, subreddit.id]
+            )
+    sql.commit()
+
+def jumble(count=20, nsfw=False):
+    subreddits = get_jumble_subreddits()
+    if nsfw is not None:
+        subreddits = [x for x in subreddits if x[SQL_SUBREDDIT['nsfw']] == int(bool(nsfw))]
+
+    random.shuffle(subreddits)
+    subreddits = subreddits[:count]
+    subreddits = [f[:-1] for f in subreddits]
+    jumble_string = [x[SQL_SUBREDDIT['name']] for x in subreddits]
+    jumble_string = '+'.join(jumble_string)
+    output = [jumble_string, subreddits]
+    return jumble_string
 
 def rounded(x, rounding=100):
     return int(round(x/rounding)) * rounding

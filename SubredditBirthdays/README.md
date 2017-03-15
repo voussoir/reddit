@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 1,281,869 subreddits
+#####Collected 1,353,928 subreddits
 
-#####[Today's jumble](http://reddit.com/r/Naruto+fatpeoplestories+Fiveheads+HarleyQuinn+ZenHabits+trumpet+seedboxes+weeabootales+WorldofTanksConsole+trashyboners+NLSSCircleJerk+AskFeminists+MGTOW+undeleteShadow+pokemon+ASU+blender+SandersForPresident+gtaonline+SarahHyland)
+#####[Today's jumble](http://reddit.com/r/Punny+birdswitharms+LivestreamFails+advertising+ottawa+cade+jellybeantoes+dayton+BitcoinMarkets+KimKardashianPics+catpictures+xboxone+labrador+bitchimabus+undelete+ActionFigures+Switzerland+snapchat+shestillsucking+PlanetCoaster)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -11,39 +11,50 @@ The earliest subreddit after which IDs are consistently incrementing is [/r/234]
 
 Some subreddits are not properly marked as NSFW. This is either the fault of the moderators or, in some cases, the data was collected while the subreddit was brand new.
 
-04 August 2016
+
+2017 03 14
+- Removed column `jumble` from `subreddits`.
+- Added table `jumble` with columns `idstr`, `last_seen`. Going to restart my jumble info because I don't know how out-of-date it was.
+- Added table `popular` with columns `idstr`, `last_seen`. Watching [/r/popular](https://reddit.com/r/popular)
+- Added column `last_scanned` to `subreddits`.
+- Added column `noticed` to `suspicious` to keep track of when it happened.
+- Renamed indices to be more consistent. "index_{table}_{column}".
+- Lowercased the base36 default alphabet because I'm always lowercasing it anyway.
+
+2016 08 04
 - Database files have been moved to [the release page](https://github.com/voussoir/reddit/releases)
 
-02 November 2014
-- Finally decided to start measuring subscribers. Numbers will be wrong for quite some time.
-
-07 November 2014
-- 2009, 2010, and 2011 complete!
-
-08 November 2014
-- 2012 and 2013 complete!
-
-09 November 2014
-- 2014 up-to-date!!!!
-
-24 December 2014
-- **Massive speed boost** - I just learned about sql INDEX; and I've also added a column to the table where subreddit IDs are stored in integers instead of b36 strings. Together, these changes make updates go like 20x faster. Why have I waited so long?
-
-18 February 2015
-- Database is now TOO BIG for github! ZIP is provided in its place. The db is now tracking subreddit_type and submission_type to help detect spam. This has put the file over the allowed 100 megabyte limit. I'll probably forget to re-zip it on every commit but I'll do my best.
-
-03 October 2015
-- I'm starting to migrate to Git LFS for storing the big stuff.
-- All of the /show/ text files are now using the extension "vdump" so that they can be registered to lfs without interfering with any other text files I use. They are still text files.
+2016 04 08
+- Removed `doupdates` parameter since I have no reason to use it ever again.
+- Now using named bindings for SQL operations for clarity.
+- Filenames and Labeling of bar plots greatly improved.
 
 Some time in 2015
 - Migrated back out of Git LFS because 1GB wasn't enough.
 - Back to using .txt. So much for vdump.
 
-08 April 2016
-- Removed `doupdates` parameter since I have no reason to use it ever again.
-- Now using named bindings for SQL operations for clarity.
-- Filenames and Labeling of bar plots greatly improved.
+2015 10 03
+- I'm starting to migrate to Git LFS for storing the big stuff.
+- All of the /show/ text files are now using the extension "vdump" so that they can be registered to lfs without interfering with any other text files I use. They are still text files.
+
+2015 02 18
+- Database is now TOO BIG for github! ZIP is provided in its place. The db is now tracking subreddit_type and submission_type to help detect spam. This has put the file over the allowed 100 megabyte limit. I'll probably forget to re-zip it on every commit but I'll do my best.
+
+2014 12 24
+- Big speed boost - Just learned about sql INDEX; and I've also added a column to the table where subreddit IDs are stored in integers instead of b36 strings. Together, these changes make updates go like 20x faster. Why have I waited so long?
+
+2014 11 09
+- 2014 up-to-date!!!!
+
+2014 11 08
+- 2012 and 2013 complete!
+
+2014 11 07
+- 2009, 2010, and 2011 complete!
+
+2014 11 02
+- Finally decided to start measuring subscribers. Numbers will be wrong for quite some time.
+
 ______
 
 
