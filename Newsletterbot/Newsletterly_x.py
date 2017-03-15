@@ -173,6 +173,7 @@ def add_subreddit_to_multireddit(subreddit):
             return
 
     for multireddit in my_multireddits:
+        multireddit._author = r.user.name
         if len(multireddit.subreddits) >= 100:
             continue
         try:
@@ -559,7 +560,7 @@ def interpret_message(pm):
                 argument = argument.split('.')
                 user = argument[0]
                 subreddit = argument[1]
-                add_subscription(user, subreddit)
+                add_subscription(user, subreddit, bypass_pph=True)
                 status = (MESSAGE_SUBSCRIBE_FORCE % (user, subreddit)) + '\n\n'
                 results.append(status)
 
@@ -701,6 +702,9 @@ def manage_posts():
     my_multireddits = r.get_my_multireddits()
     for multireddit in my_multireddits:
         print('Checking /m/%s' % multireddit.name)
+        # Reddit has introduced a bug which causes incorrect multireddit URLs.
+        multireddit._url = 'https://api.reddit.com/me/m/%s/' % multireddit.name
+        multireddit._author = r.user.name
         total_submissions.extend(multireddit.get_new(limit=100))
 
     keep_submissions = []
