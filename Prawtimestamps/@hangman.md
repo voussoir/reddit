@@ -19,7 +19,7 @@ Average score of deleted: 36
 
 &nbsp;
 
-#reposts
+# reposts
 
 Submissions with the same link as another: 7495  
 Submissions living with the same link as another living: 1500  
@@ -893,7 +893,7 @@ http://i.imgur.com/JXgaIqH.gifv | [`5cpq4q-`](http://redd.it/5cpq4q), [`5cppqi-`
 
 &nbsp;
 
-#subreddits
+# subreddits
 
 Subreddits posted to: 301  
 Subreddits with living submissions: 233  
@@ -1208,7 +1208,7 @@ creepyeyes | 1 | 0 | 0
 
 &nbsp;
 
-#living
+# living
 
 [`5hqin4`](http://redd.it/5hqin4), [`5hq759`](http://redd.it/5hq759), [`5hq1wh`](http://redd.it/5hq1wh), [`5hq04c`](http://redd.it/5hq04c), [`5hpnh6`](http://redd.it/5hpnh6), [`5hftz7`](http://redd.it/5hftz7), [`5h18ny`](http://redd.it/5h18ny), [`5gzmdj`](http://redd.it/5gzmdj), [`5gzjhq`](http://redd.it/5gzjhq), [`5gzg5f`](http://redd.it/5gzg5f), [`5gu3us`](http://redd.it/5gu3us), [`5gtlxs`](http://redd.it/5gtlxs)  
 [`5gtcjr`](http://redd.it/5gtcjr), [`5gtcd3`](http://redd.it/5gtcd3), [`5gsy9m`](http://redd.it/5gsy9m), [`5gstx8`](http://redd.it/5gstx8), [`5gsol7`](http://redd.it/5gsol7), [`5gsiuo`](http://redd.it/5gsiuo), [`5gn7am`](http://redd.it/5gn7am), [`5gmtcd`](http://redd.it/5gmtcd), [`5gmitw`](http://redd.it/5gmitw), [`5gm50p`](http://redd.it/5gm50p), [`5glrx2`](http://redd.it/5glrx2), [`5glrsr`](http://redd.it/5glrsr)  
@@ -1817,7 +1817,7 @@ creepyeyes | 1 | 0 | 0
 
 &nbsp;
 
-#deleted
+# deleted
 
 [`5ht193`](http://redd.it/5ht193), [`5hrj7a`](http://redd.it/5hrj7a), [`5hrgnr`](http://redd.it/5hrgnr), [`5hra2e`](http://redd.it/5hra2e), [`5hr8ue`](http://redd.it/5hr8ue), [`5hr531`](http://redd.it/5hr531), [`5hr182`](http://redd.it/5hr182), [`5hqx6l`](http://redd.it/5hqx6l), [`5hqsk1`](http://redd.it/5hqsk1), [`5hqsf1`](http://redd.it/5hqsf1), [`5hqs3y`](http://redd.it/5hqs3y), [`5hqrg4`](http://redd.it/5hqrg4)  
 [`5hqr5p`](http://redd.it/5hqr5p), [`5hqr2o`](http://redd.it/5hqr2o), [`5hqi6m`](http://redd.it/5hqi6m), [`5hqg3r`](http://redd.it/5hqg3r), [`5hqdvz`](http://redd.it/5hqdvz), [`5hqdkg`](http://redd.it/5hqdkg), [`5hqd0o`](http://redd.it/5hqd0o), [`5hqbar`](http://redd.it/5hqbar), [`5hqb9v`](http://redd.it/5hqb9v), [`5hq7ob`](http://redd.it/5hq7ob), [`5hq7ne`](http://redd.it/5hq7ne), [`5hq7fx`](http://redd.it/5hq7fx)  
@@ -2663,7 +2663,7 @@ creepyeyes | 1 | 0 | 0
 
 &nbsp;
 
-#archives
+# archives
 
 
 submission | archive | note

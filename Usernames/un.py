@@ -537,7 +537,7 @@ def show():
     print('Updating readme')
     readmelines = file_readme.readlines()
     file_readme.close()
-    readmelines[3] = '#####{0:,} accounts\n'.format(validitems)
+    readmelines[3] = '##### {0:,} accounts\n'.format(validitems)
     readmelines = ''.join(readmelines)
     file_readme = open('README.md', 'w')
     file_readme.write(readmelines)

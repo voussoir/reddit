@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 1,353,928 subreddits
+##### Collected 1,353,928 subreddits
 
-#####[Today's jumble](http://reddit.com/r/Punny+birdswitharms+LivestreamFails+advertising+ottawa+cade+jellybeantoes+dayton+BitcoinMarkets+KimKardashianPics+catpictures+xboxone+labrador+bitchimabus+undelete+ActionFigures+Switzerland+snapchat+shestillsucking+PlanetCoaster)
+##### [Today's jumble](http://reddit.com/r/Punny+birdswitharms+LivestreamFails+advertising+ottawa+cade+jellybeantoes+dayton+BitcoinMarkets+KimKardashianPics+catpictures+xboxone+labrador+bitchimabus+undelete+ActionFigures+Switzerland+snapchat+shestillsucking+PlanetCoaster)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 
@@ -58,9 +58,9 @@ Some time in 2015
 ______
 
 
-###Anomalies and gaps
+### Anomalies and gaps
 
-#####[/r/basement](http://reddit.com/r/basement)  
+##### [/r/basement](http://reddit.com/r/basement)  
     (2qho7, 1206628926, Mar 27 2008 14:42:06 UTC, NSFW:0, selfhelp)  
     (2qho8, 1206628935, Mar 27 2008 14:42:15 UTC, NSFW:0, CoolSiteOfTheDay)  
     (2qho9, 1301555473, Mar 31 2011 07:11:13 UTC, NSFW:0, basement)  
@@ -68,7 +68,7 @@ ______
     (2qhob, 1206634488, Mar 27 2008 16:14:48 UTC, NSFW:0, InDepth)  
 
 .
-#####[/r/Greed](http://reddit.com/r/greed)
+##### [/r/Greed](http://reddit.com/r/greed)
     (2qxht, 1240916867, Apr 28 2009 11:07:47 UTC, NSFW:0, Internet_Detectives)
     (2qxhu, 1240918063, Apr 28 2009 11:27:43 UTC, NSFW:0, favorite_colors)
     (2qxhv, 1293172070, Dec 24 2010 06:27:50 UTC, NSFW:0, greed)
@@ -76,7 +76,7 @@ ______
     (2qxhx, 1240920547, Apr 28 2009 12:09:07 UTC, NSFW:0, chinee)
 
 .
-#####[/r/i18n](http://reddit.com/r/i18n)
+##### [/r/i18n](http://reddit.com/r/i18n)
     (2rfde, 1262626934, Jan 04 2010 17:42:14 UTC, NSFW:0, ScandalsReddit)
     (2rfdf, 1262627321, Jan 04 2010 17:48:41 UTC, NSFW:0, musicacristiana)
     (2rfdg, 1321208402, Nov 13 2011 18:20:02 UTC, NSFW:0, i18n)
@@ -84,7 +84,7 @@ ______
     (2rfdi, 1262636046, Jan 04 2010 20:14:06 UTC, NSFW:0, riyl)
 
 .
-#####[/r/t:heatdeathoftheuniverse](http://reddit.com/r/t:heatdeathoftheuniverse)
+##### [/r/t:heatdeathoftheuniverse](http://reddit.com/r/t:heatdeathoftheuniverse)
     2ttsl, 1333250351, Apr 01 2012 03:19:11 UTC, 0, t:heatdeathoftheuniverse.....1,285
     
     At 24 characters, this is the longest subreddit name on the site.
@@ -92,7 +92,7 @@ ______
     
 
 .
-#####The subreddit spammer of 2014
+##### The subreddit spammer of 2014
     #spam begins
     34nab, 1416340781, Nov 18 2014 19:59:41 UTC, 0, aDTALMel.........................0
     
@@ -109,7 +109,7 @@ ______
 
 
 .
-#####Did I stutter?
+##### Did I stutter?
     (2qjft, 1214562943, Jun 27 2008 10:35:43 UTC, NSFW:0, Seekers)
     (2qjfu, 1214563517, Jun 27 2008 10:45:17 UTC, NSFW:1, Smartphoneking)
     (2qjfv, 1214564906, Jun 27 2008 11:08:26 UTC, NSFW:0, wbsage)
@@ -138,7 +138,7 @@ ______
 
 
 .
-#####Newlines in names
+##### Newlines in names
     2quw7, 1237025633, Mar 14 2009 10:13:53 UTC, 1, Inbedwithmedia...................0
     2quw8, 1237027829, Mar 14 2009 10:50:29 UTC, 0, MySingaporeTailor................0
     2quw9, 1237028834, Mar 14 2009 11:07:14 UTC, 0, she4he\n.........................0
@@ -171,14 +171,14 @@ ______
     
 
 .
-#####The only subreddit with a hyphen
+##### The only subreddit with a hyphen
 
     2r3oh, Aug 01 2009 07:16:14 UTC, 0, banned..........................335
     2quox, Mar 10 2009 20:57:13 UTC, 0, banned-irene......................1
     32k0q, Jul 14 2014 04:37:47 UTC, 0, banned_accounts...................0
 
 .
-#####There is a nsfw subreddit in Reddit's /r/random list
+##### There is a nsfw subreddit in Reddit's /r/random list
     >>> processjumble(15)
     Upd: 2vpth :                                Frozen : 10538
     Upd: 2qi63 :                                toronto : 49876
@@ -204,7 +204,7 @@ ______
     Remember that processjumble() queries /r/random *only* unlesss specified nsfw.
 
 .
-#####The 2s6__ gap
+##### The 2s6__ gap
     (2s6p4, 1289727678, Nov 14 2010 09:41:18 UTC, NSFW:0, verydirtythings)
     (2s6p5, 1289730697, Nov 14 2010 10:31:37 UTC, NSFW:0, memehistory)
     38 missing
@@ -214,7 +214,7 @@ ______
 
 
 .
-#####The 2w7v_ gap
+##### The 2w7v_ gap
     2w7uz, 1359742360, Feb 01 2013 18:12:40 UTC, 0, Karma_mafia......................0
     2w7v0, 1359742368, Feb 01 2013 18:12:48 UTC, 0, inferiorityjerk..................0
     33 missing
@@ -222,7 +222,7 @@ ______
     2w7vz, 1359743971, Feb 01 2013 18:39:31 UTC, 0, gunsMETAL........................0
 
 .
-#####The 2wdt_ gap
+##### The 2wdt_ gap
     (2wdt2, 1361097827, Feb 17 2013 10:43:47 UTC, NSFW:0, euroondy)
     (2wdt3, 1361098023, Feb 17 2013 10:47:03 UTC, NSFW:0, 2YOON)
     (2wdt4, 1361098384, Feb 17 2013 10:53:04 UTC, NSFW:0, gqmagazine)
@@ -234,7 +234,7 @@ ______
     (2wdu0, 1361100799, Feb 17 2013 11:33:19 UTC, NSFW:0, trueNaruto)
 
 .
-#####The 2wf__ gaps
+##### The 2wf__ gaps
     (2wfuu, 1361574351, Feb 22 2013 23:05:51 UTC, NSFW:0, TOmapsarchives)
     (2wfuv, 1361574397, Feb 22 2013 23:06:37 UTC, NSFW:0, picsofgunnar)
     32 missing  
@@ -248,7 +248,7 @@ ______
     (2wfwq, 1361575515, Feb 22 2013 23:25:15 UTC, NSFW:0, mitsuba)  
 
 .
-#####The 2wg__ gap
+##### The 2wg__ gap
     (2wg1p, 1361605573, Feb 23 2013 07:46:13 UTC, NSFW:0, randomplot)
     (2wg1q, 1361605863, Feb 23 2013 07:51:03 UTC, NSFW:0, Employment4u)
     22 missing
