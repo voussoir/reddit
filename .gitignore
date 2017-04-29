@@ -2,6 +2,7 @@
 ## Eclipse
 #################
 
+*.ignore
 *.db-journal
 SubredditBirthdays/sb.db
 SubredditBirthdays/sb.zip
