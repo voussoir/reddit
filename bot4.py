@@ -1,5 +1,5 @@
 '''
-bot.py template for PRAW3
+bot.py template for PRAW4
 
 This file will be imported by all bots, and provides a standard way to log in.
 
@@ -50,17 +50,18 @@ APP_REFRESH = 'xxx'
 # https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 
 def anonymous():
-    r = praw.Reddit(USERAGENT)
+    r = praw4.Reddit(
+        user_agent=USERAGENT,
+        client_id=APP_ID,
+        client_secret=APP_SECRET,
+    )
     return r
 
 def login(r=None):
-    if r is None:
-        r = anonymous()
-
-    if r.access_token is not None:
-        return r
-
-    r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
-    r.refresh_access_information(APP_REFRESH)
-    r.config.api_request_delay = 1
+    r = praw4.Reddit(
+        user_agent=USERAGENT,
+        client_id=APP_ID,
+        client_secret=APP_SECRET,
+        refresh_token=APP_REFRESH,
+    )
     return r
