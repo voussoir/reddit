@@ -19,8 +19,8 @@ Timesearch is a collection of utilities for archiving subreddits.
 
 - **commentaugment**: Although we can search for submissions, we cannot search for comments. After performing a timesearch, you can use commentaugment to download the comment tree for each submission.  
     Note: commentaugment only gets the comments attached to the submissions that you found in your timesearch scan. If you're trying to commentaugment on a user, you're going to get comments that were made on their submissions, **not** comments they made on other people's submissions. Therefore, comprehensively collecting a user's activity is not possible. You will have to use someone else's dataset like that of [/u/Stuck_in_the_Matrix](https://reddit.com/u/Stuck_in_the_Matrix) at [pushshift.io](https://pushshift.io).  
-    `> timesearch commentaugment -r subredditname <flags>`  
-    `> timesearch commentaugment -u username <flags>`
+    `> timesearch.py commentaugment -r subredditname <flags>`  
+    `> timesearch.py commentaugment -u username <flags>`
 
 - **livestream**: timesearch+commentaugment is great for starting your database and getting historical posts, but it's not the best for staying up-to-date. Instead, livestream monitors `/new` and `/comments` to continuously ingest data.  
     `> timesearch.py livestream -r subredditname <flags>`  
@@ -42,8 +42,8 @@ Timesearch is a collection of utilities for archiving subreddits.
     `> timesearch.py redmash -u username <flags>`
 
 - **breakdown**: Produces a JSON file indicating which users make the most posts in a subreddit, or which subreddits a user posts in.  
-    `> timesearch.py breakdown -r subredditname`  
-    `> timesearch.py breakdown -u username`
+    `> timesearch.py breakdown -r subredditname` <flags>  
+    `> timesearch.py breakdown -u username` <flags>
 
 ### To use it
 
