@@ -32,6 +32,7 @@ cur.execute('''
     lastscan INT)
     ''')
 cur.execute('CREATE INDEX IF NOT EXISTS userindex ON users(idint)')
+cur.execute('CREATE INDEX IF NOT EXISTS index_users_available ON users(available)')
 cur.execute('CREATE INDEX IF NOT EXISTS nameindex ON users(lowername)')
 sql.commit()
 
@@ -184,9 +185,9 @@ def fetchwriter(cur, outfile, spacer1=' ', spacer2=None, brief=False):
     for item in fetchgenerator(cur):
         spacer = spacer1 if flipflop else spacer2
         if brief:
-            item = memberformat_brief(item, spacer)
+            item = memberformat_brief(item)
         else:
-            item = memberformat_full(item, spacer)
+            item = memberformat_full(item)
         print(item, file=outfile)
         if spacer2 is not None:
             flipflop = not flipflop

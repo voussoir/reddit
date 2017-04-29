@@ -1088,3 +1088,13 @@ def plotbars(filename, inputdata, upperlabel='Subreddits created', colorbg="#fff
 
 def execit(*args, **kwargs):
     exec(*args, **kwargs)
+
+def _idle():
+    while True:
+        try:
+            processpopular(100, 'new')
+            processjumble(30, nsfw=False)
+            processjumble(30, nsfw=True)
+            time.sleep(30)
+        except Exception:
+            pass
