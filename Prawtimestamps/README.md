@@ -1,5 +1,61 @@
-timesearch.py
+timesearch
 =============
+
+I don't have a test suite. You're my test suite! Messages go to [/u/GoldenSights](https://reddit.com/u/GoldenSights).
+
+Timesearch is a collection of utilities for archiving subreddits.
+
+### Make sure you have:
+
+- Installed PRAW >= 4, as well as the other modules in `requirements.txt`.
+- Acquired OAuth tokens. PRAW has a guide on readthedocs [here](https://praw.readthedocs.io/en/latest/tutorials/refresh_token.html).
+- A copy of [bot.py](https://github.com/voussoir/reddit/blob/master/bot4.py).
+
+### This package consists of:
+
+- **timesearch**: If you try to page through `/new` on a subreddit, you'll hit a limit at or before 1,000 posts. Timesearch uses the `timestamp` cloudsearch query parameter to step from the beginning of a subreddit to present time, to collect as many submissions as possible. Read more about timestamp searching [here](https://www.reddit.com/r/reddittips/comments/2ix73n/use_cloudsearch_to_search_for_posts_on_reddit/).  
+    `> timesearch.py timesearch -r subredditname <flags>`  
+    `> timesearch.py timesearch -u username <flags>`
+
+- **commentaugment**: Although we can search for submissions, we cannot search for comments. After performing a timesearch, you can use commentaugment to download the comment tree for each submission.  
+    Note: commentaugment only gets the comments attached to the submissions that you found in your timesearch scan. If you're trying to commentaugment on a user, you're going to get comments that were made on their submissions, **not** comments they made on other people's submissions. Therefore, comprehensively collecting a user's activity is not possible. You will have to use someone else's dataset like that of [/u/Stuck_in_the_Matrix](https://reddit.com/u/Stuck_in_the_Matrix) at [pushshift.io](https://pushshift.io).  
+    `> timesearch commentaugment -r subredditname <flags>`  
+    `> timesearch commentaugment -u username <flags>`
+
+- **livestream**: timesearch+commentaugment is great for starting your database and getting historical posts, but it's not the best for staying up-to-date. Instead, livestream monitors `/new` and `/comments` to continuously ingest data.  
+    `> timesearch.py livestream -r subredditname <flags>`  
+    `> timesearch.py livestream -u username <flags>`
+
+- **getstyles**: Downloads the stylesheet and CSS images.  
+    `> timesearch.py getstyles -r subredditname`
+
+- **getwiki**: Downloads the wiki pages, sidebar, etc. from /wiki/pages.  
+    `> timesearch.py getwiki -r subredditname`
+
+- **offline_reading**: Renders comment threads into HTML via markdown.  
+    Note: I'm currently using the [markdown library from pypi](https://pypi.python.org/pypi/Markdown), and it doesn't do reddit's custom markdown like `/r/` or `/u/`, obviously. So far I don't think anybody really uses o_r so I haven't invested much time into improving it.  
+    `> timesearch.py offline_reading -r subredditname <flags>`  
+    `> timesearch.py offline_reading -u username <flags>`
+
+- **redmash**: Generates plaintext or HTML lists of submissions, sorted by a property of your choosing. You can order by date, author, flair, etc.  
+    `> timesearch.py redmash -r subredditname <flags>`  
+    `> timesearch.py redmash -u username <flags>`
+
+- **breakdown**: Produces a JSON file indicating which users make the most posts in a subreddit, or which subreddits a user posts in.  
+    `> timesearch.py breakdown -r subredditname`  
+    `> timesearch.py breakdown -u username`
+
+### To use it
+
+You'll want to download the `timesearch.py` file, as well as the entire `timesearch` directory, as it is a package. The .py file and the package should be siblings as they are seen here. On GitHub you can't download an individual folder as a zip so you'll have to visit each file and download individually. Sorry.
+
+When you run the .py file, it imports the package and sends it your commandline arguments. You can view a summarized version of all the docstrings with just `timesearch.py`, or you can view a specific docstring with `timesearch.py livestream`, etc.
+
+I recommend [sqlitebrowser](https://github.com/sqlitebrowser/sqlitebrowser/releases) if you want to inspect the database yourself.
+
+### Changelog
+- 2017 04 28
+    - Complete restructure into package, started using PRAW4.
 
 - 2016 08 10
     - Started merging redmash and wrote its argparser
@@ -30,17 +86,8 @@ timesearch.py
     - fixed bug in which updatescores stopped iterating early if you had more than 100 comments in a row in the db
     - commentaugment has been completely merged into the timesearch.py file. you can use commentaugment_prompt() to input the parameters, or use the commentaugment() function directly.
 
-&nbsp;
 
-It's all fresh all smooth
-
-This creates an sqlite database file containing the submissions on a subreddit within the requested time span. Best when used in conjunction with an SQL viewer or a tool like Redmash to create text files.
-
-If you leave the subreddit blank, it will ask you to enter a username instead. This feature is not as perfect as subreddit scanning due to API limitations.
-
-Don't forget to change the Useragent before starting.
-
-============
+____
 
 
 I want to live in a future where everyone uses UTC and agrees on daylight savings.
