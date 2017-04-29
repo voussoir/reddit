@@ -106,7 +106,7 @@ making new lines.
 
 '''ALL DONE'''
 
-NOSEND = 'nosend' in sys.argv
+NOSEND = 'nosend' in [x.replace('-', '') for x in sys.argv]
 if NOSEND:
     print('NOSEND active!')
 ADMINS = [admin.lower() for admin in ADMINS]
@@ -125,13 +125,29 @@ WAITS = str(WAIT)
 
 sql = sqlite3.connect('newsletterly.db')
 cur = sql.cursor()
-cur.execute('CREATE TABLE IF NOT EXISTS flag_deletion(username TEXT, warned_at INT, delete_at INT)')
-cur.execute('CREATE TABLE IF NOT EXISTS multireddits(subreddit TEXT, multireddit TEXT)')
-cur.execute('CREATE TABLE IF NOT EXISTS oldposts(id TEXT)')
-cur.execute('CREATE TABLE IF NOT EXISTS spool(name TEXT, message TEXT)')
-cur.execute('CREATE TABLE IF NOT EXISTS subscribers(name TEXT, reddit TEXT)')
+DB_INIT = '''
+CREATE TABLE IF NOT EXISTS flag_deletion(
+    username TEXT COLLATE NOCASE,
+    warned_at INT,
+    delete_at INT
+);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS oldposts(id TEXT);
+CREATE INDEX IF NOT EXISTS index_oldposts_id ON oldposts(id);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS spool(name TEXT, message TEXT);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS subscribers(
+    name TEXT COLLATE NOCASE,
+    reddit TEXT COLLATE NOCASE
+);
+CREATE INDEX IF NOT EXISTS index_subscribers_name ON subscribers(name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS index_subscribers_reddit ON subscribers(reddit COLLATE NOCASE);
+'''
 
-cur.execute('CREATE INDEX IF NOT EXISTS oldpostindex on oldposts(id)')
+statements = DB_INIT.split(';')
+for statement in statements:
+    cur.execute(statement)
 sql.commit()
 
 # Sqlite column names
@@ -214,6 +230,7 @@ def add_subscription(user, subreddit, bypass_pph=False):
         printlog('Subreddit does not exist')
         return (MESSAGE_SUBREDDIT_FAIL % subreddit)
 
+    subreddit = normalize(subreddit)
     if get_subscriptions(user=user, subreddit=subreddit):
         printlog('%s is already subscribed to %s' % (user, subreddit))
         return (MESSAGE_SUBSCRIBE_ALREADY % subreddit)
@@ -274,12 +291,13 @@ def build_report(user):
     results = []
     get_all_users = user is None
     if get_all_users:
-        cur.execute('SELECT * FROM subscribers')
-        fetch = cur.fetchall()
-        fetch = [f[0].lower() for f in fetch]
-        userlist = list(set(fetch))
+        # cur.execute('SELECT * FROM subscribers')
+        # fetch = cur.fetchall()
+        # fetch = [f[0].lower() for f in fetch]
+        # userlist = list(set(fetch))
         subscriptions = get_subscriptions()
-        subreddits = [s[SQL_SUBREDDIT] for s in subscriptions]
+        userlist = list(set(s[SQL_USERNAME] for s in subscriptions))
+        subreddits = list(set(s[SQL_SUBREDDIT] for s in subscriptions))
         subreddits = '+'.join(subreddits)
         subreddits = 'ALL REDDITS: /r/' + subreddits + '\n\n'
         results.append(subreddits)
@@ -381,8 +399,10 @@ def flag_for_deletion(username, seconds_from_now, message=None, do_commit=True):
     if fetch is None:
         cur.execute('INSERT INTO flag_deletion VALUES(?, ?, ?)', [username, warned_at, delete_at])
     else:
-        cur.execute('''UPDATE flag_deletion SET warned_at = ?, delete_at = ? WHERE username == ?''',
-                    [warned_at, delete_at, username])
+        cur.execute(
+            'UPDATE flag_deletion SET warned_at = ?, delete_at = ? WHERE username == ?',
+            [warned_at, delete_at, username]
+        )
 
     if message is not None:
         add_to_spool(username, message, do_commit=False)
@@ -441,6 +461,7 @@ def get_subscriptions(user=None, subreddit=None):
     Return subscriptions matching the parameters.
 
     user  | subreddit | return value
+    ------|-----------|---------------------------------------------------------
     None  | None      | list of all (user, sub) pairs.
     '...' | None      | list of all subreddits this user subscribes to.
     None  | '...'     | list of all users subscribed to this subreddit.
@@ -674,7 +695,7 @@ def manage_posts():
 
     # Compile sets of all our subscribers
     printlog('Managing subscriptions.')
-    subscriptions_per_user = {}
+    subreddits_per_user = {}
     users_per_subreddit = {}
     all_subreddits = set()
 
@@ -682,8 +703,8 @@ def manage_posts():
         user = normalize(subscription[SQL_USERNAME])
         subreddit = normalize(subscription[SQL_SUBREDDIT])
 
-        subscriptions_per_user.setdefault(user, set())
-        subscriptions_per_user[user].add(subreddit)
+        subreddits_per_user.setdefault(user, set())
+        subreddits_per_user[user].add(subreddit)
         users_per_subreddit.setdefault(subreddit, set())
         users_per_subreddit[subreddit].add(user)
 
@@ -692,11 +713,7 @@ def manage_posts():
     all_subreddits = list(all_subreddits)
     all_subreddits.sort(key=str.lower)
 
-    # First, go through all of the subreddits we have.
-    # Take the items from their /new queue, remove the ones
-    # which are already in the database, and add the rest
-    # to the submissions_per_subreddit dictionary, and render
-    # them into text that can be sent in the newsletter.
+    # Collect /new for all of the subreddits
     r.handler.clear_cache()
     total_submissions = []
     my_multireddits = r.get_my_multireddits()
@@ -706,12 +723,13 @@ def manage_posts():
         multireddit._url = 'https://api.reddit.com/me/m/%s/' % multireddit.name
         multireddit._author = r.user.name
         total_submissions.extend(multireddit.get_new(limit=100))
+    total_submissions.sort(key=lambda x: x.created_utc, reverse=True)
 
+    # Discard old submissions, and sort the new ones into their subreddit bucket.
+    # Format them for the newsletter.
     keep_submissions = []
     submissions_per_subreddit = {}
     formatted_submissions = {}
-
-    # Discard old submissions, and sort the new ones into their subreddit bucket.
     for submission in total_submissions:
         cur.execute('SELECT * FROM oldposts WHERE id == ?', [submission.id])
         if cur.fetchone():
@@ -730,11 +748,11 @@ def manage_posts():
 
     print()
     # Now, go through each user and take the submission list
-    # from the submissions_per_subreddit dict, then compile a message
-    # and add the message to the spool
+    # from the submissions_per_subreddit dict, then compile their message
+    # and add it to the spool.
     printlog('Compiling per-user newsletters.')
 
-    for (user, users_subreddits) in subscriptions_per_user.items():
+    for (user, users_subreddits) in subreddits_per_user.items():
         submissions_for_user = []
         for subreddit in users_subreddits:
             if subreddit in submissions_per_subreddit:
@@ -742,7 +760,7 @@ def manage_posts():
 
         if len(submissions_for_user) == 0:
             continue
-        submissions_for_user.sort(key=lambda x: x.created_utc, reverse=True)
+
         submissions_for_user = submissions_for_user[:MAX_PER_MESSAGE]
         submissions_for_user = [formatted_submissions[x.id] for x in submissions_for_user]
         message = MESSAGE_NEW_POSTS

@@ -1,6 +1,13 @@
 Newsletterbot
 =============
 
+- 2017 03 31
+    - Added COLLATE NOCASE to the subscribers table.
+    - Made a single large DB_INIT string to make formatting easier.
+    - Fixed bug in which the subreddit names were not being lowercased correctly causing db fetch to miss the entry.
+    - Fixed reportall to only say each subreddit once in the "ALL REDDITS" dump.
+    - Moved comments for clarity
+
 - 2016 06 05
     - MULTIREDDITS. Newsletterly now properly uses multireddits to find posts in lots of subreddits at once. This reduces the amount of fine-tuning I can do on a per-subreddit basis, but the speed benefits are worth the trade off. If you are running a copy of Newsletterly you'll need to migrate all active subscription subreddits to one or more multireddits on the bot's account. Order and grouping does not matter.
 
@@ -48,43 +55,43 @@ This bot operates via Private Message correspondence. When sending a message to 
 Receiving a Newsletter:
 
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_newposts.png?raw=true" alt="Stay tuned."/>
+    <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_newposts.png?raw=true" alt="Stay tuned."/>
 </p>
 
 &nbsp;
 Subscribing:
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_subscribe.png?raw=true" alt="Stay tuned."/>
+    <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_subscribe.png?raw=true" alt="Stay tuned."/>
 </p>
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_subscribemultiple.png?raw=true" alt="Stay tuned."/>
+    <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_subscribemultiple.png?raw=true" alt="Stay tuned."/>
 </p>
 
 &nbsp;
 Checking your subscriptions:
 
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_report.png?raw=true" alt="Stay tuned."/>
+    <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_report.png?raw=true" alt="Stay tuned."/>
 </p>
 
 &nbsp;
 Composing a message with multiple commands:
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_multiplecompose.png?raw=true" alt="Stay tuned."/>
+    <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_multiplecompose.png?raw=true" alt="Stay tuned."/>
 </p>
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_multipleresponse.png?raw=true" alt="Stay tuned."/>
+    <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_multipleresponse.png?raw=true" alt="Stay tuned."/>
 </p>
 
 &nbsp;
 Surviving a purge:
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_purgekeep.png?raw=true" alt="Stay tuned."/>
+    <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_purgekeep.png?raw=true" alt="Stay tuned."/>
 </p>
 
 Failing a purge:
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_purgedrop.png?raw=true" alt="Stay tuned."/>
+    <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/newsletterly_demo_purgedrop.png?raw=true" alt="Stay tuned."/>
 </p>
 
 &nbsp;
@@ -92,5 +99,5 @@ Failing a purge:
 &nbsp;
 
 <p align="center">
-  <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/Newsletterly_cover2.png?raw=true" alt="Stay tuned."/>
+    <img src="https://github.com/voussoir/reddit/blob/master/.GitImages/Newsletterly_cover2.png?raw=true" alt="Stay tuned."/>
 </p>
