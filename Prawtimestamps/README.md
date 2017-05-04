@@ -6,10 +6,10 @@ I don't have a test suite. You're my test suite! Messages go to [/u/GoldenSights
 Timesearch is a collection of utilities for archiving subreddits.
 
 ### Make sure you have:
-
-- Installed PRAW >= 4, as well as the other modules in `requirements.txt`.
+- Installed [Python](https://www.python.org/download). I use Python 3.6.
+- Installed PRAW >= 4, as well as the other modules in `requirements.txt`. Try `pip install -r requirements.txt` to get them all.
 - Acquired OAuth tokens. PRAW has a guide on readthedocs [here](https://praw.readthedocs.io/en/latest/tutorials/refresh_token.html).
-- A copy of [bot.py](https://github.com/voussoir/reddit/blob/master/bot4.py).
+- A copy of [bot.py](https://github.com/voussoir/reddit/blob/master/bot4.py). Fill out the variables using your OAuth information and keep it in a safe place. The Useragent is a description of your API usage. Typically "/u/username's praw client" is sufficient.
 
 ### This package consists of:
 

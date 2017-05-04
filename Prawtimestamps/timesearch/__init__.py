@@ -16,7 +16,7 @@ The basics:
     > timesearch.py timesearch -r subredditname
 
 2. Collect the comments for those submissions
-    > timesearch.py commentaugment subredditname.db
+    > timesearch.py commentaugment -r subredditname
 
 
 Commands for collecting:
@@ -141,7 +141,7 @@ livestream:
 
     'offline_reading': '''
 offline_reading:
-    Render submissions and comment threads to HTML.
+    Render submissions and comment threads to HTML via Markdown.
 
     > timesearch.py offline_reading -r subredditname <flags>
     > timesearch.py offline_reading -u username <flags>
