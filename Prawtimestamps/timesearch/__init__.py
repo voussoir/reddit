@@ -377,12 +377,16 @@ def main(argv):
     # The user did not enter a command, or entered something unrecognized.
     if command not in MODULE_DOCSTRINGS:
         print(DOCSTRING)
+        if command == '':
+            print('You are seeing the default help text because you did not choose a command.')
+        elif command not in helpstrings:
+            print('You are seeing the default help text because "%s" was not recognized' % command)
         return 1
 
-    # The user entered a command as arg_1, but no further arguments.
-    arg_2 = listget(argv, 1, '').lower()
-    if arg_2 in helpstrings:
-        print(MODULE_DOCSTRINGS[arg_1])
+    # The user entered a command, but no further arguments, or just help.
+    argument = listget(argv, 1, '').lower()
+    if argument in helpstrings:
+        print(MODULE_DOCSTRINGS[command])
         return 1
 
     args = parser.parse_args(argv)
