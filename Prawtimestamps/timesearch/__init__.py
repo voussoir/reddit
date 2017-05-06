@@ -95,7 +95,7 @@ commentaugment:
 
     'getstyles': '''
 getstyles:
-    Collect the sidebar text, stylesheet, and css images.
+    Collect the stylesheet, and css images.
 
     > timesearch.py getstyles -r subredditname
 ''',
@@ -154,7 +154,7 @@ offline_reading:
 
     'redmash': '''
 redmash:
-    Dump submission information to a readable file in the `REDMASH_FOLDER`
+    Dump submission listings to a plaintext or HTML file.
 
     > timesearch.py redmash -r subredditname <flags>
     > timesearch.py redmash -u username <flags>
