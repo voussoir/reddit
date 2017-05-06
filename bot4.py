@@ -50,7 +50,7 @@ APP_REFRESH = 'xxx'
 # https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 
 def anonymous():
-    r = praw4.Reddit(
+    r = praw.Reddit(
         user_agent=USERAGENT,
         client_id=APP_ID,
         client_secret=APP_SECRET,
@@ -58,7 +58,7 @@ def anonymous():
     return r
 
 def login(r=None):
-    r = praw4.Reddit(
+    r = praw.Reddit(
         user_agent=USERAGENT,
         client_id=APP_ID,
         client_secret=APP_SECRET,
