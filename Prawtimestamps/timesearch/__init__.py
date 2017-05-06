@@ -371,19 +371,23 @@ p_timesearch.set_defaults(func=timesearch_gateway)
 
 def main(argv):
     helpstrings = {'', 'help', '-h', '--help'}
-    arg_1 = listget(sys.argv, 1, '').lower()
 
-    if arg_1 not in MODULE_DOCSTRINGS:
+    command = listget(argv, 0, '').lower()
+
+    # The user did not enter a command, or entered something unrecognized.
+    if command not in MODULE_DOCSTRINGS:
         print(DOCSTRING)
-        raise SystemExit(1)
+        return 1
 
-    arg_2 = listget(sys.argv, 2, '').lower()
+    # The user entered a command as arg_1, but no further arguments.
+    arg_2 = listget(argv, 1, '').lower()
     if arg_2 in helpstrings:
         print(MODULE_DOCSTRINGS[arg_1])
-        raise SystemExit(1)
+        return 1
 
     args = parser.parse_args(argv)
     args.func(args)
+    return 0
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    raise SystemExit(main(sys.argv[1:]))

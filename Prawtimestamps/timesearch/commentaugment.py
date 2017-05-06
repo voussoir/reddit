@@ -68,7 +68,7 @@ def commentaugment(
 
         for submission in id_batch:
             submission = get_submission(submission.split('_')[-1])
-            message = 'Processing {fullname}{spacer}expecting {num_comments}'
+            message = 'Processing {fullname}{spacer}expecting {num_comments} | '
             message = message.format(
                 fullname=submission.fullname,
                 spacer=spacer,

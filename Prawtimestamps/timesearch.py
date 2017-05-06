@@ -1,3 +1,5 @@
 import sys
 import timesearch
-timesearch.main(sys.argv[1:])
+
+status_code = timesearch.main(sys.argv[1:])
+raise SystemExit(status_code)
