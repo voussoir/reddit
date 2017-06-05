@@ -17,20 +17,24 @@ def commentaugment(
     Take the IDs of collected submissions, and gather comments from those threads.
     Please see the global DOCSTRING_COMMENTAUGMENT variable.
     '''
-    if (subreddit is None) == (username is None):
-        raise Exception('Enter subreddit or username but not both')
-
-    if subreddit:
-        database = tsdb.TSDB.for_subreddit(subreddit, do_create=False)
-    else:
-        database = tsdb.TSDB.for_user(username, do_create=False)
-    cur = database.sql.cursor()
-
     common.bot.login(common.r)
     if specific_submission is not None:
         if not specific_submission.startswith('t3_'):
             specific_submission = 't3_' + specific_submission
         specific_submission_obj = common.r.submission(specific_submission[3:])
+        subreddit = specific_submission_obj.subreddit.display_name
+
+    if (subreddit is None) == (username is None):
+        raise Exception('Enter subreddit or username but not both')
+
+    if subreddit:
+        if specific_submission is None:
+            database = tsdb.TSDB.for_subreddit(subreddit, do_create=False)
+        else:
+            database = tsdb.TSDB.for_subreddit(subreddit, do_create=True)
+    else:
+        database = tsdb.TSDB.for_user(username, do_create=False)
+    cur = database.sql.cursor()
 
     if limit == 0:
         limit = None
