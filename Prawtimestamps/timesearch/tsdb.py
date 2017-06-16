@@ -2,6 +2,7 @@ import os
 import sqlite3
 
 from . import common
+from . import exceptions
 
 from voussoirkit import pathclass
 
@@ -107,7 +108,7 @@ class TSDB:
         self.filepath = pathclass.Path(filepath)
         if not self.filepath.is_file:
             if not do_create:
-                raise FileNotFoundError(self.filepath, 'is not an existing database')
+                raise exceptions.DBNotFound(self.filepath)
             print('New database', self.filepath.relative_path)
 
         os.makedirs(self.filepath.parent.absolute_path, exist_ok=True)

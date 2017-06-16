@@ -54,6 +54,9 @@ When you run the .py file, it imports the package and sends it your commandline 
 I recommend [sqlitebrowser](https://github.com/sqlitebrowser/sqlitebrowser/releases) if you want to inspect the database yourself.
 
 ### Changelog
+- 2017 06 02
+    - You can use `commentaugment -s abcdef` to get a particular thread even if you haven't scraped anything else from that subreddit. Previously `-s` only worked if the database already existed and you specified it via `-r`. Now it is inferred from the submission itself.
+
 - 2017 04 28
     - Complete restructure into package, started using PRAW4.
 

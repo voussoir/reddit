@@ -1,6 +1,7 @@
 import argparse
 import sys
 
+from . import exceptions
 
 # NOTE: Originally I wanted the docstring for each module to be within their
 # file. However, this means that composing the global helptext would require
@@ -390,7 +391,15 @@ def main(argv):
         return 1
 
     args = parser.parse_args(argv)
-    args.func(args)
+    try:
+        args.func(args)
+    except exceptions.DBNotFound as e:
+        message = '"%s" is not an existing database.'
+        message += '\nHave you used any of the other utilities to collect data?'
+        message = message % e.path.absolute_path
+        print(message)
+        return 1
+
     return 0
 
 if __name__ == '__main__':
