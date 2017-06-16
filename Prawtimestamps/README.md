@@ -8,8 +8,9 @@ Timesearch is a collection of utilities for archiving subreddits.
 ### Make sure you have:
 - Installed [Python](https://www.python.org/download). I use Python 3.6.
 - Installed PRAW >= 4, as well as the other modules in `requirements.txt`. Try `pip install -r requirements.txt` to get them all.
-- Acquired OAuth tokens. PRAW has a guide on readthedocs [here](https://praw.readthedocs.io/en/latest/tutorials/refresh_token.html).
-- A copy of [bot.py](https://github.com/voussoir/reddit/blob/master/bot4.py). Fill out the variables using your OAuth information and keep it in a safe place. The Useragent is a description of your API usage. Typically "/u/username's praw client" is sufficient.
+- Created an OAuth app at https://reddit.com/prefs/apps. Make it `script` type, and set the redirect URI to `http://localhost:8080`. The title and description can be anything you want, and the about URL is not required.
+- Used [this PRAW script](https://praw.readthedocs.io/en/latest/tutorials/refresh_token.html) to generate a refresh token. Just save it as a .py file somewhere and run it through your terminal / command line. Choose `all` for the scopes.
+- Downloaded a copy of [bot.py](https://github.com/voussoir/reddit/blob/master/bot4.py). Fill out the variables using your OAuth information and keep it in a safe place where it can be imported. The Useragent is a description of your API usage. Typically "/u/username's praw client" is sufficient.
 
 ### This package consists of:
 
