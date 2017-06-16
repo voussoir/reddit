@@ -267,10 +267,15 @@ def fetchgenerator(cur):
 def get_jumble_subreddits():
     cur.execute('SELECT idstr FROM jumble')
     fetch = [x[0] for x in cur.fetchall()]
-    subreddits = []
-    for subreddit in fetch:
-        cur.execute('SELECT * FROM subreddits WHERE idstr == ?', [subreddit])
-        subreddits.append(cur.fetchone())
+    fetch = ['\'%s\'' % x for x in fetch]
+    fetch = '(' + ','.join(fetch) + ')'
+    query = 'SELECT * FROM subreddits WHERE idstr IN %s' % fetch
+    cur.execute(query)
+    subreddits = cur.fetchall()
+    #subreddits = []
+    #for subreddit in fetch:
+    #    cur.execute('SELECT * FROM subreddits WHERE idstr == ?', [subreddit])
+    #    subreddits.append(cur.fetchone())
     return subreddits
 
 def get_newest_sub():
