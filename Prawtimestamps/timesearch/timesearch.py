@@ -34,8 +34,6 @@ def timesearch(
         database = tsdb.TSDB.for_user(username)
     cur = database.sql.cursor()
 
-    offset = -1 * time.timezone
-
     if lower == 'update':
         # Start from the latest submission
         cur.execute('SELECT * FROM submissions ORDER BY idint DESC LIMIT 1')
@@ -66,46 +64,40 @@ def timesearch(
 
     maxupper = upper
     if maxupper is None:
-        maxupper = common.get_now()
+        maxupper = common.get_now() + 86400
 
-    lower -= offset
-    maxupper -= offset
     upper = lower + interval
-    itemcount = 0
 
     toomany_inarow = 0
     while lower < maxupper:
         print('\nCurrent interval:', interval, 'seconds')
         print('Lower:', common.human(lower), lower)
         print('Upper:', common.human(upper), upper)
-        while True:
-            if username:
-                query = '(and author:"%s" (and timestamp:%d..%d))' % (username, lower, upper)
-            else:
-                query = 'timestamp:%d..%d' % (lower, upper)
-            try:
+        if username:
+            query = '(and author:"%s" (and timestamp:%d..%d))' % (username, lower, upper)
+        else:
+            query = 'timestamp:%d..%d' % (lower, upper)
 
-                searchresults = subreddit.search(
-                    query,
-                    sort='new',
-                    limit=100,
-                    syntax='cloudsearch'
-                )
-                searchresults = list(searchresults)
-                break
-            except Exception:
-                traceback.print_exc()
-                print('resuming in 5...')
-                time.sleep(5)
-                continue
+        try:
+            searchresults = subreddit.search(
+                query,
+                sort='new',
+                limit=100,
+                syntax='cloudsearch'
+            )
+            searchresults = list(searchresults)
+        except Exception:
+            traceback.print_exc()
+            print('resuming in 5...')
+            time.sleep(5)
+            continue
 
         searchresults.sort(key=lambda x: x.created_utc)
         print([i.id for i in searchresults])
 
         itemsfound = len(searchresults)
-        itemcount += itemsfound
         print('Found', itemsfound, 'items.')
-        if itemsfound < 75:
+        if itemsfound < 50:
             print('Too few results, increasing interval', end='')
             diff = (1 - (itemsfound / 75)) + 1
             diff = min(MAXIMUM_EXPANSION_MULTIPLIER, diff)
