@@ -42,7 +42,8 @@ def commentaugment(
     if specific_submission is None:
         query = '''
             SELECT idstr FROM submissions
-            WHERE augmented_at IS NULL
+            WHERE idstr IS NOT NULL
+            AND augmented_at IS NULL
             AND num_comments >= ?
             ORDER BY num_comments DESC
         '''
@@ -63,12 +64,9 @@ def commentaugment(
 
     scannedthreads = 0
     get_submission = common.nofailrequest(get_submission_immediately)
-    while True:
+    while len(fetchall) > 0:
         id_batch = fetchall[:100]
         fetchall = fetchall[100:]
-        id_batch = list(filter(None, id_batch))
-        if len(id_batch) == 0:
-            return
 
         for submission in id_batch:
             submission = get_submission(submission.split('_')[-1])
@@ -78,6 +76,7 @@ def commentaugment(
                 spacer=spacer,
                 num_comments=submission.num_comments,
             )
+
             print(message, end='', flush=True)
             if verbose:
                 print()
@@ -115,6 +114,7 @@ def get_comments_for_thread(submission, limit, threshold, verbose):
 
 def get_submission_immediately(submission_id):
     submission = common.r.submission(submission_id)
+    # force the lazyloader
     submission.title = submission.title
     return submission
 
