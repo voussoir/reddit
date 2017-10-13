@@ -19,6 +19,9 @@ The basics:
 2. Collect the comments for those submissions
     > timesearch.py commentaugment -r subredditname
 
+3. Stay up-to-date
+    > timesearch.py livestream -r subredditname
+
 
 Commands for collecting:
 {timesearch}
@@ -31,6 +34,7 @@ Commands for processing:
 {offline_reading}
 {redmash}
 {breakdown}
+{mergedb}
 
 TO SEE DETAILS ON EACH COMMAND, RUN
 > timesearch.py <command>
@@ -108,6 +112,22 @@ getwiki:
     > timesearch.py getwiki -r subredditname
 ''',
 
+    'mergedb': '''
+mergedb:
+    Copy all new posts from one timesearch database into another.
+
+    > timesearch mergedb --from redditdev1.db --to redditdev2.db
+
+    flags:
+    --from:
+        The database file containing the posts you wish to copy.
+
+    --to:
+        The database file to which you will copy the posts.
+        The database is modified in-place.
+        Existing posts will be ignored and not updated.
+''',
+
     'livestream': '''
 livestream:
     Continously collect submissions and/or comments.
@@ -127,6 +147,7 @@ livestream:
 
     -c | --comments:
         If provided, do collect comments. Otherwise don't.
+
     If submissions and comments are BOTH left unspecified, then they will
     BOTH be collected.
 
@@ -291,6 +312,10 @@ def livestream_gateway(args):
     from . import livestream
     livestream.livestream_argparse(args)
 
+def mergedb_gateway(args):
+    from . import mergedb
+    mergedb.mergedb_argparse(args)
+
 def offline_reading_gateway(args):
     from . import offline_reading
     offline_reading.offline_reading_argparse(args)
@@ -341,6 +366,11 @@ p_livestream.add_argument('-u', '--user', dest='username', default=None)
 p_livestream.add_argument('-v', '--verbose', dest='verbose', action='store_true')
 p_livestream.add_argument('-w', '--wait', dest='sleepy', default=30)
 p_livestream.set_defaults(func=livestream_gateway)
+
+p_mergedb = subparsers.add_parser('mergedb')
+p_mergedb.add_argument('--from', dest='from_db_path', required=True)
+p_mergedb.add_argument('--to', dest='to_db_path', required=True)
+p_mergedb.set_defaults(func=mergedb_gateway)
 
 p_offline_reading = subparsers.add_parser('offline_reading')
 p_offline_reading.add_argument('-r', '--subreddit', dest='subreddit', default=None)

@@ -46,6 +46,9 @@ Timesearch is a collection of utilities for archiving subreddits.
     `> timesearch.py breakdown -r subredditname` <flags>  
     `> timesearch.py breakdown -u username` <flags>
 
+- **mergedb**: Copy all new data from one timesearch database into another. Useful for syncing or merging two scans of the same subreddit.  
+    `> timesearch.py mergedb --from filepath/database1.db --to filepath/database2.db`
+
 ### To use it
 
 You'll want to download the `timesearch.py` file, as well as the entire `timesearch` directory, as it is a package. The .py file and the package should be siblings as they are seen here. On GitHub you can't download a folder as a zip so you'll have to visit each file and download them individually. Sorry.
