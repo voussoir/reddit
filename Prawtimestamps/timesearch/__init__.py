@@ -397,7 +397,7 @@ p_timesearch.add_argument('-i', '--interval', dest='interval', default=86400)
 p_timesearch.add_argument('-l', '--lower', dest='lower', default='update')
 p_timesearch.add_argument('-r', '--subreddit', dest='subreddit', default=None)
 p_timesearch.add_argument('-u', '--user', dest='username', default=None)
-p_timesearch.add_argument('-up', '--uppper', dest='upper', default=None)
+p_timesearch.add_argument('-up', '--upper', dest='upper', default=None)
 p_timesearch.set_defaults(func=timesearch_gateway)
 
 def main(argv):
