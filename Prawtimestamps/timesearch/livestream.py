@@ -101,15 +101,20 @@ def _livestream_as_a_generator(
     ):
     while True:
         #common.r.handler.clear_cache()
-        items = _livestream_helper(
-            submission_function=submission_function,
-            comment_function=comment_function,
-            limit=limit,
-            params=params,
-            verbose=verbose,
-        )
-        newitems = database.insert(items)
-        yield newitems
+        try:
+            items = _livestream_helper(
+                submission_function=submission_function,
+                comment_function=comment_function,
+                limit=limit,
+                params=params,
+                verbose=verbose,
+            )
+            newitems = database.insert(items)
+            yield newitems
+        except Exception:
+            traceback.print_exc()
+            print('Retrying in 5...')
+            time.sleep(5)
 
 
 def _livestream_helper(

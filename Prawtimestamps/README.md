@@ -58,6 +58,9 @@ When you run the .py file, it imports the package and sends it your commandline 
 I recommend [sqlitebrowser](https://github.com/sqlitebrowser/sqlitebrowser/releases) if you want to inspect the database yourself.
 
 ### Changelog
+- 2017 11 05
+    - Added a try-except inside livestream helper to prevent generator from terminating.
+
 - 2017 11 04
     - For timesearch, I switched from using my custom cloudsearch iterator to the one that comes with PRAW4+.
 
