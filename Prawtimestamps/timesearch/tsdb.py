@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import types
 
 from . import common
 from . import exceptions
@@ -164,7 +165,7 @@ class TSDB:
         return cls(filepath=filepath, do_create=do_create)
 
     def insert(self, objects, commit=True):
-        if not isinstance(objects, list):
+        if not isinstance(objects, (list, tuple, types.GeneratorType)):
             objects = [objects]
 
         new_values = {
@@ -178,7 +179,7 @@ class TSDB:
         for obj in objects:
             (method, key) = methods.get(type(obj), (None, None))
             if method is None:
-                raise TypeError('Unsupported', obj)
+                raise TypeError('Unsupported', type(obj), obj)
             status = method(obj)
             new_values[key] += status
 
