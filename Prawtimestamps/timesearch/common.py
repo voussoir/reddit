@@ -57,6 +57,16 @@ def fetchgenerator(cursor):
             break
         yield item
 
+def generator_chunker(generator, chunk_size):
+    chunk = []
+    for item in generator:
+        chunk.append(item)
+        if len(chunk) == chunk_size:
+            yield chunk
+            chunk = []
+    if len(chunk) != 0:
+        yield chunk
+
 def get_now(stamp=True):
     now = datetime.datetime.now(datetime.timezone.utc)
     if stamp:

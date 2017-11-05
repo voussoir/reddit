@@ -66,54 +66,66 @@ def timesearch(
     if maxupper is None:
         maxupper = common.get_now() + 86400
 
-    upper = lower + interval
+    form = '{upper} - {lower} +{gain}'
+    submissions = subreddit.submissions(start=lower, end=maxupper)
+    submissions = common.generator_chunker(submissions, 100)
+    for chunk in submissions:
+        chunk.sort(key=lambda x: x.created_utc, reverse=True)
+        new_count = database.insert(chunk)['new_submissions']
+        message = form.format(
+            upper=common.human(chunk[0].created_utc),
+            lower=common.human(chunk[-1].created_utc),
+            gain=new_count,
+        )
+        print(message)
 
-    toomany_inarow = 0
-    while lower < maxupper:
-        print('\nCurrent interval:', interval, 'seconds')
-        print('Lower:', common.human(lower), lower)
-        print('Upper:', common.human(upper), upper)
-        if username:
-            query = '(and author:"%s" (and timestamp:%d..%d))' % (username, lower, upper)
-        else:
-            query = 'timestamp:%d..%d' % (lower, upper)
+    #upper = lower + interval
+    #toomany_inarow = 0
+    # while lower < maxupper:
+    #     print('\nCurrent interval:', interval, 'seconds')
+    #     print('Lower:', common.human(lower), lower)
+    #     print('Upper:', common.human(upper), upper)
+    #     if username:
+    #         query = '(and author:"%s" (and timestamp:%d..%d))' % (username, lower, upper)
+    #     else:
+    #         query = 'timestamp:%d..%d' % (lower, upper)
 
-        try:
-            searchresults = subreddit.search(
-                query,
-                sort='new',
-                limit=100,
-                syntax='cloudsearch'
-            )
-            searchresults = list(searchresults)
-        except Exception:
-            traceback.print_exc()
-            print('resuming in 5...')
-            time.sleep(5)
-            continue
+    #     try:
+    #         searchresults = subreddit.search(
+    #             query,
+    #             sort='new',
+    #             limit=100,
+    #             syntax='cloudsearch'
+    #         )
+    #         searchresults = list(searchresults)
+    #     except Exception:
+    #         traceback.print_exc()
+    #         print('resuming in 5...')
+    #         time.sleep(5)
+    #         continue
 
-        searchresults.sort(key=lambda x: x.created_utc)
-        print([i.id for i in searchresults])
+    #     searchresults.sort(key=lambda x: x.created_utc)
+    #     print([i.id for i in searchresults])
 
-        itemsfound = len(searchresults)
-        print('Found', itemsfound, 'items.')
-        if itemsfound < 50:
-            print('Too few results, increasing interval', end='')
-            diff = (1 - (itemsfound / 75)) + 1
-            diff = min(MAXIMUM_EXPANSION_MULTIPLIER, diff)
-            interval = int(interval * diff)
-        if itemsfound > 99:
-            #Intentionally not elif
-            print('Too many results, reducing interval', end='')
-            interval = int(interval * (0.8 - (0.05 * toomany_inarow)))
-            upper = lower + interval
-            toomany_inarow += 1
-        else:
-            lower = upper
-            upper = lower + interval
-            toomany_inarow = max(0, toomany_inarow-1)
-            database.insert(searchresults)
-        print()
+    #     itemsfound = len(searchresults)
+    #     print('Found', itemsfound, 'items.')
+    #     if itemsfound < 50:
+    #         print('Too few results, increasing interval', end='')
+    #         diff = (1 - (itemsfound / 75)) + 1
+    #         diff = min(MAXIMUM_EXPANSION_MULTIPLIER, diff)
+    #         interval = int(interval * diff)
+    #     if itemsfound > 99:
+    #         #Intentionally not elif
+    #         print('Too many results, reducing interval', end='')
+    #         interval = int(interval * (0.8 - (0.05 * toomany_inarow)))
+    #         upper = lower + interval
+    #         toomany_inarow += 1
+    #     else:
+    #         lower = upper
+    #         upper = lower + interval
+    #         toomany_inarow = max(0, toomany_inarow-1)
+    #         print(database.insert(searchresults))
+    #     print()
 
     cur.execute('SELECT COUNT(idint) FROM submissions')
     itemcount = cur.fetchone()[0]
