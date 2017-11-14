@@ -1,6 +1,17 @@
 timesearch
 =============
 
+&nbsp;
+
+### **Timesearch now has its own repository. Please go to [voussoir/timesearch](https://github.com/voussoir/timesearch) for future updates!**
+
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
 I don't have a test suite. You're my test suite! Messages go to [/u/GoldenSights](https://reddit.com/u/GoldenSights).
 
 Timesearch is a collection of utilities for archiving subreddits.
@@ -58,6 +69,9 @@ When you run the .py file, it imports the package and sends it your commandline 
 I recommend [sqlitebrowser](https://github.com/sqlitebrowser/sqlitebrowser/releases) if you want to inspect the database yourself.
 
 ### Changelog
+- 2017 11 13
+    - Gave timesearch its own Github repository so that (1) it will be easier for people to download it and (2) it has a cleaner, more independent URL. [voussoir/timesearch](https://github.com/voussoir/timesearch)
+
 - 2017 11 05
     - Added a try-except inside livestream helper to prevent generator from terminating.
 
