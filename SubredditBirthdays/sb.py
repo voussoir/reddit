@@ -52,7 +52,7 @@ cur.execute('''
     last_scanned INT)
 ''')
 cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_idint ON subreddits(idint)')
-cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_idstr ON subreddits(idint)')
+cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_idstr ON subreddits(idstr)')
 cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_name ON subreddits(name)')
 cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_created ON subreddits(created)')
 cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_subscribers ON subreddits(subscribers)')
