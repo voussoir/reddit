@@ -42,6 +42,7 @@ application, so that the rest of the interface can stay the same.
 
 import praw
 
+CONTACT_INFO = ''
 USERAGENT = 'xxx'
 APP_ID = 'xxx'
 APP_SECRET = 'xxx'
@@ -58,10 +59,13 @@ def anonymous():
     return r
 
 def login(r=None):
-    r = praw.Reddit(
+    new_r = praw.Reddit(
         user_agent=USERAGENT,
         client_id=APP_ID,
         client_secret=APP_SECRET,
         refresh_token=APP_REFRESH,
     )
-    return r
+    if r:
+        r.__dict__.clear()
+        r.__dict__.update(new_r.__dict__)
+    return new_r

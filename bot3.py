@@ -42,6 +42,7 @@ application, so that the rest of the interface can stay the same.
 
 import praw
 
+CONTACT_INFO = ''
 USERAGENT = 'xxx'
 APP_ID = 'xxx'
 APP_SECRET = 'xxx'
