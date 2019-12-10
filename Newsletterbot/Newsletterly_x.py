@@ -814,7 +814,11 @@ def manage_spool():
         printlog('Mailing %s : %s...' % (user, preview))
         try:
             r.send_message(user, MESSAGE_SUBJECT, message, captcha=None)
-        except praw.errors.InvalidUser:
+        except (praw.errors.InvalidUser, praw.errors.APIException) as exc:
+            if isinstance(exc, praw.errors.APIException):
+                print(exc.error_type)
+                if exc.error_type not in ['INVALID_USER', 'USER_DOESNT_EXIST']:
+                    raise
             # The user is deleted, so remove all of their subscriptions.
             # Any other exceptions will be uncaught, meaning the message
             # will remain in the database safe for next time.
