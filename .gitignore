@@ -4,6 +4,7 @@
 
 *.ignore
 *.db-journal
+Prawtimestamps/*
 SubredditBirthdays/sb.db
 SubredditBirthdays/sb.zip
 SubredditBirthdays/spooky/*
@@ -11,6 +12,7 @@ SubredditBirthdays/spooky.zip
 SubredditBirthdays/show/all-*
 SubredditBirthdays/show/dirty-*
 SubredditBirthdays/show/*.zip
+Timesearch/*
 Usernames/un.db
 Usernames/show/available.txt
 Usernames/show/karma_total.txt
