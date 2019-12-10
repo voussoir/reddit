@@ -60,7 +60,7 @@ kept.
 
 MESSAGE_SUBJECT = "Newsletterly"
 MESSAGE_POSTFORMAT = "{subreddit} {author}: [{title}]({link})"
-MESSAGE_FOOTER = "\n\n_____\n\n[In operating Newsletterly](http://redd.it/26xset)"
+MESSAGE_FOOTER = "\n\n_____\n\n[In operating Newsletterly](https://old.reddit.com/comments/26xset)"
 
 MESSAGE_NEW_POSTS = "Your subscribed subreddits have had some new posts:\n\n"
 
@@ -419,7 +419,7 @@ def format_post(submission):
     subreddit = '/r/' + submission.subreddit.display_name
     title = submission.title
     title = title.replace(']', '\]').replace('[', '\[')
-    link = 'http://redd.it/' + submission.id
+    link = 'https://old.reddit.com/comments/' + submission.id
 
     template = MESSAGE_POSTFORMAT.format(
         author=author,
