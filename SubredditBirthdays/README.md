@@ -1,9 +1,9 @@
 Subreddit Birthdays
 ==========
 
-#####Collected 1,531,903 subreddits
+##### Collected 1,531,903 subreddits
 
-#####[Today's jumble](http://reddit.com/r/Granblue_en+Cornell+diablo3+truezelda+Thisismylifemeow+NovemberBumpers2017+GTAgifs+theocho+selfhosted+ContestOfChampions+bettafish+britishproblems+WayOfTheBern+ak47+UCSD+Socialism_101+meirl+DotA2+shittyadvice+LegionOfSkanks)
+##### [Today's jumble](http://reddit.com/r/Granblue_en+Cornell+diablo3+truezelda+Thisismylifemeow+NovemberBumpers2017+GTAgifs+theocho+selfhosted+ContestOfChampions+bettafish+britishproblems+WayOfTheBern+ak47+UCSD+Socialism_101+meirl+DotA2+shittyadvice+LegionOfSkanks)
 
 Gathering some information on the creation dates of subreddits, so you don't have to.
 

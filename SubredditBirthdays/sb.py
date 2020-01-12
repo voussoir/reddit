@@ -1,5 +1,5 @@
 #/u/GoldenSights
-import bot
+import bot3
 import datetime
 import json
 import os
@@ -34,7 +34,7 @@ RANKS_UP_TO = 20000
 
 GOODCHARS = string.ascii_letters + string.digits + '_'
 
-sql = sqlite3.connect('C:\\git\\reddit\\subredditbirthdays\\sb.db')
+sql = sqlite3.connect('D:\\git\\reddit\\subredditbirthdays\\sb.db')
 cur = sql.cursor()
 cur2 = sql.cursor()
 cur.execute('''
@@ -51,12 +51,12 @@ cur.execute('''
     submission_type INT,
     last_scanned INT)
 ''')
-cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_idint ON subreddits(idint)')
+# cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_idint ON subreddits(idint)')
 cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_idstr ON subreddits(idstr)')
 cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_name ON subreddits(name)')
 cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_created ON subreddits(created)')
 cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_subscribers ON subreddits(subscribers)')
-cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_last_scanned ON subreddits(last_scanned)')
+# cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_last_scanned ON subreddits(last_scanned)')
 
 cur.execute('''
     CREATE TABLE IF NOT EXISTS suspicious(
@@ -151,7 +151,7 @@ COMMENT_OBJ = praw.objects.Comment
 
 print('Logging in.')
 r = praw.Reddit(USERAGENT)
-bot.login(r)
+bot3.login(r)
 
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
@@ -181,7 +181,7 @@ def b36(i):
 
 def binding_filler(column_names, values, require_all=True):
     '''
-    Manually aligning question marks and bindings is annoying.
+    Manually aligning the bindings for INSERT statements is annoying.
     Given the table's column names and a dictionary of {column: value},
     return the question marks and the list of bindings in the right order.
 
@@ -194,7 +194,12 @@ def binding_filler(column_names, values, require_all=True):
     column_names=['id', 'name', 'score'],
     values={'score': 20, 'id': '1111', 'name': 'James'}
     ->
-    returns ('?, ?, ?, ?', ['1111', 'James', 20])
+    returns ('?, ?, ?', ['1111', 'James', 20])
+
+    Therefore:
+    (qmarks, bindings) = binding_filler(COLUMN_NAMES, data)
+    query = 'INSERT INTO table VALUES(%s)' % qmarks
+    cur.execute(query, bindings)
     '''
     values = values.copy()
     for column in column_names:
@@ -208,6 +213,37 @@ def binding_filler(column_names, values, require_all=True):
     qmarks = ', '.join(qmarks)
     bindings = [values[column] for column in column_names]
     return (qmarks, bindings)
+
+def update_filler(pairs, where_key):
+    '''
+    Manually aligning the bindings for UPDATE statements is annoying.
+    Given the dictionary of {column: value} as well as the name of the column
+    to be used as the WHERE, return the "SET ..." portion of the query and the
+    bindings in the correct order.
+
+    Ex:
+    pairs={'id': '1111', 'name': 'James', 'score': 20},
+    where_key='id'
+    ->
+    returns ('SET name = ?, score = ? WHERE id == ?', ['James', 20, '1111'])
+
+    Therefore:
+    (query, bindings) = update_filler(data, where_key)
+    query = 'UPDATE table %s' % query
+    cur.execute(query, bindings)
+    '''
+    pairs = pairs.copy()
+    where_value = pairs.pop(where_key)
+    qmarks = []
+    bindings = []
+    for (key, value) in pairs.items():
+        qmarks.append('%s = ?' % key)
+        bindings.append(value)
+    bindings.append(where_value)
+    qmarks = ', '.join(qmarks)
+    query = 'SET {setters} WHERE {where_key} == ?'
+    query = query.format(setters=qmarks, where_key=where_key)
+    return (query, bindings)
 
 def chunklist(inputlist, chunksize):
     if len(inputlist) < chunksize:
@@ -290,7 +326,7 @@ def humanize(timestamp):
     human = datetime.datetime.strftime(day, "%b %d %Y %H:%M:%S UTC")
     return human
 
-def modernize():
+def modernize(limit=None):
     cur.execute('SELECT * FROM subreddits ORDER BY created DESC LIMIT 1')
     finalitem = cur.fetchone()
     print('Current final item:')
@@ -301,13 +337,14 @@ def modernize():
     newestid = get_newest_sub()
     print(newestid)
     newestid = b36(newestid)
+    if limit is not None:
+        newestid = min(newestid, finalid+limit-1)
     
 
-    modernlist = []
-    for x in range(finalid, newestid+1):
-        modernlist.append(b36(x))
-    processmega(modernlist, nosave=True)
-    sql.commit()
+    modernlist = [b36(x) for x in range(finalid, newestid+1)]
+    if len(modernlist) > 0:
+        processmega(modernlist, nosave=True)
+        sql.commit()
 
 def modsfromid(subid):
     if 't5_' not in subid:
@@ -365,7 +402,6 @@ def process(
 
         created = subreddit.created_utc
         created_human = humanize(subreddit.created_utc)
-        idint = b36(subreddit.id)
         idstr = subreddit.id
         is_nsfw = int(subreddit.over18 or 0)
         name = subreddit.display_name
@@ -375,7 +411,7 @@ def process(
         
         now = int(get_now())
 
-        cur.execute('SELECT * FROM subreddits WHERE idint == ?', [idint])
+        cur.execute('SELECT * FROM subreddits WHERE idstr == ?', [idstr])
         f = cur.fetchone()
         if f is None:
             h = humanize(subreddit.created_utc)
@@ -390,7 +426,7 @@ def process(
             print(message)
 
             data = {
-                'idint': idint,
+                'idint': b36(idstr),
                 'idstr': idstr,
                 'created': created,
                 'human': created_human,
@@ -412,7 +448,7 @@ def process(
             if subscribers == 0 and old_subscribers > 2 and subreddit_type != SUBREDDIT_TYPE['private']:
                 print('SUSPICIOUS %s' % name)
                 data = {
-                    'idint': idint,
+                    'idint': b36(idstr),
                     'idstr': idstr,
                     'name': name,
                     'subscribers': old_subscribers,
@@ -433,20 +469,23 @@ def process(
             print(message)
 
             data = {
-                'idint': idint,
+                'idstr': idstr,
                 'subscribers': subscribers,
                 'subreddit_type': subreddit_type,
                 'submission_type': submission_type,
                 'last_scanned': now,
             }
-            cur.execute('''
-                UPDATE subreddits SET
-                subscribers = @subscribers,
-                subreddit_type = @subreddit_type,
-                submission_type = @submission_type,
-                last_scanned = @last_scanned
-                WHERE idint == @idint
-                ''', data)
+            (query, bindings) = update_filler(data, where_key='idstr')
+            query = 'UPDATE subreddits %s' % query
+            cur.execute(query, bindings)
+            #cur.execute('''
+            #    UPDATE subreddits SET
+            #    subscribers = @subscribers,
+            #    subreddit_type = @subreddit_type,
+            #    submission_type = @submission_type,
+            #    last_scanned = @last_scanned
+            #    WHERE idstr == @idstr
+            #    ''', data)
         processed_subreddits.append(subreddit)
 
     if not nosave:
@@ -503,12 +542,14 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, nosave=
                 for sub in subreddits:
                     processed_subreddits.extend(process(sub, nosave=nosave))
             except TypeError:
+                traceback.print_exc()
                 noinfolist = subset[:]
                 if len(noinfolist) == 1:
                     print('Received no info. See variable `noinfolist`')
                 else:
-                    for item in noinfolist:
-                        processmega([item])
+                    #for item in noinfolist:
+                    #    processmega([item])
+                    pass
 
             remaining -= len(subset)
         except praw.errors.HTTPException as e:
@@ -534,7 +575,7 @@ def processrand(count, doublecheck=False, sleepy=0):
     '''
     lower = LOWERBOUND_INT
 
-    cur.execute('SELECT * FROM subreddits ORDER BY idint DESC LIMIT 1')
+    cur.execute('SELECT * FROM subreddits ORDER BY idstr DESC LIMIT 1')
     upper = cur.fetchone()[SQL_SUBREDDIT['idstr']]
     print('<' + b36(lower) + ',',  upper + '>', end=', ')
     upper = b36(upper)
@@ -573,7 +614,7 @@ def show():
     file_stats = open('show\\statistics.txt', 'w')
     file_readme = open('README.md', 'r')
 
-    cur.execute('SELECT COUNT(idint) FROM subreddits WHERE created != 0')
+    cur.execute('SELECT COUNT(idstr) FROM subreddits WHERE created != 0')
     itemcount_valid = cur.fetchone()[0]
     itemcount_nsfw = 0
     name_lengths = {}
@@ -646,7 +687,7 @@ def show():
     file_jumble_nsfw.close()
 
     print('Writing missing.')
-    cur.execute('SELECT * FROM subreddits WHERE created == 0 ORDER BY idint ASC')
+    cur.execute('SELECT * FROM subreddits WHERE created == 0 ORDER BY idstr ASC')
     for item in fetchgenerator(cur):
         print(item[SQL_SUBREDDIT['idstr']], file=file_missing)
     file_missing.close()
@@ -727,7 +768,7 @@ def show():
         {'label': 'month-year', 'specialsort': 'monthyear', 'dict': myrdict,},
         {'label': 'name length', 'specialsort': None, 'dict': name_lengths,},
     ]
-    for collection in mapping:
+    for (index, collection) in enumerate(mapping):
         d = collection['dict']
         dkeys_primary = list(d.keys())
         dkeys_primary.sort(key=d.get)
@@ -928,7 +969,7 @@ def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, d
 def findwrong():
     cur.execute('SELECT * FROM subreddits WHERE name != ?', ['?'])
     fetch = cur.fetchall()
-    fetch.sort(key=lambda x: x[SQL_SUBREDDIT['idint']])
+    fetch.sort(key=lambda x: x[SQL_SUBREDDIT['idstr']])
     #sorted by ID
     fetch = fetch[25:]
     
@@ -1097,9 +1138,20 @@ def execit(*args, **kwargs):
 def _idle():
     while True:
         try:
+            modernize()
             processpopular(100, 'new')
             processjumble(30, nsfw=False)
             processjumble(30, nsfw=True)
-            time.sleep(30)
+            print('Great job!')
         except Exception:
-            pass
+            traceback.print_exc()
+        time.sleep(180)
+
+def _idlenew():
+    while True:
+        try:
+            modernize()
+            print('Great job!')
+        except Exception:
+            traceback.print_exc()
+        time.sleep(300)
