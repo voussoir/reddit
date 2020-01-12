@@ -2,6 +2,7 @@ import time
 import traceback
 
 from . import common
+from . import exceptions
 from . import tsdb
 
 
@@ -21,17 +22,17 @@ def timesearch(
     Collect submissions across time.
     Please see the global DOCSTRING variable.
     '''
-    if (subreddit is None) == (username is None):
-        raise Exception('Enter subreddit or username but not both')
+    if not common.is_xor(subreddit, username):
+        raise exceptions.NotExclusive(['subreddit', 'username'])
 
     common.bot.login(common.r)
 
     if subreddit:
-        database = tsdb.TSDB.for_subreddit(subreddit)
+        (database, subreddit) = tsdb.TSDB.for_subreddit(subreddit, fix_name=True)
     else:
         # When searching, we'll take the user's submissions from anywhere.
         subreddit = 'all'
-        database = tsdb.TSDB.for_user(username)
+        (database, username) = tsdb.TSDB.for_user(username, fix_name=True)
     cur = database.sql.cursor()
 
     if lower == 'update':
@@ -67,7 +68,12 @@ def timesearch(
         maxupper = common.get_now() + 86400
 
     form = '{upper} - {lower} +{gain}'
-    submissions = subreddit.submissions(start=lower, end=maxupper)
+    if username:
+        query = 'author:"%s"' % username
+    else:
+        query = None
+
+    submissions = subreddit.submissions(start=lower, end=maxupper, extra_query=query)
     submissions = common.generator_chunker(submissions, 100)
     for chunk in submissions:
         chunk.sort(key=lambda x: x.created_utc, reverse=True)

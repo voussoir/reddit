@@ -3,6 +3,9 @@ import sys
 
 from . import exceptions
 
+from voussoirkit import betterhelp
+
+
 # NOTE: Originally I wanted the docstring for each module to be within their
 # file. However, this means that composing the global helptext would require
 # importing those modules, which will subsequently import PRAW and a whole lot
@@ -265,29 +268,13 @@ timesearch:
 }
 
 
-def docstring_preview(text):
-    '''
-    Return the brief description at the top of the text.
-    User can get full text by looking at each specifically.
-    '''
-    return text.split('\n\n')[0]
-
 def listget(li, index, fallback=None):
     try:
         return li[index]
     except IndexError:
         return fallback
 
-def indent(text, spaces=4):
-    spaces = ' ' * spaces
-    return '\n'.join(spaces + line if line.strip() != '' else line for line in text.split('\n'))
-
-docstring_headers = {
-    key: indent(docstring_preview(value))
-    for (key, value) in MODULE_DOCSTRINGS.items()
-}
-
-DOCSTRING = DOCSTRING.format(**docstring_headers)
+DOCSTRING = betterhelp.add_previews(DOCSTRING, MODULE_DOCSTRINGS)
 
 ####################################################################################################
 ####################################################################################################
@@ -400,33 +387,14 @@ p_timesearch.add_argument('-u', '--user', dest='username', default=None)
 p_timesearch.add_argument('-up', '--upper', dest='upper', default=None)
 p_timesearch.set_defaults(func=timesearch_gateway)
 
+@betterhelp.subparser_betterhelp()
 def main(argv):
-    helpstrings = {'', 'help', '-h', '--help'}
-
-    command = listget(argv, 0, '').lower()
-
-    # The user did not enter a command, or entered something unrecognized.
-    if command not in MODULE_DOCSTRINGS:
-        print(DOCSTRING)
-        if command == '':
-            print('You are seeing the default help text because you did not choose a command.')
-        elif command not in helpstrings:
-            print('You are seeing the default help text because "%s" was not recognized' % command)
-        return 1
-
-    # The user entered a command, but no further arguments, or just help.
-    argument = listget(argv, 1, '').lower()
-    if argument in helpstrings:
-        print(MODULE_DOCSTRINGS[command])
-        return 1
-
     args = parser.parse_args(argv)
     try:
         args.func(args)
-    except exceptions.DBNotFound as e:
-        message = '"%s" is not an existing database.'
+    except exceptions.DatabaseNotFound as e:
+        message = str(e)
         message += '\nHave you used any of the other utilities to collect data?'
-        message = message % e.path.absolute_path
         print(message)
         return 1
 

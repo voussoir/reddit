@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import time
 import types
 
 from . import common
@@ -26,7 +27,15 @@ DB_FORMATS_USER = [
     '.\\users\\@{name}\\@{name}.db',
 ]
 
+DATABASE_VERSION = 1
 DB_INIT = '''
+PRAGMA user_version = {user_version};
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS config(
+    key TEXT,
+    value TEXT
+);
+----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS submissions(
     idint INT,
     idstr TEXT,
@@ -63,7 +72,25 @@ CREATE TABLE IF NOT EXISTS comments(
     textlen INT
 );
 CREATE INDEX IF NOT EXISTS comment_index ON comments(idstr);
-'''.strip()
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS submission_edits(
+    idstr TEXT,
+    previous_selftext TEXT,
+    replaced_at INT
+);
+CREATE INDEX IF NOT EXISTS submission_edits_index ON submission_edits(idstr);
+----------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS comment_edits(
+    idstr TEXT,
+    previous_body TEXT,
+    replaced_at INT
+);
+CREATE INDEX IF NOT EXISTS comment_edits_index ON comment_edits(idstr);
+'''.format(user_version=DATABASE_VERSION)
+
+DEFAULT_CONFIG = {
+    'store_edits': True,
+}
 
 SQL_SUBMISSION_COLUMNS = [
     'idint',
@@ -100,6 +127,12 @@ SQL_COMMENT_COLUMNS = [
     'textlen',
 ]
 
+SQL_EDITS_COLUMNS = [
+    'idstr',
+    'text',
+    'replaced_at',
+]
+
 SQL_SUBMISSION = {key:index for (index, key) in enumerate(SQL_SUBMISSION_COLUMNS)}
 SQL_COMMENT = {key:index for (index, key) in enumerate(SQL_COMMENT_COLUMNS)}
 
@@ -109,7 +142,7 @@ class TSDB:
         self.filepath = pathclass.Path(filepath)
         if not self.filepath.is_file:
             if not do_create:
-                raise exceptions.DBNotFound(self.filepath)
+                raise exceptions.DatabaseNotFound(self.filepath)
             print('New database', self.filepath.relative_path)
 
         os.makedirs(self.filepath.parent.absolute_path, exist_ok=True)
@@ -120,12 +153,33 @@ class TSDB:
         self.styles_dir = self.filepath.parent.with_child('styles')
         self.wiki_dir = self.filepath.parent.with_child('wiki')
 
+        existing_database = self.filepath.exists
         self.sql = sqlite3.connect(self.filepath.absolute_path)
         self.cur = self.sql.cursor()
+
+        if existing_database:
+            self.cur.execute('PRAGMA user_version')
+            existing_version = self.cur.fetchone()[0]
+            if existing_version > 0 and existing_version != DATABASE_VERSION:
+                raise exceptions.DatabaseOutOfDate(current=existing_version, new=DATABASE_VERSION)
+
         statements = DB_INIT.split(';')
         for statement in statements:
             self.cur.execute(statement)
         self.sql.commit()
+
+        self.config = {}
+        for (key, default_value) in DEFAULT_CONFIG.items():
+            self.cur.execute('SELECT value FROM config WHERE key == ?', [key])
+            existing_value = self.cur.fetchone()
+            if existing_value is None:
+                self.cur.execute('INSERT INTO config VALUES(?, ?)', [key, default_value])
+                self.config[key] = default_value
+            else:
+                existing_value = existing_value[0]
+                if isinstance(default_value, int):
+                    existing_value = int(existing_value)
+                self.config[key] = existing_value
 
     def __repr__(self):
         return 'TSDB(%s)' % self.filepath
@@ -138,35 +192,79 @@ class TSDB:
         for, and return that path. If none of them exist, then use the most
         preferred filepath.
         '''
-        paths = [pathclass.Path(format.format(name=name)) for format in formats]
-        for path in paths:
-            if path.is_file:
-                return path
-        return paths[-1]
+        for form in formats:
+            path = form.format(name=name)
+            if os.path.isfile(path):
+                break
+        return pathclass.Path(path)
 
     @classmethod
-    def for_subreddit(cls, name, do_create=True):
+    def _for_object_helper(cls, name, path_formats, do_create=True, fix_name=False):
+        if name != os.path.basename(name):
+            filepath = pathclass.Path(name)
+
+        else:
+            filepath = cls._pick_filepath(formats=path_formats, name=name)
+
+        database = cls(filepath=filepath, do_create=do_create)
+        if fix_name:
+            return (database, name_from_path(name))
+        return database
+
+    @classmethod
+    def for_subreddit(cls, name, do_create=True, fix_name=False):
         if isinstance(name, common.praw.models.Subreddit):
             name = name.display_name
         elif not isinstance(name, str):
             raise TypeError(name, 'should be str or Subreddit.')
-
-        filepath = cls._pick_filepath(formats=DB_FORMATS_SUBREDDIT, name=name)
-        return cls(filepath=filepath, do_create=do_create)
+        return cls._for_object_helper(
+            name,
+            do_create=do_create,
+            fix_name=fix_name,
+            path_formats=DB_FORMATS_SUBREDDIT,
+        )
 
     @classmethod
-    def for_user(cls, name, do_create=True):
+    def for_user(cls, name, do_create=True, fix_name=False):
         if isinstance(name, common.praw.models.Redditor):
             name = name.name
         elif not isinstance(name, str):
             raise TypeError(name, 'should be str or Redditor.')
 
-        filepath = cls._pick_filepath(formats=DB_FORMATS_USER, name=name)
-        return cls(filepath=filepath, do_create=do_create)
+        return cls._for_object_helper(
+            name,
+            do_create=do_create,
+            fix_name=fix_name,
+            path_formats=DB_FORMATS_USER,
+        )
+
+    def check_for_edits(self, obj, existing_entry):
+        '''
+        If the item's current text doesn't match the stored text, decide what
+        to do.
+
+        Firstly, make sure to ignore deleted comments.
+        Then, if the database is configured to store edited text, do so.
+        Finally, return the body that we want to store in the main table.
+        '''
+        if isinstance(obj, common.praw.models.Submission):
+            existing_body = existing_entry[SQL_SUBMISSION['selftext']]
+            body = obj.selftext
+        else:
+            existing_body = existing_entry[SQL_COMMENT['body']]
+            body = obj.body
+
+        if body != existing_body:
+            if should_keep_existing_text(obj):
+                body = existing_body
+            elif self.config['store_edits']:
+                self.insert_edited(obj, old_text=existing_body)
+        return body
 
     def insert(self, objects, commit=True):
         if not isinstance(objects, (list, tuple, types.GeneratorType)):
             objects = [objects]
+        common.log.debug('Trying to insert %d objects.', len(objects))
 
         new_values = {
             'new_submissions': 0,
@@ -184,9 +282,37 @@ class TSDB:
             new_values[key] += status
 
         if commit:
+            common.log.debug('Committing insert')
             self.sql.commit()
 
+        common.log.debug('Done inserting.')
         return new_values
+
+    def insert_edited(self, obj, old_text):
+        '''
+        Having already detected that the item has been edited, add a record to
+        the appropriate *_edits table containing the text that is being
+        replaced.
+        '''
+        if isinstance(obj, common.praw.models.Submission):
+            table = 'submission_edits'
+        else:
+            table = 'comment_edits'
+
+        if obj.edited is False:
+            replaced_at = int(time.time())
+        else:
+            replaced_at = int(obj.edited)
+
+        postdata = {
+            'idstr': obj.fullname,
+            'text': old_text,
+            'replaced_at': replaced_at,
+        }
+        cur = self.sql.cursor()
+        (qmarks, bindings) = binding_filler(SQL_EDITS_COLUMNS, postdata, require_all=True)
+        query = 'INSERT INTO %s VALUES(%s)' % (table, qmarks)
+        cur.execute(query, bindings)
 
     def insert_submission(self, submission):
         cur = self.sql.cursor()
@@ -230,12 +356,7 @@ class TSDB:
             cur.execute(query, bindings)
 
         else:
-            if submission.author is None:
-                # This post is deleted, therefore its text probably says [deleted] or [removed].
-                # Discard that, and keep the data we already had here.
-                selftext = existing_entry[SQL_SUBMISSION['selftext']]
-            else:
-                selftext = submission.selftext
+            selftext = self.check_for_edits(submission, existing_entry=existing_entry)
 
             query = '''
                 UPDATE submissions SET
@@ -291,11 +412,7 @@ class TSDB:
             cur.execute(query, bindings)
 
         else:
-            greasy = ['has been overwritten', 'pastebin.com/64GuVi2F']
-            if comment.author is None or any(grease in comment.body for grease in greasy):
-                body = existing_entry[SQL_COMMENT['body']]
-            else:
-                body = comment.body
+            body = self.check_for_edits(comment, existing_entry=existing_entry)
 
             query = '''
                 UPDATE comments SET
@@ -333,3 +450,38 @@ def binding_filler(column_names, values, require_all=True):
     qmarks = ', '.join(qmarks)
     bindings = [values[column] for column in column_names]
     return (qmarks, bindings)
+
+def name_from_path(filepath):
+    '''
+    In order to support usage like
+    > timesearch livestream -r D:\\some\\other\\filepath\\learnpython.db
+    this function extracts the subreddit name / username based on the given
+    path, so that we can pass it into `r.subreddit` / `r.redditor` properly.
+    '''
+    if isinstance(filepath, pathclass.Path):
+        filepath = filepath.basename
+    else:
+        filepath = os.path.basename(filepath)
+    name = os.path.splitext(filepath)[0]
+    name = name.strip('@')
+    return name
+
+def should_keep_existing_text(obj):
+    '''
+    Under certain conditions we do not want to update the entry in the db
+    with the most recent copy of the text. For example, if the post has
+    been deleted and the text now shows '[deleted]' we would prefer to
+    keep whatever we already have.
+
+    This function puts away the work I would otherwise have to duplicate
+    for both submissions and comments.
+    '''
+    body = obj.selftext if isinstance(obj, common.praw.models.Submission) else obj.body
+    if obj.author is None and body in ['[removed]', '[deleted]']:
+        return True
+
+    greasy = ['has been overwritten', 'pastebin.com/64GuVi2F']
+    if any(grease in body for grease in greasy):
+        return True
+
+    return False

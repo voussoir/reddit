@@ -6,11 +6,11 @@ from . import tsdb
 
 
 def getstyles(subreddit):
+    (database, subreddit) = tsdb.TSDB.for_subreddit(subreddit, fix_name=True)
+
     print('Getting styles for /r/%s' % subreddit)
     subreddit = common.r.subreddit(subreddit)
-
     styles = subreddit.stylesheet()
-    database = tsdb.TSDB.for_subreddit(subreddit.display_name)
 
     os.makedirs(database.styles_dir.absolute_path, exist_ok=True)
 

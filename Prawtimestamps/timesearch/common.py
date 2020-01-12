@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 import time
 import traceback
@@ -19,6 +20,9 @@ if bot is None or bot.praw != praw:
     import bot4
     bot = bot4
 
+
+logging.basicConfig()
+log = logging.getLogger(__name__)
 
 r = bot.anonymous()
 
@@ -82,6 +86,12 @@ def int_none(x):
     if x is None:
         return None
     return int(x)
+
+def is_xor(*args):
+    '''
+    Return True if and only if one arg is truthy.
+    '''
+    return [bool(a) for a in args].count(True) == 1
 
 def nofailrequest(function):
     '''

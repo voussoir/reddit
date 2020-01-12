@@ -2,7 +2,98 @@ import os
 import markdown
 
 from . import common
+from . import exceptions
 from . import tsdb
+
+
+HTML_HEADER = '''
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<style>
+.comment
+{
+    padding-left: 20px;
+    margin-top: 4px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    border: 2px #000 solid;
+}
+.submission
+{
+    border: 4px #00f solid;
+    padding-left: 20px;
+}
+.hidden
+{
+    display: none;
+}
+</style>
+</head>
+<body>
+'''.strip()
+HTML_FOOTER = '''
+</body>
+
+<script>
+function toggle_collapse(comment_div)
+{
+    var button = comment_div.getElementsByClassName("toggle_hide_button")[0];
+    var collapsible = comment_div.getElementsByClassName("collapsible")[0];
+    if (collapsible.classList.contains("hidden"))
+    {
+        collapsible.classList.remove("hidden");
+        button.innerText = "[-]";
+    }
+    else
+    {
+        collapsible.classList.add("hidden");
+        button.innerText = "[+]";
+    }
+}
+</script>
+</html>
+'''
+
+HTML_COMMENT = '''
+<div class="comment" id="{id}">
+    <p class="userinfo">
+        <a
+        class="toggle_hide_button"
+        href="javascript:void(0)"
+        onclick="toggle_collapse(this.parentElement.parentElement)">[-]
+        </a>
+        {usernamelink}
+        <span class="score"> | {score} points</span>
+        <span class="timestamp"> | {human}</span>
+    </p>
+    <div class="collapsible">
+        {body}
+        <p class="toolbar">
+            {permalink}
+        </p>
+        {{children}}
+    </div>
+</div>
+'''.strip()
+
+HTML_SUBMISSION = '''
+<div class="submission" id="{id}">
+    <p class="userinfo">
+        {usernamelink}
+        <span class="score"> | {score} points</span>
+        <span class="timestamp"> | {human}</span>
+    </p>
+    <strong>{title}</strong>
+    <p>{url_or_text}</p>
+    <p class="toolbar">
+        {permalink}
+    </p>
+</div>
+{{children}}
+'''.strip()
 
 
 class DBEntry:
@@ -101,64 +192,18 @@ class TreeNode:
             yield from child.walk(customsort=customsort)
 
 def html_format_comment(comment):
-    text = '''
-    <div class="comment"
-        id="{id}" 
-        style="
-        padding-left: 20px;
-        margin-top: 4px;
-        margin-right: 4px;
-        margin-bottom: 4px;
-        border: 2px #000 solid;
-    ">
-        <p class="userinfo">
-            {usernamelink}
-            <span class="score"> | {score} points</span>
-            <span class="timestamp"> | {human}</span>
-        </p>
-
-        <p>{body}</p>
-
-        <p class="toolbar">
-            {permalink}
-        </p>
-    {children}
-    </div>
-    '''.format(
+    text = HTML_COMMENT.format(
         id=comment.idstr,
         body=sanitize_braces(render_markdown(comment.body)),
         usernamelink=html_helper_userlink(comment),
         score=comment.score,
         human=common.human(comment.created),
         permalink=html_helper_permalink(comment),
-        children='{children}',
     )
     return text
 
 def html_format_submission(submission):
-    text = '''
-    <div class="submission"
-        id="{id}" 
-        style="
-        border: 4px #00f solid;
-        padding-left: 20px;
-    ">
-
-        <p class="userinfo">
-            {usernamelink}
-            <span class="score"> | {score} points</span>
-            <span class="timestamp"> | {human}</span>
-        </p>
-
-        <strong>{title}</strong>
-        <p>{url_or_text}</p>
-
-        <p class="toolbar">
-            {permalink}
-        </p>
-    </div>
-    {children}
-    '''.format(
+    text = HTML_SUBMISSION.format(
         id=submission.idstr,
         title=sanitize_braces(submission.title),
         usernamelink=html_helper_userlink(submission),
@@ -166,7 +211,6 @@ def html_format_submission(submission):
         human=common.human(submission.created),
         permalink=html_helper_permalink(submission),
         url_or_text=html_helper_urlortext(submission),
-        children='{children}',
     )
     return text
 
@@ -178,8 +222,8 @@ def html_from_database(subreddit=None, username=None, specific_submission=None):
     if markdown is None:
         raise ImportError('Page cannot be rendered without the markdown module')
 
-    if (subreddit is None) == (username is None):
-        raise Exception('Enter subreddit or username but not both')
+    if not common.is_xor(subreddit, username):
+        raise exceptions.NotExclusive(['subreddit', 'username'])
 
     if subreddit:
         database = tsdb.TSDB.for_subreddit(subreddit, do_create=False)
@@ -193,9 +237,9 @@ def html_from_database(subreddit=None, username=None, specific_submission=None):
         html_basename = '%s.html' % submission_tree.identifier
         html_filepath = database.offline_reading_dir.with_child(html_basename)
         html_handle = open(html_filepath.absolute_path, 'w', encoding='utf-8')
-        html_handle.write('<html><body><meta charset="UTF-8">')
+        html_handle.write(HTML_HEADER)
         html_handle.write(page)
-        html_handle.write('</body></html>')
+        html_handle.write(HTML_FOOTER)
         html_handle.close()
         print('Wrote', html_filepath.relative_path)
 

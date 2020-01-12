@@ -5,9 +5,10 @@ from . import tsdb
 
 
 def getwiki(subreddit):
+    (database, subreddit) = tsdb.TSDB.for_subreddit(subreddit, fix_name=True)
+
     print('Getting wiki pages for /r/%s' % subreddit)
     subreddit = common.r.subreddit(subreddit)
-    database = tsdb.TSDB.for_subreddit(subreddit)
 
     for wikipage in subreddit.wiki:
         if wikipage.name == 'config/stylesheet':

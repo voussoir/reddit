@@ -4,7 +4,7 @@ import datetime
 import praw
 import sqlite3
 
-import bot
+import bot3 as bot
 r=praw.Reddit(bot.aG)
 r.config.api_request_delay=1
 sql = sqlite3.connect('databases/@gallowboob.db')

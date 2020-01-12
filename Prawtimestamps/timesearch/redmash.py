@@ -2,6 +2,7 @@ import datetime
 import os
 
 from . import common
+from . import exceptions
 from . import tsdb
 
 
@@ -52,8 +53,8 @@ def redmash(
         html=False,
         score_threshold=0,
     ):
-    if (subreddit is None) == (username is None):
-        raise Exception('Enter subreddit or username but not both')
+    if not common.is_xor(subreddit, username):
+        raise exceptions.NotExclusive(['subreddit', 'username'])
 
     if subreddit:
         database = tsdb.TSDB.for_subreddit(subreddit, do_create=False)
@@ -159,9 +160,6 @@ def redmash_worker(
     return mash_filepath
 
 def redmash_argparse(args):
-    if args.subreddit is args.username is None:
-        raise ValueError('-r subreddit OR -u username must be provided')
-
     return redmash(
         subreddit=args.subreddit,
         username=args.username,
