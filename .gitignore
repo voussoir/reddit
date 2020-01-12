@@ -13,7 +13,7 @@ SubredditBirthdays/show/all-*
 SubredditBirthdays/show/dirty-*
 SubredditBirthdays/show/*.zip
 Timesearch/*
-Usernames/un.db
+Usernames/*.db
 Usernames/show/available.txt
 Usernames/show/karma_total.txt
 Usernames/show/name.txt

@@ -1,5 +1,5 @@
 #/u/GoldenSights
-import bot
+import bot3 as bot
 import datetime
 import praw
 import random
@@ -16,7 +16,7 @@ Gathering the creation dates of user accounts for visualization.
 More at https://github.com/voussoir/reddit/tree/master/Usernames
 '''.replace('\n', ' ').strip()
     
-sql = sqlite3.connect('C:\\git\\reddit\\usernames\\un.db')
+sql = sqlite3.connect('D:\\git\\reddit\\usernames\\un.db')
 cur = sql.cursor()
 cur.execute('''
     CREATE TABLE IF NOT EXISTS users(
