@@ -5,13 +5,14 @@
 *.ignore
 *.db-journal
 Prawtimestamps/*
+SB&U/latest.txt
 SubredditBirthdays/sb.db
 SubredditBirthdays/sb.zip
-SubredditBirthdays/spooky/*
-SubredditBirthdays/spooky.zip
+SubredditBirthdays/show/*.zip
 SubredditBirthdays/show/all-*
 SubredditBirthdays/show/dirty-*
-SubredditBirthdays/show/*.zip
+SubredditBirthdays/spooky.zip
+SubredditBirthdays/spooky/*
 Timesearch/*
 Usernames/*.db
 Usernames/show/available.txt
