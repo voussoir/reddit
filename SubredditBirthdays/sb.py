@@ -282,7 +282,7 @@ def completesweep(sleepy=0, orderby='subscribers desc', query=None):
             hundred = [h[0] for h in hundred]
             for retry in range(20):
                 try:
-                    processmega(hundred, nosave=True)
+                    processmega(hundred, commit=False)
                     break
                 except Exception:
                     traceback.print_exc()
@@ -343,7 +343,7 @@ def modernize(limit=None):
 
     modernlist = [b36(x) for x in range(finalid, newestid+1)]
     if len(modernlist) > 0:
-        processmega(modernlist, nosave=True)
+        processmega(modernlist, commit=False)
         sql.commit()
 
 def modsfromid(subid):
@@ -373,7 +373,7 @@ def normalize_subreddit_object(thing):
 
 def process(
         subreddit,
-        nosave=False,
+        commit=True,
     ):
     '''
     Retrieve the API info for the subreddit and save it to the database
@@ -381,12 +381,6 @@ def process(
     subreddit:
         The subreddit(s) to process. Can be an individual or list of:
         strings or Subreddit, Submission, or Comment objects.
-
-    nosave:
-        If True, don't do any database commits.
-
-        Default = True
-
     '''
     subreddits = []
     processed_subreddits = []
@@ -488,7 +482,7 @@ def process(
             #    ''', data)
         processed_subreddits.append(subreddit)
 
-    if not nosave:
+    if commit:
         sql.commit()
     return processed_subreddits
 
@@ -500,7 +494,7 @@ def process_input():
         except:
                 traceback.print_exc()
 
-def processmega(srinput, isrealname=False, chunksize=100, docrash=False, nosave=False):
+def processmega(srinput, isrealname=False, chunksize=100, docrash=False, commit=True):
     '''
     `srinput` can be a list of subreddit IDs or fullnames, or display names
     if `isrealname` is also True.
@@ -513,10 +507,6 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, nosave=
 
     docrash:
         If False, ignore HTTPExceptions and keep moving forward.
-
-    nosave:
-        Passed directly into process()
-
     '''
     global noinfolist
     if type(srinput) == str:
@@ -540,7 +530,7 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, nosave=
             subreddits = r.get_info(thing_id=subset)
             try:
                 for sub in subreddits:
-                    processed_subreddits.extend(process(sub, nosave=nosave))
+                    processed_subreddits.extend(process(sub, commit=commit))
             except TypeError:
                 traceback.print_exc()
                 noinfolist = subset[:]
@@ -989,7 +979,7 @@ def findwrong():
 def processjumble(count, nsfw=False):
     for x in range(count):
         sub = r.get_random_subreddit(nsfw=nsfw)
-        process(sub, nosave=True)
+        process(sub, commit=False)
         last_seen = int(get_now())
         cur.execute('SELECT * FROM jumble WHERE idstr == ?', [sub.id])
         if cur.fetchone() is None:
@@ -1011,7 +1001,7 @@ def processpopular(count, sort='hot'):
 
     submissions = list(submissions)
     subreddit_ids = list({submission.subreddit_id for submission in submissions})
-    subreddits = processmega(subreddit_ids, nosave=True)
+    subreddits = processmega(subreddit_ids, commit=False)
     last_seen = int(get_now())
     for subreddit in subreddits:
         cur.execute('SELECT * FROM popular WHERE idstr == ?', [subreddit.id])
