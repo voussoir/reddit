@@ -109,6 +109,9 @@ making new lines.
 NOSEND = 'nosend' in [x.replace('-', '') for x in sys.argv]
 if NOSEND:
     print('NOSEND active!')
+DROPSPOOL = 'dropspool' in [x.replace('-', '') for x in sys.argv]
+if DROPSPOOL:
+    print('DROPSPOOL active!')
 ADMINS = [admin.lower() for admin in ADMINS]
 
 try:
@@ -804,12 +807,10 @@ def manage_spool():
     cur.execute('SELECT ROWID, * FROM spool')
     spool = cur.fetchall()
 
-    for spoolmessage in spool:
-        if spoolmessage is None:
-            break
-        rowid = spoolmessage[0]
-        user = spoolmessage[1]
-        message = spoolmessage[2]
+    for (rowid, user, message) in spool:
+        if DROPSPOOL:
+            drop_from_spool(rowid)
+            continue
         preview = message[:30].replace('\n', ' ')
         printlog('Mailing %s : %s...' % (user, preview))
         try:
