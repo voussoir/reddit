@@ -817,7 +817,7 @@ def manage_spool():
         except (praw.errors.InvalidUser, praw.errors.APIException) as exc:
             if isinstance(exc, praw.errors.APIException):
                 print(exc.error_type)
-                if exc.error_type not in ['INVALID_USER', 'USER_DOESNT_EXIST']:
+                if exc.error_type not in ['INVALID_USER', 'USER_DOESNT_EXIST', 'NOT_WHITELISTED_BY_USER_MESSAGE']:
                     raise
             # The user is deleted, so remove all of their subscriptions.
             # Any other exceptions will be uncaught, meaning the message
