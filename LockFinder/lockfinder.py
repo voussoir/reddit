@@ -18,7 +18,7 @@ SUBREDDIT_TO_SUBMIT = 'OpenAndGenuine'
 # _title_ is special because it has to be done after all the other formats.
 SUBMISSION_TITLE = '/r/{subreddit} locks "_title_" (+{score}) ({numcomments} comments)'
 SUBMISSION_TEXT = '''
-https://reddit.com/r/{subreddit}/comments/{id}
+https://old.reddit.com/r/{subreddit}/comments/{id}
 
 https://r.go1dfish.me/r/{subreddit}/comments/{id}/
 '''
