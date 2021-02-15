@@ -22,7 +22,6 @@ The requirements for this file are:
 The exact workings of these functions, and the existence of any other variables
 and functions are up to you.
 
-
 I suggest placing this file in a private directory and adding that directory to
 your `PYTHONPATH` environment variable. This makes it importable from anywhere.
 
@@ -42,13 +41,13 @@ application, so that the rest of the interface can stay the same.
 
 import praw
 
+# https://praw.readthedocs.io/en/latest/tutorials/refresh_token.html
 CONTACT_INFO = ''
 USERAGENT = 'xxx'
 APP_ID = 'xxx'
 APP_SECRET = 'xxx'
 APP_URI = 'xxx'
 APP_REFRESH = 'xxx'
-# https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 
 def anonymous():
     r = praw.Reddit(
