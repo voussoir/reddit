@@ -1,5 +1,5 @@
 # /u/GoldenSights
-import praw
+import praw3 as praw
 import sqlite3
 import time
 import traceback

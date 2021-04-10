@@ -2,7 +2,7 @@
 
 import datetime
 import os
-import praw
+import praw3 as praw
 import sqlite3
 import string
 import sys
