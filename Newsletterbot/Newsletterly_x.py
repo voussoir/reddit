@@ -904,7 +904,10 @@ def main_forever():
     while True:
         main_once()
         printlog('Sleeping %s seconds\n\n\n' % WAITS)
-        time.sleep(WAIT)
+        try:
+            time.sleep(WAIT)
+        except KeyboardInterrupt:
+            return
 
 def main_once():
     r.handler.clear_cache()
