@@ -3,7 +3,7 @@ import bot3
 import datetime
 import json
 import os
-import praw
+import praw3 as praw
 import random
 import string
 import sqlite3
