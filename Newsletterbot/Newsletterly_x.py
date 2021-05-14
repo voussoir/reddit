@@ -10,6 +10,7 @@ import sys
 import time
 import traceback
 
+from voussoirkit import operatornotify
 from voussoirkit import vlogging
 
 log = vlogging.getLogger(__name__, 'newsletterly')
@@ -532,7 +533,7 @@ def interpret_message(pm):
         if len(arguments) == 0:
             arguments.append('')
 
-        log.info('%d %s', len(arguments), arguments)
+        log.info('%s %s', command, arguments)
         for argument in arguments:
             log.info(argument)
             argument = argument.replace(',', '')
@@ -543,21 +544,29 @@ def interpret_message(pm):
                 status = MESSAGE_REPORT_REQUEST + '\n\n'
                 status += build_report(author)
                 results.append(status)
+                break
 
             if command == 'keep':
                 status = MESSAGE_DELETION_REDEEMED + '\n\n'
                 unflag_for_deletion(author)
                 results.append(status)
+                break
 
             elif command == 'reportall' and is_admin:
                 status = MESSAGE_REPORT_ALL + '\n\n'
                 status += build_report(None)
                 results.append(status)
+                break
 
             elif command == 'kill' and is_admin:
                 pm.mark_as_read()
                 mail_admins_now('bot is being turned off')
                 quit()
+
+            elif command == 'operatornotify' and is_admin:
+                pm.mark_as_read()
+                log.error('Testing operatornotify')
+                break
 
             if not argument:
                 # We've reached an argument-based function with
@@ -771,7 +780,7 @@ def manage_posts():
         message = MESSAGE_NEW_POSTS
         message += '\n\n'.join(submissions_for_user)
         message += MESSAGE_FOOTER
-        log.info('/u/%s: %d', user, len(submissions_for_user))
+        log.info('/u/%s gets %d new posts.', user, len(submissions_for_user))
         if NOSEND:
             log.info('nosend')
         else:
@@ -841,7 +850,6 @@ def manage_spool():
             # will remain in the database safe for next time.
             log.warning('Message to /u/%s failed because of %s.', user, reason)
             drop_subscription(user, 'all')
-            mail_admins_spool(f'invalid user: {user}, reason: {reason}')
 
         drop_from_spool(user, message)
     sql.commit()
@@ -858,6 +866,10 @@ def normalize(text):
     text = text.replace('/r/', '')
     text = text.replace('r/', '')
     return text
+
+def operatornotify_override(subject, body=''):
+    return mail_admins_now(body)
+operatornotify.notify = operatornotify_override
 
 def remove_subreddit_from_multireddit(subreddit, only_unused=True):
     '''
@@ -940,27 +952,25 @@ def main_once():
                 traceback.format_exc(),
             ])
             log.error(message)
-            try:
-                mail_admins_now(message)
-            except Exception:
-                pass
     except Exception as exc:
         message = '\n\n'.join([
             'Newsletterly encountered an unhandled exception:',
             traceback.format_exc(),
         ])
         log.error(message)
-        try:
-            mail_admins_now(message)
-        except Exception:
-            pass
     log.info('%d active subscriptions', count_subscriptions())
 
 def main(argv):
     global r
     global NOSEND
     global DROPSPOOL
+
     argv = vlogging.set_level_by_argv(log, argv)
+
+    handler = operatornotify.LogHandler(subject='Newsletterly', notify_every_line=True)
+    handler.setLevel(vlogging.WARNING)
+    handler.setFormatter(vlogging.Formatter('{levelname}:{name}:{message}', style='{'))
+    vlogging.getLogger().addHandler(handler)
 
     NOSEND = 'nosend' in [x.replace('-', '') for x in sys.argv]
     if NOSEND:
