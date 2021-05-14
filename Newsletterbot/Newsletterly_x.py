@@ -3,6 +3,7 @@
 import datetime
 import os
 import praw3 as praw
+import requests
 import sqlite3
 import string
 import sys
@@ -185,20 +186,21 @@ def add_subreddit_to_multireddit(subreddit):
             log.debug('Already have it')
             return
 
+    # Prefer the one with most open spaces.
+    my_multireddits = my_multireddits.sort(key=lambda m: len(m.subreddits))
     for multireddit in my_multireddits:
         multireddit._author = r.user.name
-        if len(multireddit.subreddits) >= 100:
+        if len(multireddit.subreddits) >= 90:
             continue
         try:
             r.modhash = 'newsletters'
             multireddit.add_subreddit(subreddit)
-        except praw.errors.HTTPException as e:
-            if e._raw.status_code == 409:
+        except praw.errors.HTTPException as exc:
+            if exc.response.status_code == 409:
                 # The multi is full
-                # Already checked for len < 100 but just in case...
+                # Already checked for len but just in case...
                 pass
             else:
-                traceback.print_exc()
                 raise
         else:
             # Addition was successful, break the for loop
@@ -659,7 +661,7 @@ def manage_deletions():
     sql.commit()
 
 def manage_inbox():
-    log.info('Managing inbox')
+    log.info('Managing inbox.')
     r.evict(r.config['unread'])
     messages = list(r.get_unread(limit=None))
     for message in messages:
@@ -921,9 +923,37 @@ def main_once():
         manage_spool()
         log.info('---')
     except KeyboardInterrupt:
-        return
-    except Exception:
-        traceback.print_exc()
+        raise
+    except requests.exceptions.ConnectionError:
+        log.info('Request raised ConnectionError')
+    except requests.exceptions.Timeout:
+        log.info('Request raised Timeout')
+    except requests.exceptions.HTTPError as exc:
+        log.info('Request raised %d', exc.response.status_code)
+        if exc.response.status_code == 503:
+            pass
+        else:
+            message = '\n\n'.join([
+                'Newsletterly encountered an unhandled HTTP status:',
+                str(exc),
+                str(exc.response),
+                traceback.format_exc(),
+            ])
+            log.error(message)
+            try:
+                mail_admins_now(message)
+            except Exception:
+                pass
+    except Exception as exc:
+        message = '\n\n'.join([
+            'Newsletterly encountered an unhandled exception:',
+            traceback.format_exc(),
+        ])
+        log.error(message)
+        try:
+            mail_admins_now(message)
+        except Exception:
+            pass
     log.info('%d active subscriptions', count_subscriptions())
 
 def main(argv):
