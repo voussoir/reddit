@@ -801,23 +801,34 @@ def manage_spool():
         if DROPSPOOL:
             drop_from_spool(user, message)
             continue
+
         preview = message[:30].replace('\n', ' ')
         log.info('Mailing /u/%s: %s...', user, preview)
         try:
             r.send_message(user, MESSAGE_SUBJECT, message, captcha=None)
         except (praw.errors.InvalidUser, praw.errors.APIException) as exc:
+            if isinstance(exc, praw.errors.InvalidUser):
+                reason = 'praw.errors.invaliduser'
             if isinstance(exc, praw.errors.APIException):
-                log.warning('message to /u/%s returned %s.', user, exc.error_type)
                 if exc.error_type not in ['INVALID_USER', 'USER_DOESNT_EXIST', 'NOT_WHITELISTED_BY_USER_MESSAGE']:
                     raise
+                if exc.error_type == 'NOT_WHITELISTED_BY_USER_MESSAGE':
+                    # 2021-05-14 Reddit has changed something on their end and
+                    # lots of users are suddenly raising this exception.
+                    # I don't want to delete all of their subscriptions but
+                    # we're gonna have to drop this message.
+                    drop_from_spool(user, message)
+                    continue
+                reason = exc.error_type
             # The user is deleted, so remove all of their subscriptions.
             # Any other exceptions will be uncaught, meaning the message
             # will remain in the database safe for next time.
+            log.warning('Message to /u/%s failed because of %s.', user, reason)
             drop_subscription(user, 'all')
-            if ADMINS:
-                admin_message = 'invalid user: %s' % user
-                add_to_spool(ADMINS[0], admin_message)
-        
+            admin_message = f'invalid user: {user}, reason: {reason}'
+            for admin in ADMINS:
+                add_to_spool(admin, admin_message)
+
         drop_from_spool(user, message)
     sql.commit()
 
