@@ -9,6 +9,10 @@ import sys
 import time
 import traceback
 
+from voussoirkit import vlogging
+
+log = vlogging.getLogger(__name__, 'newsletterly')
+
 '''USER CONFIGURATION'''
 SELF_USERNAME = 'Newsletterly'
 # This is not used for login purposes, just message text
@@ -108,10 +112,10 @@ making new lines.
 
 NOSEND = 'nosend' in [x.replace('-', '') for x in sys.argv]
 if NOSEND:
-    print('NOSEND active!')
+    log.info('NOSEND active!')
 DROPSPOOL = 'dropspool' in [x.replace('-', '') for x in sys.argv]
 if DROPSPOOL:
-    print('DROPSPOOL active!')
+    log.info('DROPSPOOL active!')
 ADMINS = [admin.lower() for admin in ADMINS]
 
 try:
@@ -157,7 +161,7 @@ sql.commit()
 SQL_USERNAME = 0
 SQL_SUBREDDIT = 1
 
-print('Logging in')
+log.info('Logging in')
 r = praw.Reddit(USERAGENT)
 r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
 r.refresh_access_information(APP_REFRESH)
@@ -168,7 +172,7 @@ r.refresh_access_information(APP_REFRESH)
 # because it's expecting the session to have a modhash. It means nothing.
 r.modhash = 'newsletters'
 
-print('I am /u/%s' % r.user.name)
+log.info('I am /u/%s' % r.user.name)
 
 def add_subreddit_to_multireddit(subreddit):
     '''
@@ -179,7 +183,7 @@ def add_subreddit_to_multireddit(subreddit):
     will take this subreddit, or a new multi will be created.
     '''
     subreddit = normalize(subreddit)
-    printlog('Assigning /r/%s to a multireddit' % subreddit)
+    log.info('Assigning /r/%s to a multireddit', subreddit)
 
     # Originally I was going to keep multireddit-subreddit mappings in the local
     # database, but decided against it because that makes it harder to edit the
@@ -188,7 +192,7 @@ def add_subreddit_to_multireddit(subreddit):
     my_multireddits = r.get_my_multireddits()
     for multireddit in my_multireddits:
         if any(subreddit == s.display_name.lower() for s in multireddit.subreddits):
-            printlog('Already have it')
+            log.debug('Already have it')
             return
 
     for multireddit in my_multireddits:
@@ -215,7 +219,7 @@ def add_subreddit_to_multireddit(subreddit):
         multireddit = create_multireddit()
         multireddit.add_subreddit(subreddit)
 
-    print('Added /r/%s to /m/%s' % (subreddit, multireddit.name))
+    log.info('Added /r/%s to /m/%s', subreddit, multireddit.name)
 
 def add_subscription(user, subreddit, bypass_pph=False):
     user = normalize(user)
@@ -230,12 +234,12 @@ def add_subscription(user, subreddit, bypass_pph=False):
             praw.errors.OAuthException,
             praw.errors.RedirectException,
             ):
-        printlog('Subreddit does not exist')
+        log.info('Subreddit %s does not exist', subreddit)
         return (MESSAGE_SUBREDDIT_FAIL % subreddit)
 
     subreddit = normalize(subreddit)
     if get_subscriptions(user=user, subreddit=subreddit):
-        printlog('%s is already subscribed to %s' % (user, subreddit))
+        log.info('%s is already subscribed to %s', user, subreddit)
         return (MESSAGE_SUBSCRIBE_ALREADY % subreddit)
 
     if not bypass_pph:
@@ -247,7 +251,7 @@ def add_subscription(user, subreddit, bypass_pph=False):
 
     cur.execute('INSERT INTO subscribers VALUES(?, ?)', [user, subreddit])
     sql.commit()
-    printlog('%s has subscribed to %s' % (user, subreddit))
+    log.info('%s has subscribed to %s', user, subreddit)
     return (MESSAGE_SUBSCRIBE % subreddit)
 
 def add_to_spool(user, message, do_commit=True):
@@ -280,7 +284,7 @@ def broadcast(message):
         new_message = add_to_spool(username, message)
         if new_message:
             messages += 1
-    printlog('Added %d messages to the spool.' % messages)
+    log.info('Added %d messages to the spool.', messages)
 
 def build_report(user):
     '''
@@ -341,7 +345,7 @@ def create_multireddit():
     else:
         raise Exception('Couldnt create a unique multireddit')
     multireddit = r.create_multireddit(new_multi)
-    print('Created /m/%s' % multireddit.name)
+    log.info('Created /m/%s', multireddit.name)
     return multireddit
 
 def drop_from_spool(rowid):
@@ -353,7 +357,7 @@ def drop_subscription(user, subreddit, do_commit=True):
     subreddit = normalize(subreddit)
     if user is None:
         # This happens on 403 Forbidden when making newsletters
-        printlog('Removing all subscriptions to /r/%s' % subreddit)
+        log.info('Removing all subscriptions to /r/%s', subreddit)
         cur.execute('DELETE FROM subscribers WHERE LOWER(reddit) == ?', [subreddit])
         return ''
 
@@ -365,12 +369,12 @@ def drop_subscription(user, subreddit, do_commit=True):
             cur.execute('DELETE FROM subscribers WHERE LOWER(name) == ?', [user])
             if do_commit:
                 sql.commit()
-            printlog('%s has unsubscribed from everything' % user)
+            log.info('%s has unsubscribed from everything', user)
             for subreddit in subreddits_to_remove:
                 remove_subreddit_from_multireddit(subreddit)
             return MESSAGE_UNSUBSCRIBE_ALL
         else:
-            printlog('%s doesnt have any subscriptions' % user)
+            log.info('%s doesnt have any subscriptions', user)
             return MESSAGE_UNSUBSCRIBE_ALREADY_ALL
 
     subscription = get_subscriptions(user=user, subreddit=subreddit)
@@ -378,11 +382,11 @@ def drop_subscription(user, subreddit, do_commit=True):
         cur.execute('DELETE FROM subscribers WHERE LOWER(name) == ? AND LOWER(reddit) == ?', [user, subreddit])
         if do_commit:
             sql.commit()
-        printlog('%s has unsubscribed from %s' % (user, subreddit))
+        log.info('%s has unsubscribed from %s', user, subreddit)
         remove_subreddit_from_multireddit(subscription[SQL_SUBREDDIT])
         return (MESSAGE_UNSUBSCRIBE % subreddit)
     else:
-        printlog('%s is already unsubscribed from %s' % (user, subreddit))
+        log.info('%s is already unsubscribed from %s', user, subreddit)
         return (MESSAGE_UNSUBSCRIBE_ALREADY % subreddit)
 
 def flag_for_deletion(username, seconds_from_now, message=None, do_commit=True):
@@ -444,7 +448,7 @@ def get_posts_per_hour(subreddit):
     Given a subreddit, return a float representing the posts/hour
     of the last 100 submissions.
     '''
-    printlog('Getting PPH for /r/%s' % subreddit)
+    log.debug('Getting PPH for /r/%s', subreddit)
     subreddit = r.get_subreddit(subreddit)
     # Any 403 errors will be caught by the calling function.
     submissions = list(subreddit.get_new())
@@ -536,12 +540,12 @@ def interpret_message(pm):
         if len(arguments) == 0:
             arguments.append('')
 
-        print(len(arguments), arguments)
+        log.info('%d %s', len(arguments), arguments)
         for argument in arguments:
-            print(argument)
+            log.info(argument)
             argument = argument.replace(',', '')
             argument = argument.replace(' ', '')
-            printlog('%s : %s - %s' % (author, command, argument))
+            log.info('%s : %s - %s', author, command, argument)
 
             if command == 'report':
                 status = MESSAGE_REPORT_REQUEST + '\n\n'
@@ -609,7 +613,6 @@ def interpret_message(pm):
         results = results[:9900]
         results += '\n\n' + MESSAGE_MESSAGE_LONG
     results += MESSAGE_FOOTER
-    #printlog('Generated', results)
     return results
 
 def manage_deletions():
@@ -617,7 +620,7 @@ def manage_deletions():
     Look for users who are flagged for removal, drop
     their subscriptions, and spool a message.
     '''
-    printlog('Managing deletions.')
+    log.info('Managing deletions.')
 
     now = get_now().timestamp()
 
@@ -647,7 +650,7 @@ def manage_deletions():
             )
             message += MESSAGE_FOOTER
 
-            printlog('DROPPING %s' % username)
+            log.info('DROPPING %s', username)
             add_to_spool(username, message, do_commit=False)
             drop_subscription(username, 'all', do_commit=False)
 
@@ -658,7 +661,7 @@ def manage_deletions():
     sql.commit()
 
 def manage_inbox():
-    printlog('Managing inbox')
+    log.info('Managing inbox')
     r.evict(r.config['unread'])
     messages = list(r.get_unread(limit=None))
     for message in messages:
@@ -697,7 +700,7 @@ def manage_posts():
     '''
 
     # Compile sets of all our subscribers
-    printlog('Managing subscriptions.')
+    log.info('Managing subscriptions.')
     subreddits_per_user = {}
     users_per_subreddit = {}
     all_subreddits = set()
@@ -721,7 +724,7 @@ def manage_posts():
     total_submissions = []
     my_multireddits = r.get_my_multireddits()
     for multireddit in my_multireddits:
-        print('Checking /m/%s' % multireddit.name)
+        log.info('Checking /m/%s' % multireddit.name)
         # Reddit has introduced a bug which causes incorrect multireddit URLs.
         multireddit._url = 'https://api.reddit.com/me/m/%s/' % multireddit.name
         multireddit._author = r.user.name
@@ -744,16 +747,15 @@ def manage_posts():
         submissions_per_subreddit[subreddit].append(submission)
         formatted_submissions[submission.id] = format_post(submission)
 
-    print('Found %d new submissions' % len(keep_submissions))
+    log.info('Found %d new submissions', len(keep_submissions))
 
     if len(keep_submissions) == 0:
         return
 
-    print()
     # Now, go through each user and take the submission list
     # from the submissions_per_subreddit dict, then compile their message
     # and add it to the spool.
-    printlog('Compiling per-user newsletters.')
+    log.info('Compiling per-user newsletters.')
 
     for (user, users_subreddits) in subreddits_per_user.items():
         submissions_for_user = []
@@ -769,9 +771,9 @@ def manage_posts():
         message = MESSAGE_NEW_POSTS
         message += '\n\n'.join(submissions_for_user)
         message += MESSAGE_FOOTER
-        printlog('/u/%s: %d' % (user, len(submissions_for_user)))
+        log.info('/u/%s: %d', user, len(submissions_for_user))
         if NOSEND:
-            printlog('nosend')
+            log.info('nosend')
         else:
             # We'll do one big commit at the end
             add_to_spool(user, message, do_commit=False)
@@ -799,7 +801,7 @@ def manage_spool():
     '''
     Send all the messages from the spool.
     '''
-    printlog('Managing spool.')
+    log.info('Managing spool.')
     if NOSEND:
         return
 
@@ -812,12 +814,12 @@ def manage_spool():
             drop_from_spool(rowid)
             continue
         preview = message[:30].replace('\n', ' ')
-        printlog('Mailing %s : %s...' % (user, preview))
+        log.info('Mailing %s : %s...', user, preview)
         try:
             r.send_message(user, MESSAGE_SUBJECT, message, captcha=None)
         except (praw.errors.InvalidUser, praw.errors.APIException) as exc:
             if isinstance(exc, praw.errors.APIException):
-                print(exc.error_type)
+                log.warning('message to /u/%s returned %s.', user, exc.error_type)
                 if exc.error_type not in ['INVALID_USER', 'USER_DOESNT_EXIST', 'NOT_WHITELISTED_BY_USER_MESSAGE']:
                     raise
             # The user is deleted, so remove all of their subscriptions.
@@ -844,15 +846,6 @@ def normalize(text):
     text = text.replace('r/', '')
     return text
 
-def printlog(*args, **kwargs):
-    '''
-    Print everything using only console-safe characters.
-    '''
-    args = list(args)
-    args = [str(x) for x in args]
-    args = [to_printable(x) for x in args]
-    print(*args, **kwargs)
-
 def remove_subreddit_from_multireddit(subreddit, only_unused=True):
     '''
     Go through our multireddits and remove this subreddit from them.
@@ -874,13 +867,10 @@ def remove_subreddit_from_multireddit(subreddit, only_unused=True):
             # This must have been the only subreddit in there.
             # The count is not updated by PRAW when removing a sub,
             # so the len is whatever it was when we fetched it. Thus 1.
-            printlog('Deleting /m/%s' % multireddit.name)
+            log.info('Deleting /m/%s', multireddit.name)
             multireddit.delete()
 
-    print('Removed /r/%s from multireddits' % subreddit)
-
-def to_printable(s):
-    return ''.join(character for character in s if character in string.printable)
+    log.info('Removed /r/%s from multireddits', subreddit)
 
 def uid(length=8):
     '''
@@ -899,11 +889,10 @@ def unflag_for_deletion(username, do_commit=True):
     if do_commit:
         sql.commit()
 
-
 def main_forever():
     while True:
         main_once()
-        printlog('Sleeping %s seconds\n\n\n' % WAITS)
+        log.info('Sleeping %s seconds\n\n\n', WAITS)
         try:
             time.sleep(WAIT)
         except KeyboardInterrupt:
@@ -913,16 +902,22 @@ def main_once():
     r.handler.clear_cache()
     try:
         manage_inbox()
-        printlog('--')
+        log.info('---')
         manage_deletions()
-        printlog('--')
+        log.info('---')
         manage_posts()
-        printlog('--')
+        log.info('---')
         manage_spool()
-        printlog('--')
+        log.info('---')
+    except KeyboardInterrupt:
+        return
     except Exception:
         traceback.print_exc()
-    printlog('%d active subscriptions' % count_subscriptions())
+    log.info('%d active subscriptions', count_subscriptions())
+
+def main(argv):
+    argv = vlogging.set_level_by_argv(log, argv)
+    return main_forever()
 
 if __name__ == '__main__':
-    main_forever()
+    raise SystemExit(main(sys.argv[1:]))
