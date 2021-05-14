@@ -338,8 +338,8 @@ def create_multireddit():
     log.info('Created /m/%s', multireddit.name)
     return multireddit
 
-def drop_from_spool(rowid):
-    cur.execute('DELETE FROM spool WHERE ROWID == ?', [rowid])
+def drop_from_spool(name, message):
+    cur.execute('DELETE FROM spool WHERE name == ? AND message == ?', [name, message])
     sql.commit()
 
 def drop_subscription(user, subreddit, do_commit=True):
@@ -795,16 +795,14 @@ def manage_spool():
     if NOSEND:
         return
 
-    cur = sql.cursor()
-    cur.execute('SELECT ROWID, * FROM spool')
-    spool = cur.fetchall()
+    spool = sql.execute('SELECT user, message FROM spool').fetchall()
 
-    for (rowid, user, message) in spool:
+    for (user, message) in spool:
         if DROPSPOOL:
-            drop_from_spool(rowid)
+            drop_from_spool(user, message)
             continue
         preview = message[:30].replace('\n', ' ')
-        log.info('Mailing %s : %s...', user, preview)
+        log.info('Mailing /u/%s: %s...', user, preview)
         try:
             r.send_message(user, MESSAGE_SUBJECT, message, captcha=None)
         except (praw.errors.InvalidUser, praw.errors.APIException) as exc:
@@ -820,7 +818,7 @@ def manage_spool():
                 admin_message = 'invalid user: %s' % user
                 add_to_spool(ADMINS[0], admin_message)
         
-        drop_from_spool(rowid)
+        drop_from_spool(user, message)
     sql.commit()
 
 def normalize(text):
