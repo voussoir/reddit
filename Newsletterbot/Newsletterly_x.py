@@ -46,7 +46,7 @@ MAX_SUBSCRIPTION_POSTS_PER_HOUR = 2
 # that subreddit
 
 
-MESSAGE_DELETION_DROPPED = """
+MESSAGE_DELETION_DROPPED = '''
 Hi {username},
 
 On {warned_at}, your account was marked to have its subscriptions dropped.
@@ -56,33 +56,33 @@ have been removed. You may re-subscribe at any time.
 Your subscriptions were:
 
 {subreddits}
-"""
-MESSAGE_DELETION_REDEEMED = """
+'''
+MESSAGE_DELETION_REDEEMED = '''
 Thanks for confirming your Newsletterly activity. All of your subscriptions will be
 kept.
-"""
+'''
 
 MESSAGE_SUBJECT = "Newsletterly"
 MESSAGE_POSTFORMAT = "{subreddit} {author}: [{title}]({link})"
-MESSAGE_FOOTER = "\n\n_____\n\n[In operating Newsletterly](https://old.reddit.com/comments/26xset)"
+MESSAGE_FOOTER = "\n\n_____\n\n[About Newsletterly](https://old.reddit.com/comments/26xset)"
 
 MESSAGE_NEW_POSTS = "Your subscribed subreddits have had some new posts:\n\n"
 
 MESSAGE_MESSAGE_LONG = "This message ended up being too long!"
 MESSAGE_SUBSCRIBE = "You have subscribed to /r/%s"
 MESSAGE_SUBSCRIBE_ALREADY = "You are already subscribed to /r/%s"
-MESSAGE_SUBSCRIBE_BLACKLISTED = """
+MESSAGE_SUBSCRIBE_BLACKLISTED = '''
 Sorry, but Newsletterly is designed for keeping an eye on very small or niche
 subreddits. Currently, only subreddits with less than {maxpph} posts per hour
 are accepted, and /r/%s is too active. Maybe an RSS reader would be a better
 option. You can message /u/{admin} if you think this is in error.
-""".format(maxpph=MAX_SUBSCRIPTION_POSTS_PER_HOUR, admin=ADMINS[0])
+'''.format(maxpph=MAX_SUBSCRIPTION_POSTS_PER_HOUR, admin=ADMINS[0])
 
 MESSAGE_SUBSCRIBE_FORCE = "You have forcefully added /u/%s to /r/%s"
-MESSAGE_SUBREDDIT_FAIL = """
+MESSAGE_SUBREDDIT_FAIL = '''
 Could not find /r/%s. Make sure it's spelled correctly and is a
 public subreddit (If it's private, add /u/{self} as a contributor).
-""".format(self=SELF_USERNAME)
+'''.format(self=SELF_USERNAME)
 
 MESSAGE_UNSUBSCRIBE = "You have unsubscribed from /r/%s"
 MESSAGE_UNSUBSCRIBE_ALL = "You have unsubscribed from all subreddits."
@@ -99,16 +99,15 @@ MESSAGE_REPORT_ALL = "All Newsletterly subscriptions:"
 MESSAGE_REPORT_EMPTY = "There's nothing here!"
 MESSAGE_REPORT_REQUEST = "You have requested a list of your subscriptions:"
 MESSAGE_REPORT_USER = "Newsletterly subscriptions for /u/%s:"
-MESSAGE_TOOLONG = """
+MESSAGE_TOOLONG = '''
 Your message was too long. This measure is in place to prevent abuse.
 
 When subscribing to multiple subreddits, use the comma syntax instead of
 making new lines.
+'''
 
+'''END OF USER CONFIGURATION'''
 
-"""
-
-'''ALL DONE'''
 
 NOSEND = 'nosend' in [x.replace('-', '') for x in sys.argv]
 if NOSEND:
