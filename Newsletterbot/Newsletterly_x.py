@@ -801,15 +801,21 @@ def manage_spool():
     '''
     log.info('Managing spool.')
     if NOSEND:
+        log.info('nosend')
         return
 
-    spool = sql.execute('SELECT user, message FROM spool').fetchall()
+    if DROPSPOOL:
+        log.info('dropspool')
+        sql.execute('DELETE FROM spool')
+        sql.commit()
+        return
+
+    spool = sql.execute('SELECT name, message FROM spool').fetchall()
+
+    if not spool:
+        return
 
     for (user, message) in spool:
-        if DROPSPOOL:
-            drop_from_spool(user, message)
-            continue
-
         preview = message[:30].replace('\n', ' ')
         log.info('Mailing /u/%s: %s...', user, preview)
         try:
