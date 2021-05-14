@@ -163,7 +163,7 @@ def login():
     # because it's expecting the session to have a modhash. It means nothing.
     r.modhash = 'newsletters'
 
-    log.info('I am /u/%s' % r.user.name)
+    log.info('I am /u/%s', r.user.name)
     return r
 
 def add_subreddit_to_multireddit(subreddit):
@@ -546,7 +546,7 @@ def interpret_message(pm):
                 results.append(status)
                 break
 
-            if command == 'keep':
+            elif command == 'keep':
                 status = MESSAGE_DELETION_REDEEMED + '\n\n'
                 unflag_for_deletion(author)
                 results.append(status)
@@ -633,23 +633,21 @@ def manage_deletions():
 
     now = get_now().timestamp()
 
-    cur.execute('SELECT * FROM flag_deletion WHERE delete_at < ?', [now])
-    flags = cur.fetchall()
+    cur.execute('SELECT username, warned_at FROM flag_deletion WHERE delete_at < ?', [now])
+    flagged_users = cur.fetchall()
 
     # To keep only 1 query running at a time, this list stores names
     # so we can remove them all at the end.
-    to_remove = []
+    to_unflag = []
 
-    for flagged_user in flags:
-        username = flagged_user[0]
-        warned_at = int(flagged_user[1])
-        delete_at = int(flagged_user[2])
+    for (username, warned_at) in flagged_users:
+        warned_at = int(warned_at)
 
         subreddits = get_subscriptions(user=username)
         if len(subreddits) > 0:
             warned_at = datetime.datetime.utcfromtimestamp(warned_at)
             warned_at = warned_at.strftime('%B %d %Y')
-            subreddits = ['/r/%s' % s for s in subreddits]
+            subreddits = [f'/r/{s}' for s in subreddits]
             subreddits = ', '.join(subreddits)
 
             message = MESSAGE_DELETION_DROPPED.format(
@@ -663,9 +661,9 @@ def manage_deletions():
             add_to_spool(username, message, do_commit=False)
             drop_subscription(username, 'all', do_commit=False)
 
-        to_remove.append(username)
+        to_unflag.append(username)
 
-    for username in to_remove:
+    for username in to_unflag:
         unflag_for_deletion(username, do_commit=False)
     sql.commit()
 
