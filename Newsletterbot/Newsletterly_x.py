@@ -554,7 +554,7 @@ def interpret_message(pm):
 
             elif command == 'kill' and is_admin:
                 pm.mark_as_read()
-                r.send_message(ADMINS[0], "force kill", "bot is being turned off")
+                mail_admins_now('bot is being turned off')
                 quit()
 
             if not argument:
@@ -604,6 +604,14 @@ def interpret_message(pm):
         results += '\n\n' + MESSAGE_MESSAGE_LONG
     results += MESSAGE_FOOTER
     return results
+
+def mail_admins_now(message):
+    for admin in ADMINS:
+        r.send_message(admin, MESSAGE_SUBJECT, message)
+
+def mail_admins_spool(message):
+    for admin in ADMINS:
+        add_to_spool(admin, message)
 
 def manage_deletions():
     '''
@@ -825,9 +833,7 @@ def manage_spool():
             # will remain in the database safe for next time.
             log.warning('Message to /u/%s failed because of %s.', user, reason)
             drop_subscription(user, 'all')
-            admin_message = f'invalid user: {user}, reason: {reason}'
-            for admin in ADMINS:
-                add_to_spool(admin, admin_message)
+            mail_admins_spool(f'invalid user: {user}, reason: {reason}')
 
         drop_from_spool(user, message)
     sql.commit()
