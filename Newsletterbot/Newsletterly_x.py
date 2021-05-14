@@ -902,9 +902,9 @@ def unflag_for_deletion(username, do_commit=True):
 
 def main_forever():
     while True:
-        main_once()
-        log.info('Sleeping %s seconds\n\n\n', WAITS)
         try:
+            main_once()
+            log.info('Sleeping %d seconds.\n\n\n', WAIT)
             time.sleep(WAIT)
         except KeyboardInterrupt:
             return
