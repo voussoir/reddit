@@ -108,13 +108,6 @@ making new lines.
 
 '''END OF USER CONFIGURATION'''
 
-
-NOSEND = 'nosend' in [x.replace('-', '') for x in sys.argv]
-if NOSEND:
-    log.info('NOSEND active!')
-DROPSPOOL = 'dropspool' in [x.replace('-', '') for x in sys.argv]
-if DROPSPOOL:
-    log.info('DROPSPOOL active!')
 ADMINS = [admin.lower() for admin in ADMINS]
 
 try:
@@ -126,8 +119,6 @@ try:
     APP_REFRESH = newsletterly_creds.oN_refresh
 except ImportError:
     pass
-
-WAITS = str(WAIT)
 
 sql = sqlite3.connect('newsletterly.db')
 cur = sql.cursor()
@@ -160,18 +151,18 @@ sql.commit()
 SQL_USERNAME = 0
 SQL_SUBREDDIT = 1
 
-log.info('Logging in')
-r = praw.Reddit(USERAGENT)
-r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
-r.refresh_access_information(APP_REFRESH)
-# import bot
-# r = bot.o7()
+def login():
+    log.info('Logging in')
+    r = praw.Reddit(USERAGENT)
+    r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+    r.refresh_access_information(APP_REFRESH)
 
-# multireddit.add_subreddit is currently experiencing a bug under OAuth
-# because it's expecting the session to have a modhash. It means nothing.
-r.modhash = 'newsletters'
+    # multireddit.add_subreddit is currently experiencing a bug under OAuth
+    # because it's expecting the session to have a modhash. It means nothing.
+    r.modhash = 'newsletters'
 
-log.info('I am /u/%s' % r.user.name)
+    log.info('I am /u/%s' % r.user.name)
+    return r
 
 def add_subreddit_to_multireddit(subreddit):
     '''
@@ -915,7 +906,21 @@ def main_once():
     log.info('%d active subscriptions', count_subscriptions())
 
 def main(argv):
+    global r
+    global NOSEND
+    global DROPSPOOL
     argv = vlogging.set_level_by_argv(log, argv)
+
+    NOSEND = 'nosend' in [x.replace('-', '') for x in sys.argv]
+    if NOSEND:
+        log.info('NOSEND active!')
+
+    DROPSPOOL = 'dropspool' in [x.replace('-', '') for x in sys.argv]
+    if DROPSPOOL:
+        log.info('DROPSPOOL active!')
+
+    r = login()
+
     return main_forever()
 
 if __name__ == '__main__':
