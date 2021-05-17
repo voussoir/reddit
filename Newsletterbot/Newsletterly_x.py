@@ -963,7 +963,7 @@ def main(argv):
     global NOSEND
     global DROPSPOOL
 
-    argv = vlogging.set_level_by_argv(log, argv)
+    argv = vlogging.main_level_by_argv(argv)
 
     handler = operatornotify.LogHandler(subject='Newsletterly', notify_every_line=True)
     handler.setLevel(vlogging.WARNING)
