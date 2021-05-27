@@ -938,9 +938,15 @@ def main_once():
         log.info('Request raised ConnectionError')
     except requests.exceptions.Timeout:
         log.info('Request raised Timeout')
-    except requests.exceptions.HTTPError as exc:
-        log.info('Request raised %d', exc.response.status_code)
-        if exc.response.status_code == 503:
+    except (requests.exceptions.HTTPError, praw.errors.HTTPException) as exc:
+        if isinstance(exc, requests.exceptions.HTTPError):
+            status = exc.response.status_code
+        elif isinstance(exc, praw.errors.HTTPException):
+            status = exc._raw.status_code
+        log.info('Request raised %d', status)
+        if status == 500:
+            pass
+        if status == 503:
             pass
         else:
             message = '\n\n'.join([
