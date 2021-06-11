@@ -940,9 +940,10 @@ def main_once():
         log.info('Request raised Timeout')
     except (requests.exceptions.HTTPError, praw.errors.HTTPException) as exc:
         if isinstance(exc, requests.exceptions.HTTPError):
-            status = exc.response.status_code
+            response = exc.response
         elif isinstance(exc, praw.errors.HTTPException):
-            status = exc._raw.status_code
+            response = exc._raw
+        status = response.status_code
         log.info('Request raised %d', status)
         if status == 500:
             pass
@@ -952,7 +953,7 @@ def main_once():
             message = '\n\n'.join([
                 'Newsletterly encountered an unhandled HTTP status:',
                 str(exc),
-                str(exc.response),
+                str(response),
                 traceback.format_exc(),
             ])
             log.error(message)
