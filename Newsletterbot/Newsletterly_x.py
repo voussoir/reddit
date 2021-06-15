@@ -945,9 +945,7 @@ def main_once():
             response = exc._raw
         status = response.status_code
         log.info('Request raised %d', status)
-        if status == 500:
-            pass
-        if status == 503:
+        if status in {500, 502, 503, 504}:
             pass
         else:
             message = '\n\n'.join([
