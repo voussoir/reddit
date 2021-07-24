@@ -1,1 +1,0 @@
-This folder will contain images that may be embedded in other places
