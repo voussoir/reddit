@@ -1,5 +1,0 @@
-botwatch
-requestabot
-goldtesting
-redditdev
-bugs

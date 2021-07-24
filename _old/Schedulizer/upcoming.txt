@@ -1,2 +1,0 @@
-'35', 'GoldTesting', 'Oct 11 15:52', 'Test', 'This is the test that never ends.\n'
-'36', 'Test', 'Oct 11 15:57', 'test', '\n'

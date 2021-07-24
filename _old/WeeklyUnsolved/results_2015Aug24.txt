@@ -1,5 +1,0 @@
-title | author | time | comments
-:- | :- | -: | -:
-[(Mac) add-in to copy tables to wiki?](http://redd.it/3hrir2) | /u/mzinz | 20 Aug 2015 20:37:39 | 0
-[Using custom map backgrounds in Powermap: How to assign geography?](http://redd.it/3hu8rl) | /u/PurpleMan | 21 Aug 2015 12:10:41 | 0
-[Some way to create and import Minitab Capability charts into multiple excel sheets?](http://redd.it/3hujp6) | /u/Nonamenewname | 21 Aug 2015 13:46:00 | 0
