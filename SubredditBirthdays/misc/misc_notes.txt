@@ -1,6 +1,0 @@
-17 February 2015
-	Submitted list of spammers to admins
-	start=36111
-	end=  36v8i
-	http://voussoir.github.io/restricted_subreddit_links.html
-	http://voussoir.github.io/restricted_subreddit_links_nobanned.html
