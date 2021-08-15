@@ -20,12 +20,11 @@ modernize_once:
 import argparse
 import bot3
 import datetime
-import json
 import os
 import praw3 as praw
 import random
-import string
 import sqlite3
+import string
 import subprocess
 import sys
 import time
@@ -41,7 +40,6 @@ USERAGENT = '''
 Gathering the creation dates of subreddits for visualization.
 More at https://github.com/voussoir/reddit/tree/master/SubredditBirthdays
 '''.replace('\n', ' ').strip()
-
 
 LOWERBOUND_STR = '2qh0j'
 LOWERBOUND_INT = 4594339
@@ -131,39 +129,40 @@ SQL_SUBREDDIT = {key:index for (index, key) in enumerate(SQL_SUBREDDIT_COLUMNS)}
 noinfolist = []
 
 monthnumbers = {
-    "Jan":"01",
-    "Feb":"02",
-    "Mar":"03",
-    "Apr":"04",
-    "May":"05",
-    "Jun":"06",
-    "Jul":"07",
-    "Aug":"08",
-    "Sep":"09",
-    "Oct":"10",
-    "Nov":"11",
-    "Dec":"12",
+    'Jan': '01',
+    'Feb': '02',
+    'Mar': '03',
+    'Apr': '04',
+    'May': '05',
+    'Jun': '06',
+    'Jul': '07',
+    'Aug': '08',
+    'Sep': '09',
+    'Oct': '10',
+    'Nov': '11',
+    'Dec': '12',
 }
 
 SUBREDDIT_TYPE = {
-    'public':0,
-    'restricted':1,
-    'private':2,
-    'archived':3,
-    None:4,
-    'employees_only':5,
-    'gold_restricted':6,
-    'gold_only':7,
+    'public': 0,
+    'restricted': 1,
+    'private': 2,
+    'archived': 3,
+    None: 4,
+    'employees_only': 5,
+    'gold_restricted': 6,
+    'gold_only': 7,
     'user': 8,
 }
 SUBMISSION_TYPE = {
-    'any':0,
-    'link':1,
-    'self':2,
-    None:3,
+    'any': 0,
+    'link': 1,
+    'self': 2,
+    None: 3,
 }
-SUBREDDIT_TYPE_REVERSE = {v:k for (k,v) in SUBREDDIT_TYPE.items()}
-SUBMISSION_TYPE_REVERSE = {v:k for (k,v) in SUBMISSION_TYPE.items()}
+
+SUBREDDIT_TYPE_REVERSE = {v:k for (k, v) in SUBREDDIT_TYPE.items()}
+SUBMISSION_TYPE_REVERSE = {v:k for (k, v) in SUBMISSION_TYPE.items()}
 
 SUBMISSION_OBJ = praw.objects.Submission
 SUBREDDIT_OBJ = praw.objects.Subreddit
@@ -176,7 +175,7 @@ bot3.login(r)
 
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
-    """Converts an integer to a base36 string."""
+    '''Converts an integer to a base36 string.'''
     if not isinstance(number, (int)):
         raise TypeError('number must be an integer')
     base36 = ''
@@ -360,7 +359,6 @@ def modernize(limit=None):
     newestid = b36(newestid)
     if limit is not None:
         newestid = min(newestid, finalid+limit-1)
-    
 
     modernlist = [b36(x) for x in range(finalid, newestid+1)]
     if len(modernlist) > 0:
@@ -431,7 +429,7 @@ def process(
         subscribers = subreddit.subscribers or 0
         subreddit_type = SUBREDDIT_TYPE[subreddit.subreddit_type]
         submission_type = SUBMISSION_TYPE[subreddit.submission_type]
-        
+
         now = int(get_now())
 
         cur.execute('SELECT * FROM subreddits WHERE idstr == ?', [idstr])
@@ -445,7 +443,7 @@ def process(
                 nsfw=is_nsfw,
                 name=name,
                 subscribers=subscribers,
-                )
+            )
             print(message)
 
             data = {
@@ -580,9 +578,9 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, commit=
 
 def processrand(count, doublecheck=False, sleepy=0):
     '''
-    Gets random IDs between a known lower bound and the newest collection, and pass
-    them into processmega().
-    
+    Gets random IDs between a known lower bound and the newest collection, and
+    pass them into processmega().
+
     count:
         How many you want
 
@@ -596,7 +594,7 @@ def processrand(count, doublecheck=False, sleepy=0):
 
     cur.execute('SELECT * FROM subreddits ORDER BY idstr DESC LIMIT 1')
     upper = cur.fetchone()[SQL_SUBREDDIT['idstr']]
-    print('<' + b36(lower) + ',',  upper + '>', end=', ')
+    print('<' + b36(lower) + ',', upper + '>', end=', ')
     upper = b36(upper)
     totalpossible = upper-lower
     print(totalpossible, 'possible')
@@ -674,11 +672,11 @@ def show():
     file_duplicates.close()
     file_all_name.close()
     file_dirty_name.close()
-    name_lengths = {'%02d'%k: v for (k,v) in name_lengths.items()}
-
+    name_lengths = {'%02d'%k: v for (k, v) in name_lengths.items()}
 
     print('Writing subscriber files.')
-    ranks = {'all':1, 'nsfw':1}
+    ranks = {'all': 1, 'nsfw': 1}
+
     def write_with_rank(itemf, ranktype, filehandle):
         index = ranks[ranktype]
         if index <= RANKS_UP_TO:
@@ -710,7 +708,6 @@ def show():
     for item in fetchgenerator(cur):
         print(item[SQL_SUBREDDIT['idstr']], file=file_missing)
     file_missing.close()
-
 
     print('Writing statistics.')
     headline = 'Collected {0:,} subreddits\n'.format(itemcount_valid)
@@ -747,7 +744,6 @@ def show():
     statisticoutput += '%.2f subs are created each hour\n' % (20000 / (timediff/3600))
     statisticoutput += '%.2f subs are created each day\n\n\n' % (20000 / (timediff/86400))
 
-
     ################################
     # Breakdown by time period
     # hour of day, day of week, day of month, month of year, month-year, year
@@ -775,17 +771,33 @@ def show():
 
     print('    forming columns')
     plotnum = 0
-    labels = ['hour of day', 'day of week', 'day of month', 'month of year', 'year', 'month-year', 'name length']
-    modes =  [None,    'day',   None,    'month', None,    'monthyear', None]
-    dicts =  [hoddict, dowdict, domdict, moydict, yerdict, myrdict, name_lengths]
+    labels = [
+        'hour of day',
+        'day of week',
+        'day of month',
+        'month of year',
+        'year',
+        'month-year',
+        'name length',
+    ]
+    modes = [
+        None,
+        'day',
+        None,
+        'month',
+        None,
+        'monthyear',
+        None,
+    ]
+    dicts = [hoddict, dowdict, domdict, moydict, yerdict, myrdict, name_lengths]
     mapping = [
-        {'label': 'hour of day', 'specialsort': None, 'dict': hoddict,},
-        {'label': 'day of week', 'specialsort': 'day', 'dict': dowdict,},
-        {'label': 'day of month', 'specialsort': None, 'dict': domdict,},
-        {'label': 'month of year', 'specialsort': 'month', 'dict': moydict,},
-        {'label': 'year', 'specialsort': None, 'dict': yerdict,},
-        {'label': 'month-year', 'specialsort': 'monthyear', 'dict': myrdict,},
-        {'label': 'name length', 'specialsort': None, 'dict': name_lengths,},
+        {'label': 'hour of day', 'specialsort': None, 'dict': hoddict},
+        {'label': 'day of week', 'specialsort': 'day', 'dict': dowdict},
+        {'label': 'day of month', 'specialsort': None, 'dict': domdict},
+        {'label': 'month of year', 'specialsort': 'month', 'dict': moydict},
+        {'label': 'year', 'specialsort': None, 'dict': yerdict},
+        {'label': 'month-year', 'specialsort': 'monthyear', 'dict': myrdict},
+        {'label': 'name length', 'specialsort': None, 'dict': name_lengths},
     ]
     for (index, collection) in enumerate(mapping):
         d = collection['dict']
@@ -809,7 +821,7 @@ def show():
             spacer = 34 - (len(key) + len(val))
             spacer = '.' * spacer
             statisticoutput += key + spacer + val
-            statisticoutput +=  '\n'
+            statisticoutput += '\n'
         statisticoutput += '\n'
 
         if d is name_lengths:
@@ -875,14 +887,29 @@ def dictadding(targetdict, item):
 
 def specialsort(inlist, mode=None):
     if mode == 'month':
-        return ['January', 'February', 'March',
-                'April', 'May', 'June', 'July',
-                'August', 'September', 'October',
-                'November', 'December']
+        return [
+            'January',
+            'February',
+            'March', 'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December'
+        ]
     if mode == 'day':
-        return ['Sunday', 'Monday', 'Tuesday',
-                'Wednesday', 'Thursday', 'Friday',
-                'Saturday']
+        return [
+            'Sunday',
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday'
+        ]
     if mode == 'monthyear':
         td = {}
         for item in inlist:
@@ -898,8 +925,16 @@ def specialsort(inlist, mode=None):
     if mode is None:
         return sorted(inlist)
 
-def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, doreturn=False, sort=None):
-    """
+def search(
+        query='',
+        casesense=False,
+        filterout=[],
+        subscribers=0,
+        nsfwmode=2,
+        doreturn=False,
+        sort=None,
+    ):
+    '''
     Search for a subreddit by name
     *str query = The search query
         "query"    = results where "query" is in the name
@@ -915,13 +950,13 @@ def search(query="", casesense=False, filterout=[], subscribers=0, nsfwmode=2, d
       2 - All
     int sort = The integer representing the sql column to sort by. Defaults
                to no sort.
-    """
+    '''
     querys = ''.join([c for c in query if c in GOODCHARS])
     queryx = '%%{term}%%'.format(term=querys)
     if '!' in query:
         cur.execute('SELECT * FROM subreddits WHERE name LIKE ?', [querys])
         return cur.fetchone()
-    if nsfwmode in [0,1]:
+    if nsfwmode in [0, 1]:
         cur.execute('SELECT * FROM subreddits WHERE name LIKE ? AND subscribers > ? AND nsfw=?', [queryx, subscribers, nsfwmode])
     else:
         cur.execute('SELECT * FROM subreddits WHERE name LIKE ? AND subscribers > ?', [queryx, subscribers])
@@ -991,7 +1026,7 @@ def findwrong():
     fetch.sort(key=lambda x: x[SQL_SUBREDDIT['idstr']])
     #sorted by ID
     fetch = fetch[25:]
-    
+
     pos = 0
     l = []
 
@@ -1014,7 +1049,8 @@ def processjumble(count, nsfw=False):
         if cur.fetchone() is None:
             cur.execute('INSERT INTO jumble VALUES(?, ?)', [sub.id, last_seen])
         else:
-            cur.execute('UPDATE jumble SET last_seen = ? WHERE idstr == ?',
+            cur.execute(
+                'UPDATE jumble SET last_seen = ? WHERE idstr == ?',
                 [sub.id, last_seen]
             )
     sql.commit()
@@ -1059,14 +1095,23 @@ def jumble(count=20, nsfw=False):
 def rounded(x, rounding=100):
     return int(round(x/rounding)) * rounding
 
-def plotbars(filename, inputdata, upperlabel='Subreddits created', colorbg="#fff", colorfg="#000", colormid="#888", forcezero=False):
-    """Create postscript vectors of data
+def plotbars(
+        filename,
+        inputdata,
+        upperlabel='Subreddits created',
+        colorbg="#fff",
+        colorfg="#000",
+        colormid="#888",
+        forcezero=False,
+    ):
+    '''
+    Create postscript vectors of data
 
     filename = Name of the file without extension
 
     inputdata = A list of two lists. First list has the x axis labels, second list
     has the y axis data. x label 14 coresponds to y datum 14, etc.
-    """
+    '''
     print('    Printing', filename)
     t=tkinter.Tk()
 
@@ -1091,11 +1136,11 @@ def plotbars(filename, inputdata, upperlabel='Subreddits created', colorbg="#fff
     if forcezero:
         bottom = 0
     largest = max(dvals)
-    top = int(largest + (largest/5))
+    top = int(largest + (largest / 5))
     top = rounded(top, 10)
-    print(bottom,top)
-    span = top-bottom
-    perpixel = span/availableheight
+    print(bottom, top)
+    span = top - bottom
+    perpixel = span / availableheight
 
     curx = 445
     cury = 1735
@@ -1103,7 +1148,7 @@ def plotbars(filename, inputdata, upperlabel='Subreddits created', colorbg="#fff
     labelx = 420
     labely = 255
     #canvas.create_text(labelx, labely, text=str(top), font=("Consolas", 72), anchor="e")
-    labelspan = 130#(1735-255)/10
+    labelspan = 130
     canvas.create_text(175, 100, text=upperlabel, font=("Consolas", 72), anchor="w", fill=colorfg)
     for x in range(12):
         value = int(top -((labely - 245) * perpixel))
@@ -1128,7 +1173,7 @@ def plotbars(filename, inputdata, upperlabel='Subreddits created', colorbg="#fff
         entryy1 = entryy0 - entryy1
         #print(perpixel, entryy1)
         #print(entry, entryx0,entryy0, entryx1, entryy1)
-        canvas.create_rectangle(entryx0,entryy0, entryx1,entryy1, fill=colorfg, outline=colorfg)
+        canvas.create_rectangle(entryx0, entryy0, entryx1, entryy1, fill=colorfg, outline=colorfg)
 
         font0x = entryx0 + (entrywidth / 2)
         font0y = entryy1 - 5
@@ -1136,17 +1181,17 @@ def plotbars(filename, inputdata, upperlabel='Subreddits created', colorbg="#fff
         font1y = 1760
 
         entryvalue = round(entryvalue)
-        fontsize0 = len(str(entryvalue)) 
+        fontsize0 = len(str(entryvalue))
         fontsize0 = round(entrywidth / fontsize0) + 3
         fontsize0 = 100 if fontsize0 > 100 else fontsize0
         fontsize1 = len(str(entry))
-        fontsize1 = round(1.5* entrywidth / fontsize1) + 5
+        fontsize1 = round(1.5 * entrywidth / fontsize1) + 5
         fontsize1 = 60 if fontsize1 > 60 else fontsize1
         canvas.create_text(font0x, font0y, text=entryvalue, font=("Consolas", fontsize0), anchor="s", fill=colorfg)
         canvas.create_text(font0x, font1y, text=entry, font=("Consolas", fontsize1), anchor="n", fill=colorfg)
         canvas.update()
     print('    Done')
-    canvas.postscript(file='spooky\\' +filename+".ps", width=3840, height=2160)
+    canvas.postscript(file=f'spooky\\{filename}.ps', width=3840, height=2160)
     t.geometry("1x1+1+1")
     t.update()
     t.destroy()
