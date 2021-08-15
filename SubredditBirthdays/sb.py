@@ -20,7 +20,6 @@ modernize_once:
 import argparse
 import bot3
 import datetime
-import os
 import praw3 as praw
 import random
 import sqlite3
@@ -34,6 +33,7 @@ import types
 
 from voussoirkit import betterhelp
 from voussoirkit import pipeable
+from voussoirkit import sqlhelpers
 
 USERAGENT = '''
 /u/GoldenSights SubredditBirthdays data collection:
@@ -199,72 +199,6 @@ def b36(i):
     if type(i) == str:
         return base36decode(i)
 
-def binding_filler(column_names, values, require_all=True):
-    '''
-    Manually aligning the bindings for INSERT statements is annoying.
-    Given the table's column names and a dictionary of {column: value},
-    return the question marks and the list of bindings in the right order.
-
-    require_all:
-        If `values` does not contain one of the column names, should we raise
-        an exception?
-        Otherwise, that column will simply receive None.
-
-    Ex:
-    column_names=['id', 'name', 'score'],
-    values={'score': 20, 'id': '1111', 'name': 'James'}
-    ->
-    returns ('?, ?, ?', ['1111', 'James', 20])
-
-    Therefore:
-    (qmarks, bindings) = binding_filler(COLUMN_NAMES, data)
-    query = 'INSERT INTO table VALUES(%s)' % qmarks
-    cur.execute(query, bindings)
-    '''
-    values = values.copy()
-    for column in column_names:
-        if column in values:
-            continue
-        if require_all:
-            raise ValueError('Missing column "%s"' % column)
-        else:
-            values.setdefault(column, None)
-    qmarks = '?' * len(column_names)
-    qmarks = ', '.join(qmarks)
-    bindings = [values[column] for column in column_names]
-    return (qmarks, bindings)
-
-def update_filler(pairs, where_key):
-    '''
-    Manually aligning the bindings for UPDATE statements is annoying.
-    Given the dictionary of {column: value} as well as the name of the column
-    to be used as the WHERE, return the "SET ..." portion of the query and the
-    bindings in the correct order.
-
-    Ex:
-    pairs={'id': '1111', 'name': 'James', 'score': 20},
-    where_key='id'
-    ->
-    returns ('SET name = ?, score = ? WHERE id == ?', ['James', 20, '1111'])
-
-    Therefore:
-    (query, bindings) = update_filler(data, where_key)
-    query = 'UPDATE table %s' % query
-    cur.execute(query, bindings)
-    '''
-    pairs = pairs.copy()
-    where_value = pairs.pop(where_key)
-    qmarks = []
-    bindings = []
-    for (key, value) in pairs.items():
-        qmarks.append('%s = ?' % key)
-        bindings.append(value)
-    bindings.append(where_value)
-    qmarks = ', '.join(qmarks)
-    query = 'SET {setters} WHERE {where_key} == ?'
-    query = query.format(setters=qmarks, where_key=where_key)
-    return (query, bindings)
-
 def chunklist(inputlist, chunksize):
     if len(inputlist) < chunksize:
         return [inputlist]
@@ -274,10 +208,6 @@ def chunklist(inputlist, chunksize):
             outputlist.append(inputlist[:chunksize])
             inputlist = inputlist[chunksize:]
         return outputlist
-
-def cls():
-    if os.system('cls'):
-        os.system('clear')
 
 def completesweep(sleepy=0, orderby='subscribers desc', query=None):
     if query is None:
@@ -292,14 +222,11 @@ def completesweep(sleepy=0, orderby='subscribers desc', query=None):
 
     try:
         while True:
-            hundred = [cur2.fetchone() for x in range(100)]
-            while None in hundred:
-                hundred.remove(None)
+            hundred = (cur2.fetchone() for x in range(100))
+            hundred = (row for row in hundred if row is not None)
+            hundred = [idstr for (idstr,) in hundred]
             if len(hundred) == 0:
                 break
-            # h[0] because the selection query calls for idstr
-            # This is not a mistake
-            hundred = [h[0] for h in hundred]
             for retry in range(20):
                 try:
                     processmega(hundred, commit=False)
@@ -435,8 +362,6 @@ def process(
         cur.execute('SELECT * FROM subreddits WHERE idstr == ?', [idstr])
         f = cur.fetchone()
         if f is None:
-            h = humanize(subreddit.created_utc)
-
             message = FORMAT_MESSAGE_NEW.format(
                 idstr=idstr,
                 human=created_human,
@@ -459,7 +384,7 @@ def process(
                 'last_scanned': now,
             }
 
-            (qmarks, bindings) = binding_filler(SQL_SUBREDDIT_COLUMNS, data)
+            (qmarks, bindings) = sqlhelpers.insert_filler(SQL_SUBREDDIT_COLUMNS, data)
             query = 'INSERT INTO subreddits VALUES(%s)' % qmarks
             cur.execute(query, bindings)
         else:
@@ -475,7 +400,7 @@ def process(
                     'subscribers': old_subscribers,
                     'noticed': int(get_now()),
                 }
-                (qmarks, bindings) = binding_filler(SQL_SUSPICIOUS_COLUMNS, data)
+                (qmarks, bindings) = sqlhelpers.insert_filler(SQL_SUSPICIOUS_COLUMNS, data)
                 query = 'INSERT INTO suspicious VALUES(%s)' % qmarks
                 cur.execute(query, bindings)
 
@@ -496,7 +421,7 @@ def process(
                 'submission_type': submission_type,
                 'last_scanned': now,
             }
-            (query, bindings) = update_filler(data, where_key='idstr')
+            (query, bindings) = sqlhelpers.update_filler(data, where_key='idstr')
             query = 'UPDATE subreddits %s' % query
             cur.execute(query, bindings)
             #cur.execute('''
@@ -517,9 +442,11 @@ def process_input():
     while True:
         x = input('p> ')
         try:
-                process(x)
-        except:
-                traceback.print_exc()
+            process(x)
+        except KeyboardInterrupt:
+            break
+        except Exception:
+            traceback.print_exc()
 
 def processmega(srinput, isrealname=False, chunksize=100, docrash=False, commit=True):
     '''
@@ -596,7 +523,7 @@ def processrand(count, doublecheck=False, sleepy=0):
     upper = cur.fetchone()[SQL_SUBREDDIT['idstr']]
     print('<' + b36(lower) + ',', upper + '>', end=', ')
     upper = b36(upper)
-    totalpossible = upper-lower
+    totalpossible = upper - lower
     print(totalpossible, 'possible')
     rands = []
     if doublecheck:
@@ -771,25 +698,6 @@ def show():
 
     print('    forming columns')
     plotnum = 0
-    labels = [
-        'hour of day',
-        'day of week',
-        'day of month',
-        'month of year',
-        'year',
-        'month-year',
-        'name length',
-    ]
-    modes = [
-        None,
-        'day',
-        None,
-        'month',
-        None,
-        'monthyear',
-        None,
-    ]
-    dicts = [hoddict, dowdict, domdict, moydict, yerdict, myrdict, name_lengths]
     mapping = [
         {'label': 'hour of day', 'specialsort': None, 'dict': hoddict},
         {'label': 'day of week', 'specialsort': 'day', 'dict': dowdict},
@@ -806,7 +714,7 @@ def show():
         dkeys_secondary = specialsort(dkeys_primary, collection['specialsort'])
         dvals = [d[x] for x in dkeys_secondary]
 
-        statisticoutput += labels[index] + '\n'
+        statisticoutput += collection['label'] + '\n'
         for (keyindex, key) in enumerate(dkeys_primary):
             val = d[key]
             val = '{0:,}'.format(val)
@@ -865,7 +773,7 @@ def show():
     file_readme.close()
 
     time.sleep(2)
-    x = subprocess.call('PNGCREATOR.bat', shell=True, cwd='spooky')
+    subprocess.call('PNGCREATOR.bat', shell=True, cwd='spooky')
     print()
 
 def memberformat(member):
@@ -1028,17 +936,17 @@ def findwrong():
     fetch = fetch[25:]
 
     pos = 0
-    l = []
+    wrongs = []
 
     while pos < len(fetch)-5:
         if fetch[pos][1] > fetch[pos+1][1]:
-            l.append(str(fetch[pos-1]))
-            l.append(str(fetch[pos]))
-            l.append(str(fetch[pos+1]) + "\n")
+            wrongs.append(str(fetch[pos-1]))
+            wrongs.append(str(fetch[pos]))
+            wrongs.append(str(fetch[pos+1]) + "\n")
         pos += 1
 
-    for x in l:
-        print(x)
+    for wrong in wrongs:
+        print(wrong)
 
 def processjumble(count, nsfw=False):
     for x in range(count):
@@ -1195,9 +1103,6 @@ def plotbars(
     t.geometry("1x1+1+1")
     t.update()
     t.destroy()
-
-def execit(*args, **kwargs):
-    exec(*args, **kwargs)
 
 def _idle():
     while True:
