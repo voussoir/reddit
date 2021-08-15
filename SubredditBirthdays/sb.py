@@ -1,4 +1,23 @@
-#/u/GoldenSights
+'''
+Subreddit Birthdays
+===================
+
+{modernize_forever}
+'''
+
+SUB_DOCSTRINGS = dict(
+modernize_forever='''
+modernize_forever:
+    Gather new subreddits forever.
+'''.strip(),
+
+modernize_once='''
+modernize_once:
+    Gather new subreddits once.
+'''.strip(),
+)
+
+import argparse
 import bot3
 import datetime
 import json
@@ -14,6 +33,8 @@ import tkinter
 import traceback
 import types
 
+from voussoirkit import betterhelp
+from voussoirkit import pipeable
 
 USERAGENT = '''
 /u/GoldenSights SubredditBirthdays data collection:
@@ -345,6 +366,14 @@ def modernize(limit=None):
     if len(modernlist) > 0:
         processmega(modernlist, commit=False)
         sql.commit()
+
+def modernize_forever(limit=10000):
+    while True:
+        try:
+            modernize(limit=limit)
+        except Exception:
+            traceback.print_exc()
+        time.sleep(300)
 
 def modsfromid(subid):
     if 't5_' not in subid:
@@ -1137,11 +1166,28 @@ def _idle():
             traceback.print_exc()
         time.sleep(180)
 
-def _idlenew():
-    while True:
-        try:
-            modernize()
-            print('Great job!')
-        except Exception:
-            traceback.print_exc()
-        time.sleep(300)
+@pipeable.ctrlc_return1
+def modernize_once_argparse(args):
+    return modernize(limit=args.limit)
+
+@pipeable.ctrlc_return1
+def modernize_forever_argparse(args):
+    return modernize_forever()
+
+__doc__ = betterhelp.add_previews(__doc__, SUB_DOCSTRINGS)
+
+def main(argv):
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers()
+
+    p_modernize_once = subparsers.add_parser('modernize_once')
+    p_modernize_once.add_argument('--limit', default=None)
+    p_modernize_once.set_defaults(func=modernize_once_argparse)
+
+    p_modernize_forever = subparsers.add_parser('modernize_forever')
+    p_modernize_forever.set_defaults(func=modernize_forever_argparse)
+
+    return betterhelp.subparser_main(argv, parser, __doc__, SUB_DOCSTRINGS)
+
+if __name__ == '__main__':
+    raise SystemExit(main(sys.argv[1:]))
