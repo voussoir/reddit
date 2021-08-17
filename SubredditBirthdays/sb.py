@@ -124,7 +124,7 @@ SQL_SUSPICIOUS_COLUMNS = [
     'noticed',
 ]
 
-SQL_SUBREDDIT = {key:index for (index, key) in enumerate(SQL_SUBREDDIT_COLUMNS)}
+SQL_SUBREDDIT = {key: index for (index, key) in enumerate(SQL_SUBREDDIT_COLUMNS)}
 
 noinfolist = []
 
@@ -161,8 +161,8 @@ SUBMISSION_TYPE = {
     None: 3,
 }
 
-SUBREDDIT_TYPE_REVERSE = {v:k for (k, v) in SUBREDDIT_TYPE.items()}
-SUBMISSION_TYPE_REVERSE = {v:k for (k, v) in SUBMISSION_TYPE.items()}
+SUBREDDIT_TYPE_REVERSE = {v: k for (k, v) in SUBREDDIT_TYPE.items()}
+SUBMISSION_TYPE_REVERSE = {v: k for (k, v) in SUBMISSION_TYPE.items()}
 
 SUBMISSION_OBJ = praw.objects.Submission
 SUBREDDIT_OBJ = praw.objects.Subreddit
@@ -525,23 +525,16 @@ def processrand(count, doublecheck=False, sleepy=0):
     upper = b36(upper)
     totalpossible = upper - lower
     print(totalpossible, 'possible')
-    rands = []
-    if doublecheck:
-        allids = [x[SQL_SUBREDDIT['idstr']] for x in fetched]
+    rands = set()
     for x in range(count):
         rand = random.randint(lower, upper)
         rand = b36(rand)
         if doublecheck:
-            while rand in allids or rand in rands:
-                if rand in allids:
-                    print('Old:', rand, 'Rerolling: in allid')
-                else:
-                    print('Old:', rand, 'Rerolling: in rands')
+            while rand in rands:
                 rand = random.randint(lower, upper)
                 rand = b36(rand)
-        rands.append(rand)
+        rands.add(rand)
 
-    rands.sort()
     processmega(rands)
 
 def show():
