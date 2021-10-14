@@ -1,22 +1,3 @@
-'''
-Subreddit Birthdays
-===================
-
-{modernize_forever}
-'''
-
-SUB_DOCSTRINGS = dict(
-modernize_forever='''
-modernize_forever:
-    Gather new subreddits forever.
-'''.strip(),
-
-modernize_once='''
-modernize_once:
-    Gather new subreddits once.
-'''.strip(),
-)
-
 import argparse
 import bot3
 import datetime
@@ -32,8 +13,12 @@ import traceback
 import types
 
 from voussoirkit import betterhelp
+from voussoirkit import operatornotify
 from voussoirkit import pipeable
 from voussoirkit import sqlhelpers
+from voussoirkit import vlogging
+
+log = vlogging.getLogger(__name__, 'sb')
 
 USERAGENT = '''
 /u/GoldenSights SubredditBirthdays data collection:
@@ -297,7 +282,7 @@ def modernize_forever(limit=10000):
         try:
             modernize(limit=limit)
         except Exception:
-            traceback.print_exc()
+            log.warning(traceback.format_exc())
         time.sleep(300)
 
 def modsfromid(subid):
@@ -1109,18 +1094,44 @@ def _idle():
             traceback.print_exc()
         time.sleep(180)
 
+# Command line #####################################################################################
+
+DOCSTRING = '''
+Subreddit Birthdays
+===================
+
+{modernize_forever}
+
+{modernize_once}
+'''
+
+SUB_DOCSTRINGS = dict(
+modernize_forever='''
+modernize_forever:
+    Gather new subreddits forever.
+'''.strip(),
+
+modernize_once='''
+modernize_once:
+    Gather new subreddits once.
+'''.strip(),
+)
+
+DOCSTRING = betterhelp.add_previews(DOCSTRING, SUB_DOCSTRINGS)
 @pipeable.ctrlc_return1
 def modernize_once_argparse(args):
-    return modernize(limit=args.limit)
+    modernize(limit=args.limit)
+    return 0
 
 @pipeable.ctrlc_return1
 def modernize_forever_argparse(args):
-    return modernize_forever()
+    modernize_forever()
+    return 0
 
-__doc__ = betterhelp.add_previews(__doc__, SUB_DOCSTRINGS)
-
+@operatornotify.main_decorator(subject='sb')
+@vlogging.main_decorator
 def main(argv):
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=DOCSTRING)
     subparsers = parser.add_subparsers()
 
     p_modernize_once = subparsers.add_parser('modernize_once')
