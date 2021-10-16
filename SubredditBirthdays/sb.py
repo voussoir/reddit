@@ -13,6 +13,7 @@ import traceback
 import types
 
 from voussoirkit import betterhelp
+from voussoirkit import mutables
 from voussoirkit import operatornotify
 from voussoirkit import pipeable
 from voussoirkit import sqlhelpers
@@ -1118,6 +1119,8 @@ modernize_once:
 )
 
 DOCSTRING = betterhelp.add_previews(DOCSTRING, SUB_DOCSTRINGS)
+NOTIFY_EVERY_LINE = mutables.Boolean(False)
+
 @pipeable.ctrlc_return1
 def modernize_once_argparse(args):
     modernize(limit=args.limit)
@@ -1125,10 +1128,11 @@ def modernize_once_argparse(args):
 
 @pipeable.ctrlc_return1
 def modernize_forever_argparse(args):
+    NOTIFY_EVERY_LINE.set(True)
     modernize_forever()
     return 0
 
-@operatornotify.main_decorator(subject='sb')
+@operatornotify.main_decorator(subject='sb', notify_every_line=NOTIFY_EVERY_LINE)
 @vlogging.main_decorator
 def main(argv):
     parser = argparse.ArgumentParser(description=DOCSTRING)
