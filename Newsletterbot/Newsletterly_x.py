@@ -963,17 +963,12 @@ def main_once():
         log.error(message)
     log.info('%d active subscriptions', count_subscriptions())
 
+@operatornotify.main_decorator(subject='Newsletterly', notify_every_line=True)
+@vlogging.main_decorator
 def main(argv):
     global r
     global NOSEND
     global DROPSPOOL
-
-    argv = vlogging.main_level_by_argv(argv)
-
-    handler = operatornotify.LogHandler(subject='Newsletterly', notify_every_line=True)
-    handler.setLevel(vlogging.WARNING)
-    handler.setFormatter(vlogging.Formatter('{levelname}:{name}:{message}', style='{'))
-    vlogging.getLogger().addHandler(handler)
 
     NOSEND = 'nosend' in [x.replace('-', '') for x in sys.argv]
     if NOSEND:
