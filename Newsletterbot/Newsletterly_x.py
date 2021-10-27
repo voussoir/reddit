@@ -11,42 +11,49 @@ import time
 import traceback
 
 from voussoirkit import operatornotify
+from voussoirkit import sqlhelpers
 from voussoirkit import vlogging
 
 log = vlogging.getLogger(__name__, 'newsletterly')
 
-'''USER CONFIGURATION'''
-SELF_USERNAME = 'Newsletterly'
+####################################################################################################
+# CONFIGURATION ####################################################################################
+
 # This is not used for login purposes, just message text
+SELF_USERNAME = 'Newsletterly'
 
-APP_ID = ""
-APP_SECRET = ""
-APP_URI = ""
-APP_REFRESH = ""
 # https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
-USERAGENT = ""
+import newsletterly_credentials
+USERAGENT = newsletterly_credentials.USERAGENT
+APP_ID = newsletterly_credentials.APP_ID
+APP_SECRET = newsletterly_credentials.APP_SECRET
+APP_URI = newsletterly_credentials.APP_URI
+APP_REFRESH = newsletterly_credentials.APP_REFRESH
 
+# Number of posts to fetch from each multireddit during each cycle.
 MAXPOSTS = 100
-WAIT = 30
-ADMINS = ["GoldenSights"]
+
+# Number of seconds to wait between each main cycle.
+WAIT = 60
+
 # The Admins have the ability to see other peoples' subscriptions
 # as well as forcibly subscribe people to subreddits.
 # They can also send the "kill" message to the bot and have it 
 # turn off.
 # The first name on the list will receive the error messages.
+ADMINS = ["GoldenSights"]
 
 MULTIREDDIT_NAME_LENGTH = 21
 
-MAX_PER_MESSAGE = 20
 # Only this many posts may be compiled into a newsletter
 # to avoid massive walls of text
+MAX_PER_MESSAGE = 20
 
-MAX_SUBSCRIPTION_POSTS_PER_HOUR = 2
 # When a user subscribes to a subreddit, the subreddit will first
 # undergo a posts/hour check. If the pph of the last 100 submissions
 # exceeds this value, the user will not be allowed to subscribe to
 # that subreddit
-
+MAX_SUBSCRIPTION_POSTS_PER_HOUR = 2
 
 MESSAGE_DELETION_DROPPED = '''
 Hi {username},
@@ -88,9 +95,9 @@ public subreddit (If it's private, add /u/{self} as a contributor).
 
 MESSAGE_UNSUBSCRIBE = "You have unsubscribed from /r/%s"
 MESSAGE_UNSUBSCRIBE_ALL = "You have unsubscribed from all subreddits."
-MESSAGE_UNSUBSCRIBE_ALREADY = "You are not currently subscribed to /r/%s"
+MESSAGE_UNSUBSCRIBE_ALREADY = "You are not currently subscribed to /r/%s."
 MESSAGE_UNSUBSCRIBE_ALREADY_ALL = "You don't have any subscriptions!"
-MESSAGE_UNSUBSCRIBE_FORCE = "You have forcefully removed /u/%s from /r/%s"
+MESSAGE_UNSUBSCRIBE_FORCE = "You have forcefully removed /u/%s from /r/%s."
 MESSAGE_UNSUBSCRIBE_PRIVATIZED = '''
 While I was building your Newsletter for /r/%s, I received a 403 Forbidden error.
 This means the subreddit became private or banned, or I lost my Approved Submitter
@@ -108,23 +115,16 @@ When subscribing to multiple subreddits, use the comma syntax instead of
 making new lines.
 '''
 
-'''END OF USER CONFIGURATION'''
+# END OF CONFIGURATION #############################################################################
+####################################################################################################
 
 ADMINS = [admin.lower() for admin in ADMINS]
-
-try:
-    import newsletterly_creds
-    USERAGENT = newsletterly_creds.aN
-    APP_ID = newsletterly_creds.oN_id
-    APP_SECRET = newsletterly_creds.oN_secret
-    APP_URI = newsletterly_creds.oN_uri
-    APP_REFRESH = newsletterly_creds.oN_refresh
-except ImportError:
-    pass
 
 sql = sqlite3.connect('newsletterly.db')
 cur = sql.cursor()
 DB_INIT = '''
+BEGIN;
+----------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS flag_deletion(
     username TEXT COLLATE NOCASE,
     warned_at INT,
@@ -142,29 +142,15 @@ CREATE TABLE IF NOT EXISTS subscribers(
 );
 CREATE INDEX IF NOT EXISTS index_subscribers_name ON subscribers(name COLLATE NOCASE);
 CREATE INDEX IF NOT EXISTS index_subscribers_reddit ON subscribers(reddit COLLATE NOCASE);
+----------------------------------------------------------------------------------------------------
+COMMIT;
 '''
 
-statements = DB_INIT.split(';')
-for statement in statements:
-    cur.execute(statement)
-sql.commit()
+sqlhelpers.executescript(sql, DB_INIT)
 
 # Sqlite column names
 SQL_USERNAME = 0
 SQL_SUBREDDIT = 1
-
-def login():
-    log.info('Logging in')
-    r = praw.Reddit(USERAGENT)
-    r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
-    r.refresh_access_information(APP_REFRESH)
-
-    # multireddit.add_subreddit is currently experiencing a bug under OAuth
-    # because it's expecting the session to have a modhash. It means nothing.
-    r.modhash = 'newsletters'
-
-    log.info('I am /u/%s', r.user.name)
-    return r
 
 def add_subreddit_to_multireddit(subreddit):
     '''
@@ -429,13 +415,6 @@ def format_post(submission):
         )
     return template
 
-def fetchgenerator(cur):
-    while True:
-        fetch = cur.fetchone()
-        if fetch is None:
-            break
-        yield fetch
-
 def get_posts_per_hour(subreddit):
     '''
     Given a subreddit, return a float representing the posts/hour
@@ -616,6 +595,19 @@ def interpret_message(pm):
     results += MESSAGE_FOOTER
     return results
 
+def login():
+    log.info('Logging in')
+    r = praw.Reddit(USERAGENT)
+    r.set_oauth_app_info(APP_ID, APP_SECRET, APP_URI)
+    r.refresh_access_information(APP_REFRESH)
+
+    # multireddit.add_subreddit is currently experiencing a bug under OAuth
+    # because it's expecting the session to have a modhash. It means nothing.
+    r.modhash = 'newsletters'
+
+    log.info('I am /u/%s', r.user.name)
+    return r
+
 def mail_admins_now(message):
     for admin in ADMINS:
         r.send_message(admin, MESSAGE_SUBJECT, message)
@@ -790,7 +782,6 @@ def manage_posts():
         cur.execute('INSERT INTO oldposts VALUES(?)', [submission.id])
     sql.commit()
 
-
         # try:
         #     submissions = list(subreddit_obj.get_new(limit=100))
         # except praw.errors.Forbidden:
@@ -919,7 +910,7 @@ def main_forever():
             log.info('Sleeping %d seconds.\n\n\n', WAIT)
             time.sleep(WAIT)
         except KeyboardInterrupt:
-            return
+            return 0
 
 def main_once():
     r.handler.clear_cache()
@@ -961,7 +952,7 @@ def main_once():
             traceback.format_exc(),
         ])
         log.error(message)
-    log.info('%d active subscriptions', count_subscriptions())
+    log.info('There are %d active subscriptions', count_subscriptions())
 
 @operatornotify.main_decorator(subject='Newsletterly', notify_every_line=True)
 @vlogging.main_decorator
