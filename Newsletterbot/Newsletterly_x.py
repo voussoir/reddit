@@ -11,6 +11,8 @@ import time
 import traceback
 
 from voussoirkit import operatornotify
+from voussoirkit import httperrors
+httperrors.monkeypatch_requests()
 from voussoirkit import sqlhelpers
 from voussoirkit import vlogging
 
