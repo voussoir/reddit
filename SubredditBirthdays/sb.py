@@ -153,11 +153,12 @@ SUBMISSION_OBJ = praw.objects.Submission
 SUBREDDIT_OBJ = praw.objects.Subreddit
 COMMENT_OBJ = praw.objects.Comment
 
-
-print('Logging in.')
-r = praw.Reddit(USERAGENT)
-bot3.login(r)
-
+r = None
+def login():
+    global r
+    print('Logging in.')
+    r = praw.Reddit(USERAGENT)
+    bot3.login(r)
 
 def base36encode(number, alphabet='0123456789abcdefghijklmnopqrstuvwxyz'):
     '''Converts an integer to a base36 string.'''
@@ -1123,11 +1124,13 @@ NOTIFY_EVERY_LINE = mutables.Boolean(False)
 
 @pipeable.ctrlc_return1
 def modernize_once_argparse(args):
+    login()
     modernize(limit=args.limit)
     return 0
 
 @pipeable.ctrlc_return1
 def modernize_forever_argparse(args):
+    login()
     NOTIFY_EVERY_LINE.set(True)
     modernize_forever()
     return 0
