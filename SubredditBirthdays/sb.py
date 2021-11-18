@@ -41,7 +41,6 @@ GOODCHARS = string.ascii_letters + string.digits + '_'
 
 sql = sqlite3.connect('D:\\git\\reddit\\subredditbirthdays\\sb.db')
 cur = sql.cursor()
-cur2 = sql.cursor()
 cur.execute('''
     CREATE TABLE IF NOT EXISTS subreddits(
     idint INT,
@@ -196,19 +195,20 @@ def chunklist(inputlist, chunksize):
         return outputlist
 
 def completesweep(sleepy=0, orderby='subscribers desc', query=None):
+    cur = sql.cursor()
     if query is None:
         if orderby is None:
-            cur2.execute('SELECT idstr FROM subreddits WHERE created > 0')
+            cur.execute('SELECT idstr FROM subreddits WHERE created > 0')
         else:
-            cur2.execute('SELECT idstr FROM subreddits WHERE created > 0 ORDER BY %s' % orderby)
+            cur.execute('SELECT idstr FROM subreddits WHERE created > 0 ORDER BY %s' % orderby)
     elif query == 'restricted':
-        cur2.execute('SELECT idstr FROM subreddits WHERE created > 0 AND subreddit_type != 0 ORDER BY subscribers DESC')
+        cur.execute('SELECT idstr FROM subreddits WHERE created > 0 AND subreddit_type != 0 ORDER BY subscribers DESC')
     else:
-        cur2.execute(query)
+        cur.execute(query)
 
     try:
         while True:
-            hundred = (cur2.fetchone() for x in range(100))
+            hundred = (cur.fetchone() for x in range(100))
             hundred = (row for row in hundred if row is not None)
             hundred = [idstr for (idstr,) in hundred]
             if len(hundred) == 0:
