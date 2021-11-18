@@ -1110,12 +1110,12 @@ SUB_DOCSTRINGS = dict(
 modernize_forever='''
 modernize_forever:
     Gather new subreddits forever.
-'''.strip(),
+''',
 
 modernize_once='''
 modernize_once:
     Gather new subreddits once.
-'''.strip(),
+''',
 )
 
 DOCSTRING = betterhelp.add_previews(DOCSTRING, SUB_DOCSTRINGS)
@@ -1138,14 +1138,14 @@ def main(argv):
     parser = argparse.ArgumentParser(description=DOCSTRING)
     subparsers = parser.add_subparsers()
 
-    p_modernize_once = subparsers.add_parser('modernize_once')
+    p_modernize_once = subparsers.add_parser('modernize_once', aliases=['modernize-once'])
     p_modernize_once.add_argument('--limit', default=None)
     p_modernize_once.set_defaults(func=modernize_once_argparse)
 
-    p_modernize_forever = subparsers.add_parser('modernize_forever')
+    p_modernize_forever = subparsers.add_parser('modernize_forever', aliases=['modernize-forever'])
     p_modernize_forever.set_defaults(func=modernize_forever_argparse)
 
-    return betterhelp.subparser_main(argv, parser, __doc__, SUB_DOCSTRINGS)
+    return betterhelp.subparser_main(argv, parser, DOCSTRING, SUB_DOCSTRINGS)
 
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
