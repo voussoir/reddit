@@ -39,10 +39,10 @@ RANKS_UP_TO = 20000
 
 GOODCHARS = string.ascii_letters + string.digits + '_'
 
-sql = sqlite3.connect('D:\\git\\reddit\\subredditbirthdays\\sb.db')
-cur = sql.cursor()
-cur.execute('''
-    CREATE TABLE IF NOT EXISTS subreddits(
+DB_INIT = '''
+BEGIN;
+--------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS subreddits(
     idint INT,
     idstr TEXT,
     created INT,
@@ -53,40 +53,43 @@ cur.execute('''
     jumble INT,
     subreddit_type INT,
     submission_type INT,
-    last_scanned INT)
-''')
-# cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_idint ON subreddits(idint)')
-cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_idstr ON subreddits(idstr)')
-cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_name ON subreddits(name)')
-cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_created ON subreddits(created)')
-cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_subscribers ON subreddits(subscribers)')
-# cur.execute('CREATE INDEX IF NOT EXISTS index_subreddits_last_scanned ON subreddits(last_scanned)')
-
-cur.execute('''
-    CREATE TABLE IF NOT EXISTS suspicious(
+    last_scanned INT
+);
+CREATE INDEX IF NOT EXISTS index_subreddits_idstr ON subreddits(idstr);
+CREATE INDEX IF NOT EXISTS index_subreddits_name ON subreddits(name);
+CREATE INDEX IF NOT EXISTS index_subreddits_created ON subreddits(created);
+CREATE INDEX IF NOT EXISTS index_subreddits_subscribers ON subreddits(subscribers);
+--CREATE INDEX IF NOT EXISTS index_subreddits_idint ON subreddits(idint);
+--CREATE INDEX IF NOT EXISTS index_subreddits_last_scanned ON subreddits(last_scanned);
+--------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS suspicious(
     idint INT,
     idstr TEXT,
     name TEXT,
     subscribers INT,
-    noticed INT)
-''')
-
-cur.execute('''
-    CREATE TABLE IF NOT EXISTS popular(
+    noticed INT
+);
+--------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS popular(
     idstr TEXT,
-    last_seen INT)
-''')
-cur.execute('CREATE INDEX IF NOT EXISTS index_popular_idstr on popular(idstr)')
-cur.execute('CREATE INDEX IF NOT EXISTS index_popular_last_seen on popular(last_seen)')
-
-cur.execute('''
-    CREATE TABLE IF NOT EXISTS jumble(
+    last_seen INT
+);
+CREATE INDEX IF NOT EXISTS index_popular_idstr on popular(idstr);
+CREATE INDEX IF NOT EXISTS index_popular_last_seen on popular(last_seen);
+--------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS jumble(
     idstr TEXT,
-    last_seen INT)
-''')
-cur.execute('CREATE INDEX IF NOT EXISTS index_jumble_idstr on jumble(idstr)')
-cur.execute('CREATE INDEX IF NOT EXISTS index_jumble_last_seen on jumble(last_seen)')
-sql.commit()
+    last_seen INT
+);
+CREATE INDEX IF NOT EXISTS index_jumble_idstr on jumble(idstr);
+CREATE INDEX IF NOT EXISTS index_jumble_last_seen on jumble(last_seen);
+--------------------------------------------------------------------------------
+COMMIT;
+'''
+
+sql = sqlite3.connect('D:\\git\\reddit\\subredditbirthdays\\sb.db')
+sqlhelpers.executescript(conn=sql, script=DB_INIT)
+cur = sql.cursor()
 
 # These numbers are used for interpreting the tuples that come from SELECT
 SQL_SUBREDDIT_COLUMNS = [
