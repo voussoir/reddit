@@ -21,11 +21,11 @@ log = vlogging.getLogger(__name__, 'newsletterly')
 ####################################################################################################
 # CONFIGURATION ####################################################################################
 
-# This is not used for login purposes, just message text
-SELF_USERNAME = 'Newsletterly'
 
 # https://www.reddit.com/comments/3cm1p8/how_to_make_your_bot_use_oauth2/
 import newsletterly_credentials
+# Username is not used for login purposes, just message text
+SELF_USERNAME = newsletterly_credentials.USERNAME
 USERAGENT = newsletterly_credentials.USERAGENT
 APP_ID = newsletterly_credentials.APP_ID
 APP_SECRET = newsletterly_credentials.APP_SECRET
@@ -178,7 +178,7 @@ def add_subreddit_to_multireddit(subreddit):
     # Prefer the one with most open spaces.
     my_multireddits = my_multireddits.sort(key=lambda m: len(m.subreddits))
     for multireddit in my_multireddits:
-        multireddit._author = r.user.name
+        multireddit._author = SELF_USERNAME
         if len(multireddit.subreddits) >= 90:
             continue
         try:
@@ -728,7 +728,7 @@ def manage_posts():
         log.info('Checking /m/%s' % multireddit.name)
         # Reddit has introduced a bug which causes incorrect multireddit URLs.
         multireddit._url = 'https://api.reddit.com/me/m/%s/' % multireddit.name
-        multireddit._author = r.user.name
+        multireddit._author = SELF_USERNAME
         total_submissions.extend(multireddit.get_new(limit=100))
     total_submissions.sort(key=lambda x: x.created_utc, reverse=True)
 
