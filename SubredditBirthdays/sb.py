@@ -1101,28 +1101,6 @@ def _idle():
 
 # Command line #####################################################################################
 
-DOCSTRING = '''
-Subreddit Birthdays
-===================
-
-{modernize_forever}
-
-{modernize_once}
-'''
-
-SUB_DOCSTRINGS = dict(
-modernize_forever='''
-modernize_forever:
-    Gather new subreddits forever.
-''',
-
-modernize_once='''
-modernize_once:
-    Gather new subreddits once.
-''',
-)
-
-DOCSTRING = betterhelp.add_previews(DOCSTRING, SUB_DOCSTRINGS)
 NOTIFY_EVERY_LINE = mutables.Boolean(False)
 
 @pipeable.ctrlc_return1
@@ -1141,17 +1119,37 @@ def modernize_forever_argparse(args):
 @operatornotify.main_decorator(subject='sb', notify_every_line=NOTIFY_EVERY_LINE)
 @vlogging.main_decorator
 def main(argv):
-    parser = argparse.ArgumentParser(description=DOCSTRING)
+    parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
 
-    p_modernize_once = subparsers.add_parser('modernize_once', aliases=['modernize-once'])
-    p_modernize_once.add_argument('--limit', default=None)
+    ################################################################################################
+
+    p_modernize_once = subparsers.add_parser(
+        'modernize_once',
+        aliases=['modernize-once'],
+        description='''
+        Gather new subreddits forever.
+        ''',
+    )
+    p_modernize_once.add_argument(
+        '--limit',
+        type=int,
+        default=None,
+    )
     p_modernize_once.set_defaults(func=modernize_once_argparse)
 
-    p_modernize_forever = subparsers.add_parser('modernize_forever', aliases=['modernize-forever'])
+    ################################################################################################
+
+    p_modernize_forever = subparsers.add_parser(
+        'modernize_forever',
+        aliases=['modernize-forever'],
+        description='''
+        Gather new subreddits once.
+        ''',
+    )
     p_modernize_forever.set_defaults(func=modernize_forever_argparse)
 
-    return betterhelp.subparser_main(argv, parser, DOCSTRING, SUB_DOCSTRINGS)
+    return betterhelp.go(parser, argv)
 
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
