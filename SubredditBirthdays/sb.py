@@ -15,6 +15,7 @@ import types
 from voussoirkit import betterhelp
 from voussoirkit import mutables
 from voussoirkit import operatornotify
+from voussoirkit import pathclass
 from voussoirkit import pipeable
 from voussoirkit import sqlhelpers
 from voussoirkit import vlogging
@@ -87,9 +88,23 @@ CREATE INDEX IF NOT EXISTS index_jumble_last_seen on jumble(last_seen);
 COMMIT;
 '''
 
-sql = sqlite3.connect('D:\\git\\reddit\\subredditbirthdays\\sb.db')
-sqlhelpers.executescript(conn=sql, script=DB_INIT)
-cur = sql.cursor()
+def init_db():
+    log.debug('Initializing database.')
+    db_path = pathclass.Path(__file__).parent.with_child('sb.db')
+    if db_path.is_link and not db_path.is_file:
+        raise RuntimeError(f'{db_path.absolute_path} is a broken link.')
+
+    db_exists = db_path.is_file
+    sql = sqlite3.connect(db_path.absolute_path)
+    cur = sql.cursor()
+
+    if not db_exists:
+        log.debug('Running first-time database setup.')
+        sqlhelpers.executescript(conn=sql, script=DB_INIT)
+
+    return (sql, cur)
+
+(sql, cur) = init_db()
 
 # These numbers are used for interpreting the tuples that come from SELECT
 SQL_SUBREDDIT_COLUMNS = [
@@ -159,7 +174,7 @@ COMMENT_OBJ = praw.objects.Comment
 r = None
 def login():
     global r
-    print('Logging in.')
+    log.info('Logging in.')
     r = praw.Reddit(USERAGENT)
     bot3.login(r)
 
@@ -266,13 +281,13 @@ def humanize(timestamp):
 def modernize(limit=None):
     cur.execute('SELECT * FROM subreddits ORDER BY created DESC LIMIT 1')
     finalitem = cur.fetchone()
-    print('Current final item:')
+    print('Newest stored item:')
     print(finalitem[SQL_SUBREDDIT['idstr']], finalitem[SQL_SUBREDDIT['human']], finalitem[SQL_SUBREDDIT['name']])
     finalid = finalitem[SQL_SUBREDDIT['idint']]
 
-    print('Newest item:')
+    log.info('Newest live item:')
     newestid = get_newest_sub()
-    print(newestid)
+    log.info(newestid)
     newestid = b36(newestid)
     if limit is not None:
         newestid = min(newestid, finalid+limit-1)
@@ -1128,7 +1143,7 @@ def main(argv):
         'modernize_once',
         aliases=['modernize-once'],
         description='''
-        Gather new subreddits forever.
+        Gather new subreddits once.
         ''',
     )
     p_modernize_once.add_argument(
@@ -1144,7 +1159,7 @@ def main(argv):
         'modernize_forever',
         aliases=['modernize-forever'],
         description='''
-        Gather new subreddits once.
+        Gather new subreddits forever.
         ''',
     )
     p_modernize_forever.set_defaults(func=modernize_forever_argparse)
