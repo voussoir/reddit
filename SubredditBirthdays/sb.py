@@ -389,8 +389,8 @@ def process(
                 'last_scanned': now,
             }
 
-            (qmarks, bindings) = sqlhelpers.insert_filler(SQL_SUBREDDIT_COLUMNS, data)
-            query = 'INSERT INTO subreddits VALUES(%s)' % qmarks
+            (qmarks, bindings) = sqlhelpers.insert_filler(data)
+            query = f'INSERT INTO subreddits {qmarks}'
             cur.execute(query, bindings)
         else:
             old_subscribers = f[SQL_SUBREDDIT['subscribers']]
@@ -405,8 +405,8 @@ def process(
                     'subscribers': old_subscribers,
                     'noticed': int(get_now()),
                 }
-                (qmarks, bindings) = sqlhelpers.insert_filler(SQL_SUSPICIOUS_COLUMNS, data)
-                query = 'INSERT INTO suspicious VALUES(%s)' % qmarks
+                (qmarks, bindings) = sqlhelpers.insert_filler(data)
+                query = f'INSERT INTO suspicious {qmarks}'
                 cur.execute(query, bindings)
 
             message = FORMAT_MESSAGE_UPDATE.format(
