@@ -167,10 +167,6 @@ SUBMISSION_TYPE = {
 SUBREDDIT_TYPE_REVERSE = {v: k for (k, v) in SUBREDDIT_TYPE.items()}
 SUBMISSION_TYPE_REVERSE = {v: k for (k, v) in SUBMISSION_TYPE.items()}
 
-SUBMISSION_OBJ = praw.objects.Submission
-SUBREDDIT_OBJ = praw.objects.Subreddit
-COMMENT_OBJ = praw.objects.Comment
-
 r = None
 def login():
     global r
@@ -213,6 +209,13 @@ def chunklist(inputlist, chunksize):
             inputlist = inputlist[chunksize:]
         return outputlist
 
+def commit(message=None):
+    if message is None:
+        log.info('Comitting.')
+    else:
+        log.info('Committing - %s', message)
+    sql.commit()
+
 def completesweep(sleepy=0, orderby='subscribers desc', query=None):
     cur = sql.cursor()
     if query is None:
@@ -243,7 +246,7 @@ def completesweep(sleepy=0, orderby='subscribers desc', query=None):
         pass
     except Exception:
         traceback.print_exc()
-    sql.commit()
+    commit()
 
 def fetchgenerator(cur):
     while True:
@@ -289,13 +292,16 @@ def modernize(limit=None):
     newestid = get_newest_sub()
     log.info(newestid)
     newestid = b36(newestid)
+
+    if finalid == newestid:
+        return
+
     if limit is not None:
         newestid = min(newestid, finalid+limit-1)
 
     modernlist = [b36(x) for x in range(finalid, newestid+1)]
-    if len(modernlist) > 0:
-        processmega(modernlist, commit=False)
-        sql.commit()
+    processmega(modernlist, commit=False)
+    commit()
 
 def modernize_forever(limit=10000):
     while True:
@@ -319,13 +325,13 @@ def normalize_subreddit_object(thing):
     Given a string, Subreddit, Submission, or Comment object, return
     a Subreddit object.
     '''
-    if isinstance(thing, SUBREDDIT_OBJ):
+    if isinstance(thing, praw.objects.Subreddit):
         return thing
 
     if isinstance(thing, str):
         return r.get_subreddit(thing)
 
-    if isinstance(thing, (SUBMISSION_OBJ, COMMENT_OBJ)):
+    if isinstance(thing, (praw.objects.Submission, praw.objects.Comment)):
         return thing.subreddit
 
     raise ValueError('Dont know how to normalize', type(thing))
@@ -426,8 +432,8 @@ def process(
                 'submission_type': submission_type,
                 'last_scanned': now,
             }
-            (query, bindings) = sqlhelpers.update_filler(data, where_key='idstr')
-            query = 'UPDATE subreddits %s' % query
+            (qmarks, bindings) = sqlhelpers.update_filler(data, where_key='idstr')
+            query = 'UPDATE subreddits %s' % qmarks
             cur.execute(query, bindings)
             #cur.execute('''
             #    UPDATE subreddits SET
@@ -440,7 +446,7 @@ def process(
         processed_subreddits.append(subreddit)
 
     if commit:
-        sql.commit()
+        commit()
     return processed_subreddits
 
 def process_input():
@@ -489,7 +495,7 @@ def processmega(srinput, isrealname=False, chunksize=100, docrash=False, commit=
             subreddits = r.get_info(thing_id=subset)
             try:
                 for sub in subreddits:
-                    processed_subreddits.extend(process(sub, commit=commit))
+                    processed_subreddits.extend(process(sub, commit=False))
             except TypeError:
                 traceback.print_exc()
                 noinfolist = subset[:]
@@ -959,7 +965,7 @@ def processjumble(count, nsfw=False):
                 'UPDATE jumble SET last_seen = ? WHERE idstr == ?',
                 [sub.id, last_seen]
             )
-    sql.commit()
+    commit()
 
 def processpopular(count, sort='hot'):
     subreddit = r.get_subreddit('popular')
@@ -983,7 +989,7 @@ def processpopular(count, sort='hot'):
                 'UPDATE popular SET last_seen = ? WHERE idstr == ?',
                 [last_seen, subreddit.id]
             )
-    sql.commit()
+    commit()
 
 def jumble(count=20, nsfw=False):
     subreddits = get_jumble_subreddits()
